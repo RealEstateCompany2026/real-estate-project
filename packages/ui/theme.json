@@ -1,0 +1,142 @@
+{
+  "colors": {
+    "Couleurs de typographies/Anthracite . Textes": "#474747",
+    "Couleurs d'icones/Grey Bold . Icons": "#858585",
+    "Couleurs d'icones/Grey . Icons": "#b6b6b6",
+    "Couleurs/White . Couleur primaire": "#ffffff",
+    "Couleurs/Grey Ultra . Couleur primaire": "#fcfbfc",
+    "Couleurs/Grey light . Couleur primaire": "#e5e5e5",
+    "Couleurs/Green . Couleur fonctionnelle": "#7cd064",
+    "Couleurs/Yellow . Couleur fonctionnelle": "#f8d862",
+    "Couleurs/Red . Couleur fonctionnelle": "#e95d66",
+    "Couleurs/Blue . Couleur fonctionnelle": "#33a0fa",
+    "Couleurs de Layout/White . Background": "#ffffff",
+    "Couleurs de Layout/Grey Ultra . Background": "#fcfbfc",
+    "Couleurs de Layout/Grey light . Background": "#e5e5e5",
+    "Couleurs de Layout/Grey . background": "#b6b6b6",
+    "Couleurs de Layout/Soft Red . Background": "#ffe9e9",
+    "Couleurs de Layout/Soft Blue . Background": "#e9f7ff",
+    "Couleurs de Layout/Soft Yellow . Background": "#fffbdb",
+    "Couleurs/Indigo . Couleur fonctionnelle": "#7b72f9",
+    "Couleurs de contours/Grey Ultra . Contour": "#fcfbfc",
+    "Couleurs de contours/Grey . Contour": "#b6b6b6",
+    "Couleurs de Layout/Grey bold . Background": "#6d6d6d",
+    "Couleurs de Layout/Anthracite . 474747": "#474747",
+    "Couleurs de typographies/Grey bold . Textes": "#6d6d6d",
+    "Couleurs de typographies/Grey . Textes": "#b6b6b6",
+    "Couleurs de typographies/Grey light . Textes": "#e5e5e5",
+    "Couleurs de typographies/White . Textes . Tons foncés": "#ffffff",
+    "Couleurs d'icones/Anthracite . Icons": "#4b4b4b",
+    "Couleurs d'icones/Grey light . Icons": "#e5e5e5",
+    "Couleurs d'icones/White . Icons": "#ffffff",
+    "Couleurs d'icones/Green . Icons": "#7cd064",
+    "Couleurs d'icones/Red . Icons": "#e95d66",
+    "Couleurs d'icones/Yellow . Icons": "#f8d862",
+    "Couleurs de Layout/Black transparency 50% . background": "#000000"
+  },
+  "typography": {
+    "Body/Body. 16px. light": {
+      "fontFamily": "Roboto",
+      "fontWeight": 300,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Body/Body . 16px . regular": {
+      "fontFamily": "Roboto",
+      "fontWeight": 400,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Body/Body . 16px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Small print/Small print . 14px . regular": {
+      "fontFamily": "Roboto",
+      "fontWeight": 400,
+      "fontSize": "14px",
+      "lineHeightPx": "16px"
+    },
+    "Tagline, Tri, Filtres/Tagline . 14px . bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "14px",
+      "lineHeightPx": "16px"
+    },
+    "Form label/Form label . 16px . light": {
+      "fontFamily": "Roboto",
+      "fontWeight": 300,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Form label/Form label . 16px . regular": {
+      "fontFamily": "Roboto",
+      "fontWeight": 400,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Form label/Form label . 16px . bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Description/Description . 16px . regular": {
+      "fontFamily": "Roboto",
+      "fontWeight": 400,
+      "fontSize": "16px",
+      "lineHeightPx": "22px"
+    },
+    "Big Content/Big Content . 40px . regular": {
+      "fontFamily": "Roboto",
+      "fontWeight": 400,
+      "fontSize": "40px",
+      "lineHeightPx": "40px"
+    },
+    "Big Content/Big Content . 40px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "40px",
+      "lineHeightPx": "40px"
+    },
+    "Title/Title . H0 . 40px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "40px",
+      "lineHeightPx": "40px"
+    },
+    "Title/Title . H1 . 28px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "28px",
+      "lineHeightPx": "34px"
+    },
+    "Title/Title . H2 . 24px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "24px",
+      "lineHeightPx": "32px"
+    },
+    "Title/Title . H3 . 20px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "20px",
+      "lineHeightPx": "26px"
+    },
+    "Title/Title . H4-H5 . 16px . Bold": {
+      "fontFamily": "Roboto",
+      "fontWeight": 700,
+      "fontSize": "16px",
+      "lineHeightPx": "24px"
+    },
+    "Title/Title . H4-H5 . 16px . Regular": {
+      "fontFamily": "Roboto",
+      "fontWeight": 400,
+      "fontSize": "16px",
+      "lineHeightPx": "24px"
+    }
+  },
+  "radius": {}
+}

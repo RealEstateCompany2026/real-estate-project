@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  email            String          @unique
+  name             String?
+  role             String          @default("OWNER") // "OWNER" or "AGENT"
+  
+  // Relations
+  properties       Property[]      @relation("OwnerProperties")
+  assignedProperties PropertyAgent[]
+}
+
+model Property {
+  id             String               @id @default(cuid())
+  address        String
+  // ... other fields ...
+  
+  ownerId        String
+  owner          User                 @relation("OwnerProperties", fields: [ownerId], references: [id])
+  
+  // Several-to-several relation for the multi-agent
+  assignedAgents PropertyAgent[] 
+
+  maintenanceLogs MaintenanceLog[]
+  documents       Document[]
+  triggers        OpportunityTrigger[]
+}
+
+// Map table to handle independence and multi-agent
+model PropertyAgent {
+  id              String   @id @default(cuid())
+  propertyId      String
+  agentId         String
+  property        Property @relation(fields: [propertyId], references: [id])
+  agent           User     @relation(fields: [agentId], references: [id])
+  
+  // Permissions: what can the agent see?
+  canSeeEstimations Boolean @default(true)
+  canSeeTriggers    Boolean @default(true)
+  
+  createdAt       DateTime @default(now())
+  @@unique([propertyId, agentId])
+}
+
+model MaintenanceLog {
+  id            String   @id @default(cuid())
+  category      String   
+  description   String
+  amount        Float?
+  isPrivate     Boolean  @default(true) // If TRUE, the agent only sees the type of action
+  
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id])
+}
+
+model OpportunityTrigger {
+  id            String   @id @default(cuid())
+  type          String   // "RENO_DETECTED", "DPE_ALERT"
+  description   String   // Anonymized text for the agent (e.g., "Travaux de valorisation détectés")
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id])
+  // We do not link the trigger to a specific agent here, but to the property
+}
+
+// Basic Document model to ensure schema validity
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+}
