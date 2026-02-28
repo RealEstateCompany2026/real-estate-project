@@ -1,18 +1,19 @@
 import type { Config } from "tailwindcss";
 
-const sharedConfig: Omit<Config, "content"> = {
+const sharedConfig: Config = {
+    content: ["./src/**/*.tsx"],
     theme: {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: "#7b72f9", // Indigo - likely the main brand color
+                    DEFAULT: "#7b72f9",
                     foreground: "#ffffff",
                 },
                 semantic: {
-                    success: "#7cd064", // Green - Fonctionnelle
-                    warning: "#f8d862", // Yellow - Fonctionnelle
-                    danger: "#e95d66",  // Red - Fonctionnelle
-                    info: "#33a0fa",    // Blue - Fonctionnelle
+                    success: "#7cd064",
+                    warning: "#f8d862",
+                    danger: "#e95d66",
+                    info: "#33a0fa",
                 },
                 neutral: {
                     anthracite: "#474747",
@@ -27,7 +28,7 @@ const sharedConfig: Omit<Config, "content"> = {
                     softRed: "#ffe9e9",
                     softBlue: "#e9f7ff",
                     softYellow: "#fffbdb",
-                    overlay: "rgba(0, 0, 0, 0.5)", // Black transparency 50%
+                    overlay: "rgba(0, 0, 0, 0.5)",
                 },
                 text: {
                     DEFAULT: "#474747",
@@ -39,20 +40,20 @@ const sharedConfig: Omit<Config, "content"> = {
                 sans: ["var(--font-roboto)", "Roboto", "sans-serif"],
             },
             fontSize: {
-                sm: ["0.875rem", { lineHeight: "1rem" }], // 14px, 16px LH
-                base: ["1rem", { lineHeight: "1.375rem" }], // 16px, 22px LH
-                lg: ["1.125rem", { lineHeight: "1.5rem" }], // 18px (intermediate)
-                xl: ["1.25rem", { lineHeight: "1.625rem" }], // 20px, 26px LH (H3)
-                "2xl": ["1.5rem", { lineHeight: "2rem" }], // 24px, 32px LH (H2)
-                "3xl": ["1.75rem", { lineHeight: "2.125rem" }], // 28px, 34px LH (H1)
-                "4xl": ["2.25rem", { lineHeight: "2.5rem" }], // 36px (intermediate)
-                "5xl": ["2.5rem", { lineHeight: "2.5rem" }], // 40px, 40px LH (H0)
+                sm: ["0.875rem", { lineHeight: "1rem" }],
+                base: ["1rem", { lineHeight: "1.375rem" }],
+                lg: ["1.125rem", { lineHeight: "1.5rem" }],
+                xl: ["1.25rem", { lineHeight: "1.625rem" }],
+                "2xl": ["1.5rem", { lineHeight: "2rem" }],
+                "3xl": ["1.75rem", { lineHeight: "2.125rem" }],
+                "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
+                "5xl": ["2.5rem", { lineHeight: "2.5rem" }],
             },
             borderRadius: {
-                sm: "0.25rem", // 4px
-                md: "0.5rem",  // 8px
-                lg: "0.75rem", // 12px
-                xl: "1rem",    // 16px
+                sm: "0.25rem",
+                md: "0.5rem",
+                lg: "0.75rem",
+                xl: "1rem",
             },
             boxShadow: {
                 card: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
