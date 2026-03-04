@@ -45,6 +45,8 @@ model Client {
   id                   String          @id @default(cuid())
   userId               String?         @unique
   user                 User?           @relation(fields: [userId], references: [id])
+  
+  isActive             Boolean         @default(true)
 
   status               ClientStatus[]
   gender               ClientGender?
@@ -81,28 +83,75 @@ model Client {
   // Relations
   properties           Property[]      @relation("ClientProperties")
   deals                Deal[]
+  loanAnalyses         LoanAnalysis[]
   
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
 }
 
+enum DealType {
+  VENTE
+  BAIL
+  ACQUISITION
+  LOCATION
+}
+
+enum DealStatus {
+  VENTE_ATTENTE_MANDAT
+  VENTE_MANDAT_EDITE
+  VENTE_MANDAT_SIGNE_ANNONCE_EDITEE
+  VENTE_MANDAT_SIGNE_ANNONCE_PUBLIEE_VISITES_PROGRAMMEES
+  VENTE_MANDAT_SIGNE_ANNONCE_PUBLIEE_VISITES_EFFECTUEES_PROMESSE
+  VENTE_MANDAT_SIGNE_ANNONCE_PUBLIEE_VISITES_EFFECTUEES_NOTAIRE
+  BAIL_ATTENTE_MANDAT
+  BAIL_MANDAT_SIGNE
+  ACQUISITION_RECHERCHE
+  LOCATION_RECHERCHE
+  OTHER
+}
+
 model Deal {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   clientId    String
-  propertyId  String
-  type        String   @default("SALE") 
-  status      String   @default("OPEN") 
+  propertyId  String?
+  type        DealType   @default(VENTE) 
+  status      DealStatus @default(VENTE_ATTENTE_MANDAT) 
   
-  client      Client   @relation(fields: [clientId], references: [id])
-  property    Property @relation(fields: [propertyId], references: [id])
+  client      Client     @relation(fields: [clientId], references: [id])
+  property    Property?  @relation(fields: [propertyId], references: [id])
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  saleAnalyses SaleAnalysis[]
+  loanAnalyses LoanAnalysis[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+enum PropertyType {
+  STUDIO
+  T1
+  T2
+  T3
+  T4
+  MAISON_DE_VILLE
+  OTHER
+}
+
+enum PropertyStatus {
+  OFF_MARKET
+  A_VENDRE
+  A_LOUER
+  LOUER
+  VENDU
+  OTHER
 }
 
 model Property {
   id             String               @id @default(cuid())
   address        String
+  
+  type           PropertyType         @default(OTHER)
+  status         PropertyStatus       @default(OFF_MARKET)
   
   ownerId        String?
   owner          User?                 @relation("OwnerProperties", fields: [ownerId], references: [id])
@@ -115,6 +164,7 @@ model Property {
   documents       Document[]
   triggers        OpportunityTrigger[]
   deals           Deal[]
+  saleAnalyses    SaleAnalysis[]
 }
 
 // Map table to handle independence and multi-agent
@@ -160,4 +210,42 @@ model Document {
   url         String
   propertyId  String
   property    Property @relation(fields: [propertyId], references: [id])
+}
+
+model SaleAnalysis {
+  id             String    @id @default(cuid())
+  propertyId     String
+  dealId         String?
+  
+  estimatedValue Float?
+  targetPrice    Float?
+  finalPrice     Float?
+  
+  notes          String    @default("")
+  
+  property       Property  @relation(fields: [propertyId], references: [id])
+  deal           Deal?     @relation(fields: [dealId], references: [id])
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model LoanAnalysis {
+  id             String    @id @default(cuid())
+  clientId       String
+  dealId         String?
+  
+  maxLoanAmount  Float?
+  interestRate   Float?
+  durationMonths Int?
+  monthlyPayment Float?
+  
+  bankName       String?
+  status         String    @default("PENDING") // e.g., PENDING, APPROVED, REJECTED
+  
+  client         Client    @relation(fields: [clientId], references: [id])
+  deal           Deal?     @relation(fields: [dealId], references: [id])
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
