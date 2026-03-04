@@ -1,5 +1,7 @@
 import { db } from "@real-estate/database";
 import { PropertyCard } from "@real-estate/ui/property-card";
+import { Button } from "@real-estate/ui/button";
+import { Plus } from "lucide-react";
 
 export default async function AgentDashboard() {
   // Query to find the Agent User and all available properties
@@ -26,10 +28,19 @@ export default async function AgentDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-neutral-anthracite p-8">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold font-sans">Bonjour, {agentUser.name}</h1>
-        <p className="text-neutral-grey-bold mt-2">Bienvenue sur votre espace Agent Immobilier.</p>
+    <div className="w-full text-neutral-anthracite p-10 max-w-[1600px] mx-auto">
+      <header className="mb-10 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold font-sans">Bonjour, {agentUser.name}</h1>
+          <p className="text-neutral-grey-bold mt-2">Bienvenue sur votre espace Agent Immobilier.</p>
+        </div>
+        <div className="flex gap-4">
+          <Button variant="outline">Générer Rapport</Button>
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Nouveau Dossier
+          </Button>
+        </div>
       </header>
 
       <section>
