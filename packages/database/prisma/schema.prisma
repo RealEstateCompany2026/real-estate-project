@@ -8,30 +8,113 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  email            String          @unique
-  name             String?
-  role             String          @default("OWNER") // "OWNER" or "AGENT"
+  id                 String          @id @default(cuid())
+  email              String          @unique
+  name               String?
+  role               String          @default("OWNER") // "OWNER" or "AGENT"
+  
+  clientProfile      Client?
   
   // Relations
-  properties       Property[]      @relation("OwnerProperties")
+  properties         Property[]      @relation("OwnerProperties")
   assignedProperties PropertyAgent[]
+}
+
+enum ClientStatus {
+  PROPRIETAIRE
+  ACQUEREUR
+  BAILLEUR
+  LOCATAIRE
+}
+
+enum ClientGender {
+  HOMME
+  FEMME
+  AUTRE
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  OTHER
+}
+
+model Client {
+  id                   String          @id @default(cuid())
+  userId               String?         @unique
+  user                 User?           @relation(fields: [userId], references: [id])
+
+  status               ClientStatus[]
+  gender               ClientGender?
+  firstName            String
+  lastName             String
+  dateOfBirth          DateTime?
+  placeOfBirth         String?
+  maritalStatus        MaritalStatus?
+  
+  addressId            Int?
+  address              String?
+  mobilePhone          String?
+  primaryEmail         String          
+  secondaryEmail       String?
+  
+  jobTitle             String?
+  incomeBracket        String? // (e.g., "80 000 à 120 000 euros Brut / an")
+  
+  kbisUrl              String?
+  cniUrl               String?
+  passportUrl          String?
+  
+  // Specific - Owner / Bailleur
+  totalOwnedProperties     String? 
+  propertiesForSaleCount   String?
+  titleDeedUrl             String?
+  propertiesUnderMgmtCount String?
+  
+  // Specific - Acquéreur / Locataire
+  paySlipUrl               String?
+  taxStatementUrl          String?
+  loanOfferUrl             String?
+  
+  // Relations
+  properties           Property[]      @relation("ClientProperties")
+  deals                Deal[]
+  
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+}
+
+model Deal {
+  id          String   @id @default(cuid())
+  clientId    String
+  propertyId  String
+  type        String   @default("SALE") 
+  status      String   @default("OPEN") 
+  
+  client      Client   @relation(fields: [clientId], references: [id])
+  property    Property @relation(fields: [propertyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Property {
   id             String               @id @default(cuid())
   address        String
-  // ... other fields ...
   
-  ownerId        String
-  owner          User                 @relation("OwnerProperties", fields: [ownerId], references: [id])
+  ownerId        String?
+  owner          User?                 @relation("OwnerProperties", fields: [ownerId], references: [id])
   
-  // Several-to-several relation for the multi-agent
+  clientId       String?
+  client         Client?               @relation("ClientProperties", fields: [clientId], references: [id])
+  
   assignedAgents PropertyAgent[] 
-
   maintenanceLogs MaintenanceLog[]
   documents       Document[]
   triggers        OpportunityTrigger[]
+  deals           Deal[]
 }
 
 // Map table to handle independence and multi-agent
