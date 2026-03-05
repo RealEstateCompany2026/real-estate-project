@@ -1,66 +1,103 @@
 import type { Config } from "tailwindcss";
+import tokens from "./src/tokens.json";
 
-const sharedConfig: Config = {
-    content: ["./src/**/*.tsx"],
+// Mappers for Atomic Design Variables
+const colors = Object.fromEntries(
+    Object.keys(tokens.colors).map((key) => [key, `var(--color-${key})`])
+);
+
+const fontSize = Object.fromEntries(
+    Object.entries(tokens.typography).map(([key, val]) => {
+        const value: [string, { lineHeight: string; fontWeight: string }] = [
+            `var(--font-size-${key})`,
+            { lineHeight: `var(--line-height-${key})`, fontWeight: `var(--font-weight-${key})` }
+        ];
+        return [key, value];
+    })
+);
+
+const spacing = Object.fromEntries(
+    Object.keys(tokens.spacing).map((key) => [key, `var(--spacing-${key})`])
+);
+
+const borderRadius = Object.fromEntries(
+    Object.keys(tokens.radius).map((key) => [key, `var(--radius-${key})`])
+);
+
+const boxShadow = Object.fromEntries(
+    Object.keys(tokens.shadows).map((key) => [key, `var(--shadow-${key})`])
+);
+
+const config: Config = {
+    content: [
+        "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
     theme: {
+        // Override Tailwind's default palette to STRICTLY use Figma tokens
+        colors: {
+            transparent: 'transparent',
+            current: 'currentColor',
+            ...colors,
+            // Create semantic aliases based on extracted naming convention if needed
+            primary: `var(--color-white-couleur-primaire)`,
+            background: `var(--color-grey-ultra-background)`,
+            'background-subtle': `var(--color-grey-light-background)`,
+            'background-softBlue': `var(--color-soft-blue-background)`,
+            'neutral-grey-light': `var(--color-grey-light-textes)`,
+            'neutral-grey-bold': `var(--color-grey-bold-textes)`,
+            'neutral-anthracite': `var(--color-anthracite-textes)`,
+            'semantic-info': `var(--color-blue-couleur-fonctionnelle)`,
+            'semantic-success': `var(--color-green-couleur-fonctionnelle)`,
+            'semantic-warning': `var(--color-yellow-couleur-fonctionnelle)`,
+            'semantic-destructive': `var(--color-red-couleur-fonctionnelle)`,
+        },
+        spacing: {
+            ...spacing,
+            '0': '0px',
+            px: '1px',
+            '0.5': '0.125rem',
+            '1': '0.25rem',
+            '1.5': '0.375rem',
+            '2': '0.5rem',
+            '3': '0.75rem',
+            '4': '1rem',
+            '5': '1.25rem',
+            '6': '1.5rem',
+            '8': '2rem',
+            '10': '2.5rem',
+            '12': '3rem',
+            '64': '16rem',
+        },
+        borderRadius: {
+            ...borderRadius,
+            none: '0px',
+            sm: '0.125rem',
+            DEFAULT: '0.25rem',
+            md: '0.375rem',
+            lg: '0.5rem',
+            xl: '0.75rem',
+            '2xl': '1rem',
+            '3xl': '1.5rem',
+            full: '9999px',
+        },
+        boxShadow: {
+            ...boxShadow,
+            DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+            sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+            md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+            lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+            card: '0px 4px 12px rgba(0, 0, 0, 0.05)',
+        },
         extend: {
-            colors: {
-                primary: {
-                    DEFAULT: "#7b72f9",
-                    foreground: "#ffffff",
-                },
-                semantic: {
-                    success: "#7cd064",
-                    warning: "#f8d862",
-                    danger: "#e95d66",
-                    info: "#33a0fa",
-                },
-                neutral: {
-                    anthracite: "#474747",
-                    "grey-bold": "#6d6d6d",
-                    grey: "#b6b6b6",
-                    "grey-light": "#e5e5e5",
-                    "grey-ultra": "#fcfbfc",
-                },
-                background: {
-                    DEFAULT: "#ffffff",
-                    subtle: "#fcfbfc",
-                    softRed: "#ffe9e9",
-                    softBlue: "#e9f7ff",
-                    softYellow: "#fffbdb",
-                    overlay: "rgba(0, 0, 0, 0.5)",
-                },
-                text: {
-                    DEFAULT: "#474747",
-                    muted: "#6d6d6d",
-                    light: "#b6b6b6",
-                }
-            },
             fontFamily: {
-                sans: ["var(--font-roboto)", "Roboto", "sans-serif"],
+                sans: ['var(--font-roboto)', 'sans-serif'],
             },
             fontSize: {
-                sm: ["0.875rem", { lineHeight: "1rem" }],
-                base: ["1rem", { lineHeight: "1.375rem" }],
-                lg: ["1.125rem", { lineHeight: "1.5rem" }],
-                xl: ["1.25rem", { lineHeight: "1.625rem" }],
-                "2xl": ["1.5rem", { lineHeight: "2rem" }],
-                "3xl": ["1.75rem", { lineHeight: "2.125rem" }],
-                "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
-                "5xl": ["2.5rem", { lineHeight: "2.5rem" }],
-            },
-            borderRadius: {
-                sm: "0.25rem",
-                md: "0.5rem",
-                lg: "0.75rem",
-                xl: "1rem",
-            },
-            boxShadow: {
-                card: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+                ...fontSize
             }
         },
     },
     plugins: [],
 };
 
-export default sharedConfig;
+export default config;

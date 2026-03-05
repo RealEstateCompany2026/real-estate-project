@@ -1,21 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "../../../../packages/ui/src/tokens.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-:root {
-  --background: #ffffff;
-  --foreground: #474747;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #1a1a1a;
-    --foreground: #ededed;
+    --font-roboto: 'Roboto', sans-serif;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
+  font-family: var(--font-roboto);
+  color: var(--color-anthracite-textes);
+  background: var(--color-white-background);
 }
