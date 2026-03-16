@@ -26,10 +26,7 @@ export async function middleware(request: NextRequest) {
   )
 
   // IMPORTANT: Never add code between createServerClient and getUser().
-  // This ensures the session token is always refreshed correctly.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
 
@@ -39,7 +36,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthRoute && request.nextUrl.pathname === '/auth/login') {
+  if (user && request.nextUrl.pathname === '/auth/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
