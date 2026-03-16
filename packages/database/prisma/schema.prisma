@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id                 String          @id @default(cuid())
-  email              String          @unique
-  name               String?
-  role               String          @default("OWNER") // "OWNER" or "AGENT"
-  
+  id          String  @id @default(cuid())
+  supabase_id String? @unique @db.Uuid  // Links to auth.users.id in Supabase
+  email       String  @unique
+  name        String?
+  role        String  @default("AGENT") // "AGENT" | "MANAGER" | "ADMIN"
+
   clientProfile      Client?
-  
-  // Relations
   properties         Property[]      @relation("OwnerProperties")
   assignedProperties PropertyAgent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum ClientStatus {
@@ -42,51 +44,50 @@ enum MaritalStatus {
 }
 
 model Client {
-  id                   String          @id @default(cuid())
-  userId               String?         @unique
-  user                 User?           @relation(fields: [userId], references: [id])
-  
-  isActive             Boolean         @default(true)
+  id     String  @id @default(cuid())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
 
-  status               ClientStatus[]
-  gender               ClientGender?
-  firstName            String
-  lastName             String
-  dateOfBirth          DateTime?
-  placeOfBirth         String?
-  maritalStatus        MaritalStatus?
-  
-  addressId            Int?
-  address              String?
-  mobilePhone          String?
-  primaryEmail         String          
-  secondaryEmail       String?
-  
-  jobTitle             String?
-  incomeBracket        String? // (e.g., "80 000 à 120 000 euros Brut / an")
-  
-  kbisUrl              String?
-  cniUrl               String?
-  passportUrl          String?
-  
-  // Specific - Owner / Bailleur
-  totalOwnedProperties     String? 
+  isActive Boolean @default(true)
+
+  status        ClientStatus[]
+  gender        ClientGender?
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime?
+  placeOfBirth  String?
+  maritalStatus MaritalStatus?
+
+  addressId      Int?
+  address        String?
+  mobilePhone    String?
+  primaryEmail   String
+  secondaryEmail String?
+
+  jobTitle      String?
+  incomeBracket String?
+
+  kbisUrl     String?
+  cniUrl      String?
+  passportUrl String?
+
+  // Specific — Owner / Bailleur
+  totalOwnedProperties     String?
   propertiesForSaleCount   String?
   titleDeedUrl             String?
   propertiesUnderMgmtCount String?
-  
-  // Specific - Acquéreur / Locataire
-  paySlipUrl               String?
-  taxStatementUrl          String?
-  loanOfferUrl             String?
-  
-  // Relations
-  properties           Property[]      @relation("ClientProperties")
-  deals                Deal[]
-  loanAnalyses         LoanAnalysis[]
-  
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+
+  // Specific — Acquéreur / Locataire
+  paySlipUrl      String?
+  taxStatementUrl String?
+  loanOfferUrl    String?
+
+  properties   Property[]     @relation("ClientProperties")
+  deals        Deal[]
+  loanAnalyses LoanAnalysis[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum DealType {
@@ -111,20 +112,20 @@ enum DealStatus {
 }
 
 model Deal {
-  id          String     @id @default(cuid())
-  clientId    String
-  propertyId  String?
-  type        DealType   @default(VENTE) 
-  status      DealStatus @default(VENTE_ATTENTE_MANDAT) 
-  
-  client      Client     @relation(fields: [clientId], references: [id])
-  property    Property?  @relation(fields: [propertyId], references: [id])
-  
+  id         String     @id @default(cuid())
+  clientId   String
+  propertyId String?
+  type       DealType   @default(VENTE)
+  status     DealStatus @default(VENTE_ATTENTE_MANDAT)
+
+  client   Client    @relation(fields: [clientId], references: [id])
+  property Property? @relation(fields: [propertyId], references: [id])
+
   saleAnalyses SaleAnalysis[]
   loanAnalyses LoanAnalysis[]
-  
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum PropertyType {
@@ -147,19 +148,17 @@ enum PropertyStatus {
 }
 
 model Property {
-  id             String               @id @default(cuid())
-  address        String
-  
-  type           PropertyType         @default(OTHER)
-  status         PropertyStatus       @default(OFF_MARKET)
-  
-  ownerId        String?
-  owner          User?                 @relation("OwnerProperties", fields: [ownerId], references: [id])
-  
-  clientId       String?
-  client         Client?               @relation("ClientProperties", fields: [clientId], references: [id])
-  
-  assignedAgents PropertyAgent[] 
+  id      String         @id @default(cuid())
+  address String
+  type    PropertyType   @default(OTHER)
+  status  PropertyStatus @default(OFF_MARKET)
+
+  ownerId  String?
+  owner    User?   @relation("OwnerProperties", fields: [ownerId], references: [id])
+  clientId String?
+  client   Client? @relation("ClientProperties", fields: [clientId], references: [id])
+
+  assignedAgents  PropertyAgent[]
   maintenanceLogs MaintenanceLog[]
   documents       Document[]
   triggers        OpportunityTrigger[]
@@ -167,85 +166,76 @@ model Property {
   saleAnalyses    SaleAnalysis[]
 }
 
-// Map table to handle independence and multi-agent
 model PropertyAgent {
-  id              String   @id @default(cuid())
-  propertyId      String
-  agentId         String
-  property        Property @relation(fields: [propertyId], references: [id])
-  agent           User     @relation(fields: [agentId], references: [id])
-  
-  // Permissions: what can the agent see?
+  id         String   @id @default(cuid())
+  propertyId String
+  agentId    String
+  property   Property @relation(fields: [propertyId], references: [id])
+  agent      User     @relation(fields: [agentId], references: [id])
+
   canSeeEstimations Boolean @default(true)
   canSeeTriggers    Boolean @default(true)
-  
-  createdAt       DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
   @@unique([propertyId, agentId])
 }
 
 model MaintenanceLog {
-  id            String   @id @default(cuid())
-  category      String   
-  description   String
-  amount        Float?
-  isPrivate     Boolean  @default(true) // If TRUE, the agent only sees the type of action
-  
-  propertyId    String
-  property      Property @relation(fields: [propertyId], references: [id])
-}
-
-model OpportunityTrigger {
-  id            String   @id @default(cuid())
-  type          String   // "RENO_DETECTED", "DPE_ALERT"
-  description   String   // Anonymized text for the agent (e.g., "Travaux de valorisation détectés")
-  propertyId    String
-  property      Property @relation(fields: [propertyId], references: [id])
-  // We do not link the trigger to a specific agent here, but to the property
-}
-
-// Basic Document model to ensure schema validity
-model Document {
   id          String   @id @default(cuid())
-  title       String
-  url         String
+  category    String
+  description String
+  amount      Float?
+  isPrivate   Boolean  @default(true)
   propertyId  String
   property    Property @relation(fields: [propertyId], references: [id])
 }
 
+model OpportunityTrigger {
+  id          String   @id @default(cuid())
+  type        String
+  description String
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  title      String
+  url        String
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+}
+
 model SaleAnalysis {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   propertyId     String
   dealId         String?
-  
   estimatedValue Float?
   targetPrice    Float?
   finalPrice     Float?
-  
-  notes          String    @default("")
-  
-  property       Property  @relation(fields: [propertyId], references: [id])
-  deal           Deal?     @relation(fields: [dealId], references: [id])
-  
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  notes          String   @default("")
+  property       Property @relation(fields: [propertyId], references: [id])
+  deal           Deal?    @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model LoanAnalysis {
-  id             String    @id @default(cuid())
+  id             String  @id @default(cuid())
   clientId       String
   dealId         String?
-  
   maxLoanAmount  Float?
   interestRate   Float?
   durationMonths Int?
   monthlyPayment Float?
-  
   bankName       String?
-  status         String    @default("PENDING") // e.g., PENDING, APPROVED, REJECTED
-  
-  client         Client    @relation(fields: [clientId], references: [id])
-  deal           Deal?     @relation(fields: [dealId], references: [id])
-  
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  status         String  @default("PENDING")
+
+  client Client @relation(fields: [clientId], references: [id])
+  deal   Deal?  @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
