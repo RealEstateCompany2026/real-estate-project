@@ -891,11 +891,11 @@ export function DesignSystemClient() {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden" style={{ display: 'flex', flexDirection: 'row', flex: '1 1 0%', overflow: 'hidden' }}>
         {/* ── Sidebar ── */}
         <aside
           className="w-52 flex-none overflow-y-auto border-r border-[#ecedee] py-4 px-2"
-          style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff' }}
+          style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff', width: '208px', minWidth: '208px', maxWidth: '208px', flex: '0 0 208px', overflowY: 'auto' }}
         >
           {NAV.map(({ id, label }) => (
             <button
@@ -914,7 +914,7 @@ export function DesignSystemClient() {
         </aside>
 
         {/* ── Main content ── */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto px-10 py-8 max-w-5xl">
+        <main ref={mainRef} className="flex-1 overflow-y-auto px-10 py-8 max-w-5xl" style={{ flex: '1 1 0%', overflowY: 'auto', minWidth: 0 }}>
 
           {/* ── Token Map ── */}
           <Section id="tokens" title="Token Map — Figma ↔ Local">
