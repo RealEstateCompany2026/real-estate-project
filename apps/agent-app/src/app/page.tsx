@@ -9,20 +9,15 @@ export default async function AgentDashboard() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // The middleware should handle this, but double-check for safety
   if (!user) {
     redirect('/auth/login')
   }
 
-  // Resolve the agent from our DB using the authenticated user's email
   const agentUser = await db.user.findUnique({
     where: { email: user.email! },
   })
 
   if (!agentUser) {
-    // First-time login: account exists in Supabase Auth but not yet in our DB.
-    // The Supabase trigger (see supabase/migrations) should handle this automatically.
-    // If it hasn't fired yet, show a graceful waiting screen.
     return (
       <div className="flex items-center justify-center min-h-screen p-10">
         <div className="text-center">
@@ -30,8 +25,7 @@ export default async function AgentDashboard() {
             Initialisation de votre compte…
           </p>
           <p className="text-neutral-grey-bold text-sm">
-            Actualisez la page dans quelques instants. Si le problème persiste,
-            contactez votre administrateur.
+            Actualisez la page dans quelques instants.
           </p>
         </div>
       </div>
@@ -40,9 +34,7 @@ export default async function AgentDashboard() {
 
   const properties = await db.property.findMany({
     include: {
-      deals: {
-        include: { saleAnalyses: true },
-      },
+      deals: { include: { saleAnalyses: true } },
       owner: true,
       maintenanceLogs: true,
       documents: true,
@@ -75,7 +67,7 @@ export default async function AgentDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {properties.map((prop) => {
             const activeSaleDeal = prop.deals.find((d) => d.type === 'VENTE')
-            const saleAnalysis   = activeSaleDeal?.saleAnalyses[0]
+            const saleAnalysis = activeSaleDeal?.saleAnalyses[0]
             const formattedTriggers = prop.triggers.map((t) => ({
               id: t.id,
               type: t.type,
