@@ -25,7 +25,6 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Never add code between createServerClient and getUser().
   const { data: { user } } = await supabase.auth.getUser()
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
