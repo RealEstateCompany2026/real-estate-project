@@ -825,7 +825,15 @@ export function DesignSystemClient() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
     const container = mainRef.current
-    if (el && container) container.scrollTo({ top: el.offsetTop - 32, behavior: 'smooth' })
+    if (el && container) {
+      // getBoundingClientRect() gives position relative to viewport;
+      // subtracting container's top + current scrollTop gives correct scroll target
+      const top = el.getBoundingClientRect().top
+        - container.getBoundingClientRect().top
+        + container.scrollTop
+        - 32
+      container.scrollTo({ top, behavior: 'smooth' })
+    }
     setActiveSection(id)
   }
 
@@ -847,12 +855,12 @@ export function DesignSystemClient() {
 
   return (
     <div
-      className="min-h-screen font-sans"
+      className="h-screen flex flex-col overflow-hidden font-sans"
       style={{ ...(dark ? DARK_VARS : {}), backgroundColor: dark ? '#111111' : '#f5f5f5', color: dark ? '#f0f0f0' : F.nDefault } as React.CSSProperties}
     >
       {/* ── Header ── */}
       <header
-        className="sticky top-0 z-50 flex items-center justify-between px-6 h-14 border-b border-[#ecedee]"
+        className="flex-none flex items-center justify-between px-6 h-14 border-b border-[#ecedee] z-10"
         style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff' }}
       >
         <div className="flex items-center gap-3">
@@ -883,10 +891,10 @@ export function DesignSystemClient() {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
+      <div className="flex-1 flex overflow-hidden">
         {/* ── Sidebar ── */}
         <aside
-          className="w-52 shrink-0 overflow-y-auto border-r border-[#ecedee] py-4 px-2"
+          className="w-52 flex-none overflow-y-auto border-r border-[#ecedee] py-4 px-2"
           style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff' }}
         >
           {NAV.map(({ id, label }) => (
