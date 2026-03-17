@@ -7,20 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String  @id @default(cuid())
-  supabase_id String? @unique @db.Uuid  // Links to auth.users.id in Supabase
-  email       String  @unique
-  name        String?
-  role        String  @default("AGENT") // "AGENT" | "MANAGER" | "ADMIN"
-
-  clientProfile      Client?
-  properties         Property[]      @relation("OwnerProperties")
-  assignedProperties PropertyAgent[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+// ── Enums ─────────────────────────────────────────────────────────────────────
 
 enum ClientStatus {
   PROPRIETAIRE
@@ -43,98 +30,26 @@ enum MaritalStatus {
   OTHER
 }
 
-model Client {
-  id     String  @id @default(cuid())
-  userId String? @unique
-  user   User?   @relation(fields: [userId], references: [id])
-
-  isActive Boolean @default(true)
-
-  status        ClientStatus[]
-  gender        ClientGender?
-  firstName     String
-  lastName      String
-  dateOfBirth   DateTime?
-  placeOfBirth  String?
-  maritalStatus MaritalStatus?
-
-  addressId      Int?
-  address        String?
-  mobilePhone    String?
-  primaryEmail   String
-  secondaryEmail String?
-
-  jobTitle      String?
-  incomeBracket String?
-
-  kbisUrl     String?
-  cniUrl      String?
-  passportUrl String?
-
-  // Specific — Owner / Bailleur
-  totalOwnedProperties     String?
-  propertiesForSaleCount   String?
-  titleDeedUrl             String?
-  propertiesUnderMgmtCount String?
-
-  // Specific — Acquéreur / Locataire
-  paySlipUrl      String?
-  taxStatementUrl String?
-  loanOfferUrl    String?
-
-  properties   Property[]     @relation("ClientProperties")
-  deals        Deal[]
-  loanAnalyses LoanAnalysis[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum PreferredChannel {
+  EMAIL
+  SMS
+  IN_APP
 }
 
-enum DealType {
-  VENTE
-  BAIL
-  ACQUISITION
-  LOCATION
-}
-
-enum DealStatus {
-  VENTE_ATTENTE_MANDAT
-  VENTE_MANDAT_EDITE
-  VENTE_MANDAT_SIGNE_ANNONCE_EDITEE
-  VENTE_MANDAT_SIGNE_ANNONCE_PUBLIEE_VISITES_PROGRAMMEES
-  VENTE_MANDAT_SIGNE_ANNONCE_PUBLIEE_VISITES_EFFECTUEES_PROMESSE
-  VENTE_MANDAT_SIGNE_ANNONCE_PUBLIEE_VISITES_EFFECTUEES_NOTAIRE
-  BAIL_ATTENTE_MANDAT
-  BAIL_MANDAT_SIGNE
-  ACQUISITION_RECHERCHE
-  LOCATION_RECHERCHE
-  OTHER
-}
-
-model Deal {
-  id         String     @id @default(cuid())
-  clientId   String
-  propertyId String?
-  type       DealType   @default(VENTE)
-  status     DealStatus @default(VENTE_ATTENTE_MANDAT)
-
-  client   Client    @relation(fields: [clientId], references: [id])
-  property Property? @relation(fields: [propertyId], references: [id])
-
-  saleAnalyses SaleAnalysis[]
-  loanAnalyses LoanAnalysis[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum ClientSource {
+  IMPORT_CSV
+  MANUEL
+  CRM
+  ANNONCE
 }
 
 enum PropertyType {
+  APPARTEMENT
+  MAISON
+  LOFT
   STUDIO
-  T1
-  T2
-  T3
-  T4
-  MAISON_DE_VILLE
+  TERRAIN
+  IMMEUBLE
   OTHER
 }
 
@@ -142,28 +57,557 @@ enum PropertyStatus {
   OFF_MARKET
   A_VENDRE
   A_LOUER
-  LOUER
+  LOUE
   VENDU
+  EN_VIAGER
   OTHER
 }
 
+enum PropertyCondition {
+  NEUF
+  RENOVE
+  BON_ETAT
+  A_RENOVER
+  ANCIEN
+}
+
+enum KitchenType {
+  SEPAREE
+  OUVERTE
+  AMERICAINE
+  KITCHENETTE
+}
+
+enum ParkingType {
+  BOX_FERME
+  PARKING_EXTERIEUR
+  GARAGE
+  AUCUN
+}
+
+enum HeatingType {
+  INDIVIDUEL_GAZ
+  INDIVIDUEL_ELECTRIQUE
+  COLLECTIF_GAZ
+  PAC
+  FUEL
+  BOIS
+}
+
+enum HotWaterSystem {
+  CUMULUS_ELECTRIQUE
+  CHAUDIERE_GAZ
+  SOLAIRE
+  THERMODYNAMIQUE
+}
+
+enum PoolType {
+  ENTERREE
+  SEMI_ENTERREE
+  HORS_SOL
+  AUCUNE
+}
+
+enum Exposure {
+  N
+  NE
+  E
+  SE
+  S
+  SO
+  O
+  NO
+}
+
+enum ViewType {
+  SUR_RUE
+  SUR_COUR
+  DEGAGEE
+  SUR_JARDIN
+  PANORAMIQUE
+}
+
+enum DpeClass {
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+}
+
+enum ListingStatus {
+  NON_CREEE
+  EDITEE
+  EN_VALIDATION
+  PUBLIEE
+  ARCHIVEE
+}
+
+enum DealType {
+  VENTE
+  BAIL
+  ACQUISITION
+  LOCATION
+  GESTION
+}
+
+enum DealStatus {
+  INACTIVE
+  EN_COURS
+  CLOTUREE
+  ARCHIVEE
+}
+
+enum DealTrend {
+  POSITIF
+  NEUTRE
+  A_RISQUE
+}
+
+enum MandateStatus {
+  NON_CREE
+  EDITE
+  ENVOYE
+  SIGNE
+  RESILIE
+}
+
+enum PurchaseOfferStatus {
+  AUCUNE
+  EN_ATTENTE
+  ENVOYEE
+  ACCEPTEE
+  REFUSEE
+  CONTRE_OFFRE
+}
+
+enum NotarialDeedStatus {
+  EN_ATTENTE
+  RDV_FIXE
+  SIGNE
+  ANNULE
+}
+
+enum BailType {
+  NU
+  MEUBLE
+  COMMERCIAL
+  PROFESSIONNEL
+  MIXTE
+}
+
+enum CoOwnershipType {
+  HORIZONTAL
+  VERTICAL
+  EN_VOLUME
+}
+
+enum RegimeFiscal {
+  MICRO_FONCIER
+  REGIME_REEL
+  LMNP_MICRO_BIC
+  LMNP_REEL_BIC
+}
+
+enum TmiBracket {
+  TMI_0
+  TMI_11
+  TMI_30
+  TMI_41
+  TMI_45
+}
+
+enum LoanType {
+  TAUX_FIXE
+  TAUX_VARIABLE
+  TAUX_MIXTE
+  PRET_RELAIS
+  PAS
+  PTZ
+}
+
+enum LoanPurpose {
+  ACHAT_RESIDENCE_PRINCIPALE
+  ACHAT_INVESTISSEMENT_LOCATIF
+  RACHAT_DE_CREDIT
+  TRAVAUX
+}
+
+enum GuaranteeType {
+  CAUTION
+  HYPOTHEQUE
+  PPD
+}
+
+enum LoanStatus {
+  EN_COURS
+  SOLDE
+  EN_ATTENTE_DEBLOCAGE
+  EN_RENEGOCIATION
+}
+
+enum AnalyzedBy {
+  AGENT
+  IA
+  AUTOMATIQUE
+}
+
+enum OpportunityStatus {
+  DETECTEE
+  NOTIFIEE
+  EN_COURS
+  TRAITEE
+  NON_RETENUE
+}
+
+enum MessageSenderType {
+  AGENT
+  CLIENT
+  IA
+}
+
+enum MessageChannel {
+  EMAIL
+  SMS
+  IN_APP
+  WHATSAPP
+}
+
+enum MessageStatus {
+  BROUILLON
+  ENVOYE
+  DELIVRE
+  LU
+  ECHOUE
+}
+
+enum TriggerType {
+  INACTIVITY
+  DPE_ALERT
+  MARKET_OPPORTUNITY
+  CREDIT_RENEGOCIATION
+  BIRTHDAY
+  ANNIVERSARY
+  DATA_MISSING
+  DOCUMENT_EXPIRY
+  STAGNATION
+  MOMENTUM
+}
+
+enum TriggerCategory {
+  QUALIFICATION
+  CONVERSION
+  FIDELISATION
+  HYGIENE
+  PERFORMANCE
+}
+
+enum TriggerStatus {
+  ACTIF
+  TRAITE
+  IGNORE
+  EXPIRE
+}
+
+enum EventType {
+  RDV_COMMERCIAL
+  VISITE
+  SIGNATURE_PROMESSE
+  SIGNATURE_NOTAIRE
+  SIGNATURE_BAIL
+  RELANCE
+  TACHE
+  ANNIVERSAIRE
+  AUTRE
+}
+
+enum EventLocationType {
+  PRESENTIEL
+  VISIOCONFERENCE
+  TELEPHONE
+  AUTRE
+}
+
+enum EventStatus {
+  PROGRAMME
+  CONFIRME
+  TERMINE
+  ANNULE
+  REPORTE
+  NO_SHOW
+}
+
+enum ReportStatus {
+  NON_REDIGE
+  BROUILLON
+  VALIDE
+  ENVOYE_AU_CLIENT
+}
+
+enum DocumentType {
+  CNI
+  PASSEPORT
+  KBIS
+  FICHE_PAIE
+  AVIS_IMPOSITION
+  OFFRE_PRET
+  ATTESTATION_FINANCEMENT
+  ACTE_PROPRIETE
+  MANDAT_VENTE
+  MANDAT_GESTION
+  BAIL
+  COMPROMIS
+  ACTE_NOTARIE
+  DPE
+  ANNONCE
+  COMPTE_RENDU
+  AUTRE
+}
+
+enum FileFormat {
+  PDF
+  JPG
+  PNG
+  DOCX
+  XLSX
+  AUTRE
+}
+
+enum DocumentStatus {
+  EN_ATTENTE
+  RECU
+  VERIFIE
+  EXPIRE
+  REJETE
+  ARCHIVE
+}
+
+// ── Models ────────────────────────────────────────────────────────────────────
+
+model Organization {
+  id   String @id @default(cuid())
+  name String
+
+  users      User[]
+  clients    Client[]
+  properties Property[]
+  deals      Deal[]
+  messages   Message[]
+  triggers   Trigger[]
+  events     Event[]
+  documents  Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id          String  @id @default(cuid())
+  supabase_id String? @unique @db.Uuid
+  email       String  @unique
+  name        String?
+  role        String  @default("AGENT") // "AGENT" | "MANAGER" | "ADMIN"
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  clientProfile      Client?
+  properties         Property[]      @relation("OwnerProperties")
+  assignedProperties PropertyAgent[]
+  managedClients     Client[]        @relation("AgentClients")
+  managedDeals       Deal[]          @relation("AgentDeals")
+  managedTriggers    Trigger[]       @relation("AgentTriggers")
+  sentMessages       Message[]       @relation("AgentMessages")
+  managedEvents      Event[]         @relation("AgentEvents")
+  uploadedDocuments  Document[]      @relation("UploadedDocuments")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id     String  @id @default(cuid())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  agentId String?
+  agent   User?   @relation("AgentClients", fields: [agentId], references: [id])
+
+  isActive Boolean @default(true)
+
+  // Profil
+  status        ClientStatus[]
+  gender        ClientGender?
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime?
+  placeOfBirth  String?
+  nationality   String?
+  maritalStatus MaritalStatus?
+
+  // Contact
+  address          String?
+  mobilePhone      String?
+  primaryEmail     String
+  secondaryEmail   String?
+  preferredChannel PreferredChannel?
+
+  // Professionnel
+  jobTitle      String?
+  incomeBracket String?
+  employer      String?
+  siren         String?
+
+  // Scoring IA
+  reactivationScore  Int?
+  qualificationScore Int?
+  triggerCount       Int?
+
+  // Documents KYC
+  kbisUrl            String?
+  cniUrl             String?
+  passportUrl        String?
+  cniExpiryDate      DateTime?
+  passportExpiryDate DateTime?
+
+  // Propriétaire / Bailleur
+  totalOwnedProperties     Int?
+  propertiesForSaleCount   Int?
+  titleDeedUrl             String?
+  propertiesUnderMgmtCount Int?
+
+  // Acquéreur / Locataire
+  paySlipUrl            String?
+  taxStatementUrl       String?
+  loanOfferUrl          String?
+  financingExpiryDate   DateTime?
+  searchCriteriaSummary String?
+
+  // Misc
+  notes  String?
+  source ClientSource?
+
+  properties    Property[]              @relation("ClientProperties")
+  deals         Deal[]
+  financing     ClientFinancing[]
+  loanAnalyses  LoanAnalysis[]
+  fiscalDetails PropertyFiscalDetails[]
+  messages      Message[]
+  triggers      Trigger[]
+  events        Event[]
+  documents     Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Property {
-  id      String         @id @default(cuid())
-  address String
-  type    PropertyType   @default(OTHER)
-  status  PropertyStatus @default(OFF_MARKET)
+  id String @id @default(cuid())
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   ownerId  String?
   owner    User?   @relation("OwnerProperties", fields: [ownerId], references: [id])
   clientId String?
   client   Client? @relation("ClientProperties", fields: [clientId], references: [id])
 
+  // Type & statut
+  type      PropertyType      @default(OTHER)
+  status    PropertyStatus    @default(OFF_MARKET)
+  condition PropertyCondition?
+
+  // Localisation
+  address          String
+  neighborhoodName String?
+
+  // Structure
+  constructionYear  Int?
+  floorLevel        Int?
+  numberOfFloors    Int?
+  hasElevator       Boolean?
+  hasIntercom       Boolean?
+  hasHomeAutomation Boolean?
+
+  // Surfaces
+  livingAreaSqm   Decimal? @db.Decimal(10, 2)
+  landAreaSqm     Decimal? @db.Decimal(10, 2)
+  numberOfRooms   Int?
+  mainRoomAreaSqm Decimal? @db.Decimal(10, 2)
+  bedroomCount    Int?
+  bedroom1AreaSqm Decimal? @db.Decimal(10, 2)
+  bedroom2AreaSqm Decimal? @db.Decimal(10, 2)
+  bedroom3AreaSqm Decimal? @db.Decimal(10, 2)
+  bedroom4AreaSqm Decimal? @db.Decimal(10, 2)
+  kitchenAreaSqm  Decimal? @db.Decimal(10, 2)
+  kitchenType     KitchenType?
+  bathroomCount   Int?
+  showerRoomCount Int?
+  toiletCount     Int?
+  terraceAreaSqm  Decimal? @db.Decimal(10, 2)
+  balconyAreaSqm  Decimal? @db.Decimal(10, 2)
+  gardenAreaSqm   Decimal? @db.Decimal(10, 2)
+  basementAreaSqm Decimal? @db.Decimal(10, 2)
+  atticAreaSqm    Decimal? @db.Decimal(10, 2)
+
+  // Équipements
+  parkingType      ParkingType?
+  parkingSpotCount Int?
+  heatingType      HeatingType?
+  hotWaterSystem   HotWaterSystem?
+  hasPool          Boolean?
+  poolType         PoolType?
+
+  // Exposition & vue
+  mainExposure Exposure?
+  mainViewType ViewType?
+
+  // DPE
+  dpeEnergyClass        DpeClass?
+  dpeGasEmissionClass   DpeClass?
+  dpeEnergyKwh          Decimal?  @db.Decimal(10, 2)
+  dpeGasGco2            Decimal?  @db.Decimal(10, 2)
+  dpeValidityDate       DateTime?
+  dpeComplianceDeadline DateTime?
+
+  // Valeur & annonce
+  estimatedMarketValue       Decimal?      @db.Decimal(15, 2)
+  estimatedMarketValuePerSqm Decimal?      @db.Decimal(10, 2)
+  desiredSellingPrice        Decimal?      @db.Decimal(15, 2)
+  listingStatus              ListingStatus?
+  listingPublicationDate     DateTime?
+
+  // Entretien
+  hasMaintenanceLog          Boolean?
+  maintenanceLogCreationDate DateTime?
+  lastMaintenanceDate        DateTime?
+
+  // Proximité
+  proximityToShops     Boolean?
+  proximityToSchools   Boolean?
+  proximityToDaycares  Boolean?
+  proximityToTransport Boolean?
+  proximityToHighways  Boolean?
+
   assignedAgents  PropertyAgent[]
   maintenanceLogs MaintenanceLog[]
-  documents       Document[]
-  triggers        OpportunityTrigger[]
+  coOwnership     CoOwnershipDetails?
+  fiscalDetails   PropertyFiscalDetails[]
   deals           Deal[]
+  financing       ClientFinancing[]
   saleAnalyses    SaleAnalysis[]
+  messages        Message[]
+  triggers        Trigger[]
+  events          Event[]
+  documents       Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PropertyAgent {
@@ -181,6 +625,249 @@ model PropertyAgent {
   @@unique([propertyId, agentId])
 }
 
+model CoOwnershipDetails {
+  id         String   @id @default(cuid())
+  propertyId String   @unique
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  type                      CoOwnershipType?
+  numberOfLots              Int?
+  lotNumber                 String?
+  syndicName                String?
+  syndicContact             String?
+  lastAgmDate               DateTime?
+  estimatedAnnualFees       Decimal? @db.Decimal(10, 2)
+  monthlyCharges            Decimal? @db.Decimal(10, 2)
+  plannedWorkAmount         Decimal? @db.Decimal(10, 2)
+  hasCurrentLegalProcedures Boolean?
+  hasPlannedLegalProcedures Boolean?
+  legalProcedureDetails     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PropertyFiscalDetails {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  clientId   String?
+  client     Client?  @relation(fields: [clientId], references: [id])
+
+  isCurrentSimulation Boolean      @default(true)
+  simulationDate      DateTime     @default(now())
+  regimeFiscal        RegimeFiscal?
+  tmiBracket          TmiBracket?
+
+  estimatedNotaryFees       Decimal? @db.Decimal(10, 2)
+  estimatedPropertyTax      Decimal? @db.Decimal(10, 2)
+  estimatedOccupancyTax     Decimal? @db.Decimal(10, 2)
+  estimatedVacantHousingTax Decimal? @db.Decimal(10, 2)
+  estimatedGarbageTax       Decimal? @db.Decimal(10, 2)
+  cadastralRentalValue      Decimal? @db.Decimal(10, 2)
+  estimatedManagementCost   Decimal? @db.Decimal(10, 2)
+  estimatedDeductibleFees   Decimal? @db.Decimal(10, 2)
+  estimatedCapitalGainsTax  Decimal? @db.Decimal(10, 2)
+
+  lmnpEligible                 Boolean?
+  lmnpFiscalSimulation         Decimal? @db.Decimal(10, 2)
+  pinelEligible                Boolean?
+  pinelFiscalSimulation        Decimal? @db.Decimal(10, 2)
+  denormandieEligible          Boolean?
+  denormandieFiscalSimulation  Decimal? @db.Decimal(10, 2)
+  censiBouvardEligible         Boolean?
+  censiBouvardFiscalSimulation Decimal? @db.Decimal(10, 2)
+  malrauxEligible              Boolean?
+  malrauxFiscalSimulation      Decimal? @db.Decimal(10, 2)
+  girardinEligible             Boolean?
+  girardinFiscalSimulation     Decimal? @db.Decimal(10, 2)
+  ifiEligible                  Boolean?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Deal {
+  id String @id @default(cuid())
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  agentId    String?
+  agent      User?     @relation("AgentDeals", fields: [agentId], references: [id])
+
+  type   DealType   @default(VENTE)
+  status DealStatus @default(EN_COURS)
+  trend  DealTrend?
+
+  lastActivityDate DateTime?
+
+  // Mandat de vente
+  saleMandateStatus     MandateStatus?
+  saleMandateSignedDate DateTime?
+  saleMandateEndDate    DateTime?
+
+  // Mandat de gestion
+  mgmtMandateStatus MandateStatus?
+
+  // Pipeline commercial
+  infoRequestsCount   Int?
+  visitCount          Int?
+  lastVisitDate       DateTime?
+  purchaseOfferStatus PurchaseOfferStatus?
+  purchaseOfferDate   DateTime?
+  purchaseOfferAmount Decimal?             @db.Decimal(15, 2)
+  notarialDeedStatus  NotarialDeedStatus?
+  notarialDeedDate    DateTime?
+  finalSalePrice      Decimal?             @db.Decimal(15, 2)
+
+  // Acquisition
+  acquisitionMinBudget       Decimal? @db.Decimal(15, 2)
+  acquisitionMaxBudget       Decimal? @db.Decimal(15, 2)
+  acquisitionCriteriaSummary String?
+  acquisitionFinancingExpiry DateTime?
+
+  // Bail
+  bailType          BailType?
+  bailMonthlyRent   Decimal?  @db.Decimal(10, 2)
+  bailCharges       Decimal?  @db.Decimal(10, 2)
+  bailDepositAmount Decimal?  @db.Decimal(10, 2)
+  bailSignedDate    DateTime?
+  bailStartDate     DateTime?
+  bailEndDate       DateTime?
+
+  // Location
+  locationMinBudget       Decimal? @db.Decimal(10, 2)
+  locationCriteriaSummary String?
+
+  saleAnalyses SaleAnalysis[]
+  loanAnalyses LoanAnalysis[]
+  financing    ClientFinancing[]
+  triggers     Trigger[]
+  messages     Message[]
+  events       Event[]
+  documents    Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ClientFinancing {
+  id String @id @default(cuid())
+
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  dealId     String?
+  deal       Deal?     @relation(fields: [dealId], references: [id])
+
+  lenderName          String?
+  loanType            LoanType?
+  loanPurpose         LoanPurpose?
+  loanAmount          Decimal?      @db.Decimal(15, 2)
+  downPaymentAmount   Decimal?      @db.Decimal(15, 2)
+  loanRateAnnual      Decimal?      @db.Decimal(6, 4)
+  insuranceRateAnnual Decimal?      @db.Decimal(6, 4)
+  durationMonths      Int?
+  startDate           DateTime?
+  endDate             DateTime?
+  guaranteeType       GuaranteeType?
+  status              LoanStatus?
+
+  monthlyPayment              Decimal? @db.Decimal(10, 2)
+  monthlyPaymentWithInsurance Decimal? @db.Decimal(10, 2)
+  totalLoanCost               Decimal? @db.Decimal(15, 2)
+  remainingCapital            Decimal? @db.Decimal(15, 2)
+  remainingMonths             Int?
+
+  bankAmortizationScheduleUrl    String?
+  loanOfferUrl                   String?
+  totalCreditCostSimulation      Decimal? @db.Decimal(15, 2)
+  amortizationScheduleSimulation String?
+
+  loanAnalyses LoanAnalysis[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SaleAnalysis {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  dealId     String?
+  deal       Deal?    @relation(fields: [dealId], references: [id])
+
+  analyzedBy   AnalyzedBy?
+  analysisDate DateTime    @default(now())
+
+  estimatedMarketValue     Decimal? @db.Decimal(15, 2)
+  estimatedSellingPrice    Decimal? @db.Decimal(15, 2)
+  simulatedAddedValue      Decimal? @db.Decimal(15, 2)
+  estimatedAgencyFees      Decimal? @db.Decimal(10, 2)
+  estimatedNotaryFeesBuyer Decimal? @db.Decimal(10, 2)
+  netSellerGain            Decimal? @db.Decimal(15, 2)
+  estimatedCapitalGainsTax Decimal? @db.Decimal(10, 2)
+
+  saleSuccessProbability   Decimal? @db.Decimal(5, 2)
+  timeOnMarketEstimateDays Int?
+  comparableSalesCount     Int?
+
+  isMomentumAlertActive Boolean?
+  lastMomentumAlertDate DateTime?
+  analysisDetails       String?
+
+  // Legacy fields kept for backward compatibility
+  estimatedValue Float?
+  targetPrice    Float?
+  finalPrice     Float?
+  notes          String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LoanAnalysis {
+  id       String          @id @default(cuid())
+  clientId String
+  client   Client          @relation(fields: [clientId], references: [id])
+  dealId   String?
+  deal     Deal?           @relation(fields: [dealId], references: [id])
+  loanId   String?
+  loan     ClientFinancing? @relation(fields: [loanId], references: [id])
+
+  analysisDate DateTime   @default(now())
+  analyzedBy   AnalyzedBy?
+
+  marketRateAtAnalysis         Decimal? @db.Decimal(6, 4)
+  marketRateSource             String?
+  currentMonthlyPayment        Decimal? @db.Decimal(10, 2)
+  newRateEstimate              Decimal? @db.Decimal(6, 4)
+  newMonthlyPayment            Decimal? @db.Decimal(10, 2)
+  monthlySavings               Decimal? @db.Decimal(10, 2)
+  totalSavings                 Decimal? @db.Decimal(15, 2)
+  estimatedRateGain            Decimal? @db.Decimal(6, 4)
+  breakevenMonths              Int?
+  renegociationOpportunityDate DateTime?
+  opportunityStatus            OpportunityStatus?
+
+  // Legacy fields kept for backward compatibility
+  maxLoanAmount  Float?
+  interestRate   Float?
+  durationMonths Int?
+  monthlyPayment Float?
+  bankName       String?
+  status         String @default("PENDING")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model MaintenanceLog {
   id          String   @id @default(cuid())
   category    String
@@ -191,50 +878,136 @@ model MaintenanceLog {
   property    Property @relation(fields: [propertyId], references: [id])
 }
 
-model OpportunityTrigger {
-  id          String   @id @default(cuid())
-  type        String
-  description String
-  propertyId  String
-  property    Property @relation(fields: [propertyId], references: [id])
+model Message {
+  id String @id @default(cuid())
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  clientId   String?
+  client     Client?   @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  dealId     String?
+  deal       Deal?     @relation(fields: [dealId], references: [id])
+  agentId    String?
+  agent      User?     @relation("AgentMessages", fields: [agentId], references: [id])
+
+  parentMessageId String?
+  parentMessage   Message?  @relation("MessageThread", fields: [parentMessageId], references: [id])
+  replies         Message[] @relation("MessageThread")
+
+  subject         String?
+  body            String
+  senderType      MessageSenderType?
+  channel         MessageChannel?
+  aiGenerated     Boolean            @default(false)
+  attachmentsUrls String[]
+
+  messageDate    DateTime      @default(now())
+  status         MessageStatus?
+  readAt         DateTime?
+  deliveryStatus String?
+
+  createdAt DateTime @default(now())
 }
 
-model Document {
-  id         String   @id @default(cuid())
-  title      String
-  url        String
-  propertyId String
-  property   Property @relation(fields: [propertyId], references: [id])
+model Trigger {
+  id String @id @default(cuid())
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  clientId   String?
+  client     Client?   @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  dealId     String?
+  deal       Deal?     @relation(fields: [dealId], references: [id])
+  agentId    String?
+  agent      User?     @relation("AgentTriggers", fields: [agentId], references: [id])
+
+  automationCode String?
+  type           TriggerType?
+  category       TriggerCategory?
+  label          String?
+  description    String
+  score          Int?
+  status         TriggerStatus @default(ACTIF)
+
+  detectedAt  DateTime  @default(now())
+  resolvedAt  DateTime?
+  dismissedAt DateTime?
+  expiryDate  DateTime?
+
+  createdAt DateTime @default(now())
 }
 
-model SaleAnalysis {
-  id             String   @id @default(cuid())
-  propertyId     String
-  dealId         String?
-  estimatedValue Float?
-  targetPrice    Float?
-  finalPrice     Float?
-  notes          String   @default("")
-  property       Property @relation(fields: [propertyId], references: [id])
-  deal           Deal?    @relation(fields: [dealId], references: [id])
+model Event {
+  id String @id @default(cuid())
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  clientId   String?
+  client     Client?   @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  dealId     String?
+  deal       Deal?     @relation(fields: [dealId], references: [id])
+  agentId    String?
+  agent      User?     @relation("AgentEvents", fields: [agentId], references: [id])
+
+  type            EventType?
+  title           String
+  description     String?
+  eventDate       DateTime
+  durationMinutes Int?
+  location        String?
+  locationType    EventLocationType?
+  calendarEventId String?
+  status          EventStatus @default(PROGRAMME)
+
+  confirmationSentAt DateTime?
+  reminderSentAt     DateTime?
+  reportContent      String?
+  reportStatus       ReportStatus?
+  reportSentAt       DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model LoanAnalysis {
-  id             String  @id @default(cuid())
-  clientId       String
-  dealId         String?
-  maxLoanAmount  Float?
-  interestRate   Float?
-  durationMonths Int?
-  monthlyPayment Float?
-  bankName       String?
-  status         String  @default("PENDING")
+model Document {
+  id String @id @default(cuid())
 
-  client Client @relation(fields: [clientId], references: [id])
-  deal   Deal?  @relation(fields: [dealId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  clientId     String?
+  client       Client?   @relation(fields: [clientId], references: [id])
+  propertyId   String?
+  property     Property? @relation(fields: [propertyId], references: [id])
+  dealId       String?
+  deal         Deal?     @relation(fields: [dealId], references: [id])
+  uploadedById String?
+  uploadedBy   User?     @relation("UploadedDocuments", fields: [uploadedById], references: [id])
+
+  type        DocumentType?
+  title       String
+  description String?
+  fileUrl     String
+  fileName    String?
+  fileSizeKb  Int?
+  fileFormat  FileFormat?
+  expiryDate  DateTime?
+
+  isValid           Boolean?
+  validityCheckedAt DateTime?
+  validityNotes     String?
+  documentStatus    DocumentStatus?
+  isPrivate         Boolean         @default(false)
+  signedAt          DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
