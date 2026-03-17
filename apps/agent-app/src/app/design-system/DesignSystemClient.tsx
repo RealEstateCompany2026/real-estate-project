@@ -6,21 +6,49 @@ import { Button } from '@real-estate/ui/button'
 import { Badge } from '@real-estate/ui/badge'
 import { Input } from '@real-estate/ui/input'
 import {
-  Sun, Moon, Check, X, Minus, Search, Bell, Settings,
-  Home, Users, MapPin, Briefcase, FileText, ChevronDown,
-  ChevronRight, ArrowLeft, Plus, Upload, Star, AlertTriangle,
-  TrendingUp, Calendar, ToggleLeft, ToggleRight, Loader2,
+  Sun, Moon, Check, X, Plus, Search, ChevronDown, TrendingUp,
+  Home, Users, MapPin, Briefcase, FileText, Zap, Database, Calendar,
+  ArrowRight,
 } from 'lucide-react'
+
+// ─── Figma tokens (source of truth) ──────────────────────────────────────────
+// File key: 09EiMQjcDWgb7MzykS8zU0 · "Agent Immobilier . Desktop"
+//
+// CRITICAL discrepancies vs local project tokens:
+//   Figma border-radius/sm = 16px  ←→  local radius-sm = 4px
+//   Figma border-radius/md = 20px  ←→  local radius-md = 8px
+//   Figma neutral/default  = #444955  ←→  local anthracite = #474747
+//   Figma neutral/50       = #ecedee  ←→  local grey-ultra  = #f5f5f5
+
+// Figma exact hex values
+const F = {
+  white:          '#ffffff',
+  n50:            '#ecedee',  // borders, card bg subtle
+  n100:           '#dadbdd',  // chip borders
+  n200:           '#d0d1d4',  // section label text
+  n300:           '#a1a4aa',  // placeholder, disabled
+  n400:           '#737780',  // chart axis labels
+  nDefault:       '#444955',  // body text
+  headings:       '#333740',  // heading text
+  indigo:         '#7b72f9',  // brand / selected state
+  indigoSoft:     '#e9f7ff',  // active nav bg
+  blue:           '#33a0fa',
+  green:          '#7cd064',
+  red:            '#e95d66',
+  yellow:         '#f8d862',
+  // radii
+  rSm:            '16px',
+  rMd:            '20px',
+  rFull:          '9999px',
+} as const
 
 // ─── Dark mode CSS variable overrides ────────────────────────────────────────
 const DARK_VARS: React.CSSProperties = {
   '--color-white-background': '#1a1a1a',
   '--color-grey-ultra-background': '#111111',
   '--color-grey-light-background': '#1e1e1e',
-  '--color-grey-background': '#333333',
-  '--color-grey-bold-background': '#d0d0d0',
+  '--color-grey-background': '#2a2a2a',
   '--color-anthracite-textes': '#f0f0f0',
-  '--color-anthracite-474747': '#f0f0f0',
   '--color-grey-bold-textes': '#b8b8b8',
   '--color-grey-textes': '#777777',
   '--color-grey-light-textes': '#3a3a3a',
@@ -28,125 +56,80 @@ const DARK_VARS: React.CSSProperties = {
   '--color-anthracite-icons': '#f0f0f0',
   '--color-grey-bold-icons': '#b8b8b8',
   '--color-grey-icons': '#777777',
-  '--color-grey-light-icons': '#3a3a3a',
   '--color-grey-ultra-contour': '#2a2a2a',
   '--color-grey-contour': '#444444',
-  '--color-grey-ultra-couleur-primaire': '#111111',
-  '--color-grey-light-couleur-primaire': '#2a2a2a',
   '--color-soft-blue-background': '#0a1e2d',
   '--color-soft-red-background': '#2d1515',
   '--color-soft-yellow-background': '#2a2700',
 } as React.CSSProperties
 
-// ─── Color token map (design spec names → actual values) ─────────────────────
-const COLOR_SPEC: Record<string, { hex: string; varName: string }> = {
-  'white':      { hex: '#ffffff', varName: 'white-background' },
-  'grey 50':    { hex: '#f5f5f5', varName: 'grey-ultra-background' },
-  'grey 100':   { hex: '#f5f5f5', varName: 'grey-ultra-background' },
-  'grey 200':   { hex: '#e5e5e5', varName: 'grey-light-background' },
-  'grey 300':   { hex: '#e5e5e5', varName: 'grey-light-textes' },
-  'grey 400':   { hex: '#b6b6b6', varName: 'grey-contour' },
-  'grey 500':   { hex: '#858585', varName: 'grey-bold-icons' },
-  'grey 600':   { hex: '#6d6d6d', varName: 'grey-bold-textes' },
-  'grey 800':   { hex: '#474747', varName: 'anthracite-textes' },
-  'purple 500': { hex: '#7b72f9', varName: 'indigo-couleur-fonctionnelle' },
-  'indigo':     { hex: '#7b72f9', varName: 'indigo-couleur-fonctionnelle' },
-  'blue':       { hex: '#33a0fa', varName: 'blue-couleur-fonctionnelle' },
-  'green':      { hex: '#7cd064', varName: 'green-couleur-fonctionnelle' },
-  'red':        { hex: '#e95d66', varName: 'red-couleur-fonctionnelle' },
-  'yellow':     { hex: '#f8d862', varName: 'yellow-couleur-fonctionnelle' },
-  '-':          { hex: 'transparent', varName: '—' },
-}
+// ─── Token comparison table (Figma ↔ local project) ──────────────────────────
+const TOKEN_MAP = [
+  { figma: '--neutral/white',    fHex: '#ffffff', local: '--color-white-background',      lHex: '#ffffff', match: true  },
+  { figma: '--neutral/50',       fHex: '#ecedee', local: '--color-grey-ultra-background', lHex: '#f5f5f5', match: false },
+  { figma: '--neutral/300',      fHex: '#a1a4aa', local: '--color-grey-textes',           lHex: '#b6b6b6', match: false },
+  { figma: '--neutral/default',  fHex: '#444955', local: '--color-anthracite-textes',     lHex: '#474747', match: false },
+  { figma: '--text/headings',    fHex: '#333740', local: '(aucun mapping direct)',         lHex: '—',       match: false },
+  { figma: '--border-radius/sm', fHex: '16px',   local: 'radius-sm (tailwind)',           lHex: '4px',     match: false },
+  { figma: '--border-radius/md', fHex: '20px',   local: 'radius-md (tailwind)',           lHex: '8px',     match: false },
+]
 
-// ─── Color palette (from tokens.json) ────────────────────────────────────────
+// ─── Color palette ────────────────────────────────────────────────────────────
 const PALETTE = {
-  backgrounds: [
-    { name: 'white-background',          hex: '#ffffff',  label: 'White' },
-    { name: 'grey-ultra-background',     hex: '#f5f5f5',  label: 'Grey Ultra' },
-    { name: 'grey-light-background',     hex: '#e5e5e5',  label: 'Grey Light' },
-    { name: 'grey-background',           hex: '#b6b6b6',  label: 'Grey' },
-    { name: 'grey-bold-background',      hex: '#6d6d6d',  label: 'Grey Bold' },
-    { name: 'soft-blue-background',      hex: '#e9f7ff',  label: 'Soft Blue' },
-    { name: 'soft-red-background',       hex: '#ffe9e9',  label: 'Soft Red' },
-    { name: 'soft-yellow-background',    hex: '#fffbdb',  label: 'Soft Yellow' },
-  ],
-  texts: [
-    { name: 'anthracite-textes',         hex: '#474747',  label: 'Anthracite' },
-    { name: 'grey-bold-textes',          hex: '#6d6d6d',  label: 'Grey Bold' },
-    { name: 'grey-textes',               hex: '#b6b6b6',  label: 'Grey' },
-    { name: 'grey-light-textes',         hex: '#e5e5e5',  label: 'Grey Light' },
-    { name: 'white-textes-tons-foncés',  hex: '#ffffff',  label: 'White (dark bg)' },
+  neutral: [
+    { hex: '#ffffff',  label: 'White',           token: 'neutral/white' },
+    { hex: '#ecedee',  label: 'Neutral 50',       token: 'neutral/50 (border)' },
+    { hex: '#dadbdd',  label: 'Grey 100',         token: 'grey/100 (chip border)' },
+    { hex: '#d0d1d4',  label: 'Neutral 200',      token: 'neutral/200 (labels)' },
+    { hex: '#a1a4aa',  label: 'Neutral 300',      token: 'neutral/300 (placeholder)' },
+    { hex: '#737780',  label: 'Neutral 400',      token: 'neutral/400 (chart)' },
+    { hex: '#444955',  label: 'Neutral Default',  token: 'neutral/default (body)' },
+    { hex: '#333740',  label: 'Text Headings',    token: 'text/headings' },
   ],
   functional: [
-    { name: 'blue-couleur-fonctionnelle',   hex: '#33a0fa', label: 'Blue / Info' },
-    { name: 'green-couleur-fonctionnelle',  hex: '#7cd064', label: 'Green / Success' },
-    { name: 'yellow-couleur-fonctionnelle', hex: '#f8d862', label: 'Yellow / Warning' },
-    { name: 'red-couleur-fonctionnelle',    hex: '#e95d66', label: 'Red / Danger' },
-    { name: 'indigo-couleur-fonctionnelle', hex: '#7b72f9', label: 'Indigo / Brand' },
-  ],
-  icons: [
-    { name: 'anthracite-icons',   hex: '#4b4b4b', label: 'Anthracite' },
-    { name: 'grey-bold-icons',    hex: '#858585', label: 'Grey Bold' },
-    { name: 'grey-icons',         hex: '#b6b6b6', label: 'Grey' },
-    { name: 'grey-light-icons',   hex: '#e5e5e5', label: 'Grey Light' },
-    { name: 'white-icons',        hex: '#ffffff', label: 'White' },
-    { name: 'green-icons',        hex: '#7cd064', label: 'Green' },
-    { name: 'red-icons',          hex: '#e95d66', label: 'Red' },
-    { name: 'yellow-icons',       hex: '#f8d862', label: 'Yellow' },
+    { hex: '#7b72f9', label: 'Indigo / Brand',   token: 'indigo' },
+    { hex: '#33a0fa', label: 'Blue / Info',       token: 'blue' },
+    { hex: '#7cd064', label: 'Green / Success',   token: 'green' },
+    { hex: '#f8d862', label: 'Yellow / Warning',  token: 'yellow' },
+    { hex: '#e95d66', label: 'Red / Danger',      token: 'red' },
+    { hex: '#e9f7ff', label: 'Soft Blue (nav)',   token: 'soft-blue-background' },
   ],
   score: [
-    { name: 'score-green-icons',  hex: '#6cde20', label: 'A' },
-    { name: 'score-grass-icons',  hex: '#c1e01e', label: 'B' },
-    { name: 'score-yellow-icons', hex: '#ebc718', label: 'C' },
-    { name: 'score-orange-icons', hex: '#ed6711', label: 'D' },
-    { name: 'score-red-icons',    hex: '#f00f0f', label: 'E / F' },
+    { hex: '#6cde20', label: 'DPE A' },
+    { hex: '#c1e01e', label: 'DPE B' },
+    { hex: '#ebc718', label: 'DPE C' },
+    { hex: '#ed6711', label: 'DPE D' },
+    { hex: '#f00f0f', label: 'DPE E/F' },
   ],
 }
 
-// ─── Typography tokens ────────────────────────────────────────────────────────
+// ─── Typography ───────────────────────────────────────────────────────────────
 const TYPE_SCALE = [
-  { name: 'title-h0-40px-bold',         size: '40px', weight: 700, lh: '40px',  sample: 'Dashboard Immobilier' },
-  { name: 'title-h1-28px-bold',         size: '28px', weight: 700, lh: '34px',  sample: 'Fiche Client' },
-  { name: 'title-h2-24px-bold',         size: '24px', weight: 700, lh: '32px',  sample: 'Informations générales' },
-  { name: 'title-h3-20px-bold',         size: '20px', weight: 700, lh: '26px',  sample: 'Adresse du bien' },
-  { name: 'title-h4-h5-16px-bold',      size: '16px', weight: 700, lh: '24px',  sample: 'Sous-section' },
-  { name: 'body-16px-bold',             size: '16px', weight: 700, lh: '22px',  sample: 'Corps de texte — Bold' },
-  { name: 'body-16px-regular',          size: '16px', weight: 400, lh: '22px',  sample: 'Corps de texte — Regular' },
-  { name: 'body-16px-light',            size: '16px', weight: 300, lh: '22px',  sample: 'Corps de texte — Light' },
-  { name: 'small-print-14px-regular',   size: '14px', weight: 400, lh: '16px',  sample: 'Petite note, caption, metadata' },
-  { name: 'tagline-14px-bold',          size: '14px', weight: 700, lh: '16px',  sample: 'TAGLINE SECTION' },
-  { name: 'form-label-16px-bold',       size: '16px', weight: 700, lh: '22px',  sample: 'Label de formulaire — Bold' },
-  { name: 'form-label-16px-regular',    size: '16px', weight: 400, lh: '22px',  sample: 'Label de formulaire — Regular' },
-  { name: 'form-label-16px-light',      size: '16px', weight: 300, lh: '22px',  sample: 'Label de formulaire — Light' },
-  { name: 'big-content-40px-bold',      size: '40px', weight: 700, lh: '40px',  sample: '248 Clients' },
-  { name: 'big-content-40px-regular',   size: '40px', weight: 400, lh: '40px',  sample: '248 Clients' },
+  { name: 'H2 · SemiBold · Desktop',  size: '40px', weight: 600, lh: '48px', ls: '0.4px',  sample: '76' },
+  { name: 'H4 · Bold · Desktop',      size: '28px', weight: 700, lh: '34px', ls: '0.28px', sample: 'Clients' },
+  { name: 'H6 · Bold · Desktop',      size: '20px', weight: 700, lh: '24px', ls: '0.2px',  sample: '22 fév 2026' },
+  { name: 'Body · md · Bold',         size: '16px', weight: 700, lh: '20px', ls: '0.16px', sample: 'LEMARCHAND' },
+  { name: 'Body · md · SemiBold',     size: '16px', weight: 600, lh: '20px', ls: '0.16px', sample: 'Voir tout' },
+  { name: 'Body · md · Regular',      size: '16px', weight: 400, lh: '20px', ls: '0.16px', sample: 'Jean-Christophe' },
+  { name: 'Body · sm · Bold',         size: '14px', weight: 700, lh: '16px', ls: '0.14px', sample: 'QUALIFICATION  82%' },
+  { name: 'Body · sm · Regular',      size: '14px', weight: 400, lh: '16px', ls: '0.14px', sample: '28 réactions positives' },
+  { name: 'Body · xsm · Bold',        size: '12px', weight: 700, lh: '14px', ls: '0.12px', sample: 'ACTIVE' },
 ]
 
-// ─── Radius tokens ────────────────────────────────────────────────────────────
+// ─── Radii (Figma-accurate — very different from local Tailwind defaults!) ────
 const RADII = [
-  { name: 'sm',   value: '4px' },
-  { name: 'md',   value: '8px' },
-  { name: 'lg',   value: '12px' },
-  { name: 'xl',   value: '16px' },
-  { name: '2xl',  value: '24px' },
-  { name: 'full', value: '9999px' },
+  { name: 'sm',   value: '16px',    note: 'Buttons, icon-buttons, field padding' },
+  { name: 'md',   value: '20px',    note: 'Cards, nav items, inputs, dropdowns' },
+  { name: 'full', value: '9999px',  note: 'Pills, chips, mega buttons, avatars' },
 ]
 
-// ─── Spacing tokens ───────────────────────────────────────────────────────────
-const SPACING = [2, 4, 8, 12, 16, 24, 32, 40, 48, 64]
+// ─── Spacing ──────────────────────────────────────────────────────────────────
+const SPACING = [4, 6, 8, 10, 12, 15, 16, 18, 20, 23, 24, 25, 28, 30]
 
-// ─── Component inventory (from composants.xlsx) ───────────────────────────────
+// ─── Component families ───────────────────────────────────────────────────────
 type TokenSet = { surface?: string; border?: string; text?: string; icon?: string }
-type ComponentEntry = {
-  name: string
-  status: 'fait' | 'à faire' | 'factoriser' | string
-  variants: Array<{
-    name: string
-    tokensLight?: TokenSet
-    tokensDark?: TokenSet
-  }>
-  react?: boolean
-}
+type Variant = { name: string; tokensLight?: TokenSet; tokensDark?: TokenSet }
+type ComponentEntry = { name: string; status: string; react?: boolean; figmaId?: string; variants: Variant[] }
 type ComponentFamily = { id: string; label: string; components: ComponentEntry[] }
 
 const FAMILIES: ComponentFamily[] = [
@@ -154,92 +137,144 @@ const FAMILIES: ComponentFamily[] = [
     id: 'buttons', label: 'Buttons',
     components: [
       {
-        name: 'button', status: 'fait', react: true,
+        name: 'button', status: 'fait', react: true, figmaId: '609:17137',
         variants: [
-          { name: 'default',     tokensLight: { surface: 'grey 400', border: 'grey 400', text: 'white', icon: 'white' }, tokensDark: { surface: 'grey 500', border: 'grey 500', text: 'white', icon: 'white' } },
-          { name: 'brand',       tokensLight: { surface: 'purple 500', border: 'purple 500', text: 'white', icon: 'white' }, tokensDark: { surface: 'purple 500', border: 'purple 500', text: 'white', icon: 'white' } },
-          { name: 'outlined',    tokensLight: { surface: 'white', border: 'grey 500', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: 'grey 300', text: 'grey 300', icon: 'grey 300' } },
-          { name: 'transparent', tokensLight: { surface: '-', border: 'grey 500', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: '-', border: 'grey 100', text: 'grey 100', icon: 'grey 100' } },
+          { name: 'ghost',    tokensLight: { surface: '#ecedee (hover)', border: 'none',     text: '#444955', icon: '#444955' } },
+          { name: 'outlined', tokensLight: { surface: 'transparent',    border: '#a1a4aa',   text: '#444955', icon: '#444955' } },
         ],
       },
       {
         name: 'icon button', status: 'fait',
+        variants: [{ name: 'default', tokensLight: { surface: 'transparent', border: 'none', icon: '#444955' } }],
+      },
+      {
+        name: 'icon button mega', status: 'fait', figmaId: '609:17120',
         variants: [
-          { name: 'default' }, { name: 'brand' }, { name: 'outlined' }, { name: 'transparent' },
+          { name: 'outlined default', tokensLight: { surface: 'transparent', border: '#a1a4aa', icon: '#444955' } },
         ],
       },
-      { name: 'sending icon button', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'icon button mega', status: 'fait', variants: [{ name: 'default' }, { name: 'outlined' }] },
-      { name: 'button . pagination', status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'button . nav . next', status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }] },
       { name: 'button . sort', status: 'fait', variants: [{ name: 'default' }] },
     ],
   },
   {
     id: 'inputs', label: 'Inputs & Text Fields',
     components: [
-      { name: 'Label', status: 'fait', react: true, variants: [{ name: 'default' }] },
-      { name: 'Input', status: 'fait', react: true, variants: [{ name: 'default' }, { name: 'disabled' }, { name: 'error' }] },
-      { name: 'outlined text field', status: 'fait', variants: [{ name: 'default' }, { name: 'focused' }, { name: 'error' }, { name: 'disabled' }] },
+      {
+        name: 'Input', status: 'fait', react: true, figmaId: '1106:28985',
+        variants: [
+          { name: 'default',  tokensLight: { surface: '#ffffff', border: '#ecedee (bottom only)', text: '#444955' } },
+          { name: 'placeholder', tokensLight: { surface: '#ffffff', border: '#ecedee', text: '#a1a4aa (SemiBold)' } },
+        ],
+      },
+      {
+        name: 'Label', status: 'fait',
+        variants: [{ name: 'default', tokensLight: { text: '#444955', surface: 'none' } }],
+      },
     ],
   },
   {
-    id: 'badges', label: 'Badges & Chips',
+    id: 'badges', label: 'Badges, Chips & Stickers',
     components: [
+      { name: 'Badge', status: 'fait', react: true, variants: [
+        { name: 'default' }, { name: 'secondary' }, { name: 'info' },
+        { name: 'success' }, { name: 'warning' }, { name: 'destructive' }, { name: 'outline' },
+      ]},
       {
-        name: 'Badge', status: 'fait', react: true,
+        name: 'atome . sticker', status: 'fait', figmaId: '1167:32935',
         variants: [
-          { name: 'default' }, { name: 'secondary' }, { name: 'info' },
-          { name: 'success' }, { name: 'warning' }, { name: 'destructive' }, { name: 'outline' },
+          { name: 'default', tokensLight: { surface: '#ecedee', border: '#dadbdd', text: '#444955 Bold 12px' } },
         ],
       },
-      { name: 'atome . sticker', status: 'fait', variants: [{ name: 'default' }] },
       { name: 'atome . criteria', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'atome . icon + text . medium', status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'atome . message . status', status: 'fait', variants: [{ name: 'none' }, { name: 'fail' }, { name: 'success' }] },
+      { name: 'atome . text + icon . medium', status: 'fait', variants: [{ name: 'default' }] },
       { name: 'atome . text + icon . date', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'atome . message . status', status: 'fait', variants: [{ name: 'default' }] },
     ],
   },
   {
     id: 'navigation', label: 'Navigation',
     components: [
-      { name: 'agent navigation rail . desktop', status: 'fait', variants: [{ name: 'default' }, { name: 'collapsed' }] },
-      { name: 'button . nav . dashboard', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }] },
-      { name: 'button . nav . client', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }] },
-      { name: 'button . nav . bien', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }] },
-      { name: 'button . nav . affaire', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }] },
-      { name: 'button . nav . document', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }] },
-      { name: 'button . nav . automatisation', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }] },
-      { name: 'breadcrumb', status: 'fait', variants: [{ name: 'default' }] },
+      {
+        name: 'agent navigation rail . desktop', status: 'fait', figmaId: '1081:33432',
+        variants: [
+          { name: 'light', tokensLight: { surface: '#ffffff', icon: '#a1a4aa', border: 'none' } },
+          { name: 'selected item', tokensLight: { surface: '#e9f7ff', icon: '#7b72f9', border: 'none' } },
+        ],
+      },
+      { name: 'button . nav . dashboard',     status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }, { name: 'selected' }] },
+      { name: 'button . nav . client',         status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }, { name: 'selected' }] },
+      { name: 'button . nav . bien',           status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }, { name: 'selected' }] },
+      { name: 'button . nav . affaire',        status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }, { name: 'selected' }] },
+      { name: 'button . nav . document',       status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }, { name: 'selected' }] },
+      { name: 'button . nav . automatisation', status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }, { name: 'selected' }] },
+      { name: 'breadcrumb',   status: 'fait', variants: [{ name: 'default' }] },
       { name: 'button profile', status: 'fait', variants: [{ name: 'default' }] },
-    ],
-  },
-  {
-    id: 'lists', label: 'Lists',
-    components: [
-      { name: 'list . client', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: 'white', border: '-', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: '-', text: 'grey 50', icon: 'grey 50' } }] },
-      { name: 'list . bien', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: 'white', border: '-', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: '-', text: 'grey 50', icon: 'grey 50' } }] },
-      { name: 'list . affaire', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: 'white', border: '-', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: '-', text: 'grey 50', icon: 'grey 50' } }] },
-      { name: 'list . document', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: 'white', border: '-', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: '-', text: 'grey 50', icon: 'grey 50' } }] },
-      { name: 'list . évènement', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: 'white', border: '-', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: '-', text: 'grey 50', icon: 'grey 50' } }] },
-      { name: 'list . database', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'list automation', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: 'white', border: '-', text: 'grey 500', icon: 'grey 500' }, tokensDark: { surface: 'grey 800', border: '-', text: 'grey 50', icon: 'grey 50' } }] },
-      { name: 'list . import . data . select', status: 'fait', variants: [{ name: 'default' }, { name: 'success' }, { name: 'error' }] },
     ],
   },
   {
     id: 'app-bars', label: 'App Bars',
     components: [
-      { name: 'app bar category', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche client', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche client . messagerie', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche bien', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche bien . annonce', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche affaire', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche affaire . metrics', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar fiche automatisation', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar document', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar ajout bdd', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'app bar ajout bdd . import', status: 'fait', variants: [{ name: 'default' }] },
+      {
+        name: 'App bar_category', status: 'fait', figmaId: '602:16811',
+        variants: [
+          { name: 'default', tokensLight: { surface: '#ffffff', text: '#333740 H4 28px Bold' } },
+        ],
+      },
+      { name: 'App bar_Fiche client',            status: 'fait', figmaId: '609:17515', variants: [{ name: 'default' }] },
+      { name: 'App bar_Fiche client_Messagerie', status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Fiche Bien',              status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Fiche Bien_Annonce',      status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Fiche Affaire',           status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_bar_Fiche Affaire_Metrics', status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Fiche Automatisation',    status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Fiche document',          status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Ajout de bdd',            status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'App bar_Import bdd',              status: 'fait', variants: [{ name: 'default' }] },
+    ],
+  },
+  {
+    id: 'lists', label: 'Lists',
+    components: [
+      {
+        name: 'list . client', status: 'fait', figmaId: '970:69728',
+        variants: [
+          { name: 'default', tokensLight: { surface: '#ffffff', border: '#ecedee', text: '#444955' } },
+          { name: 'hover',   tokensLight: { surface: '#f9f9f9', border: '#ecedee', text: '#444955' } },
+        ],
+      },
+      { name: 'list . bien',     status: 'fait', variants: [{ name: 'default', tokensLight: { surface: '#ffffff', border: '#ecedee' } }] },
+      { name: 'list . affaire',  status: 'fait', variants: [{ name: 'default', tokensLight: { surface: '#ffffff', border: '#ecedee' } }] },
+      { name: 'list . document', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: '#ffffff', border: '#ecedee' } }] },
+      { name: 'list . évènement',status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'list . automation',status: 'fait', variants: [{ name: 'default' }, { name: 'expanded' }] },
+      { name: 'list . import . data . select', status: 'fait', variants: [{ name: 'default' }, { name: 'success' }, { name: 'error' }] },
+    ],
+  },
+  {
+    id: 'menu', label: 'Menu & Dropdowns',
+    components: [
+      {
+        name: 'dropdown', status: 'fait', figmaId: '970:77207',
+        variants: [
+          { name: 'ghost',  tokensLight: { surface: 'transparent', text: '#6d6d6d', border: 'none' } },
+          { name: 'shadow', tokensLight: { surface: '#ffffff', text: '#444955', border: '#ffffff (shadow)' } },
+        ],
+      },
+      { name: 'menu item', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }, { name: 'hover' }] },
+    ],
+  },
+  {
+    id: 'switch-radio', label: 'Switch, Checkbox & Radio',
+    components: [
+      { name: 'switch', status: 'fait', variants: [{ name: 'off' }, { name: 'on' }] },
+      {
+        name: 'checkbox', status: 'fait', figmaId: '1164:32863',
+        variants: [
+          { name: 'checked',   tokensLight: { surface: '#ffffff', border: '#444955', icon: '#444955' } },
+          { name: 'unchecked', tokensLight: { surface: '#ffffff', border: '#a1a4aa', icon: 'none' } },
+        ],
+      },
     ],
   },
   {
@@ -252,13 +287,6 @@ const FAMILIES: ComponentFamily[] = [
     ],
   },
   {
-    id: 'menu', label: 'Menu & Dropdowns',
-    components: [
-      { name: 'dropdown', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'menu item', status: 'fait', variants: [{ name: 'default' }, { name: 'selected' }, { name: 'hover' }] },
-    ],
-  },
-  {
     id: 'loading', label: 'Loading & Progress',
     components: [
       { name: 'progess bar', status: 'fait', variants: [{ name: 'default' }] },
@@ -266,18 +294,10 @@ const FAMILIES: ComponentFamily[] = [
     ],
   },
   {
-    id: 'switch-radio', label: 'Switch & Radio',
-    components: [
-      { name: 'switch', status: 'fait', variants: [{ name: 'off' }, { name: 'on' }] },
-      { name: 'checkbox', status: 'fait', variants: [{ name: 'unchecked' }, { name: 'checked' }, { name: 'indeterminate' }] },
-      { name: 'checkbox label', status: 'fait', variants: [{ name: 'default' }] },
-    ],
-  },
-  {
     id: 'dividers', label: 'Dividers',
     components: [
       { name: 'horizontal divider', status: 'fait', variants: [{ name: '1191px' }, { name: '935px' }, { name: '350px' }] },
-      { name: 'vertical divider', status: 'fait', variants: [{ name: '84px' }] },
+      { name: 'vertical divider 84px', status: 'fait', variants: [{ name: 'default' }, { name: 'hover' }] },
     ],
   },
   {
@@ -301,7 +321,6 @@ const FAMILIES: ComponentFamily[] = [
     id: 'ai', label: 'AI Components',
     components: [
       { name: 'atome . ai . suggestion', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'atome . titre + icon . suggestion', status: 'fait', variants: [{ name: 'default' }] },
       { name: 'dashboard . suggestions', status: 'fait', variants: [{ name: 'default' }] },
       { name: 'organisme . suggestion', status: 'fait', variants: [{ name: 'default' }] },
     ],
@@ -309,14 +328,17 @@ const FAMILIES: ComponentFamily[] = [
   {
     id: 'scoring', label: 'Scoring',
     components: [
-      { name: 'organisme . scoring . section list', status: 'fait', variants: [{ name: 'default' }] },
+      { name: 'organisme . scoring . section list', status: 'fait', variants: [{ name: 'Up light' }, { name: 'Down light' }] },
     ],
   },
   {
     id: 'graphs', label: 'Graphs',
     components: [
-      { name: 'card . graph . indicateur', status: 'fait', variants: [{ name: 'default' }] },
-      { name: 'graph . courbe', status: 'fait', variants: [{ name: 'default' }] },
+      {
+        name: 'graph . courbe', status: 'fait', figmaId: '1053:23841',
+        variants: [{ name: 'default', tokensLight: { surface: '#ecedee', border: 'none' } }],
+      },
+      { name: 'card . graph . indicateur', status: 'fait', variants: [{ name: 'default', tokensLight: { surface: '#ffffff', border: 'none (shadow)' } }] },
     ],
   },
   {
@@ -327,96 +349,72 @@ const FAMILIES: ComponentFamily[] = [
   },
 ]
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function TokenChip({ specName }: { specName?: string }) {
-  if (!specName || specName === '-') {
-    return <span className="text-xs text-neutral-grey-bold italic">—</span>
-  }
-  const tok = COLOR_SPEC[specName.toLowerCase()]
-  if (!tok) return <span className="text-xs">{specName}</span>
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span
-        className="w-3 h-3 rounded-sm border border-neutral-grey-light inline-block flex-shrink-0"
-        style={{ backgroundColor: tok.hex }}
-      />
-      <code className="text-xs">{specName}</code>
-      <span className="text-neutral-grey-bold text-xs">({tok.hex})</span>
-    </span>
-  )
-}
-
+// ─── Helper atoms ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    'fait': 'bg-green-couleur-fonctionnelle/20 text-green-couleur-fonctionnelle border border-green-couleur-fonctionnelle/30',
-    'à faire': 'bg-yellow-couleur-fonctionnelle/20 text-neutral-anthracite border border-yellow-couleur-fonctionnelle/50',
-    'factoriser': 'bg-blue-couleur-fonctionnelle/20 text-blue-couleur-fonctionnelle border border-blue-couleur-fonctionnelle/30',
+    'fait':       'bg-[#7cd064]/10 text-[#5ab04a] border border-[#7cd064]/30',
+    'à faire':    'bg-[#f8d862]/10 text-[#8a7300] border border-[#f8d862]/50',
+    'factoriser': 'bg-[#33a0fa]/10 text-[#1a7fd4] border border-[#33a0fa]/30',
   }
-  const cls = map[status] ?? 'bg-neutral-grey-light text-neutral-grey-bold border border-neutral-grey-light'
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${cls}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${map[status] ?? 'bg-[#ecedee] text-[#737780] border border-[#ecedee]'}`}>
       {status}
     </span>
   )
 }
 
-function ColorSwatch({ name, hex, label }: { name: string; hex: string; label: string }) {
+function ColorSwatch({ hex, label, token }: { hex: string; label: string; token?: string; name?: string }) {
   const [copied, setCopied] = useState(false)
-  const isDark = parseInt(hex.slice(1, 3), 16) < 150
+  const isDark = parseInt(hex.replace('#','').slice(0, 2), 16) < 140
   return (
     <button
       onClick={() => { navigator.clipboard.writeText(hex); setCopied(true); setTimeout(() => setCopied(false), 1200) }}
-      className="group flex flex-col rounded-lg overflow-hidden border border-neutral-grey-light hover:shadow-md transition-shadow"
-      title={`Copier ${hex}`}
+      className="group flex flex-col rounded-xl overflow-hidden border border-[#ecedee] hover:shadow-md transition-shadow text-left"
+      title={`${hex} — ${token}`}
     >
-      <div className="h-12 w-full relative flex items-center justify-center" style={{ backgroundColor: hex }}>
+      <div className="h-12 w-full flex items-center justify-center relative" style={{ backgroundColor: hex }}>
         {copied && (
-          <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-neutral-anthracite'}`}>✓ Copié</span>
+          <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-[#333740]'}`}>✓ Copié</span>
         )}
       </div>
-      <div className="px-2 py-1.5 bg-background">
-        <p className="text-xs font-bold text-neutral-anthracite truncate">{label}</p>
-        <code className="text-xs text-neutral-grey-bold">{hex}</code>
+      <div className="px-2 py-1.5 bg-white">
+        <p className="text-xs font-bold text-[#333740] truncate">{label}</p>
+        <code className="text-xs text-[#a1a4aa]">{hex}</code>
+        {token && <p className="text-xs text-[#d0d1d4] truncate mt-0.5">{token}</p>}
       </div>
     </button>
   )
 }
 
-function TokenTable({ variants }: { variants: ComponentEntry['variants'] }) {
+function TokenTable({ variants }: { variants: Variant[] }) {
   const withTokens = variants.filter(v => v.tokensLight && Object.values(v.tokensLight).some(Boolean))
   if (withTokens.length === 0) return null
-  const slots: (keyof TokenSet)[] = ['surface', 'border', 'text', 'icon']
+  const slots = ['surface', 'border', 'text', 'icon'] as const
   return (
     <div className="mt-3 overflow-x-auto">
       <table className="w-full text-xs border-collapse">
         <thead>
-          <tr className="bg-background-subtle">
-            <th className="text-left p-2 border border-neutral-grey-light text-neutral-grey-bold font-bold">Variante</th>
-            {slots.map(s => (
-              <th key={s} className="text-left p-2 border border-neutral-grey-light text-neutral-grey-bold font-bold" colSpan={2}>
-                {s}
-              </th>
-            ))}
-          </tr>
-          <tr className="bg-background-subtle">
-            <th className="p-2 border border-neutral-grey-light" />
-            {slots.map(s => (
-              <React.Fragment key={s}>
-                <th className="p-2 border border-neutral-grey-light text-neutral-grey-bold font-normal">☀️ Light</th>
-                <th className="p-2 border border-neutral-grey-light text-neutral-grey-bold font-normal">🌙 Dark</th>
-              </React.Fragment>
-            ))}
+          <tr style={{ backgroundColor: F.n50 }}>
+            <th className="text-left p-2 border border-[#ecedee] text-[#737780] font-bold">Variante</th>
+            {slots.map(s => <th key={s} className="text-left p-2 border border-[#ecedee] text-[#737780] font-bold">{s}</th>)}
           </tr>
         </thead>
         <tbody>
-          {withTokens.map((v) => (
-            <tr key={v.name} className="hover:bg-background-subtle transition-colors">
-              <td className="p-2 border border-neutral-grey-light font-bold text-neutral-anthracite">{v.name}</td>
+          {withTokens.map(v => (
+            <tr key={v.name} className="hover:bg-[#f9f9f9] transition-colors">
+              <td className="p-2 border border-[#ecedee] font-bold text-[#444955]">{v.name}</td>
               {slots.map(s => (
-                <React.Fragment key={s}>
-                  <td className="p-2 border border-neutral-grey-light"><TokenChip specName={v.tokensLight?.[s]} /></td>
-                  <td className="p-2 border border-neutral-grey-light"><TokenChip specName={v.tokensDark?.[s]} /></td>
-                </React.Fragment>
+                <td key={s} className="p-2 border border-[#ecedee]">
+                  {v.tokensLight?.[s] ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      {v.tokensLight[s]!.startsWith('#') && (
+                        <span className="w-3 h-3 rounded-sm border border-[#ecedee] flex-shrink-0 inline-block"
+                          style={{ backgroundColor: v.tokensLight[s] }} />
+                      )}
+                      <code className="text-xs text-[#444955]">{v.tokensLight[s]}</code>
+                    </span>
+                  ) : <span className="text-[#d0d1d4]">—</span>}
+                </td>
               ))}
             </tr>
           ))}
@@ -426,172 +424,383 @@ function TokenTable({ variants }: { variants: ComponentEntry['variants'] }) {
   )
 }
 
-// ─── Live previews for implemented React components ───────────────────────────
+// ─── Live previews (Figma-accurate) ──────────────────────────────────────────
+
+// BUTTON
 function ButtonPreview() {
   return (
-    <div className="space-y-3 p-4 rounded-lg border border-neutral-grey-light bg-background">
-      <p className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wide mb-2">Variantes</p>
-      <div className="flex flex-wrap gap-3">
-        <Button variant="default">Default</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="link">Link</Button>
+    <div className="space-y-5 p-4 rounded-[20px] border border-[#ecedee] bg-white">
+      {/* Figma ghost button */}
+      <div>
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-3">Ghost / text button · Figma</p>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button className="flex items-center gap-2 px-3 py-3 rounded-[16px] text-[16px] font-semibold text-[#444955] tracking-[0.16px] hover:bg-[#ecedee] transition-colors">
+            Voir tout <ArrowRight className="w-5 h-5" />
+          </button>
+          <button className="flex items-center gap-2 px-3 py-3 rounded-[16px] text-[16px] font-semibold text-[#444955] tracking-[0.16px] hover:bg-[#ecedee] transition-colors">
+            tous <ChevronDown className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-xs text-[#a1a4aa] mt-2">
+          border-radius: 16px · padding: 12px · font: SemiBold 16px · letter-spacing: 0.16px
+        </p>
       </div>
-      <p className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wide mt-4 mb-2">Tailles</p>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button size="lg">Large</Button>
-        <Button size="default">Default</Button>
-        <Button size="sm">Small</Button>
-        <Button size="icon"><Plus className="w-4 h-4" /></Button>
+
+      {/* Icon buttons */}
+      <div>
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-3">Icon buttons</p>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button className="p-3 rounded-[16px] hover:bg-[#ecedee] transition-colors text-[#444955]">
+            <Plus className="w-5 h-5" />
+          </button>
+          <button className="p-3 rounded-[16px] hover:bg-[#ecedee] transition-colors text-[#444955]">
+            <Search className="w-5 h-5" />
+          </button>
+          {/* Mega icon button */}
+          <button className="w-[70px] h-[70px] rounded-full border border-[#a1a4aa] flex items-center justify-center hover:bg-[#ecedee] transition-colors text-[#444955]">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-xs text-[#a1a4aa] mt-2">
+          Icon button: p-3 rounded-[16px] · Mega: 70×70 rounded-full border-[#a1a4aa]
+        </p>
       </div>
-      <p className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wide mt-4 mb-2">États</p>
-      <div className="flex flex-wrap gap-3">
-        <Button>Active</Button>
-        <Button disabled>Disabled</Button>
+
+      {/* UI library component */}
+      <div className="pt-3 border-t border-[#ecedee]">
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-3">@real-estate/ui ‹Button›</p>
+        <div className="flex flex-wrap gap-2 items-center">
+          <Button variant="default">Default</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="destructive">Destructive</Button>
+          <Button disabled>Disabled</Button>
+        </div>
       </div>
     </div>
   )
 }
 
-function BadgePreview() {
-  return (
-    <div className="flex flex-wrap gap-2 p-4 rounded-lg border border-neutral-grey-light bg-background">
-      <Badge variant="default">Default</Badge>
-      <Badge variant="secondary">Secondary</Badge>
-      <Badge variant="info">Info</Badge>
-      <Badge variant="success">Success</Badge>
-      <Badge variant="warning">Warning</Badge>
-      <Badge variant="destructive">Danger</Badge>
-      <Badge variant="outline">Outline</Badge>
-    </div>
-  )
-}
-
+// INPUT — underline style (Figma: border-bottom only, no border-box)
 function InputPreview() {
   return (
-    <div className="space-y-3 p-4 rounded-lg border border-neutral-grey-light bg-background max-w-sm">
+    <div className="space-y-5 p-4 rounded-[20px] border border-[#ecedee] bg-white max-w-sm">
+      {/* Figma underline input */}
       <div>
-        <label className="text-sm font-bold text-neutral-anthracite mb-1 block">Label</label>
-        <Input placeholder="Placeholder text…" />
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-3">Input · Figma style (underline)</p>
+        <div className="flex flex-col gap-3">
+          <label className="text-[16px] font-normal text-[#444955] tracking-[0.16px]">Identifiant</label>
+          <div className="bg-white border-b border-[#ecedee] px-3 py-[18px]">
+            <span className="text-[16px] font-semibold text-[#a1a4aa] tracking-[0.16px]">Identifiant</span>
+          </div>
+        </div>
+        <p className="text-xs text-[#a1a4aa] mt-2">
+          border: bottom only #ecedee · placeholder: SemiBold #a1a4aa · py-[18px]
+        </p>
       </div>
+      {/* Focused state */}
       <div>
-        <label className="text-sm font-bold text-neutral-anthracite mb-1 block">Avec valeur</label>
-        <Input defaultValue="damien@1936.ai" />
+        <div className="flex flex-col gap-3">
+          <label className="text-[16px] font-normal text-[#444955] tracking-[0.16px]">Email</label>
+          <div className="bg-white border-b-2 border-[#7b72f9] px-3 py-[18px]">
+            <span className="text-[16px] font-normal text-[#444955] tracking-[0.16px]">damien@1936.ai</span>
+          </div>
+        </div>
       </div>
-      <div>
-        <label className="text-sm font-bold text-neutral-grey-bold mb-1 block">Disabled</label>
-        <Input disabled placeholder="Non modifiable" />
+      {/* UI library */}
+      <div className="pt-3 border-t border-[#ecedee]">
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-2">@real-estate/ui ‹Input›</p>
+        <Input placeholder="Placeholder..." />
       </div>
     </div>
   )
 }
 
+// NAVIGATION RAIL — 90px wide, icons only, no text labels
 function NavigationPreview() {
-  const [active, setActive] = useState('dashboard')
-  const items = [
-    { id: 'dashboard', icon: Home, label: 'Dashboard' },
-    { id: 'clients', icon: Users, label: 'Clients' },
-    { id: 'biens', icon: MapPin, label: 'Biens' },
-    { id: 'affaires', icon: Briefcase, label: 'Affaires' },
-    { id: 'documents', icon: FileText, label: 'Documents' },
+  const [active, setActive] = useState('clients')
+  const top = [{ id: 'dashboard', icon: Home }, { id: 'database', icon: Database }]
+  const mid = [{ id: 'clients', icon: Users }, { id: 'biens', icon: MapPin }, { id: 'affaires', icon: Briefcase }, { id: 'documents', icon: FileText }]
+  const bot = [{ id: 'events', icon: Calendar }, { id: 'automations', icon: Zap }]
+  const navBtn = (id: string, Icon: React.ElementType) => (
+    <button key={id} onClick={() => setActive(id)}
+      className="flex items-center justify-center w-[68px] h-[50px] rounded-[20px] transition-colors"
+      style={{ backgroundColor: active === id ? F.indigoSoft : 'transparent' }}
+      title={id}
+    >
+      <Icon className="w-6 h-6" style={{ color: active === id ? F.indigo : F.n300 }} />
+    </button>
+  )
+  return (
+    <div className="bg-white flex flex-col items-center py-[10px] w-[90px] rounded-[20px] border border-[#ecedee] overflow-hidden"
+      style={{ height: 420 }}>
+      {/* Logo */}
+      <div className="flex items-center justify-center w-full h-[75px] px-[11px]">
+        <div className="w-12 h-7 rounded flex items-center justify-center" style={{ backgroundColor: F.nDefault }}>
+          <span className="text-white text-xs font-bold tracking-wider">ORPI</span>
+        </div>
+      </div>
+      {/* Top section */}
+      <div className="flex flex-col gap-[10px] w-[68px]">
+        {top.map(({ id, icon }) => navBtn(id, icon))}
+      </div>
+      {/* Divider */}
+      <div className="w-[10px] border-t border-[#ecedee] my-[10px]" />
+      {/* Mid section */}
+      <div className="flex flex-col gap-[10px] w-[68px]">
+        {mid.map(({ id, icon }) => navBtn(id, icon))}
+      </div>
+      {/* Divider */}
+      <div className="w-[10px] border-t border-[#ecedee] my-[10px]" />
+      {/* Bottom section */}
+      <div className="flex flex-col gap-[10px] w-[68px]">
+        {bot.map(({ id, icon }) => navBtn(id, icon))}
+      </div>
+      {/* Avatar */}
+      <div className="mt-auto mb-1">
+        <div className="w-[54px] h-[54px] rounded-full bg-[#ecedee] flex items-center justify-center overflow-hidden">
+          <Users className="w-5 h-5 text-[#a1a4aa]" />
+        </div>
+      </div>
+      <p className="text-[10px] text-[#d0d1d4] mt-1">90px · icons only</p>
+    </div>
+  )
+}
+
+// APP BAR — category header with filter + action buttons
+function AppBarPreview() {
+  return (
+    <div className="bg-white px-[10px] py-[25px] rounded-[20px] border border-[#ecedee]">
+      <div className="flex items-center gap-2">
+        <span className="text-[28px] font-bold text-[#333740] tracking-[0.28px] px-[10px] leading-[34px]">
+          Clients
+        </span>
+        <button className="flex items-center gap-2 px-3 py-3 rounded-[16px] text-[16px] font-semibold text-[#444955] tracking-[0.16px] hover:bg-[#ecedee] transition-colors">
+          tous <ChevronDown className="w-5 h-5" />
+        </button>
+        <button className="p-3 rounded-[16px] hover:bg-[#ecedee] transition-colors text-[#444955]">
+          <Plus className="w-5 h-5" />
+        </button>
+        <button className="p-3 rounded-[16px] hover:bg-[#ecedee] transition-colors text-[#444955]">
+          <Search className="w-5 h-5" />
+        </button>
+      </div>
+      <p className="text-xs text-[#a1a4aa] mt-3 px-[10px]">
+        H4 28px Bold #333740 · py-[25px] · buttons: rounded-[16px] p-3
+      </p>
+    </div>
+  )
+}
+
+// LIST CLIENT — full card with 5 sections + dividers
+function ListClientPreview() {
+  return (
+    <div className="overflow-x-auto">
+      <div className="bg-white border border-[#ecedee] rounded-[20px] flex items-center gap-[15px] min-w-[700px]" style={{ height: 120 }}>
+        {/* Name */}
+        <div className="flex flex-col pl-[30px] pr-[20px] py-[34px] w-[213px] shrink-0">
+          <span className="text-[16px] font-normal text-[#444955] tracking-[0.16px] leading-[20px]">Jean-Christophe</span>
+          <span className="text-[16px] font-bold text-[#444955] tracking-[0.16px] leading-[20px] mt-3">LEMARCHAND</span>
+        </div>
+        {/* Divider */}
+        <div className="w-px self-stretch flex items-center justify-center mx-0"><div className="w-px h-[84px] bg-[#ecedee]" /></div>
+        {/* Score */}
+        <div className="flex flex-col items-center justify-center px-[15px] py-[28px] w-[90px] shrink-0">
+          <span className="text-[40px] font-semibold text-[#333740] tracking-[0.4px] leading-[48px]">76</span>
+          <div className="flex items-center gap-1 text-[14px] text-[#444955] tracking-[0.14px]">
+            <span>score</span>
+            <TrendingUp className="w-3.5 h-3.5 text-[#7cd064]" />
+          </div>
+        </div>
+        {/* Divider */}
+        <div className="w-px self-stretch flex items-center"><div className="w-px h-[84px] bg-[#ecedee]" /></div>
+        {/* Qualification */}
+        <div className="flex flex-col gap-6 px-3 py-7 w-[200px] shrink-0">
+          <div className="flex items-center justify-between">
+            <span className="text-[14px] font-semibold text-[#d0d1d4] tracking-[0.14px]">QUALIFICATION</span>
+            <span className="text-[14px] font-normal text-[#d0d1d4] tracking-[0.14px]">82%</span>
+          </div>
+          <div className="flex gap-3">
+            <Users className="w-5 h-5 text-[#a1a4aa]" />
+            <TrendingUp className="w-5 h-5 text-[#a1a4aa]" />
+            <Briefcase className="w-5 h-5 text-[#a1a4aa]" />
+          </div>
+        </div>
+        {/* Divider */}
+        <div className="w-px self-stretch flex items-center"><div className="w-px h-[84px] bg-[#ecedee]" /></div>
+        {/* Engagement */}
+        <div className="flex flex-col gap-6 px-3 py-7 w-[200px] shrink-0">
+          <div className="flex items-center justify-between">
+            <span className="text-[14px] font-semibold text-[#d0d1d4] tracking-[0.14px]">ENGAGEMENT</span>
+            <span className="text-[14px] font-normal text-[#d0d1d4] tracking-[0.14px]">48%</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {[true, true, true, true, false].map((ok, i) => (
+              <div key={i} className={`w-[18px] h-[18px] rounded-full border ${ok ? 'border-[#7cd064] bg-[#7cd064]/20' : 'border-[#ecedee] bg-white'}`} />
+            ))}
+          </div>
+        </div>
+        {/* AI suggestion */}
+        <div className="flex items-center justify-center pl-[19px] pr-[38px] py-[48px] ml-auto shrink-0">
+          <span className="bg-white border border-[#a1a4aa] rounded-full px-[6px] py-[4px] text-[12px] font-bold text-[#a1a4aa] tracking-[0.12px]">0</span>
+        </div>
+      </div>
+      <p className="text-xs text-[#a1a4aa] mt-2">
+        border-radius: 20px · h: 120px · sections séparées par dividers 84px · score: 40px SemiBold
+      </p>
+    </div>
+  )
+}
+
+// BADGE
+function BadgePreview() {
+  return (
+    <div className="p-4 rounded-[20px] border border-[#ecedee] bg-white space-y-3">
+      <div>
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-2">@real-estate/ui ‹Badge›</p>
+        <div className="flex flex-wrap gap-2">
+          {(['default','secondary','info','success','warning','destructive','outline'] as const).map(v => (
+            <Badge key={v} variant={v}>{v}</Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// STICKER / CHIP
+function StickerPreview() {
+  const stickers = [
+    { label: 'ACTIVE',       bg: F.n50,         border: F.n100 },
+    { label: 'ACQUÉREUR',    bg: F.n50,         border: F.n100 },
+    { label: 'VENDEUR',      bg: F.n50,         border: F.n100 },
+    { label: 'INVESTISSEUR', bg: F.n50,         border: F.n100 },
+    { label: 'EN COURS',     bg: '#e9f7ff',     border: '#b3ddfa' },
+    { label: 'SIGNÉ',        bg: '#7cd064]/10', border: F.green },
+    { label: 'ANNULÉ',       bg: '#e95d66]/10', border: F.red },
   ]
   return (
-    <div className="border border-neutral-grey-light rounded-lg overflow-hidden w-56">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-grey-light">
-        <div className="w-6 h-6 rounded bg-indigo-couleur-fonctionnelle flex items-center justify-center">
-          <Home className="w-3.5 h-3.5 text-white-icons" />
-        </div>
-        <span className="font-bold text-sm text-neutral-anthracite">RealAgent</span>
-      </div>
-      <div className="py-2 px-2 flex flex-col gap-0.5">
-        {items.map(({ id, icon: Icon, label }) => (
-          <button
-            key={id}
-            onClick={() => setActive(id)}
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm font-bold w-full text-left transition-colors ${
-              active === id
-                ? 'bg-soft-blue-background text-indigo-couleur-fonctionnelle'
-                : 'text-neutral-grey-bold hover:bg-background-subtle hover:text-neutral-anthracite'
-            }`}
-          >
-            <Icon className="w-4 h-4 flex-shrink-0" />
+    <div className="p-4 rounded-[20px] border border-[#ecedee] bg-white">
+      <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-3">
+        Figma · bg #ecedee · border #dadbdd · rounded-full · px-2 py-1 · Bold 12px
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {stickers.map(({ label, bg, border }) => (
+          <span key={label}
+            className="rounded-full px-2 py-1 text-[12px] font-bold text-[#444955] tracking-[0.12px]"
+            style={{ backgroundColor: bg, border: `1px solid ${border}` }}>
             {label}
-          </button>
+          </span>
         ))}
       </div>
     </div>
   )
 }
 
+// DROPDOWN
+function DropdownPreview() {
+  return (
+    <div className="p-4 rounded-[20px] border border-[#ecedee] bg-white flex flex-wrap gap-4 items-center">
+      <div>
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-2">Shadow variant</p>
+        <button className="flex items-center gap-1 px-5 py-3 rounded-[20px] bg-white text-[16px] font-semibold text-[#444955] tracking-[0.16px] shadow-[1px_1px_8px_0px_rgba(0,0,0,0.15)] hover:shadow-md transition-shadow">
+          Label <ChevronDown className="w-5 h-5" />
+        </button>
+      </div>
+      <div>
+        <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-2">Ghost variant</p>
+        <div className="inline-flex items-center px-2.5 py-1.5 rounded-[10px] hover:bg-[#ecedee] transition-colors cursor-pointer">
+          <span className="text-[16px] font-normal text-[#737780] tracking-[0.16px]">100</span>
+          <ChevronDown className="w-5 h-5 text-[#737780] ml-1" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// CHECKBOX — ROUND (border-radius: 20px from Figma !)
+function CheckboxPreview() {
+  const [checked, setChecked] = useState(true)
+  const [checked2, setChecked2] = useState(false)
+  return (
+    <div className="p-4 rounded-[20px] border border-[#ecedee] bg-white space-y-3">
+      <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-3">
+        Figma · border-radius: 20px · border: #444955 · p-1 · icon Check 20px
+      </p>
+      <div className="flex items-center gap-3">
+        <button onClick={() => setChecked(!checked)}
+          className="w-7 h-7 flex items-center justify-center transition-colors p-1 bg-white"
+          style={{ borderRadius: '20px', border: `1px solid ${checked ? F.nDefault : F.n300}` }}>
+          {checked && <Check className="w-4 h-4 text-[#444955]" strokeWidth={3} />}
+        </button>
+        <span className="text-[16px] text-[#444955] tracking-[0.16px]">Option sélectionnée</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <button onClick={() => setChecked2(!checked2)}
+          className="w-7 h-7 flex items-center justify-center transition-colors p-1 bg-white"
+          style={{ borderRadius: '20px', border: `1px solid ${checked2 ? F.nDefault : F.n300}` }}>
+          {checked2 && <Check className="w-4 h-4 text-[#444955]" strokeWidth={3} />}
+        </button>
+        <span className="text-[16px] text-[#444955] tracking-[0.16px]">Option non sélectionnée</span>
+      </div>
+    </div>
+  )
+}
+
+// SWITCH
 function SwitchPreview() {
   const [on, setOn] = useState(false)
   return (
-    <div className="flex items-center gap-4 p-4 rounded-lg border border-neutral-grey-light bg-background">
-      <button
-        onClick={() => setOn(!on)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-          on ? 'bg-indigo-couleur-fonctionnelle' : 'bg-neutral-grey-light'
-        }`}
-      >
+    <div className="p-4 rounded-[20px] border border-[#ecedee] bg-white flex items-center gap-4">
+      <button onClick={() => setOn(!on)}
+        className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+        style={{ backgroundColor: on ? F.indigo : F.n300 }}>
         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${on ? 'translate-x-6' : 'translate-x-1'}`} />
       </button>
-      <span className="text-sm text-neutral-anthracite font-bold">{on ? 'On' : 'Off'}</span>
+      <span className="text-[16px] font-semibold text-[#444955] tracking-[0.16px]">{on ? 'On' : 'Off'}</span>
     </div>
   )
 }
 
-function CheckboxPreview() {
-  const [checked, setChecked] = useState(false)
+// DPE icons
+function DpePreview() {
+  const dpe = [
+    { l: 'A', bg: '#6cde20' }, { l: 'B', bg: '#c1e01e' }, { l: 'C', bg: '#ebc718' },
+    { l: 'D', bg: '#ed6711' }, { l: 'E', bg: '#f00f0f' }, { l: 'F', bg: '#cc0000' }, { l: 'G', bg: '#990000' },
+  ]
   return (
-    <div className="flex items-center gap-3 p-4 rounded-lg border border-neutral-grey-light bg-background">
-      <button
-        onClick={() => setChecked(!checked)}
-        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-          checked ? 'bg-indigo-couleur-fonctionnelle border-indigo-couleur-fonctionnelle' : 'bg-background border-neutral-grey-light'
-        }`}
-      >
-        {checked && <Check className="w-3 h-3 text-white-icons" />}
-      </button>
-      <span className="text-sm text-neutral-anthracite">Option exemple</span>
-    </div>
-  )
-}
-
-function DpeIconPreview() {
-  const dpeColors: Record<string, { bg: string; text: string }> = {
-    A: { bg: '#6cde20', text: '#ffffff' }, B: { bg: '#c1e01e', text: '#ffffff' },
-    C: { bg: '#ebc718', text: '#ffffff' }, D: { bg: '#ed6711', text: '#ffffff' },
-    E: { bg: '#f00f0f', text: '#ffffff' }, F: { bg: '#cc0000', text: '#ffffff' },
-    G: { bg: '#990000', text: '#ffffff' },
-  }
-  return (
-    <div className="flex gap-2 flex-wrap p-4 rounded-lg border border-neutral-grey-light bg-background">
-      {Object.entries(dpeColors).map(([letter, { bg, text }]) => (
-        <div key={letter} className="w-8 h-8 rounded flex items-center justify-center font-bold text-sm" style={{ backgroundColor: bg, color: text }}>
-          {letter}
+    <div className="p-4 rounded-[20px] border border-[#ecedee] bg-white flex gap-2 flex-wrap">
+      {dpe.map(({ l, bg }) => (
+        <div key={l} className="w-8 h-8 rounded flex items-center justify-center font-bold text-sm text-white"
+          style={{ backgroundColor: bg }}>
+          {l}
         </div>
       ))}
     </div>
   )
 }
 
+// Live previews map
 const LIVE_PREVIEWS: Record<string, React.ReactNode> = {
-  'button': <ButtonPreview />,
-  'Badge': <BadgePreview />,
-  'Input': <InputPreview />,
-  'agent navigation rail . desktop': <NavigationPreview />,
-  'switch': <SwitchPreview />,
-  'checkbox': <CheckboxPreview />,
-  'icon . dpe': <DpeIconPreview />,
+  'button':                            <ButtonPreview />,
+  'Input':                             <InputPreview />,
+  'Badge':                             <BadgePreview />,
+  'agent navigation rail . desktop':   <NavigationPreview />,
+  'App bar_category':                  <AppBarPreview />,
+  'list . client':                     <ListClientPreview />,
+  'atome . sticker':                   <StickerPreview />,
+  'dropdown':                          <DropdownPreview />,
+  'checkbox':                          <CheckboxPreview />,
+  'switch':                            <SwitchPreview />,
+  'icon . dpe':                        <DpePreview />,
 }
 
 // ─── Section wrapper ──────────────────────────────────────────────────────────
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="mb-16 scroll-mt-20">
-      <h2 className="text-title-h2-24px-bold text-neutral-anthracite mb-6 pb-3 border-b-2 border-indigo-couleur-fonctionnelle">
+    <section id={id} className="mb-16">
+      <h2 className="text-[24px] font-bold text-[#333740] tracking-[0.24px] mb-6 pb-3 border-b-2 border-[#7b72f9]">
         {title}
       </h2>
       {children}
@@ -602,91 +811,94 @@ function Section({ id, title, children }: { id: string; title: string; children:
 // ─── Main client component ────────────────────────────────────────────────────
 export function DesignSystemClient() {
   const [dark, setDark] = useState(false)
-  const [activeSection, setActiveSection] = useState('colors')
+  const [activeSection, setActiveSection] = useState('tokens')
   const mainRef = useRef<HTMLDivElement>(null)
 
   const NAV = [
-    { id: 'colors',     label: '🎨 Colors' },
-    { id: 'typography', label: '✍️ Typography' },
-    { id: 'spacing',    label: '📐 Spacing' },
+    { id: 'tokens',     label: 'Token Map' },
+    { id: 'colors',     label: 'Colors' },
+    { id: 'typography', label: 'Typography' },
+    { id: 'spacing',    label: 'Spacing & Radius' },
     ...FAMILIES.map(f => ({ id: f.id, label: f.label })),
   ]
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const el = document.getElementById(id)
+    const container = mainRef.current
+    if (el && container) container.scrollTo({ top: el.offsetTop - 32, behavior: 'smooth' })
     setActiveSection(id)
   }
 
-  // Track scroll position to highlight active nav item
   useEffect(() => {
+    if (!mainRef.current) return
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id) })
-      },
-      { rootMargin: '-20% 0px -70% 0px' }
+      entries => entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id) }),
+      { root: mainRef.current, rootMargin: '-10% 0px -60% 0px' }
     )
-    NAV.forEach(({ id }) => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    })
+    NAV.forEach(({ id }) => { const el = document.getElementById(id); if (el) observer.observe(el) })
     return () => observer.disconnect()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const totalComponents = FAMILIES.reduce((acc, f) => acc + f.components.length, 0)
   const totalDone = FAMILIES.reduce((acc, f) => acc + f.components.filter(c => c.status === 'fait').length, 0)
-  const totalReact = FAMILIES.reduce((acc, f) => acc + f.components.filter(c => c.react).length, 0)
+  const totalWithPreview = FAMILIES.reduce((acc, f) => acc + f.components.filter(c => LIVE_PREVIEWS[c.name]).length, 0)
+  const totalWithFigma = FAMILIES.reduce((acc, f) => acc + f.components.filter(c => c.figmaId).length, 0)
 
   return (
     <div
       className="min-h-screen font-sans"
-      style={{ ...(dark ? DARK_VARS : {}), backgroundColor: 'var(--color-grey-ultra-background)', color: 'var(--color-anthracite-textes)' } as React.CSSProperties}
+      style={{ ...(dark ? DARK_VARS : {}), backgroundColor: dark ? '#111111' : '#f5f5f5', color: dark ? '#f0f0f0' : F.nDefault } as React.CSSProperties}
     >
       {/* ── Header ── */}
       <header
-        className="sticky top-0 z-50 flex items-center justify-between px-6 h-14 border-b border-neutral-grey-light"
-        style={{ backgroundColor: 'var(--color-white-background)' }}
+        className="sticky top-0 z-50 flex items-center justify-between px-6 h-14 border-b border-[#ecedee]"
+        style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff' }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded bg-indigo-couleur-fonctionnelle flex items-center justify-center">
-            <Home className="w-3.5 h-3.5 text-white-icons" />
+          <div className="w-6 h-6 rounded bg-[#7b72f9] flex items-center justify-center">
+            <Home className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="font-bold text-neutral-anthracite">Design System</span>
-          <span className="text-neutral-grey-bold text-sm">— RealAgent</span>
-          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-couleur-fonctionnelle/10 text-red-couleur-fonctionnelle border border-red-couleur-fonctionnelle/20 font-bold">
+          <span className="font-bold text-[#333740]">Design System</span>
+          <span className="text-[#a1a4aa] text-sm">— RealAgent</span>
+          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-[#e95d66]/10 text-[#e95d66] border border-[#e95d66]/20 font-bold">
             DEV ONLY
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-neutral-grey-bold">
-            <span><strong className="text-neutral-anthracite">{totalDone}</strong>/{totalComponents} Figma</span>
-            <span className="text-neutral-grey-light">|</span>
-            <span><strong className="text-neutral-anthracite">{totalReact}</strong> React</span>
+          <div className="flex items-center gap-3 text-sm text-[#737780]">
+            <span><strong className="text-[#444955]">{totalDone}</strong>/{totalComponents} Figma</span>
+            <span className="text-[#ecedee]">|</span>
+            <span><strong className="text-[#444955]">{totalWithFigma}</strong> node IDs</span>
+            <span className="text-[#ecedee]">|</span>
+            <span><strong className="text-[#444955]">{totalWithPreview}</strong> React previews</span>
           </div>
           <button
             onClick={() => setDark(!dark)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-grey-light text-sm font-bold transition-colors hover:bg-background-subtle"
-            style={{ color: 'var(--color-anthracite-textes)' }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#ecedee] text-sm font-bold transition-colors hover:bg-[#ecedee]"
+            style={{ color: dark ? '#f0f0f0' : F.nDefault }}
           >
             {dark ? <><Sun className="w-4 h-4" /> Light</> : <><Moon className="w-4 h-4" /> Dark</>}
           </button>
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
         {/* ── Sidebar ── */}
         <aside
-          className="w-52 shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-neutral-grey-light py-4 px-2"
-          style={{ backgroundColor: 'var(--color-white-background)' }}
+          className="w-52 shrink-0 overflow-y-auto border-r border-[#ecedee] py-4 px-2"
+          style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff' }}
         >
           {NAV.map(({ id, label }) => (
             <button
               key={id}
               onClick={() => scrollTo(id)}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors mb-0.5 ${
-                activeSection === id
-                  ? 'bg-soft-blue-background text-indigo-couleur-fonctionnelle font-bold'
-                  : 'text-neutral-grey-bold hover:bg-background-subtle hover:text-neutral-anthracite'
-              }`}
+              className="w-full text-left px-3 py-2 rounded-xl text-sm transition-colors mb-0.5"
+              style={{
+                backgroundColor: activeSection === id ? F.indigoSoft : 'transparent',
+                color: activeSection === id ? F.indigo : F.n400,
+                fontWeight: activeSection === id ? 700 : 400,
+              }}
             >
               {label}
             </button>
@@ -696,64 +908,90 @@ export function DesignSystemClient() {
         {/* ── Main content ── */}
         <main ref={mainRef} className="flex-1 overflow-y-auto px-10 py-8 max-w-5xl">
 
-          {/* ── Colors ── */}
-          <Section id="colors" title="🎨 Colors">
-            {[
-              { label: 'Backgrounds', items: PALETTE.backgrounds },
-              { label: 'Texts', items: PALETTE.texts },
-              { label: 'Functional (Semantic)', items: PALETTE.functional },
-              { label: 'Icons', items: PALETTE.icons },
-              { label: 'Score / DPE', items: PALETTE.score },
-            ].map(({ label, items }) => (
-              <div key={label} className="mb-8">
-                <h3 className="text-sm font-bold text-neutral-grey-bold uppercase tracking-widest mb-3">{label}</h3>
-                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
-                  {items.map(c => <ColorSwatch key={c.name} {...c} />)}
-                </div>
-              </div>
-            ))}
-
-            {/* Semantic aliases */}
-            <div className="mt-6 p-4 rounded-xl border border-neutral-grey-light" style={{ backgroundColor: 'var(--color-white-background)' }}>
-              <h3 className="text-sm font-bold text-neutral-grey-bold uppercase tracking-widest mb-3">Semantic Tailwind aliases</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {[
-                  ['primary', '#ffffff', 'white-couleur-primaire'],
-                  ['background', '#f5f5f5', 'grey-ultra-background'],
-                  ['background-subtle', '#e5e5e5', 'grey-light-background'],
-                  ['background-softBlue', '#e9f7ff', 'soft-blue-background'],
-                  ['neutral-grey-light', '#e5e5e5', 'grey-light-textes'],
-                  ['neutral-grey-bold', '#6d6d6d', 'grey-bold-textes'],
-                  ['neutral-anthracite', '#474747', 'anthracite-textes'],
-                  ['semantic-info', '#33a0fa', 'blue-couleur-fonctionnelle'],
-                  ['semantic-success', '#7cd064', 'green-couleur-fonctionnelle'],
-                  ['semantic-warning', '#f8d862', 'yellow-couleur-fonctionnelle'],
-                  ['semantic-destructive', '#e95d66', 'red-couleur-fonctionnelle'],
-                ].map(([alias, hex, source]) => (
-                  <div key={alias} className="flex items-center gap-2 p-2 rounded border border-neutral-grey-light">
-                    <div className="w-4 h-4 rounded-sm border border-neutral-grey-light flex-shrink-0" style={{ backgroundColor: hex }} />
-                    <div>
-                      <code className="text-xs font-bold text-neutral-anthracite">{alias}</code>
-                      <span className="text-xs text-neutral-grey-bold ml-1">→ {source}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* ── Token Map ── */}
+          <Section id="tokens" title="Token Map — Figma ↔ Local">
+            <div className="mb-6 p-4 rounded-[20px] bg-[#fff8e6] border border-[#f8d862]/50">
+              <p className="text-sm font-bold text-[#8a7300] mb-1">Discordances importantes à corriger</p>
+              <p className="text-sm text-[#8a7300]">
+                Les tokens Figma utilisent un système de nommage différent des variables CSS locales.
+                Les border-radius sont particulièrement différents : Figma utilise 16px et 20px,
+                le projet local utilise 4px et 8px.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse rounded-[20px] overflow-hidden">
+                <thead>
+                  <tr style={{ backgroundColor: F.n50 }}>
+                    <th className="text-left p-3 border border-[#ecedee] text-[#737780] font-bold">Token Figma</th>
+                    <th className="text-left p-3 border border-[#ecedee] text-[#737780] font-bold">Valeur Figma</th>
+                    <th className="text-left p-3 border border-[#ecedee] text-[#737780] font-bold">Token local (projet)</th>
+                    <th className="text-left p-3 border border-[#ecedee] text-[#737780] font-bold">Valeur locale</th>
+                    <th className="text-left p-3 border border-[#ecedee] text-[#737780] font-bold">Match</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TOKEN_MAP.map(({ figma, fHex, local, lHex, match }) => (
+                    <tr key={figma} className="hover:bg-[#f9f9f9]">
+                      <td className="p-3 border border-[#ecedee]"><code className="text-xs text-[#7b72f9] font-bold">{figma}</code></td>
+                      <td className="p-3 border border-[#ecedee]">
+                        <span className="inline-flex items-center gap-2">
+                          {fHex.startsWith('#') && (
+                            <span className="w-4 h-4 rounded border border-[#ecedee] inline-block flex-shrink-0" style={{ backgroundColor: fHex }} />
+                          )}
+                          <code className="text-xs">{fHex}</code>
+                        </span>
+                      </td>
+                      <td className="p-3 border border-[#ecedee]"><code className="text-xs text-[#737780]">{local}</code></td>
+                      <td className="p-3 border border-[#ecedee]">
+                        <span className="inline-flex items-center gap-2">
+                          {lHex.startsWith('#') && (
+                            <span className="w-4 h-4 rounded border border-[#ecedee] inline-block flex-shrink-0" style={{ backgroundColor: lHex }} />
+                          )}
+                          <code className="text-xs">{lHex}</code>
+                        </span>
+                      </td>
+                      <td className="p-3 border border-[#ecedee]">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${match ? 'bg-[#7cd064]/10 text-[#5ab04a]' : 'bg-[#e95d66]/10 text-[#e95d66]'}`}>
+                          {match ? '✓ ok' : '⚠ delta'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </Section>
 
+          {/* ── Colors ── */}
+          <Section id="colors" title="Colors">
+            {[
+              { label: 'Neutral (Figma)', items: PALETTE.neutral },
+              { label: 'Functional',      items: PALETTE.functional },
+              { label: 'Score / DPE',     items: PALETTE.score },
+            ].map(({ label, items }) => (
+              <div key={label} className="mb-8">
+                <h3 className="text-sm font-bold text-[#737780] uppercase tracking-widest mb-3">{label}</h3>
+                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                  {items.map(c => <ColorSwatch key={c.hex} hex={c.hex} label={c.label} token={'token' in c ? (c as { hex: string; label: string; token: string }).token : undefined} />)}
+                </div>
+              </div>
+            ))}
+          </Section>
+
           {/* ── Typography ── */}
-          <Section id="typography" title="✍️ Typography">
-            <p className="text-sm text-neutral-grey-bold mb-6">Font : <strong>Roboto</strong> — weights 300 / 400 / 700</p>
+          <Section id="typography" title="Typography">
+            <p className="text-sm text-[#737780] mb-6">
+              Font : <strong className="text-[#444955]">Roboto</strong> — weights 400 / 600 / 700 · letter-spacing systématique
+            </p>
             <div className="space-y-2">
-              {TYPE_SCALE.map(({ name, size, weight, lh, sample }) => (
-                <div key={name} className="flex items-baseline gap-4 p-4 rounded-lg border border-neutral-grey-light" style={{ backgroundColor: 'var(--color-white-background)' }}>
-                  <div style={{ fontSize: size, fontWeight: weight, lineHeight: lh, color: 'var(--color-anthracite-textes)' }} className="flex-1 min-w-0 truncate">
+              {TYPE_SCALE.map(({ name, size, weight, lh, ls, sample }) => (
+                <div key={name} className="flex items-baseline gap-4 p-4 rounded-[20px] border border-[#ecedee] bg-white">
+                  <div style={{ fontSize: size, fontWeight: weight, lineHeight: lh, letterSpacing: ls, color: F.nDefault }} className="flex-1 min-w-0 truncate">
                     {sample}
                   </div>
                   <div className="shrink-0 text-right">
-                    <code className="text-xs text-neutral-grey-bold block">{name}</code>
-                    <span className="text-xs text-neutral-grey-bold">{size} / {weight} / lh {lh}</span>
+                    <code className="text-xs text-[#737780] block">{name}</code>
+                    <span className="text-xs text-[#a1a4aa]">{size} / w{weight} / lh {lh} / ls {ls}</span>
                   </div>
                 </div>
               ))}
@@ -761,32 +999,39 @@ export function DesignSystemClient() {
           </Section>
 
           {/* ── Spacing & Radius ── */}
-          <Section id="spacing" title="📐 Spacing & Radius">
+          <Section id="spacing" title="Spacing & Radius">
+            <div className="mb-8 p-4 rounded-[20px] bg-[#fff8e6] border border-[#f8d862]/50">
+              <p className="text-sm font-bold text-[#8a7300]">
+                Figma border-radius: sm = 16px · md = 20px (très arrondi !)
+              </p>
+              <p className="text-xs text-[#8a7300] mt-1">
+                Les tokens Tailwind locaux (4px / 8px) ne correspondent pas au design Figma.
+              </p>
+            </div>
             <div className="mb-8">
-              <h3 className="text-sm font-bold text-neutral-grey-bold uppercase tracking-widest mb-4">Spacing scale</h3>
-              <div className="space-y-2">
-                {SPACING.map(px => (
-                  <div key={px} className="flex items-center gap-4">
-                    <code className="text-xs w-10 text-right text-neutral-grey-bold flex-shrink-0">{px}px</code>
-                    <div className="h-5 bg-indigo-couleur-fonctionnelle rounded-sm flex-shrink-0" style={{ width: px }} />
-                    <span className="text-xs text-neutral-grey-bold">spacing-{px}</span>
+              <h3 className="text-sm font-bold text-[#737780] uppercase tracking-widest mb-4">Border radius (Figma)</h3>
+              <div className="flex flex-wrap gap-6">
+                {RADII.map(({ name, value, note }) => (
+                  <div key={name} className="flex flex-col items-center gap-2">
+                    <div className="w-16 h-16 border-2 border-[#7b72f9] bg-[#e9f7ff]"
+                      style={{ borderRadius: value }} />
+                    <div className="text-center">
+                      <code className="text-xs font-bold text-[#444955] block">radius-{name}</code>
+                      <span className="text-xs text-[#737780] block">{value}</span>
+                      <span className="text-xs text-[#a1a4aa] block">{note}</span>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="text-sm font-bold text-neutral-grey-bold uppercase tracking-widest mb-4">Border radius</h3>
-              <div className="flex flex-wrap gap-4">
-                {RADII.map(({ name, value }) => (
-                  <div key={name} className="flex flex-col items-center gap-2">
-                    <div
-                      className="w-14 h-14 border-2 border-indigo-couleur-fonctionnelle"
-                      style={{ borderRadius: value, backgroundColor: 'var(--color-soft-blue-background)' }}
-                    />
-                    <div className="text-center">
-                      <code className="text-xs font-bold text-neutral-anthracite block">radius-{name}</code>
-                      <span className="text-xs text-neutral-grey-bold">{value}</span>
-                    </div>
+              <h3 className="text-sm font-bold text-[#737780] uppercase tracking-widest mb-4">Spacing scale</h3>
+              <div className="space-y-2">
+                {SPACING.map(px => (
+                  <div key={px} className="flex items-center gap-4">
+                    <code className="text-xs w-10 text-right text-[#737780] flex-shrink-0">{px}px</code>
+                    <div className="h-5 rounded-sm flex-shrink-0" style={{ width: px, backgroundColor: F.indigo }} />
+                    <span className="text-xs text-[#a1a4aa]">spacing-{px}</span>
                   </div>
                 ))}
               </div>
@@ -798,17 +1043,18 @@ export function DesignSystemClient() {
             <Section key={family.id} id={family.id} title={family.label}>
               <div className="space-y-6">
                 {family.components.map(comp => (
-                  <div
-                    key={comp.name}
-                    className="rounded-xl border border-neutral-grey-light overflow-hidden"
-                    style={{ backgroundColor: 'var(--color-white-background)' }}
-                  >
+                  <div key={comp.name} className="rounded-[20px] border border-[#ecedee] overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
                     {/* Component header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-grey-light" style={{ backgroundColor: 'var(--color-grey-ultra-background)' }}>
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-[#ecedee]" style={{ backgroundColor: F.n50 }}>
                       <div className="flex items-center gap-2">
-                        <code className="font-bold text-sm text-neutral-anthracite">{comp.name}</code>
-                        {comp.react && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-indigo-couleur-fonctionnelle/10 text-indigo-couleur-fonctionnelle border border-indigo-couleur-fonctionnelle/20 font-bold">
+                        <code className="font-bold text-sm text-[#333740]">{comp.name}</code>
+                        {comp.figmaId && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-[#7b72f9]/10 text-[#7b72f9] border border-[#7b72f9]/20 font-bold">
+                            Figma {comp.figmaId}
+                          </span>
+                        )}
+                        {LIVE_PREVIEWS[comp.name] && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-[#33a0fa]/10 text-[#33a0fa] border border-[#33a0fa]/20 font-bold">
                             ⚛ React
                           </span>
                         )}
@@ -816,7 +1062,7 @@ export function DesignSystemClient() {
                       <div className="flex items-center gap-2">
                         <div className="flex gap-1 flex-wrap">
                           {comp.variants.map(v => (
-                            <span key={v.name} className="px-1.5 py-0.5 rounded text-xs bg-background-subtle text-neutral-grey-bold border border-neutral-grey-light">
+                            <span key={v.name} className="px-1.5 py-0.5 rounded text-xs bg-white text-[#737780] border border-[#ecedee]">
                               {v.name}
                             </span>
                           ))}
@@ -826,21 +1072,16 @@ export function DesignSystemClient() {
                     </div>
 
                     <div className="p-4">
-                      {/* Live preview for React components */}
                       {LIVE_PREVIEWS[comp.name] && (
                         <div className="mb-4">
-                          <p className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wide mb-2">Live preview</p>
+                          <p className="text-xs font-bold text-[#737780] uppercase tracking-wide mb-2">Preview</p>
                           {LIVE_PREVIEWS[comp.name]}
                         </div>
                       )}
-
-                      {/* Token table */}
                       <TokenTable variants={comp.variants} />
-
-                      {/* No tokens note */}
                       {!LIVE_PREVIEWS[comp.name] && !comp.variants.some(v => v.tokensLight) && (
-                        <p className="text-xs text-neutral-grey-bold italic">
-                          Composant Figma — tokens non renseignés dans la spec.
+                        <p className="text-xs text-[#a1a4aa] italic">
+                          Composant Figma — preview à implémenter.
                         </p>
                       )}
                     </div>
