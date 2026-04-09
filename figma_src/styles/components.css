@@ -1,0 +1,62 @@
+/* ============================================
+   RealAgent Design System - Component Styles
+   ============================================ */
+
+/* Scroll margin pour les sections avec ancres
+   Compense la hauteur des headers sticky (100px AppBarDetail + 100px AppBarAncres) */
+section[id] {
+  scroll-margin-top: 200px;
+}
+
+/* Button Focus Ring
+   Exact Figma structure: 2px border at -4px offset
+   Only visible on keyboard focus (:focus-visible) */
+.button-component:focus-visible .button-focus-ring {
+  opacity: 1;
+}
+
+/* Remove default browser focus outline */
+.button-component:focus {
+  outline: none;
+}
+
+/* IconButton Focus Ring
+   Exact Figma structure: 2px border at -4px offset
+   Only visible on keyboard focus (:focus-visible) */
+.icon-button-component:focus-visible .icon-button-focus-ring {
+  opacity: 1;
+}
+
+/* IconButtonMega Focus Ring
+   Exact Figma structure: 2px border at -4px offset
+   Only visible on keyboard focus (:focus-visible) */
+.icon-button-mega-component:focus-visible .icon-button-mega-focus-ring {
+  opacity: 1;
+}
+
+/* ============================================
+   Layout - Page Content Wrapper
+   Handles all maxWidth — components NEVER set their own width
+   ============================================ */
+.page-content {
+  width: 100%;
+  padding-left: 25px;
+  padding-right: 25px;
+  max-width: 960px; /* desktop 1280-1599 */
+}
+@media (min-width: 1600px) {
+  .page-content { max-width: 1024px; }
+}
+@media (max-width: 1279px) {
+  .page-content { max-width: 100%; }
+}
+@media (max-width: 767px) {
+  .page-content { padding: 0 16px; max-width: 100%; }
+}
+
+/* Sheet widths */
+.sheet-narrow { width: 390px; }
+.sheet-wide { width: 960px; }
+@media (min-width: 1600px) { .sheet-wide { width: 1024px; } }
+@media (max-width: 1279px) { .sheet-narrow { width: calc(100% - 90px); } .sheet-wide { width: calc(100% - 90px); } }
+@media (max-width: 767px) { .sheet-narrow, .sheet-wide { width: 100%; border-radius: 16px 16px 0 0; } }

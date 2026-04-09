@@ -1,0 +1,10 @@
+// SUP - Sign Up Parcours (Nomenclature SUP_XX_Title)
+export { default as SUP_00_LandingPage } from "./SUP_00_LandingPage";
+export { default as SUP_01_MethodChoice } from "./SUP_01_MethodChoice";
+export { default as SUP_02_EmailPasswordForm } from "./EmailPasswordForm";
+export { default as SUP_03_VerifyEmail } from "./VerifyEmail";
+export { default as SUP_04_PersonaRouting } from "./PersonaRouting";
+export { default as SUP_05A_ProfileSolo } from "./ProfileSolo";
+export { default as SUP_05B_ProfileAgency } from "./ProfileAgency";
+export { default as SUP_06_TeamInvitation } from "./TeamInvitation";
+export { default as SUP_07_Confirmation } from "./Confirmation";
