@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
 import { Roboto } from "next/font/google"
 import "./globals.css"
-import { Sidebar } from "../components/Sidebar"
-import { createClient } from "@/lib/supabase/server"
 
 const roboto = Roboto({
   weight: ['300', '400', '700'],
@@ -11,24 +9,17 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: "RealAgent - CRM Immo",
-  description: "Dashboard Agent Immobilier",
+  title: "RealAgent - CRM Immobilier",
+  description: "CRM pour agents immobiliers français",
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const isAuthenticated = !!user
-
   return (
     <html lang="fr">
-      <body className={`${roboto.variable} antialiased bg-background-subtle`}>
-        {isAuthenticated && <Sidebar />}
-        <main className={isAuthenticated ? "pl-64 min-h-screen" : "min-h-screen"}>
-          {children}
-        </main>
+      <body className={`${roboto.variable} antialiased`}>
+        {children}
       </body>
     </html>
   )
