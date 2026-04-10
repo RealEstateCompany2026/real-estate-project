@@ -46,10 +46,18 @@ export default function OnboardingSetupPage() {
     setIsLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-      await supabase
-        .from('Agent')
-        .update({ onboardingStep: 'DONE', onboardingCompleted: true })
-        .eq('userId', user.id)
+      // Resolve User.id from auth user (3-identity architecture)
+      const { data: appUser } = await supabase
+        .from('User')
+        .select('id')
+        .eq('supabase_id', user.id)
+        .single()
+      if (appUser) {
+        await supabase
+          .from('Agent')
+          .update({ onboardingStep: 'DONE', onboardingCompleted: true })
+          .eq('userId', appUser.id)
+      }
     }
     router.push('/dashboard')
   }

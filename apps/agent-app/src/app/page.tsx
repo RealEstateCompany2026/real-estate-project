@@ -9,12 +9,21 @@ export default async function HomePage() {
     redirect('/login')
   }
 
-  // Check onboarding status
-  const { data: agent } = await supabase
-    .from('Agent')
-    .select('onboardingCompleted')
-    .eq('userId', user.id)
+  // Resolve User.id from auth user (3-identity architecture: auth.users → User → Agent)
+  const { data: appUser } = await supabase
+    .from('User')
+    .select('id')
+    .eq('supabase_id', user.id)
     .single()
+
+  // Check onboarding status
+  const { data: agent } = appUser
+    ? await supabase
+        .from('Agent')
+        .select('onboardingCompleted')
+        .eq('userId', appUser.id)
+        .single()
+    : { data: null }
 
   if (!agent?.onboardingCompleted) {
     redirect('/tour')

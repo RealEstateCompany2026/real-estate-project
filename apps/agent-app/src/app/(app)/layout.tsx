@@ -12,12 +12,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/login')
   }
 
-  // Onboarding not completed → redirect to tour
-  const { data: agent } = await supabase
-    .from('Agent')
-    .select('onboardingCompleted')
-    .eq('userId', user.id)
+  // Resolve User.id from auth user (3-identity architecture: auth.users → User → Agent)
+  const { data: appUser } = await supabase
+    .from('User')
+    .select('id')
+    .eq('supabase_id', user.id)
     .single()
+
+  // Onboarding not completed → redirect to tour
+  const { data: agent } = appUser
+    ? await supabase
+        .from('Agent')
+        .select('onboardingCompleted')
+        .eq('userId', appUser.id)
+        .single()
+    : { data: null }
 
   if (!agent?.onboardingCompleted) {
     redirect('/tour')
