@@ -1,6 +1,19 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PUBLIC_ROUTES = [
+  '/login',
+  '/signup',
+  '/verify-email',
+  '/forgot-password',
+  '/invitation',
+  '/account-locked',
+]
+
+function isPublicRoute(pathname: string) {
+  return PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
+}
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -25,19 +38,30 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
+  const { pathname } = request.nextUrl
 
-  if (!user && !isAuthRoute) {
+  // Authenticated user trying to access auth pages → redirect to dashboard
+  if (user && isPublicRoute(pathname)) {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 
-  if (user && request.nextUrl.pathname === '/auth/login') {
+  // Unauthenticated user trying to access protected pages → redirect to login
+  if (!user && !isPublicRoute(pathname) && pathname !== '/') {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Root page → redirect based on auth status
+  if (pathname === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = user ? '/dashboard' : '/login'
     return NextResponse.redirect(url)
   }
 
