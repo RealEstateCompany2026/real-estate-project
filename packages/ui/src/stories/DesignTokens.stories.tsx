@@ -91,14 +91,6 @@ const PaletteStory = () => (
       </Grid>
     </Section>
 
-    <Section title="Score Palette (DPE)">
-      <Grid>
-        {["green", "grass", "yellow", "orange", "red"].map((n) => (
-          <Swatch key={n} name={`score-${n}`} cssVar={`--score-${n}`} />
-        ))}
-      </Grid>
-    </Section>
-
     <Section title="Surface Tokens (Layer 3 — use these)">
       <Grid>
         <Swatch name="page" cssVar="--surface-page" />
@@ -172,11 +164,12 @@ const PaletteStory = () => (
 
     <Section title="Typography">
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div style={{ fontSize: "var(--text-h0)", lineHeight: "var(--lh-h0)", fontWeight: 700, color: "var(--text-headings)" }}>H0 — 40px Bold</div>
-        <div style={{ fontSize: "var(--text-h1)", lineHeight: "var(--lh-h1)", fontWeight: 700, color: "var(--text-headings)" }}>H1 — 28px Bold</div>
-        <div style={{ fontSize: "var(--text-h2)", lineHeight: "var(--lh-h2)", fontWeight: 700, color: "var(--text-headings)" }}>H2 — 24px Bold</div>
-        <div style={{ fontSize: "var(--text-h3)", lineHeight: "var(--lh-h3)", fontWeight: 700, color: "var(--text-headings)" }}>H3 — 20px Bold</div>
-        <div style={{ fontSize: "var(--text-h4)", lineHeight: "var(--lh-h4)", fontWeight: 700, color: "var(--text-headings)" }}>H4 — 16px Bold</div>
+        <div style={{ fontSize: "var(--text-h1)", lineHeight: "var(--lh-h1)", fontWeight: 700, color: "var(--text-headings)" }}>H1 — 48px Bold</div>
+        <div style={{ fontSize: "var(--text-h2)", lineHeight: "var(--lh-h2)", fontWeight: 700, color: "var(--text-headings)" }}>H2 — 40px Bold</div>
+        <div style={{ fontSize: "var(--text-h3)", lineHeight: "var(--lh-h3)", fontWeight: 700, color: "var(--text-headings)" }}>H3 — 32px Bold</div>
+        <div style={{ fontSize: "var(--text-h4)", lineHeight: "var(--lh-h4)", fontWeight: 700, color: "var(--text-headings)" }}>H4 — 28px Bold</div>
+        <div style={{ fontSize: "var(--text-h5)", lineHeight: "var(--lh-h5)", fontWeight: 700, color: "var(--text-headings)" }}>H5 — 24px Bold</div>
+        <div style={{ fontSize: "var(--text-h6)", lineHeight: "var(--lh-h6)", fontWeight: 700, color: "var(--text-headings)" }}>H6 — 20px Bold</div>
         <div style={{ fontSize: "var(--text-lg)", lineHeight: "var(--lh-lg)", color: "var(--text-body)" }}>Body Large — 20px Regular</div>
         <div style={{ fontSize: "var(--text-base)", lineHeight: "var(--lh-base)", color: "var(--text-body)" }}>Body Base — 16px Regular</div>
         <div style={{ fontSize: "var(--text-sm)", lineHeight: "var(--lh-sm)", color: "var(--text-body)" }}>Body Small — 14px Regular</div>

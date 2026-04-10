@@ -136,7 +136,7 @@ export function ClientListView() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-h2 text-content-headings">Clients</h1>
+          <h1 className="text-h5 text-content-headings">Clients</h1>
           <p className="text-sm text-content-subtle mt-0.5">
             {clients.length} client{clients.length > 1 ? 's' : ''} actif{clients.length > 1 ? 's' : ''}
           </p>

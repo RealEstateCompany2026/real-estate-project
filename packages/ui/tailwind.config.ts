@@ -95,13 +95,6 @@ const config: Config = {
                 700: "var(--orange-700)",
                 800: "var(--orange-800)",
             },
-            score: {
-                green: "var(--score-green)",
-                grass: "var(--score-grass)",
-                yellow: "var(--score-yellow)",
-                orange: "var(--score-orange)",
-                red: "var(--score-red)",
-            },
 
             // ── Layer 3: Mapped tokens (PREFERRED — use these in components) ──
 
@@ -187,21 +180,19 @@ const config: Config = {
         },
 
         spacing: {
-            "0": "var(--scale-0)",
-            px: "var(--scale-25)",
-            "0.5": "var(--scale-50)",
-            "1": "var(--scale-100)",
-            "2": "var(--scale-200)",
-            "3": "var(--scale-300)",
-            "4": "var(--scale-400)",
-            "5": "var(--scale-500)",
-            "6": "var(--scale-600)",
-            "7": "var(--scale-700)",
-            "8": "var(--scale-800)",
-            "10": "var(--scale-900)",
-            "12": "var(--scale-1000)",
-            "16": "var(--scale-1200)",
-            // Extra spacing for layouts
+            "0": "var(--spacing-0)",
+            px: "var(--spacing-px)",
+            "0.5": "var(--spacing-0\\.5)",
+            "1": "var(--spacing-1)",
+            "2": "var(--spacing-2)",
+            "3": "var(--spacing-3)",
+            "4": "var(--spacing-4)",
+            "5": "var(--spacing-5)",
+            "6": "var(--spacing-6)",
+            "7": "var(--spacing-7)",
+            "8": "var(--spacing-8)",
+            "10": "var(--spacing-10)",
+            // Extra spacing for layouts (not in Figma, kept for practical use)
             "20": "80px",
             "24": "96px",
             "64": "256px",
@@ -209,13 +200,9 @@ const config: Config = {
 
         borderRadius: {
             none: "var(--border-radius-0)",
-            sm: "var(--border-radius-100)",
             DEFAULT: "var(--border-radius-200)",
-            md: "var(--border-radius-300)",
             lg: "var(--border-radius-400)",
-            xl: "var(--border-radius-600)",
             "2xl": "var(--border-radius-700)",
-            full: "var(--border-radius-full)",
         },
 
         borderWidth: {
@@ -239,11 +226,12 @@ const config: Config = {
                 sans: ["var(--font-family)", "sans-serif"],
             },
             fontSize: {
-                h0: ["var(--text-h0)", { lineHeight: "var(--lh-h0)", fontWeight: "700" }],
                 h1: ["var(--text-h1)", { lineHeight: "var(--lh-h1)", fontWeight: "700" }],
                 h2: ["var(--text-h2)", { lineHeight: "var(--lh-h2)", fontWeight: "700" }],
                 h3: ["var(--text-h3)", { lineHeight: "var(--lh-h3)", fontWeight: "700" }],
                 h4: ["var(--text-h4)", { lineHeight: "var(--lh-h4)", fontWeight: "700" }],
+                h5: ["var(--text-h5)", { lineHeight: "var(--lh-h5)", fontWeight: "700" }],
+                h6: ["var(--text-h6)", { lineHeight: "var(--lh-h6)", fontWeight: "700" }],
                 lg: ["var(--text-lg)", { lineHeight: "var(--lh-lg)" }],
                 base: ["var(--text-base)", { lineHeight: "var(--lh-base)" }],
                 sm: ["var(--text-sm)", { lineHeight: "var(--lh-sm)" }],

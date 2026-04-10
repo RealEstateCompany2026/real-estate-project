@@ -21,18 +21,26 @@
   --scale-700: 28px;
   --scale-800: 32px;
   --scale-900: 40px;
-  --scale-1000: 48px;
-  --scale-1200: 64px;
+
+  /* --- Spacing aliases (semantic) --- */
+  --spacing-0: var(--scale-0);
+  --spacing-px: var(--scale-25);
+  --spacing-0\.5: var(--scale-50);
+  --spacing-1: var(--scale-100);
+  --spacing-2: var(--scale-200);
+  --spacing-3: var(--scale-300);
+  --spacing-4: var(--scale-400);
+  --spacing-5: var(--scale-500);
+  --spacing-6: var(--scale-600);
+  --spacing-7: var(--scale-700);
+  --spacing-8: var(--scale-800);
+  --spacing-10: var(--scale-900);
 
   /* --- Border radius --- */
   --border-radius-0: 0px;
-  --border-radius-100: 4px;
   --border-radius-200: 8px;
-  --border-radius-300: 12px;
   --border-radius-400: 16px;
-  --border-radius-600: 24px;
   --border-radius-700: 28px;
-  --border-radius-full: 9999px;
 
   /* --- Border width --- */
   --border-width-0: 0px;
@@ -43,12 +51,13 @@
   /* --- Typography --- */
   --font-family: 'Roboto', sans-serif;
 
-  /* Heading sizes */
-  --text-h0: 40px;
-  --text-h1: 28px;
-  --text-h2: 24px;
-  --text-h3: 20px;
-  --text-h4: 16px;
+  /* Heading sizes (aligned with Figma) */
+  --text-h1: 48px;
+  --text-h2: 40px;
+  --text-h3: 32px;
+  --text-h4: 28px;
+  --text-h5: 24px;
+  --text-h6: 20px;
 
   /* Paragraph / body sizes */
   --text-lg: 20px;
@@ -56,12 +65,13 @@
   --text-sm: 14px;
   --text-xs: 12px;
 
-  /* Line heights */
-  --lh-h0: 40px;
-  --lh-h1: 34px;
-  --lh-h2: 32px;
-  --lh-h3: 26px;
-  --lh-h4: 24px;
+  /* Line heights (aligned with Figma) */
+  --lh-h1: 58px;
+  --lh-h2: 48px;
+  --lh-h3: 38px;
+  --lh-h4: 34px;
+  --lh-h5: 28px;
+  --lh-h6: 24px;
   --lh-lg: 24px;
   --lh-base: 22px;
   --lh-sm: 16px;
@@ -144,12 +154,6 @@
   --orange-700: #803600;
   --orange-800: #401B00;
 
-  /* --- Score palette (DPE / performance) --- */
-  --score-green: #6cde20;
-  --score-grass: #c1e01e;
-  --score-yellow: #ebc718;
-  --score-orange: #ed6711;
-  --score-red: #f00f0f;
 }
 
 /* ==================== LAYER 2 — SEMANTIC ALIASES ==================== */
@@ -288,9 +292,13 @@
   --border-warning: var(--orange-100);
   --border-warning-default: var(--orange-500);
 
-  /* --- Legacy compatibility --- */
+  /* --- Legacy / shadcn compatibility --- */
+  --border: var(--neutral-50);
   --background: var(--neutral-white);
   --foreground: var(--neutral-600);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
 }
 
 /* ==================== DARK MODE TOKENS ==================== */
@@ -368,7 +376,11 @@
   --border-warning: var(--orange-600);
   --border-warning-default: var(--orange-300);
 
-  /* Legacy compatibility */
+  /* Legacy / shadcn compatibility */
+  --border: var(--neutral-700);
   --background: var(--neutral-800);
   --foreground: var(--neutral-200);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
 }
