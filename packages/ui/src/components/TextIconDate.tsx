@@ -20,7 +20,7 @@ export function TextIconDate({ days, className = "" }: TextIconDateProps) {
       <div className="relative shrink-0 w-[20px] h-[20px]">
         <Calendar
           size={20}
-          className="text-content-body dark:text-content-caption"
+          className="text-content-body"
         />
       </div>
 

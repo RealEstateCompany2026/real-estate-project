@@ -47,7 +47,7 @@ export function Chip({
           {icon}
         </span>
       )}
-      <span className={`${sizeClasses} ${weightClass} ${colorClass} whitespace-nowrap tracking-wide`}>
+      <span className={`${sizeClasses} ${weightClass} ${colorClass} whitespace-nowrap ${size === "medium" ? "tracking-[0.16px]" : "tracking-[0.14px]"}`}>
         {children}
       </span>
       {icon && iconPosition === "right" && (
