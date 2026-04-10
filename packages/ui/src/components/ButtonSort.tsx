@@ -47,10 +47,10 @@ export function ButtonSort({
       aria-label={`Trier par ${label} ${sortDirection === "asc" ? "croissant" : sortDirection === "desc" ? "décroissant" : ""}`}
     >
       {/* Label + Count */}
-      <div className="px-[10px] py-[8px]">
+      <div className="p-3">
         <p
           className={`
-            text-[14px] leading-[16px] tracking-[0.14px] whitespace-nowrap
+            text-base font-semibold tracking-[0.14px] whitespace-nowrap
             ${isSorted ? "text-content-body" : "text-content-caption"}
           `}
         >
@@ -60,7 +60,7 @@ export function ButtonSort({
 
       {/* Sort Icon - Visible uniquement si trié */}
       {isSorted && (
-        <div className="w-[24px] h-[24px] shrink-0">
+        <div className="w-5 h-5 shrink-0">
           {sortDirection === "asc" ? (
             <ArrowUp
               className="w-full h-full"

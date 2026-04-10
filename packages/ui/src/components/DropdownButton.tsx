@@ -37,11 +37,11 @@ export function DropdownButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`h-11 rounded-lg px-5 py-3 min-w-[104px] bg-surface-neutral-default border border-edge-default transition-all ${
+      className={`h-11 rounded-lg p-3 min-w-[104px] bg-surface-neutral-default border border-edge-default transition-all ${
         shadow ? "shadow-sm" : ""
       } ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:bg-surface-neutral-action"} ${className}`.trim()}
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         {LeftIcon && <LeftIcon size={20} className="shrink-0 text-content-body" />}
         {label && LeftIcon && <div className="w-1" />}
         {label && (

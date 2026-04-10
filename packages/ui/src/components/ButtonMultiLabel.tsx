@@ -41,9 +41,9 @@ export function ButtonMultiLabel({
         : "text-neutral-500 dark:text-neutral-400",
       fontWeight: isSelected ? "font-bold" : "font-semibold",
       borderRadius: isFirst
-        ? "rounded-l-[20px]"
+        ? "rounded-l-[16px]"
         : isLast
-          ? "rounded-r-[20px]"
+          ? "rounded-r-[16px]"
           : "rounded-none",
     };
   };

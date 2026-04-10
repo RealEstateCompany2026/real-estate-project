@@ -66,16 +66,16 @@ export const WithIcon: Story = {
   render: () => (
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
       <Button variant="default">
-        <Plus className="w-4 h-4 mr-2" /> Nouveau client
+        <Plus className="w-5 h-5" /> Nouveau client
       </Button>
       <Button variant="outline">
-        <Download className="w-4 h-4 mr-2" /> Exporter
+        <Download className="w-5 h-5" /> Exporter
       </Button>
       <Button variant="destructive">
-        <Trash2 className="w-4 h-4 mr-2" /> Supprimer
+        <Trash2 className="w-5 h-5" /> Supprimer
       </Button>
       <Button variant="ghost">
-        Suivant <ArrowRight className="w-4 h-4 ml-2" />
+        Suivant <ArrowRight className="w-5 h-5" />
       </Button>
     </div>
   ),
@@ -97,7 +97,7 @@ export const AllVariants: Story = {
         <Button variant="default" size="sm">Small</Button>
         <Button variant="default" size="default">Default</Button>
         <Button variant="default" size="lg">Large</Button>
-        <Button variant="default" size="icon"><Plus className="w-4 h-4" /></Button>
+        <Button variant="default" size="icon"><Plus className="w-5 h-5" /></Button>
       </div>
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <Button variant="default" disabled>Disabled</Button>
