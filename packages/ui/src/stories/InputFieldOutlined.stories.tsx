@@ -84,7 +84,7 @@ export const Interactive: Story = {
     return (
       <InputFieldOutlined
         label="Notes"
-        placeholder: "Ajoutez des notes..."
+        placeholder="Ajoutez des notes..."
         value={value}
         onChange={(e) => setValue(e.target.value)}
         hintText={`${value.length} caractères`}

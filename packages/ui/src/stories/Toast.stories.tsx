@@ -59,7 +59,7 @@ export const WithoutDescription: Story = {
   },
 };
 
-export const Auto Dismiss: Story = {
+export const AutoDismiss: Story = {
   args: {
     id: "toast-6",
     variant: "info" as ToastVariant,

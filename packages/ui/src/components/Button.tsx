@@ -63,4 +63,30 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
-export { Button, buttonVariants }
+/**
+ * IconButton — Convenience wrapper for icon-only buttons.
+ * Uses the Button with size="icon" and ghost variant by default.
+ */
+export interface IconButtonProps extends Omit<ButtonProps, "size"> {
+    icon?: React.ReactNode
+    size?: number
+}
+
+const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+    ({ icon, children, variant = "ghost", className, ...props }, ref) => {
+        return (
+            <Button
+                variant={variant}
+                size="icon"
+                className={cn("shrink-0", className)}
+                ref={ref}
+                {...props}
+            >
+                {icon || children}
+            </Button>
+        )
+    }
+)
+IconButton.displayName = "IconButton"
+
+export { Button, buttonVariants, IconButton }
