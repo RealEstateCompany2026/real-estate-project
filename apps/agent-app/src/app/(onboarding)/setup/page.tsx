@@ -48,7 +48,7 @@ export default function OnboardingSetupPage() {
     if (user) {
       await supabase
         .from('Agent')
-        .update({ onboardingStep: 'COMPLETED', onboardingCompleted: true })
+        .update({ onboardingStep: 'DONE', onboardingCompleted: true })
         .eq('userId', user.id)
     }
     router.push('/dashboard')
