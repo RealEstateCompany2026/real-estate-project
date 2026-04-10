@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react";
 
-// Import the design system tokens
-import "../src/tokens.css";
+// Import Tailwind + design system tokens + Roboto font
+import "../src/globals.css";
 
 const preview: Preview = {
   parameters: {
