@@ -1,7 +1,14 @@
 import type { Preview } from "@storybook/react";
 
-// Import Tailwind + design system tokens + Roboto font
+// Import design system tokens (CSS custom properties)
+import "../src/tokens.css";
+// Import Tailwind utilities + Roboto font
 import "../src/globals.css";
+// Import Roboto font weights
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/600.css";
+import "@fontsource/roboto/700.css";
 
 const preview: Preview = {
   parameters: {

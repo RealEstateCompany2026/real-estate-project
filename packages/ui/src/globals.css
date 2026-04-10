@@ -2,16 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design System tokens */
-@import "./tokens.css";
-
-/* Roboto font */
-@import "@fontsource/roboto/400.css";
-@import "@fontsource/roboto/500.css";
-@import "@fontsource/roboto/600.css";
-@import "@fontsource/roboto/700.css";
-
-/* Base styles */
+/* Base styles — tokens.css and @fontsource imports are handled in preview.ts */
 body {
   font-family: "Roboto", sans-serif;
   color: var(--text-body);
