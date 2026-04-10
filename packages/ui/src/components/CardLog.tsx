@@ -22,7 +22,7 @@ export interface CardLogProps {
   /** Description de l'activité */
   description: string;
   /** Variante de couleur pour la catégorie */
-  categoryVariant?: "default" | "primary" | "success" | "warning" | "error";
+  categoryVariant?: "default" | "information" | "success" | "warning" | "error";
 }
 
 export const CardLog: React.FC<CardLogProps> = ({

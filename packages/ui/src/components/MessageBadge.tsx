@@ -29,13 +29,13 @@ export function MessageBadge({
     <div
       className={`
         h-[20px] relative rounded-[16px] shrink-0
-        border border-solid border-neutral-500 dark:border-neutral-200
+        border border-solid border-edge-neutral-default
         ${className}
       `.trim()}
     >
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex h-full items-center px-[8px] py-[4px] relative">
-          <p className="text-[12px] leading-[14px] text-center tracking-[0.12px] whitespace-nowrap font-bold text-neutral-500 dark:text-neutral-200">
+          <p className="text-[12px] leading-[14px] text-center tracking-[0.12px] whitespace-nowrap font-bold text-content-caption">
             {label}
           </p>
         </div>

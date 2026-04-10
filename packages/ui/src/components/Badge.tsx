@@ -3,35 +3,37 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/utils"
 
 /**
- * Badge — Design System tokens mapping:
+ * Badge (Sticker) — Aligned with Figma DS (file 09EiMQjcDWgb7MzykS8zU0)
  *
- *   default:      surface/branded-action, text/branded-on-action
- *   secondary:    surface/neutral-action, text/body
- *   destructive:  red-500, white
- *   success:      green-500, white
- *   warning:      surface/warning, text/warning
- *   info:         surface/information, text/information
- *   outline:      border/default, text/body
+ * Figma name: "atome . sticker"
+ * Figma specs: height 20px, padding 4px 8px, border-radius 16px,
+ * border 1px, font Roboto Bold 12px/14px, tracking 0.12px, uppercase
+ *
+ * Figma variants → code mapping:
+ *   "Default light/dark"     → default   (border only, neutral text)
+ *   "Disabled light/dark"    → disabled  (surface-disabled bg)
+ *   "information light/dark" → information (blue/purple bg)
+ *   "warning light/dark"     → warning   (orange bg)
+ *   "success light/dark"     → success   (green bg)
+ *   "error light/dark"       → error     (red bg)
  */
 const badgeVariants = cva(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-sm font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2",
+    "inline-flex items-center h-[20px] rounded-lg border px-[8px] py-[4px] text-[12px] leading-[14px] tracking-[0.12px] font-bold text-center whitespace-nowrap uppercase font-roboto transition-colors",
     {
         variants: {
             variant: {
                 default:
-                    "border-transparent bg-surface-branded-action text-content-branded-on-action",
-                secondary:
-                    "border-transparent bg-surface-neutral-action text-content-body",
-                destructive:
-                    "border-transparent bg-red-500 text-white",
+                    "border-edge-neutral-default text-content-caption bg-transparent",
+                disabled:
+                    "bg-surface-disabled border-edge-disabled text-content-disabled",
                 success:
-                    "border-transparent bg-green-500 text-white",
+                    "bg-surface-success border-edge-success text-content-success",
                 warning:
-                    "border-transparent bg-surface-warning text-content-warning",
-                info:
-                    "border-transparent bg-surface-information text-content-information",
-                outline:
-                    "text-content-body border-edge-default",
+                    "bg-surface-warning border-edge-warning text-content-warning",
+                information:
+                    "bg-surface-information border-edge-information text-content-information",
+                error:
+                    "bg-surface-error border-edge-error text-content-error",
             },
         },
         defaultVariants: {
@@ -49,5 +51,7 @@ function Badge({ className, variant, ...props }: BadgeProps) {
         <div className={cn(badgeVariants({ variant }), className)} {...props} />
     )
 }
+
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>
 
 export { Badge, badgeVariants }

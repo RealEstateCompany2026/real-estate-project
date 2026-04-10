@@ -39,7 +39,7 @@ export function PropertyCard({ variant, property }: PropertyCardProps) {
                         {property.address}
                     </p>
                 </div>
-                <Badge variant={variant === "agent" ? "info" : "default"}>
+                <Badge variant={variant === "agent" ? "information" : "default"}>
                     {variant === "agent" ? "Agent View" : "Owner View"}
                 </Badge>
             </div>
@@ -104,7 +104,7 @@ export function PropertyCard({ variant, property }: PropertyCardProps) {
                                             <p className="text-sm text-content-subtle">{log.description}</p>
                                         </div>
                                         {log.amount && (
-                                            <Badge variant="secondary">€{log.amount}</Badge>
+                                            <Badge variant="default">€{log.amount}</Badge>
                                         )}
                                     </div>
                                 ))

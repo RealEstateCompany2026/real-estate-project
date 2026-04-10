@@ -46,9 +46,9 @@ export function BadgePaymentMethod({
     <div
       className={`
         relative h-[35px] w-[60px] rounded-[16px]
-        border border-[#dadbdd] border-solid
+        border border-edge-default border-solid
         flex items-center justify-center
-        bg-white dark:bg-neutral-800
+        bg-surface-neutral-default
         ${className}
       `.trim()}
     >
@@ -59,7 +59,7 @@ export function BadgePaymentMethod({
           className="w-full h-full object-contain rounded-[16px] p-1"
         />
       ) : (
-        <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+        <span className="text-xs font-semibold text-content-caption">
           {getMethodLabel()}
         </span>
       )}

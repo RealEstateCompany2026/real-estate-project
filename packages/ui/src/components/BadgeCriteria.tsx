@@ -3,17 +3,15 @@
 import { CircleX } from "lucide-react";
 
 /**
- * BadgeCriteria - Badge de filtre/critère de recherche avec bouton de suppression
+ * BadgeCriteria — Aligned with Figma DS (file 09EiMQjcDWgb7MzykS8zU0)
  *
- * Structure:
- * - Pill-shaped badge avec icône CircleX à droite
- * - Padding intérieur: 8px de chaque côté
- * - Border-radius 16px
- * - 2 variantes : outlined (bordure seule), default (fond coloré)
+ * Figma name: "atome . criteria"
+ * Figma specs: border-radius 16px, padding 6px (outer) + 6px/4px (inner),
+ * font Roboto Bold 14px/16px, tracking 0.14px, cancel icon 18px
  *
- * Variantes:
- * - outlined: bordure uniquement, fond transparent
- * - default: fond coloré (#ECEDEE light, #22252B dark)
+ * Figma variants → code mapping:
+ *   "outlined light/dark" → outlined (border, no bg)
+ *   "default light/dark"  → default  (surface-neutral-action bg)
  */
 
 export type BadgeCriteriaVariant = "outlined" | "default";
@@ -36,22 +34,20 @@ export function BadgeCriteria({
   return (
     <div
       className={`
-        relative inline-flex items-center rounded-[16px] ${className}
+        relative inline-flex items-center rounded-[16px] px-[6px] ${className}
         ${isOutlined
-          ? "border border-solid border-neutral-500 dark:border-neutral-200 bg-transparent"
-          : "bg-neutral-100 dark:bg-neutral-700 border-transparent"}
+          ? "border border-solid border-edge-neutral-default bg-transparent"
+          : "bg-surface-neutral-action"}
       `.trim()}
     >
-      {/* Content container - 8px padding de chaque côté */}
-      <div className="relative flex items-center gap-[10px] px-[8px] py-[8px]">
+      {/* Content container */}
+      <div className="relative flex items-center px-[6px] py-[4px]">
         {/* Label */}
         <p
           className={`
-            text-sm leading-[16px] tracking-[0.14px] whitespace-nowrap
-            ${isOutlined
-              ? "text-neutral-500 dark:text-neutral-200"
-              : "text-neutral-500 dark:text-neutral-200"}
-          `}
+            text-sm leading-[16px] tracking-[0.14px] whitespace-nowrap font-bold font-roboto
+            ${isOutlined ? "text-content-caption" : "text-content-body"}
+          `.trim()}
         >
           {label}
         </p>
@@ -60,16 +56,12 @@ export function BadgeCriteria({
         {onRemove && (
           <button
             onClick={onRemove}
-            className="shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
+            className="shrink-0 cursor-pointer hover:opacity-70 transition-opacity ml-[4px]"
             aria-label={`Remove ${label}`}
           >
             <CircleX
-              size={20}
-              className={`
-                ${isOutlined
-                  ? "text-neutral-500 dark:text-neutral-200"
-                  : "text-neutral-500 dark:text-neutral-200"}
-              `}
+              size={18}
+              className={isOutlined ? "text-content-caption" : "text-content-body"}
             />
           </button>
         )}
