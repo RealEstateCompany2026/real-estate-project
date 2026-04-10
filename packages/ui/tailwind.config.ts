@@ -179,56 +179,33 @@ const config: Config = {
             },
         },
 
-        spacing: {
-            "0": "var(--spacing-0)",
-            px: "var(--spacing-px)",
-            "0.5": "var(--spacing-0\\.5)",
-            "1": "var(--spacing-1)",
-            "2": "var(--spacing-2)",
-            "3": "var(--spacing-3)",
-            "4": "var(--spacing-4)",
-            "5": "var(--spacing-5)",
-            "6": "var(--spacing-6)",
-            "7": "var(--spacing-7)",
-            "8": "var(--spacing-8)",
-            "10": "var(--spacing-10)",
-            // Extra spacing for layouts (not in Figma, kept for practical use)
-            "20": "80px",
-            "24": "96px",
-            "64": "256px",
-        },
-
-        borderRadius: {
-            none: "var(--border-radius-0)",
-            sm: "4px",
-            DEFAULT: "var(--border-radius-200)",  // 8px
-            md: "var(--border-radius-200)",        // 8px — alias so rounded-md works
-            lg: "var(--border-radius-400)",        // 16px
-            xl: "20px",
-            "2xl": "var(--border-radius-700)",     // 28px
-            full: "9999px",
-        },
-
-        borderWidth: {
-            "0": "var(--border-width-0)",
-            DEFAULT: "var(--border-width-25)",
-            "2": "var(--border-width-50)",
-            "4": "var(--border-width-100)",
-        },
-
-        boxShadow: {
-            sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-            DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-            md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-            lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-            card: "0px 4px 12px rgba(0, 0, 0, 0.05)",
-            none: "none",
-        },
+        // Keep Tailwind defaults for spacing, borderRadius, borderWidth, boxShadow
+        // and EXTEND with our DS tokens below
 
         extend: {
+            // DS token spacing aliases (override matching keys from Tailwind defaults)
+            spacing: {
+                "20": "80px",
+                "24": "96px",
+                "64": "256px",
+            },
+
+            borderRadius: {
+                none: "0px",
+                DEFAULT: "var(--border-radius-200)",  // 8px
+                md: "var(--border-radius-200)",        // 8px
+                lg: "var(--border-radius-400)",        // 16px
+                "2xl": "var(--border-radius-700)",     // 28px
+            },
+
+            boxShadow: {
+                card: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+            },
+
             fontFamily: {
                 sans: ["var(--font-family)", "sans-serif"],
             },
+
             fontSize: {
                 h1: ["var(--text-h1)", { lineHeight: "var(--lh-h1)", fontWeight: "700" }],
                 h2: ["var(--text-h2)", { lineHeight: "var(--lh-h2)", fontWeight: "700" }],
@@ -236,10 +213,6 @@ const config: Config = {
                 h4: ["var(--text-h4)", { lineHeight: "var(--lh-h4)", fontWeight: "700" }],
                 h5: ["var(--text-h5)", { lineHeight: "var(--lh-h5)", fontWeight: "700" }],
                 h6: ["var(--text-h6)", { lineHeight: "var(--lh-h6)", fontWeight: "700" }],
-                lg: ["var(--text-lg)", { lineHeight: "var(--lh-lg)" }],
-                base: ["var(--text-base)", { lineHeight: "var(--lh-base)" }],
-                sm: ["var(--text-sm)", { lineHeight: "var(--lh-sm)" }],
-                xs: ["var(--text-xs)", { lineHeight: "var(--lh-xs)" }],
             },
         },
     },
