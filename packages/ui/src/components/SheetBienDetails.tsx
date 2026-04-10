@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 /**
  * SheetBienDetails - Contenu de la sheet affichant les détails d'un bien
  *
@@ -16,7 +18,7 @@ import { Chip } from "./Chip";
 import { IconDpe, DpeType } from "./IconDpe";
 import { AiSuggestion } from "./AiSuggestion";
 import { KpiIndicator } from "./KpiIndicator";
-import { MapPin, Tag, House, Square } from "lucide-react";
+import { MapPin, Tag, Home, Square } from "lucide-react";
 
 export interface SheetBienDetailsProps {
   // Informations du bien
@@ -58,7 +60,7 @@ export function SheetBienDetails({
     aiSuggestions,
     details,
   }: {
-    kpiComponent: React.ReactNode;
+    kpiComponent: ReactNode;
     aiSuggestions: number;
     details: Array<{ label: string; value?: string }>;
   }) => {
@@ -135,7 +137,7 @@ export function SheetBienDetails({
 
           <Chip
             size="medium"
-            icon={<House size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Home size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
             iconPosition="left"
           >
             {bienType}

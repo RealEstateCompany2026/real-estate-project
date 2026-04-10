@@ -14,7 +14,7 @@
  *   - Ligne 2: Chip localisation + Chip type bien + Chip surface + Icon DPE
  */
 
-import { MapPin, Tag, House, Square } from "lucide-react";
+import { MapPin, Tag, Home, Square } from "lucide-react";
 import { ImageBien } from "./ImageBien";
 import { Badge } from "./Badge";
 import { Chip } from "./Chip";
@@ -94,7 +94,7 @@ export function SectionListBien({
 
             <Chip
               size="medium"
-              icon={<House size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+              icon={<Home size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
               iconPosition="left"
             >
               {bienType}
