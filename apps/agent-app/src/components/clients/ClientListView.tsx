@@ -36,10 +36,10 @@ const columns: Column<ClientListItem>[] = [
       <div className="flex items-center gap-3">
         <Avatar firstName={row.firstName} lastName={row.lastName} size="sm" />
         <div className="min-w-0">
-          <p className="font-medium text-neutral-anthracite truncate">
+          <p className="font-medium text-content-headings truncate">
             {row.firstName} {row.lastName}
           </p>
-          <p className="text-xs text-neutral-400 truncate">{row.primaryEmail}</p>
+          <p className="text-xs text-content-subtle truncate">{row.primaryEmail}</p>
         </div>
       </div>
     ),
@@ -65,7 +65,7 @@ const columns: Column<ClientListItem>[] = [
     key: 'mobilePhone',
     label: 'Téléphone',
     render: (row) => (
-      <span className="text-neutral-600">{row.mobilePhone ?? '—'}</span>
+      <span className="text-content-body">{row.mobilePhone ?? '—'}</span>
     ),
   },
   {
@@ -76,10 +76,10 @@ const columns: Column<ClientListItem>[] = [
     render: (row) => {
       const score = row.completionScore;
       const color =
-        score >= 75 ? '#22C55E' : score >= 50 ? '#EAB308' : score >= 25 ? '#F97316' : '#EF4444';
+        score >= 75 ? 'var(--green-500)' : score >= 50 ? 'var(--orange-400)' : score >= 25 ? 'var(--orange-500)' : 'var(--red-500)';
       return (
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-surface-neutral-action-hover rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{ width: `${score}%`, backgroundColor: color }}
@@ -96,7 +96,7 @@ const columns: Column<ClientListItem>[] = [
     sortable: true,
     className: 'w-32',
     render: (row) => (
-      <span className="text-neutral-400 text-xs">{formatRelativeDate(row.createdAt)}</span>
+      <span className="text-content-subtle text-xs">{formatRelativeDate(row.createdAt)}</span>
     ),
   },
 ];
@@ -136,22 +136,22 @@ export function ClientListView() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-anthracite">Clients</h1>
-          <p className="text-sm text-neutral-400 mt-0.5">
+          <h1 className="text-h2 text-content-headings">Clients</h1>
+          <p className="text-sm text-content-subtle mt-0.5">
             {clients.length} client{clients.length > 1 ? 's' : ''} actif{clients.length > 1 ? 's' : ''}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-edge-default text-content-body hover:bg-surface-neutral-action transition-colors"
           >
             <Upload className="w-4 h-4" />
             Importer
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-edge-default text-content-body hover:bg-surface-neutral-action transition-colors"
           >
             <Download className="w-4 h-4" />
             Exporter
@@ -159,7 +159,7 @@ export function ClientListView() {
           <button
             type="button"
             onClick={() => router.push('/clients/new')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg text-white bg-primary hover:bg-primary-dark transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg text-content-branded-on-action bg-surface-branded-action hover:bg-surface-branded-action-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             Nouveau client
@@ -185,8 +185,8 @@ export function ClientListView() {
                 onClick={() => setStatusFilter(f.value)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                   statusFilter === f.value
-                    ? 'bg-primary text-white border-primary'
-                    : 'bg-white text-neutral-500 border-neutral-200 hover:border-neutral-300'
+                    ? 'bg-surface-branded-action text-content-branded-on-action border-edge-branded-action'
+                    : 'bg-surface-neutral-default text-content-body border-edge-default hover:border-edge-neutral-default'
                 }`}
               >
                 {f.label}
@@ -203,7 +203,7 @@ export function ClientListView() {
               <button
                 type="button"
                 onClick={() => router.push('/clients/new')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-content-branded-on-action bg-surface-branded-action hover:bg-surface-branded-action-hover transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Nouveau client

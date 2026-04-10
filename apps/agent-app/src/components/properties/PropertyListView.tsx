@@ -33,7 +33,7 @@ const STATUS_FILTERS: { label: string; value: PropertyStatus | 'ALL' }[] = [
 // ---------------------------------------------------------------------------
 
 function DpeBadge({ dpe }: { dpe: DpeClass | null }) {
-  if (!dpe) return <span className="text-neutral-300">—</span>;
+  if (!dpe) return <span className="text-content-disabled">—</span>;
   return (
     <span
       className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold text-white"
@@ -56,13 +56,13 @@ const columns: Column<PropertyListItem>[] = [
     className: 'min-w-[240px]',
     render: (row) => (
       <div className="min-w-0">
-        <p className="font-medium text-neutral-anthracite truncate">
+        <p className="font-medium text-content-headings truncate">
           {row.internalRef && (
-            <span className="text-xs text-neutral-400 mr-1.5">{row.internalRef}</span>
+            <span className="text-xs text-content-subtle mr-1.5">{row.internalRef}</span>
           )}
           {PROPERTY_TYPE_LABELS[row.type]}
         </p>
-        <p className="text-xs text-neutral-400 truncate">{row.address}</p>
+        <p className="text-xs text-content-subtle truncate">{row.address}</p>
       </div>
     ),
   },
@@ -84,7 +84,7 @@ const columns: Column<PropertyListItem>[] = [
     sortable: true,
     className: 'w-32',
     render: (row) => (
-      <span className="font-medium text-neutral-700">
+      <span className="font-medium text-content-strong">
         {formatPrice(row.desiredSellingPrice)}
       </span>
     ),
@@ -95,7 +95,7 @@ const columns: Column<PropertyListItem>[] = [
     sortable: true,
     className: 'w-24',
     render: (row) => (
-      <span className="text-neutral-600">{formatSurface(row.livingAreaSqm)}</span>
+      <span className="text-content-body">{formatSurface(row.livingAreaSqm)}</span>
     ),
   },
   {
@@ -104,7 +104,7 @@ const columns: Column<PropertyListItem>[] = [
     sortable: true,
     className: 'w-20',
     render: (row) => (
-      <span className="text-neutral-600">
+      <span className="text-content-body">
         {row.numberOfRooms != null ? `${row.numberOfRooms} p.` : '—'}
       </span>
     ),
@@ -123,10 +123,10 @@ const columns: Column<PropertyListItem>[] = [
     render: (row) => {
       const score = row.completionScore ?? 0;
       const color =
-        score >= 75 ? '#22C55E' : score >= 50 ? '#EAB308' : score >= 25 ? '#F97316' : '#EF4444';
+        score >= 75 ? 'var(--green-500)' : score >= 50 ? 'var(--orange-400)' : score >= 25 ? 'var(--orange-500)' : 'var(--red-500)';
       return (
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-surface-neutral-action-hover rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{ width: `${score}%`, backgroundColor: color }}
@@ -143,7 +143,7 @@ const columns: Column<PropertyListItem>[] = [
     sortable: true,
     className: 'w-32',
     render: (row) => (
-      <span className="text-neutral-400 text-xs">{formatRelativeDate(row.createdAt)}</span>
+      <span className="text-content-subtle text-xs">{formatRelativeDate(row.createdAt)}</span>
     ),
   },
 ];
@@ -181,22 +181,22 @@ export function PropertyListView() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-anthracite">Biens</h1>
-          <p className="text-sm text-neutral-400 mt-0.5">
+          <h1 className="text-h2 text-content-headings">Biens</h1>
+          <p className="text-sm text-content-subtle mt-0.5">
             {properties.length} bien{properties.length > 1 ? 's' : ''} au total
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-edge-default text-content-body hover:bg-surface-neutral-action transition-colors"
           >
             <Upload className="w-4 h-4" />
             Importer
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-edge-default text-content-body hover:bg-surface-neutral-action transition-colors"
           >
             <Download className="w-4 h-4" />
             Exporter
@@ -204,7 +204,7 @@ export function PropertyListView() {
           <button
             type="button"
             onClick={() => router.push('/properties/new')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg text-white bg-primary hover:bg-primary-dark transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg text-content-branded-on-action bg-surface-branded-action hover:bg-surface-branded-action-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             Nouveau bien
@@ -230,8 +230,8 @@ export function PropertyListView() {
                 onClick={() => setStatusFilter(f.value)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                   statusFilter === f.value
-                    ? 'bg-primary text-white border-primary'
-                    : 'bg-white text-neutral-500 border-neutral-200 hover:border-neutral-300'
+                    ? 'bg-surface-branded-action text-content-branded-on-action border-edge-branded-action'
+                    : 'bg-surface-neutral-default text-content-body border-edge-default hover:border-edge-neutral-default'
                 }`}
               >
                 {f.label}
@@ -248,7 +248,7 @@ export function PropertyListView() {
               <button
                 type="button"
                 onClick={() => router.push('/properties/new')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-content-branded-on-action bg-surface-branded-action hover:bg-surface-branded-action-hover transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Nouveau bien

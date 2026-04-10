@@ -65,6 +65,17 @@ function defaultCompare(a: unknown, b: unknown): number {
 // Component
 // ---------------------------------------------------------------------------
 
+/**
+ * DataTable — Design System tokens:
+ *   Search input:    border/default, surface/neutral-default, focus ring purple-500
+ *   Table border:    border/default, surface/neutral-default
+ *   Header row:      surface/neutral-action, text/body uppercase
+ *   Sortable hover:  text/headings
+ *   Row border:      border/divider
+ *   Row hover:       surface/neutral-action (subtle)
+ *   Pagination:      text/body, hover surface/neutral-action-hover
+ *   Skeleton:        surface/neutral-action-hover
+ */
 export function DataTable<T>({
   columns,
   data,
@@ -132,7 +143,7 @@ export function DataTable<T>({
     return (
       <div className="space-y-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-12 bg-neutral-100 rounded-lg animate-pulse" />
+          <div key={i} className="h-12 bg-surface-neutral-action-hover rounded-lg animate-pulse" />
         ))}
       </div>
     );
@@ -145,13 +156,13 @@ export function DataTable<T>({
         <div className="flex flex-wrap items-center gap-3">
           {searchableFields?.length ? (
             <div className="relative flex-1 min-w-[220px] max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-icon-placeholder" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-edge-default bg-surface-neutral-default text-content-body placeholder:text-content-placeholder focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-edge-branded-default transition-colors"
               />
             </div>
           ) : null}
@@ -162,19 +173,19 @@ export function DataTable<T>({
       {/* Table */}
       {paginated.length === 0 ? (
         emptyState ?? (
-          <div className="py-16 text-center text-sm text-neutral-400">
+          <div className="py-16 text-center text-sm text-content-subtle">
             Aucun résultat
           </div>
         )
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-neutral-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-edge-default bg-surface-neutral-default">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-100 bg-neutral-50/60">
+              <tr className="border-b border-edge-subtle bg-surface-neutral-action">
                 {columns.map((col) => (
                   <th
                     key={col.key}
-                    className={`px-4 py-3 text-left text-xs font-bold text-neutral-500 uppercase tracking-wider select-none ${col.className ?? ''} ${col.sortable ? 'cursor-pointer hover:text-neutral-700' : ''}`}
+                    className={`px-4 py-3 text-left text-xs font-bold text-content-body uppercase tracking-wider select-none ${col.className ?? ''} ${col.sortable ? 'cursor-pointer hover:text-content-headings' : ''}`}
                     onClick={col.sortable ? () => handleSort(col.key) : undefined}
                   >
                     <span className="inline-flex items-center gap-1">
@@ -196,7 +207,7 @@ export function DataTable<T>({
                 <tr
                   key={extractKey(row)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  className={`border-b border-neutral-50 last:border-0 transition-colors ${onRowClick ? 'cursor-pointer hover:bg-primary/[0.03]' : ''}`}
+                  className={`border-b border-edge-divider last:border-0 transition-colors ${onRowClick ? 'cursor-pointer hover:bg-surface-neutral-action' : ''}`}
                 >
                   {columns.map((col) => (
                     <td key={col.key} className={`px-4 py-3 ${col.className ?? ''}`}>
@@ -214,7 +225,7 @@ export function DataTable<T>({
 
       {/* Pagination */}
       {pageSize > 0 && totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-neutral-500">
+        <div className="flex items-center justify-between text-sm text-content-body">
           <span>
             {sorted.length} résultat{sorted.length > 1 ? 's' : ''}
             {search && ` pour « ${search} »`}
@@ -224,7 +235,7 @@ export function DataTable<T>({
               type="button"
               disabled={page === 0}
               onClick={() => setPage((p) => p - 1)}
-              className="p-1.5 rounded-lg hover:bg-neutral-100 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg hover:bg-surface-neutral-action-hover disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -235,7 +246,7 @@ export function DataTable<T>({
               type="button"
               disabled={page >= totalPages - 1}
               onClick={() => setPage((p) => p + 1)}
-              className="p-1.5 rounded-lg hover:bg-neutral-100 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg hover:bg-surface-neutral-action-hover disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
