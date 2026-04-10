@@ -50,7 +50,7 @@ export function NavAvatar({
         aria-label={alt}
         style={{
           border: "4px solid var(--surface-branded-action)",
-          background: "var(--surface-branded-container)",
+          background: "var(--surface-branded-subtle)",
         }}
       >
         <img

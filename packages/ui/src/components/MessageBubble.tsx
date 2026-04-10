@@ -53,7 +53,7 @@ export function MessageBubble({
       // WhatsApp style
       return `
         rounded-[12px] p-[8px_12px]
-        ${isSent ? "bg-green-100 dark:bg-green-900" : "bg-neutral-100 dark:bg-neutral-800"}
+        ${isSent ? "bg-green-100 dark:bg-green-800" : "bg-neutral-100 dark:bg-neutral-800"}
         shadow-sm
       `;
     }
@@ -61,8 +61,8 @@ export function MessageBubble({
     // Standard Figma style
     return `
       rounded-[16px] p-[10px]
-      bg-neutral-100 dark:bg-neutral-900
-      border border-neutral-100 dark:border-neutral-900
+      bg-neutral-100 dark:bg-neutral-800
+      border border-neutral-100 dark:border-neutral-800
     `;
   };
 

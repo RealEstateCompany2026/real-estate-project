@@ -116,7 +116,7 @@ export function MessageEdit({
 
           {/* Editor container */}
           <div
-            className="flex-1 rounded-full overflow-hidden bg-surface-neutral-defaulter px-4 py-2"
+            className="flex-1 rounded-full overflow-hidden bg-surface-neutral-default dark:bg-neutral-800 px-4 py-2"
           >
             <textarea
               value={content}
@@ -170,7 +170,7 @@ export function MessageEdit({
 
         {/* Editor box */}
         <div
-          className="relative rounded-2xl shrink-0 w-full overflow-hidden border border-edge-default bg-surface-neutral-defaulter"
+          className="relative rounded-2xl shrink-0 w-full overflow-hidden border border-edge-default bg-surface-neutral-default dark:bg-neutral-800"
         >
           <textarea
             value={content}
@@ -184,7 +184,7 @@ export function MessageEdit({
         {/* Attachment button (if has attachments) */}
         {attachments.length > 0 && (
           <div
-            className="relative rounded-2xl shrink-0 border border-edge-default p-3 flex gap-2 items-center justify-center bg-surface-neutral-defaulter"
+            className="relative rounded-2xl shrink-0 border border-edge-default p-3 flex gap-2 items-center justify-center bg-surface-neutral-default dark:bg-neutral-800"
           >
             <Paperclip className="size-5 text-content-body" />
             <p className="text-base font-semibold text-content-body">

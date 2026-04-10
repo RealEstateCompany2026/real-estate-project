@@ -70,21 +70,21 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
             >
               <path
                 d="M12 2L2 7L12 12L22 7L12 2Z"
-                stroke="var(--icon-on-branded)"
+                stroke="var(--icon-branded-on-action)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <path
                 d="M2 17L12 22L22 17"
-                stroke="var(--icon-on-branded)"
+                stroke="var(--icon-branded-on-action)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <path
                 d="M2 12L12 17L22 12"
-                stroke="var(--icon-on-branded)"
+                stroke="var(--icon-branded-on-action)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"

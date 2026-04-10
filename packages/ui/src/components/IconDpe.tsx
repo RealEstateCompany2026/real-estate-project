@@ -65,7 +65,7 @@ export function IconDpe({
           ? "3px solid var(--surface-branded-action)"
           : "3px solid transparent",
         boxShadow: selected
-          ? "0 0 0 2px var(--surface-branded-container)"
+          ? "0 0 0 2px var(--surface-branded-subtle)"
           : "none",
       }}
     >

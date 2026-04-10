@@ -104,28 +104,28 @@ export function Toast({
       case "success":
         return {
           icon: CheckCircle2,
-          bgClass: "bg-surface-success-subtle",
+          bgClass: "bg-green-500/10 dark:bg-green-600/10",
           borderClass: "border-edge-success-default",
           iconColorClass: "text-content-success",
         };
       case "error":
         return {
           icon: XCircle,
-          bgClass: "bg-surface-error-subtle",
+          bgClass: "bg-red-500/10 dark:bg-red-600/10",
           borderClass: "border-edge-error-default",
           iconColorClass: "text-content-error",
         };
       case "warning":
         return {
           icon: AlertTriangle,
-          bgClass: "bg-surface-warning-subtle",
+          bgClass: "bg-orange-500/10 dark:bg-orange-600/10",
           borderClass: "border-edge-warning-default",
           iconColorClass: "text-content-warning",
         };
       case "info":
         return {
           icon: Info,
-          bgClass: "bg-surface-information",
+          bgClass: "bg-blue-500/10 dark:bg-blue-600/10",
           borderClass: "border-edge-information-default",
           iconColorClass: "text-content-information",
         };
@@ -156,13 +156,13 @@ export function Toast({
       {/* Content */}
       <div className="flex-1 min-w-0">
         {/* Title */}
-        <p className="font-medium text-[16px] leading-[20px] tracking-[0.16px] mb-[4px] text-content-body font-roboto">
+        <p className="font-medium text-[16px] leading-[20px] tracking-[0.16px] mb-[4px] text-content-body dark:text-neutral-200 font-roboto">
           {title}
         </p>
 
         {/* Description */}
         {description && (
-          <p className="text-[14px] leading-[18px] tracking-[0.14px] text-content-placeholder font-roboto">
+          <p className="text-[14px] leading-[18px] tracking-[0.14px] text-content-placeholder dark:text-neutral-300 font-roboto">
             {description}
           </p>
         )}
@@ -171,7 +171,7 @@ export function Toast({
       {/* Close Button */}
       <button
         onClick={handleClose}
-        className="shrink-0 p-[4px] rounded-[8px] transition-all hover:opacity-70 text-content-body"
+        className="shrink-0 p-[4px] rounded-[8px] transition-all hover:opacity-70 text-content-body dark:text-neutral-200"
         aria-label="Fermer"
       >
         <X size={16} strokeWidth={2} />

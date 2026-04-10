@@ -53,7 +53,7 @@ export function DatePickerNumber({
   const getClasses = () => {
     switch (effectiveState) {
       case "selected":
-        return "bg-surface-branded-default dark:bg-surface-branded-default text-content-on-branded-default dark:text-content-on-branded-default font-bold border-none";
+        return "bg-surface-branded-default dark:bg-surface-branded-default text-content-branded-on-action dark:text-content-branded-on-action font-bold border-none";
       case "today":
         return "bg-surface-neutral-action dark:bg-surface-neutral-action text-content-body dark:text-content-body font-normal border border-solid border-edge-branded-default dark:border-edge-branded-default";
       case "hover":

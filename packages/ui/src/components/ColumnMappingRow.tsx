@@ -49,9 +49,9 @@ export const ColumnMappingRow: React.FC<ColumnMappingRowProps> = ({
   const getStatusIcon = () => {
     switch (status) {
       case "success":
-        return <Check size={16} className="text-icon-success-strong" />;
+        return <Check size={16} className="text-icon-success" />;
       case "error":
-        return <X size={16} className="text-icon-error-strong" />;
+        return <X size={16} className="text-icon-error" />;
       default:
         return null;
     }

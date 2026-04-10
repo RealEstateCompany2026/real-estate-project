@@ -74,7 +74,7 @@ export function Stepper({
               style={{
                 width: isActive ? "24px" : "8px",
                 height: "8px",
-                backgroundColor: isCompleted || isActive ? "var(--surface-branded-default)" : "var(--surface-neutral-action)",
+                backgroundColor: isCompleted || isActive ? "var(--purple-500)" : "var(--neutral-200)",
                 opacity: isActive ? 1 : 0.5,
               }}
             />
@@ -132,7 +132,7 @@ export function Stepper({
                     transition-all duration-200
                     text-[var(--text-sm)]
                     tracking-[0.14px]
-                    ${isActive ? "font-bold text-content-branded-action" : isCompleted ? "font-medium text-content-body" : "font-medium text-content-placeholder"}
+                    ${isActive ? "font-bold text-purple-500" : isCompleted ? "font-medium text-content-body" : "font-medium text-content-placeholder"}
                   `}
                 >
                   {step}

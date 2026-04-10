@@ -126,8 +126,8 @@ export function TextFieldOutlined({
   };
 
   const getBackgroundColor = () => {
-    if (disabled) return "bg-neutral-50 dark:bg-neutral-900";
-    if (error) return "bg-red-50 dark:bg-red-950";
+    if (disabled) return "bg-neutral-50 dark:bg-neutral-800";
+    if (error) return "bg-red-50 dark:bg-red-800";
     return "bg-white dark:bg-neutral-800";
   };
 

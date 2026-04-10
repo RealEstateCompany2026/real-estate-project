@@ -103,7 +103,7 @@ export function MessageComposer({
 
           {/* Input */}
           <div
-            className="flex-1 rounded-full px-4 py-2 bg-surface-neutral-defaulter"
+            className="flex-1 rounded-full px-4 py-2 bg-surface-neutral-default dark:bg-neutral-800"
           >
             <input
               type="text"
@@ -154,7 +154,7 @@ export function MessageComposer({
             <div className="content-stretch flex flex-col gap-2 items-end relative shrink-0 w-full">
               {/* Message box */}
               <div
-                className="relative rounded-2xl shrink-0 w-full border border-edge-default bg-surface-neutral-defaulter"
+                className="relative rounded-2xl shrink-0 w-full border border-edge-default bg-surface-neutral-default dark:bg-neutral-800"
               >
                 <div className="content-stretch flex flex-col gap-2 items-start p-5 relative w-full">
                   {/* Textarea */}
@@ -175,7 +175,7 @@ export function MessageComposer({
                   {/* Attachment button (if has attachments) */}
                   {attachments.length > 0 && (
                     <div
-                      className="relative rounded-2xl shrink-0 border border-edge-default p-3 flex gap-2 items-center justify-center bg-surface-neutral-defaulter"
+                      className="relative rounded-2xl shrink-0 border border-edge-default p-3 flex gap-2 items-center justify-center bg-surface-neutral-default dark:bg-neutral-800"
                     >
                       <Paperclip className="size-5 text-content-body" />
                       <p className="text-base font-semibold text-content-body">

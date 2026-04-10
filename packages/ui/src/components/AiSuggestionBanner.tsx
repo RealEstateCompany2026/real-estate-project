@@ -71,12 +71,12 @@ export function AiSuggestionBanner({
           >
             <div className="flex flex-row items-center justify-center size-full">
               <div className="content-stretch flex gap-[8px] items-center justify-center p-[12px] relative">
-                <p className="text-[16px] leading-[20px] tracking-[0.16px] font-semibold not-italic relative shrink-0 whitespace-nowrap text-content-on-branded-default dark:text-content-on-branded-default">
+                <p className="text-[16px] leading-[20px] tracking-[0.16px] font-semibold not-italic relative shrink-0 whitespace-nowrap text-content-branded-on-action">
                   {actionLabel}
                 </p>
                 <ArrowRight
                   size={20}
-                  className="text-content-on-branded-default dark:text-content-on-branded-default"
+                  className="text-content-branded-on-action"
                 />
               </div>
             </div>

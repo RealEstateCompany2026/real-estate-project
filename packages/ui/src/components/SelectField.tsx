@@ -51,9 +51,9 @@ export function SelectField({
         disabled={disabled}
         className={`
           h-[56px] px-4 py-3 rounded-lg
-          bg-surface-neutral-default
-          text-content-body
-          border border-edge-default
+          bg-surface-neutral-default dark:bg-neutral-700
+          text-content-body dark:text-neutral-200
+          border border-edge-default dark:border-neutral-600
           ${error ? "border-edge-error-default" : "border-edge-default"}
           focus:outline-none focus:ring-2 focus:ring-purple-500
           disabled:opacity-50 disabled:cursor-not-allowed

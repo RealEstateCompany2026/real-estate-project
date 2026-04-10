@@ -40,7 +40,7 @@ export function ViewModeDropdown({
           inline-flex items-center gap-2
           px-3 py-2 rounded-lg
           border border-edge-default
-          bg-surface-neutral-default
+          bg-surface-neutral-default dark:bg-neutral-700
           hover:bg-surface-neutral-action dark:hover:bg-neutral-600
           text-content-body dark:text-neutral-200
           transition-colors
@@ -55,7 +55,7 @@ export function ViewModeDropdown({
         <div
           className={`
             absolute top-full right-0 mt-1
-            bg-surface-neutral-default
+            bg-surface-neutral-default dark:bg-neutral-700
             border border-edge-default
             rounded-lg shadow-lg
             z-10

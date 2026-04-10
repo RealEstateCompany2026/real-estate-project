@@ -131,7 +131,7 @@ export const GraphCourbe: React.FC<GraphCourbeProps> = ({
               y={index * 4}
               width="10"
               height="2"
-              fill="var(--edge-disabled)"
+              fill="var(--border-disabled)"
               opacity="0.5"
             />
           ))}
@@ -145,7 +145,7 @@ export const GraphCourbe: React.FC<GraphCourbeProps> = ({
               y1="0"
               x2="95%"
               y2="0"
-              stroke="var(--edge-disabled)"
+              stroke="var(--border-disabled)"
               strokeWidth="1"
             />
             <line
@@ -153,7 +153,7 @@ export const GraphCourbe: React.FC<GraphCourbeProps> = ({
               y1="50%"
               x2="95%"
               y2="50%"
-              stroke="var(--edge-disabled)"
+              stroke="var(--border-disabled)"
               strokeWidth="1"
             />
             <line
@@ -161,7 +161,7 @@ export const GraphCourbe: React.FC<GraphCourbeProps> = ({
               y1="100%"
               x2="95%"
               y2="100%"
-              stroke="var(--edge-disabled)"
+              stroke="var(--border-disabled)"
               strokeWidth="1"
             />
           </svg>

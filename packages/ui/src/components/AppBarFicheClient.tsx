@@ -101,7 +101,7 @@ export const AppBarFicheClient: React.FC<AppBarFicheClientProps> = ({
         {/* Badge IA */}
         {aiSuggestions > 0 && (
           <div className="h-6 px-3 rounded-2xl flex items-center justify-center bg-surface-branded-default dark:bg-surface-branded-default border border-solid border-surface-branded-default dark:border-surface-branded-default">
-            <span className="font-bold text-[14px] leading-[16px] tracking-[0.14px] text-content-on-branded-default dark:text-content-on-branded-default">
+            <span className="font-bold text-[14px] leading-[16px] tracking-[0.14px] text-content-branded-on-action dark:text-content-branded-on-action">
               {aiSuggestions}
             </span>
           </div>

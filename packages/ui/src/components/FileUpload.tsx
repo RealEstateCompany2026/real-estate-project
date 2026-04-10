@@ -179,7 +179,7 @@ export function FileUpload({
           flex flex-col items-center justify-center
           ${!disabled && !selectedFile ? "cursor-pointer" : ""}
           ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-          ${isDragging ? "border-edge-branded-default bg-surface-branded-subtle" : "border-edge-default bg-surface-neutral-default"}
+          ${isDragging ? "border-purple-500 bg-surface-branded-action" : "border-neutral-300 bg-surface-neutral-default"}
         `.trim()}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}

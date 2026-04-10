@@ -66,7 +66,7 @@ export function SheetBienDetails({
   }) => {
     return (
       <div
-        className="rounded-2xl w-full bg-surface-neutral-default border border-edge-default p-6"
+        className="rounded-2xl w-full bg-surface-neutral-default dark:bg-neutral-800 border border-edge-default p-6"
       >
         <div className="flex flex-col gap-2">
           {/* KPI + AI Suggestions */}
@@ -97,7 +97,7 @@ export function SheetBienDetails({
     <div className="flex flex-col gap-5 px-5 py-5">
       {/* Position 1: Map */}
       <div
-        className="w-full rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
+        className="w-full rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default dark:bg-neutral-800"
         style={{
           height: "115px",
         }}

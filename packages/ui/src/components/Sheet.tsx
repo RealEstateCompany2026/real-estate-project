@@ -132,7 +132,7 @@ export const Sheet: React.FC<SheetProps> = ({
           <div
             className="sticky top-0 z-10"
             style={{
-              borderBottom: showHeaderDivider ? "1px solid var(--edge-default)" : "none",
+              borderBottom: showHeaderDivider ? "1px solid var(--border-default)" : "none",
               backgroundColor: "var(--surface-neutral-default)",
             }}
           >
@@ -142,7 +142,7 @@ export const Sheet: React.FC<SheetProps> = ({
           <div
             className="sticky top-0 z-10 flex items-center justify-between px-5 py-6 border-edge-default"
             style={{
-              borderBottom: showHeaderDivider ? "1px solid var(--edge-default)" : "none",
+              borderBottom: showHeaderDivider ? "1px solid var(--border-default)" : "none",
               backgroundColor: "var(--surface-neutral-default)",
             }}
           >
