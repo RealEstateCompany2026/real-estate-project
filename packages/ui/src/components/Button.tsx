@@ -2,20 +2,33 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/utils"
 
+/**
+ * Button — Design System tokens mapping:
+ *
+ *   default:      surface/branded-action → branded-action-hover
+ *   destructive:  red-500 → red-600
+ *   outline:      border/default, surface/neutral-default → neutral-action
+ *   secondary:    surface/neutral-action → neutral-action-hover
+ *   ghost:        transparent → surface/neutral-action
+ *   link:         text/branded-action
+ */
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ring-offset-surface-page disabled:pointer-events-none disabled:opacity-50",
     {
         variants: {
             variant: {
-                default: "bg-primary text-primary-foreground hover:bg-primary/90",
+                default:
+                    "bg-surface-branded-action text-content-branded-on-action hover:bg-surface-branded-action-hover",
                 destructive:
-                    "bg-semantic-danger text-white hover:bg-semantic-danger/90",
+                    "bg-red-500 text-white hover:bg-red-600",
                 outline:
-                    "border border-neutral-grey-light bg-background hover:bg-background-subtle text-neutral-anthracite",
+                    "border border-edge-default bg-surface-neutral-default hover:bg-surface-neutral-action text-content-body",
                 secondary:
-                    "bg-neutral-grey-light text-neutral-anthracite hover:bg-neutral-grey-light/80",
-                ghost: "hover:bg-background-subtle text-neutral-anthracite",
-                link: "text-primary underline-offset-4 hover:underline",
+                    "bg-surface-neutral-action text-content-body hover:bg-surface-neutral-action-hover",
+                ghost:
+                    "hover:bg-surface-neutral-action text-content-body",
+                link:
+                    "text-content-branded-action underline-offset-4 hover:underline",
             },
             size: {
                 default: "h-10 px-4 py-2",

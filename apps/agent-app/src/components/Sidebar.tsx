@@ -17,7 +17,14 @@ const NAV_ITEMS = [
 
 /**
  * NavRail 90px — navigation principale de l'app agent.
- * Conforme au design system (90px, vertical, icône + label, 3 états).
+ *
+ * Tokens Figma:
+ *   Background:  surface/page (#FFFFFF)
+ *   Default:     icon neutral/300 (#A1A4AA), transparent bg
+ *   Hover:       icon branded-action-hover (#635CC7), surface/neutral-action-hover (#DADBDD)
+ *   Selected:    icon neutral-action (#444955), surface/neutral-action (#ECEDEE)
+ *   Border:      border/divider (#ECEDEE)
+ *   Radius btn:  border-radius/400 (16px) → rounded-lg
  */
 export function Sidebar() {
   const pathname = usePathname();
@@ -28,10 +35,10 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-[90px] bg-background border-r border-neutral-grey-light flex flex-col z-40">
+    <aside className="fixed top-0 left-0 h-screen w-[90px] bg-surface-page border-r border-edge-divider flex flex-col z-40">
       {/* Logo */}
-      <div className="flex items-center justify-center h-16 border-b border-neutral-grey-light">
-        <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
+      <div className="flex items-center justify-center h-16 border-b border-edge-divider">
+        <div className="w-8 h-8 rounded-md bg-surface-branded-default flex items-center justify-center">
           <Home className="w-5 h-5 text-white" />
         </div>
       </div>
@@ -40,7 +47,7 @@ export function Sidebar() {
       <div className="flex justify-center py-3">
         <Link
           href="/clients/new"
-          className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+          className="w-10 h-10 rounded-lg bg-surface-branded-action text-white flex items-center justify-center hover:bg-surface-branded-action-hover transition-colors"
           title="Nouveau..."
         >
           <Plus className="w-5 h-5" />
@@ -58,8 +65,8 @@ export function Sidebar() {
               href={item.href}
               className={`flex flex-col items-center justify-center gap-0.5 w-full py-2 rounded-lg transition-colors ${
                 active
-                  ? 'bg-background-softBlue text-primary font-bold'
-                  : 'text-neutral-grey-bold hover:bg-background-subtle hover:text-neutral-anthracite'
+                  ? 'bg-surface-neutral-action text-icon-neutral-action font-bold'
+                  : 'text-neutral-300 hover:bg-surface-neutral-action-hover hover:text-icon-branded-action-hover'
               }`}
               title={item.label}
             >
@@ -71,22 +78,22 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="flex flex-col items-center gap-2 py-3 border-t border-neutral-grey-light">
+      <div className="flex flex-col items-center gap-2 py-3 border-t border-edge-divider">
         <button
           type="button"
-          className="p-2 rounded-lg text-neutral-grey-bold hover:bg-background-subtle hover:text-neutral-anthracite transition-colors"
+          className="p-2 rounded-lg text-neutral-300 hover:bg-surface-neutral-action-hover hover:text-icon-branded-action-hover transition-colors"
           title="Notifications"
         >
           <Bell className="w-5 h-5" />
         </button>
         <button
           type="button"
-          className="p-2 rounded-lg text-neutral-grey-bold hover:bg-background-subtle hover:text-neutral-anthracite transition-colors"
+          className="p-2 rounded-lg text-neutral-300 hover:bg-surface-neutral-action-hover hover:text-icon-branded-action-hover transition-colors"
           title="Paramètres"
         >
           <Settings className="w-5 h-5" />
         </button>
-        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold mt-1">
+        <div className="w-8 h-8 rounded-full bg-surface-branded-subtle text-content-branded-action flex items-center justify-center text-xs font-bold mt-1">
           AP
         </div>
       </div>
