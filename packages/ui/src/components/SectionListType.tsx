@@ -54,7 +54,7 @@ export function SectionListType({
           {/* Type de bien */}
           <Chip
             size="medium"
-            icon={<Home size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Home size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {bienType}
@@ -63,7 +63,7 @@ export function SectionListType({
           {/* Surface */}
           <Chip
             size="medium"
-            icon={<Square size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Square size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {surface}

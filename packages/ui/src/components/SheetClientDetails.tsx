@@ -48,7 +48,7 @@ export function SheetClientDetails({
   }) => {
     return (
       <div
-        className="rounded-2xl w-full bg-surface-neutral-white dark:bg-surface-neutral-darker border border-edge-default p-6"
+        className="rounded-2xl w-full bg-surface-neutral-default border border-edge-default p-6"
       >
         <div className="flex flex-col gap-2">
           {/* KPI + AI Suggestions */}

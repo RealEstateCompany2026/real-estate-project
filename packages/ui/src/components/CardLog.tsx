@@ -36,7 +36,7 @@ export const CardLog: React.FC<CardLogProps> = ({
   return (
     <div className="px-[10px] py-[6px]">
       {/* Divider top */}
-      <div className="h-px mb-2 bg-edge-default" />
+      <div className="h-px mb-2 bg-[var(--border-default)]" />
 
       {/* Contenu */}
       <div className="space-y-2">

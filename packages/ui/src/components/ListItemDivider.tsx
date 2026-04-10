@@ -13,7 +13,7 @@ export interface ListItemDividerProps {
 export function ListItemDivider({ className = "" }: ListItemDividerProps) {
   return (
     <div
-      className={`h-px w-full bg-edge-divider ${className}`}
+      className={`h-px w-full bg-[var(--border-divider)] ${className}`}
       role="separator"
     />
   );

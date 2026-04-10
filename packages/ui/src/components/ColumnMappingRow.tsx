@@ -81,7 +81,7 @@ export const ColumnMappingRow: React.FC<ColumnMappingRowProps> = ({
               {sourceColumn}
             </span>
             {required && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-surface-error-subtle text-text-error-strong">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-surface-error-subtle text-content-error">
                 Requis
               </span>
             )}
@@ -91,7 +91,7 @@ export const ColumnMappingRow: React.FC<ColumnMappingRowProps> = ({
         {/* Mapping Icon */}
         <Link2
           size={20}
-          className={status === "success" ? "text-icon-success-default" : "text-icon-subtle"}
+          className={status === "success" ? "text-icon-success" : "text-icon-placeholder"}
         />
 
         {/* Target Field Selector */}
@@ -121,8 +121,8 @@ export const ColumnMappingRow: React.FC<ColumnMappingRowProps> = ({
         <div
           className={`mt-2 px-3 py-2 rounded text-xs ${
             status === "error"
-              ? "bg-surface-error-subtle text-text-error-strong"
-              : "bg-surface-warning-subtle text-text-warning-strong"
+              ? "bg-surface-error-subtle text-content-error"
+              : "bg-surface-warning-subtle text-content-warning"
           }`}
         >
           {message}

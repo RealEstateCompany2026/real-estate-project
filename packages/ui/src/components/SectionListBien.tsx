@@ -71,7 +71,7 @@ export function SectionListBien({
 
             <Chip
               size="medium"
-              icon={<Tag size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+              icon={<Tag size={20} className="text-icon-neutral-default" />}
               iconPosition="left"
             >
               {price}
@@ -86,7 +86,7 @@ export function SectionListBien({
           <div className="content-stretch flex gap-2 items-center relative shrink-0">
             <Chip
               size="medium"
-              icon={<MapPin size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+              icon={<MapPin size={20} className="text-icon-neutral-default" />}
               iconPosition="left"
             >
               {location}
@@ -94,7 +94,7 @@ export function SectionListBien({
 
             <Chip
               size="medium"
-              icon={<Home size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+              icon={<Home size={20} className="text-icon-neutral-default" />}
               iconPosition="left"
             >
               {bienType}
@@ -102,7 +102,7 @@ export function SectionListBien({
 
             <Chip
               size="medium"
-              icon={<Square size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+              icon={<Square size={20} className="text-icon-neutral-default" />}
               iconPosition="left"
             >
               {surface}

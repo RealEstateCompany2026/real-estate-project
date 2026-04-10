@@ -55,7 +55,7 @@ export function SectionListDossier({
           {/* Message + count */}
           <Chip
             size="medium"
-            icon={<MessageCircle size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<MessageCircle size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {messageCount}
@@ -64,7 +64,7 @@ export function SectionListDossier({
           {/* Document + check */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <FileText size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <FileText size={20} className="text-icon-neutral-default" />
             </div>
             {documentComplete && (
               <div className="relative shrink-0 size-5">
@@ -76,7 +76,7 @@ export function SectionListDossier({
           {/* Gallery + check */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <Image size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <Image size={20} className="text-icon-neutral-default" />
             </div>
             {photosComplete && (
               <div className="relative shrink-0 size-5">

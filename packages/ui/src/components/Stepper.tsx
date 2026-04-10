@@ -74,7 +74,7 @@ export function Stepper({
               style={{
                 width: isActive ? "24px" : "8px",
                 height: "8px",
-                backgroundColor: isCompleted || isActive ? "var(--tw-colors-branded-500)" : "var(--tw-colors-neutral-200)",
+                backgroundColor: isCompleted || isActive ? "var(--surface-branded-default)" : "var(--surface-neutral-action)",
                 opacity: isActive ? 1 : 0.5,
               }}
             />
@@ -109,14 +109,14 @@ export function Stepper({
                 {isCompleted ? (
                   <Check
                     size={18}
-                    className={`${isCompleted || isActive ? "text-text-branded-on-action" : "text-text-placeholder"}`}
+                    className={`${isCompleted || isActive ? "text-content-branded-on-action" : "text-content-placeholder"}`}
                     strokeWidth={3}
                   />
                 ) : (
                   <span
                     className={`${isActive ? "font-bold" : "font-semibold"} text-[var(--text-sm)]`}
                     style={{
-                      color: isCompleted || isActive ? "var(--tw-colors-text-branded-on-action)" : "var(--tw-colors-text-placeholder)",
+                      color: isCompleted || isActive ? "var(--text-branded-on-action)" : "var(--text-placeholder)",
                     }}
                   >
                     {index + 1}
@@ -132,7 +132,7 @@ export function Stepper({
                     transition-all duration-200
                     text-[var(--text-sm)]
                     tracking-[0.14px]
-                    ${isActive ? "font-bold text-branded-500" : isCompleted ? "font-medium text-content-body" : "font-medium text-content-placeholder"}
+                    ${isActive ? "font-bold text-content-branded-action" : isCompleted ? "font-medium text-content-body" : "font-medium text-content-placeholder"}
                   `}
                 >
                   {step}

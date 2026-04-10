@@ -53,7 +53,7 @@ export function SectionListEntretien({
           {/* Statut création */}
           <Chip
             size="medium"
-            icon={<Shield size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Shield size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {creationStatus}
@@ -62,14 +62,14 @@ export function SectionListEntretien({
           {/* Icône database */}
           {showDatabase && (
             <div className="relative shrink-0 size-5">
-              <Database size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <Database size={20} className="text-icon-neutral-default" />
             </div>
           )}
 
           {/* Paramétrage (jours) */}
           <Chip
             size="medium"
-            icon={<Settings size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Settings size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {settingsDays}

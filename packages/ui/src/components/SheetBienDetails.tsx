@@ -66,7 +66,7 @@ export function SheetBienDetails({
   }) => {
     return (
       <div
-        className="rounded-2xl w-full bg-surface-neutral-white dark:bg-surface-neutral-darker border border-edge-default p-6"
+        className="rounded-2xl w-full bg-surface-neutral-default border border-edge-default p-6"
       >
         <div className="flex flex-col gap-2">
           {/* KPI + AI Suggestions */}
@@ -97,7 +97,7 @@ export function SheetBienDetails({
     <div className="flex flex-col gap-5 px-5 py-5">
       {/* Position 1: Map */}
       <div
-        className="w-full rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default dark:bg-surface-neutral-darker"
+        className="w-full rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
         style={{
           height: "115px",
         }}
@@ -114,7 +114,7 @@ export function SheetBienDetails({
 
           <Chip
             size="medium"
-            icon={<Tag size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Tag size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {price}
@@ -129,7 +129,7 @@ export function SheetBienDetails({
         <div className="flex gap-2 items-center">
           <Chip
             size="medium"
-            icon={<MapPin size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<MapPin size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {location}
@@ -137,7 +137,7 @@ export function SheetBienDetails({
 
           <Chip
             size="medium"
-            icon={<Home size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Home size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {bienType}
@@ -145,7 +145,7 @@ export function SheetBienDetails({
 
           <Chip
             size="medium"
-            icon={<Square size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Square size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {surface}

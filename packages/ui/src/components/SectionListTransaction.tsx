@@ -55,7 +55,7 @@ export function SectionListTransaction({
           {/* Nombre d'offres */}
           <Chip
             size="medium"
-            icon={<Archive size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Archive size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {offerCount}
@@ -64,7 +64,7 @@ export function SectionListTransaction({
           {/* Prix + check */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <Tag size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <Tag size={20} className="text-icon-neutral-default" />
             </div>
             {priceValidated && (
               <div className="relative shrink-0 size-5">
@@ -76,7 +76,7 @@ export function SectionListTransaction({
           {/* Factures + check ou X */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <FileText size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <FileText size={20} className="text-icon-neutral-default" />
             </div>
             {invoicesComplete ? (
               <div className="relative shrink-0 size-5">
@@ -84,7 +84,7 @@ export function SectionListTransaction({
               </div>
             ) : (
               <div className="relative shrink-0 size-5">
-                <X size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+                <X size={20} className="text-icon-neutral-default" />
               </div>
             )}
           </div>

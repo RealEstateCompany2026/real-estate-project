@@ -209,7 +209,7 @@ export function DatePicker({
       <div className="p-[24px]">
         {/* Header - Select date */}
         <div className="mb-[20px]">
-          <h3 className="text-[20px] leading-[24px] font-semibold text-text-headings">
+          <h3 className="text-[20px] leading-[24px] font-semibold text-content-headings">
             Select date
           </h3>
         </div>

@@ -53,7 +53,7 @@ export function SectionListPromotion({
           {/* Envois */}
           <Chip
             size="medium"
-            icon={<Inbox size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Inbox size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {envois}
@@ -62,7 +62,7 @@ export function SectionListPromotion({
           {/* Visites */}
           <Chip
             size="medium"
-            icon={<DoorOpen size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<DoorOpen size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {visites}
@@ -71,7 +71,7 @@ export function SectionListPromotion({
           {/* Favoris */}
           <Chip
             size="medium"
-            icon={<Heart size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Heart size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {favoris}

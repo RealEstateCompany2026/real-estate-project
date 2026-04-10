@@ -104,19 +104,19 @@ export function MessageEdit({
     return (
       <div className={`relative w-full ${className}`.trim()}>
         <div
-          className="flex items-start gap-2 p-2 rounded-3xl bg-surface-neutral-default dark:bg-surface-neutral-dark"
+          className="flex items-start gap-2 p-2 rounded-3xl bg-surface-neutral-default"
         >
           {/* Attachment button */}
           <button
             onClick={handleAttachment}
             className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors mt-1"
           >
-            <Paperclip className="size-5 text-icon-neutral-default dark:text-icon-neutral-dark" />
+            <Paperclip className="size-5 text-icon-neutral-default" />
           </button>
 
           {/* Editor container */}
           <div
-            className="flex-1 rounded-full overflow-hidden bg-surface-neutral-white dark:bg-surface-neutral-darker px-4 py-2"
+            className="flex-1 rounded-full overflow-hidden bg-surface-neutral-defaulter px-4 py-2"
           >
             <textarea
               value={content}
@@ -134,7 +134,7 @@ export function MessageEdit({
               onClick={onCancel}
               className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors mt-1"
             >
-              <X className="size-5 text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <X className="size-5 text-icon-neutral-default" />
             </button>
           )}
 
@@ -170,7 +170,7 @@ export function MessageEdit({
 
         {/* Editor box */}
         <div
-          className="relative rounded-2xl shrink-0 w-full overflow-hidden border border-edge-default bg-surface-neutral-white dark:bg-surface-neutral-darker"
+          className="relative rounded-2xl shrink-0 w-full overflow-hidden border border-edge-default bg-surface-neutral-defaulter"
         >
           <textarea
             value={content}
@@ -184,7 +184,7 @@ export function MessageEdit({
         {/* Attachment button (if has attachments) */}
         {attachments.length > 0 && (
           <div
-            className="relative rounded-2xl shrink-0 border border-content-body p-3 flex gap-2 items-center justify-center bg-surface-neutral-white dark:bg-surface-neutral-darker"
+            className="relative rounded-2xl shrink-0 border border-edge-default p-3 flex gap-2 items-center justify-center bg-surface-neutral-defaulter"
           >
             <Paperclip className="size-5 text-content-body" />
             <p className="text-base font-semibold text-content-body">

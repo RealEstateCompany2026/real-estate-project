@@ -42,7 +42,7 @@ export const CardCA: React.FC<CardCAProps> = ({
   );
 
   const VerticalDivider = () => (
-    <div className="w-px h-[84px] bg-edge-default" />
+    <div className="w-px h-[84px] bg-[var(--border-default)]" />
   );
 
   return (

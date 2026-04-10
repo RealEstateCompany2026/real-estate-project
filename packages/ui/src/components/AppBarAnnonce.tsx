@@ -42,7 +42,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
           <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
             <Building size={20} />
           </div>
-          <div className="flex items-center px-[10px] py-2 text-text-headings font-bold">
+          <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
             {type}
           </div>
         </div>
@@ -52,7 +52,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
           <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
             <Square size={20} />
           </div>
-          <div className="flex items-center px-[10px] py-2 text-text-headings font-bold">
+          <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
             {surface}
           </div>
         </div>
@@ -62,7 +62,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
           <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
             <Compass size={20} />
           </div>
-          <div className="flex items-center px-[10px] py-2 text-text-headings font-bold">
+          <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
             N.E
           </div>
         </div>
@@ -87,7 +87,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
               />
             </svg>
           </div>
-          <div className="flex items-center px-[10px] py-2 text-text-headings font-bold">
+          <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
             {annee}
           </div>
         </div>
@@ -97,7 +97,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
           <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
             <MapPin size={20} />
           </div>
-          <div className="flex items-center px-[10px] py-2 text-text-headings font-bold">
+          <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
             {ville}
           </div>
         </div>
@@ -107,14 +107,14 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
           <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
             <Tag size={20} />
           </div>
-          <div className="flex items-center px-[10px] py-2 text-text-headings font-bold">
+          <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
             {prix}
           </div>
         </div>
 
         {/* Prix au m² - Sticker */}
         <div className="h-5 px-2 py-1 rounded-2xl border border-solid border-edge-default">
-          <p className="font-bold text-xs text-center whitespace-nowrap text-text-body">
+          <p className="font-bold text-xs text-center whitespace-nowrap text-content-body">
             {prixM2}
           </p>
         </div>

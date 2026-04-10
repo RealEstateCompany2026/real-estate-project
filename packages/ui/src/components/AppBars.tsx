@@ -82,7 +82,7 @@ interface AppBarTitleProps {
 
 function AppBarTitle({ children }: AppBarTitleProps) {
   return (
-    <h4 className="font-bold text-[28px] leading-[34px] tracking-[0.28px] whitespace-nowrap px-[10px] text-text-headings">
+    <h4 className="font-bold text-[28px] leading-[34px] tracking-[0.28px] whitespace-nowrap px-[10px] text-content-headings">
       {children}
     </h4>
   );

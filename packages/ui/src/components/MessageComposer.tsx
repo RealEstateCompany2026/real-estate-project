@@ -91,19 +91,19 @@ export function MessageComposer({
     return (
       <div className={`relative w-full ${className}`.trim()}>
         <div
-          className="flex items-center gap-2 p-2 rounded-3xl bg-surface-neutral-default dark:bg-surface-neutral-dark"
+          className="flex items-center gap-2 p-2 rounded-3xl bg-surface-neutral-default"
         >
           {/* Attachment button */}
           <button
             onClick={handleAttachment}
             className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors"
           >
-            <Paperclip className="size-5 text-icon-neutral-default dark:text-icon-neutral-dark" />
+            <Paperclip className="size-5 text-icon-neutral-default" />
           </button>
 
           {/* Input */}
           <div
-            className="flex-1 rounded-full px-4 py-2 bg-surface-neutral-white dark:bg-surface-neutral-darker"
+            className="flex-1 rounded-full px-4 py-2 bg-surface-neutral-defaulter"
           >
             <input
               type="text"
@@ -154,7 +154,7 @@ export function MessageComposer({
             <div className="content-stretch flex flex-col gap-2 items-end relative shrink-0 w-full">
               {/* Message box */}
               <div
-                className="relative rounded-2xl shrink-0 w-full border border-edge-default bg-surface-neutral-white dark:bg-surface-neutral-darker"
+                className="relative rounded-2xl shrink-0 w-full border border-edge-default bg-surface-neutral-defaulter"
               >
                 <div className="content-stretch flex flex-col gap-2 items-start p-5 relative w-full">
                   {/* Textarea */}
@@ -175,7 +175,7 @@ export function MessageComposer({
                   {/* Attachment button (if has attachments) */}
                   {attachments.length > 0 && (
                     <div
-                      className="relative rounded-2xl shrink-0 border border-content-body p-3 flex gap-2 items-center justify-center bg-surface-neutral-white dark:bg-surface-neutral-darker"
+                      className="relative rounded-2xl shrink-0 border border-edge-default p-3 flex gap-2 items-center justify-center bg-surface-neutral-defaulter"
                     >
                       <Paperclip className="size-5 text-content-body" />
                       <p className="text-base font-semibold text-content-body">

@@ -113,8 +113,8 @@ function TabButton({ tab, isActive, onClick, hasIcon }: TabButtonProps) {
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset
         disabled:cursor-not-allowed disabled:opacity-50
         font-roboto
-        ${isActive ? "font-semibold text-branded-500 dark:text-branded-400" : "font-normal text-content-placeholder dark:text-neutral-300"}
-        ${isHovered && !isActive && !tab.disabled ? "text-neutral-600 dark:text-neutral-200" : ""}
+        ${isActive ? "font-semibold text-content-branded-action" : "font-normal text-content-placeholder"}
+        ${isHovered && !isActive && !tab.disabled ? "text-content-body" : ""}
       `.trim()}
     >
       {/* Icon */}
@@ -125,7 +125,7 @@ function TabButton({ tab, isActive, onClick, hasIcon }: TabButtonProps) {
 
       {/* Active indicator - border-bottom */}
       {isActive && (
-        <div className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-branded-500 dark:bg-branded-400" />
+        <div className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-surface-branded-action" />
       )}
     </button>
   );

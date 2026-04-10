@@ -145,7 +145,7 @@ export function SearchBar({
   const borderColorClass = disabled
     ? "border-edge-disabled"
     : isFocused
-      ? "border-edge-emphasis"
+      ? "border-edge-branded-default"
       : "border-edge-default";
 
   return (

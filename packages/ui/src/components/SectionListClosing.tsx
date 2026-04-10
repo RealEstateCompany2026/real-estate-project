@@ -54,7 +54,7 @@ export function SectionListClosing({
           {/* Document + check */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <FileText size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <FileText size={20} className="text-icon-neutral-default" />
             </div>
             {documentSigned && (
               <div className="relative shrink-0 size-5">
@@ -66,7 +66,7 @@ export function SectionListClosing({
           {/* Argent + check */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <ArrowDownLeft size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <ArrowDownLeft size={20} className="text-icon-neutral-default" />
             </div>
             {paymentReceived && (
               <div className="relative shrink-0 size-5">
@@ -78,7 +78,7 @@ export function SectionListClosing({
           {/* Justice + check */}
           <div className="flex gap-1 items-center">
             <div className="relative shrink-0 size-5">
-              <Gavel size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+              <Gavel size={20} className="text-icon-neutral-default" />
             </div>
             {legalComplete && (
               <div className="relative shrink-0 size-5">

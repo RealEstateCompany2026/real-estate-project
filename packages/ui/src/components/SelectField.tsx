@@ -51,11 +51,11 @@ export function SelectField({
         disabled={disabled}
         className={`
           h-[56px] px-4 py-3 rounded-lg
-          bg-surface-neutral-default dark:bg-surface-neutral-700
-          text-content-body dark:text-neutral-200
-          border border-edge-default dark:border-neutral-600
-          ${error ? "border-error-500 dark:border-error-400" : "border-edge-default"}
-          focus:outline-none focus:ring-2 focus:ring-branded-500
+          bg-surface-neutral-default
+          text-content-body
+          border border-edge-default
+          ${error ? "border-edge-error-default" : "border-edge-default"}
+          focus:outline-none focus:ring-2 focus:ring-purple-500
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-all
           font-roboto text-[16px] leading-[20px]
@@ -76,7 +76,7 @@ export function SelectField({
       {/* Helper text or error */}
       {(helperText || error) && (
         <span
-          className={`text-xs ${error ? "text-error-500 dark:text-error-400" : "text-content-subtle"}`}
+          className={`text-xs ${error ? "text-content-error" : "text-content-subtle"}`}
         >
           {error || helperText}
         </span>

@@ -179,7 +179,7 @@ export function FileUpload({
           flex flex-col items-center justify-center
           ${!disabled && !selectedFile ? "cursor-pointer" : ""}
           ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-          ${isDragging ? "border-branded-500 bg-surface-branded-action" : "border-neutral-300 bg-surface-neutral-default"}
+          ${isDragging ? "border-edge-branded-default bg-surface-branded-subtle" : "border-edge-default bg-surface-neutral-default"}
         `.trim()}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -249,7 +249,7 @@ export function FileUpload({
 
       {/* Error message */}
       {error && (
-        <p className="text-[14px] mt-2 text-error-500 dark:text-error-400 font-roboto">
+        <p className="text-[14px] mt-2 text-content-error font-roboto">
           {error}
         </p>
       )}

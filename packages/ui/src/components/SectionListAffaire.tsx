@@ -64,7 +64,7 @@ export function SectionListAffaire({
           <ChipId>{affaireId}</ChipId>
 
           <div className="relative shrink-0 size-5">
-            <UserCircle size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />
+            <UserCircle size={20} className="text-icon-neutral-default" />
           </div>
         </div>
 
@@ -72,7 +72,7 @@ export function SectionListAffaire({
         <div className="flex gap-6 items-center">
           <Chip
             size="medium"
-            icon={<Home size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Home size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {bienType}
@@ -80,7 +80,7 @@ export function SectionListAffaire({
 
           <Chip
             size="medium"
-            icon={<Square size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Square size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {surface}
@@ -88,7 +88,7 @@ export function SectionListAffaire({
 
           <Chip
             size="medium"
-            icon={<Tag size={20} className="text-icon-neutral-default dark:text-icon-neutral-dark" />}
+            icon={<Tag size={20} className="text-icon-neutral-default" />}
             iconPosition="left"
           >
             {price}

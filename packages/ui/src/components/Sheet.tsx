@@ -154,7 +154,7 @@ export const Sheet: React.FC<SheetProps> = ({
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="rounded-2xl p-3 transition-colors text-icon-default hover:bg-surface-neutral-action"
+              className="rounded-2xl p-3 transition-colors text-icon-neutral-default hover:bg-surface-neutral-action"
               aria-label="Fermer"
             >
               {closeIcon ? closeIcon : <X size={20} />}

@@ -55,7 +55,7 @@ export const AppBarFicheBien: React.FC<AppBarFicheBienProps> = ({
         </button>
 
         {/* Identifiant du bien - H4 Desktop Bold */}
-        <h4 className="whitespace-nowrap font-bold text-[28px] leading-[34px] tracking-[0.28px] text-text-strong">
+        <h4 className="whitespace-nowrap font-bold text-[28px] leading-[34px] tracking-[0.28px] text-content-strong">
           {bienId}
         </h4>
 
