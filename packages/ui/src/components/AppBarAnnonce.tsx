@@ -35,7 +35,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
   prixM2 = "1 450€ /m2",
 }) => {
   return (
-    <div className="px-[10px] flex items-center h-[100px] bg-surface-neutral-default dark:bg-surface-neutral-default">
+    <div className="px-[10px] flex items-center h-[100px] bg-surface-neutral-default">
       <div className="flex items-center gap-[8px]">
         {/* Type de bien */}
         <div className="flex items-center">

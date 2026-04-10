@@ -5,6 +5,7 @@ import { ArrowLeft, Database, MessageCircle, ScrollText, Flame } from "lucide-re
 import { Badge } from "./Badge";
 import { KpiIndicator } from "./KpiIndicator";
 import { AiTitleWithBadge } from "./AiTitleWithBadge";
+import { AiSuggestion } from "./AiSuggestion";
 
 /**
  * AppBarFicheClient - Barre d'en-tête de fiche client
@@ -44,7 +45,7 @@ export const AppBarFicheClient: React.FC<AppBarFicheClientProps> = ({
   onBack,
 }) => {
   return (
-    <div className="h-[100px] flex items-center px-8 bg-surface-neutral-default dark:bg-surface-neutral-default">
+    <div className="h-[100px] flex items-center px-8 bg-surface-neutral-default">
       <div className="flex items-center gap-6">
         {/* Bouton retour */}
         <button
@@ -55,7 +56,7 @@ export const AppBarFicheClient: React.FC<AppBarFicheClientProps> = ({
         </button>
 
         {/* Nom du client - H4 Desktop Bold */}
-        <h4 className="whitespace-nowrap font-bold text-[28px] leading-[34px] tracking-[0.28px] text-content-strong">
+        <h4 className="whitespace-nowrap font-bold text-[28px] leading-[34px] tracking-[0.28px] text-content-headings">
           {clientName}
         </h4>
 
@@ -100,11 +101,7 @@ export const AppBarFicheClient: React.FC<AppBarFicheClientProps> = ({
 
         {/* Badge IA */}
         {aiSuggestions > 0 && (
-          <div className="h-6 px-3 rounded-2xl flex items-center justify-center bg-surface-branded-default dark:bg-surface-branded-default border border-solid border-surface-branded-default dark:border-surface-branded-default">
-            <span className="font-bold text-[14px] leading-[16px] tracking-[0.14px] text-content-branded-on-action dark:text-content-branded-on-action">
-              {aiSuggestions}
-            </span>
-          </div>
+          <AiSuggestion count={aiSuggestions} />
         )}
       </div>
     </div>

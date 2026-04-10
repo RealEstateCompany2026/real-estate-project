@@ -97,7 +97,7 @@ export const AppBarAffaireAncres: React.FC<AppBarAffaireAncresProps> = ({
   };
 
   return (
-    <div className="px-5 py-10 bg-surface-neutral-default dark:bg-surface-neutral-default">
+    <div className="px-5 py-10 bg-surface-neutral-default">
       <div className="flex items-center justify-between">
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
@@ -119,7 +119,7 @@ export const AppBarAffaireAncres: React.FC<AppBarAffaireAncresProps> = ({
 
             {/* Divider vertical (sauf après le dernier item) */}
             {index < items.length - 1 && (
-              <div className="h-[50px] w-px bg-surface-neutral-action dark:bg-surface-neutral-action" />
+              <div className="h-[50px] w-px bg-surface-neutral-action" />
             )}
           </React.Fragment>
         ))}

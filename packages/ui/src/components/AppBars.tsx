@@ -66,7 +66,7 @@ interface AppBarContainerProps {
 function AppBarContainer({ children, className = "" }: AppBarContainerProps) {
   return (
     <div
-      className={`flex items-center px-[20px] h-[100px] bg-surface-neutral-default dark:bg-surface-neutral-default pt-[27px] pb-[27px] ${className}`.trim()}
+      className={`flex items-center px-[20px] h-[100px] bg-surface-neutral-default py-[25px] ${className}`.trim()}
     >
       {children}
     </div>
@@ -397,7 +397,7 @@ export function AppBarImport({
       <button
         onClick={onSave}
         disabled={saving}
-        className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[16px] transition-all hover:opacity-90 disabled:opacity-50 bg-surface-branded-default dark:bg-surface-branded-default text-content-branded-on-action dark:text-content-branded-on-action font-semibold text-[16px] leading-[20px] tracking-[0.16px]"
+        className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[16px] transition-all hover:opacity-90 disabled:opacity-50 bg-surface-branded-action text-content-branded-on-action font-semibold text-[16px] leading-[20px] tracking-[0.16px]"
       >
         {saving ? "Enregistrement..." : saveLabel}
         {!saving && (
