@@ -9,7 +9,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+      options: ["default", "primary", "destructive", "outline", "secondary", "ghost", "link"],
     },
     size: {
       control: "select",
@@ -24,6 +24,10 @@ type Story = StoryObj<typeof Button>;
 
 export const Default: Story = {
   args: { children: "Action principale", variant: "default" },
+};
+
+export const Primary: Story = {
+  args: { children: "Valider", variant: "primary" },
 };
 
 export const Destructive: Story = {
@@ -82,6 +86,7 @@ export const AllVariants: Story = {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <Button variant="default">Default</Button>
+        <Button variant="primary">Primary</Button>
         <Button variant="destructive">Destructive</Button>
         <Button variant="outline">Outline</Button>
         <Button variant="secondary">Secondary</Button>

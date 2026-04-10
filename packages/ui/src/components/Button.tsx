@@ -3,26 +3,29 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/utils"
 
 /**
- * Button — Design System tokens mapping:
+ * Button — Design System Figma variants:
  *
- *   default:      surface/branded-action → branded-action-hover
- *   destructive:  red-500 → red-600
- *   outline:      border/default, surface/neutral-default → neutral-action
- *   secondary:    surface/neutral-action → neutral-action-hover
- *   ghost:        transparent → surface/neutral-action
- *   link:         text/branded-action
+ *   default:      neutral/white background, body text (standard action)
+ *   primary:      surface/branded-action (purple) — prominent CTA
+ *   destructive:  red-500 — danger actions
+ *   outline:      border + transparent bg
+ *   secondary:    neutral-action bg
+ *   ghost:        transparent bg
+ *   link:         branded text, no bg
  */
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ring-offset-surface-page disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center whitespace-nowrap rounded text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ring-offset-surface-page disabled:pointer-events-none disabled:opacity-50",
     {
         variants: {
             variant: {
                 default:
+                    "bg-surface-neutral-default text-content-body border border-edge-neutral-default hover:bg-surface-neutral-action",
+                primary:
                     "bg-surface-branded-action text-content-branded-on-action hover:bg-surface-branded-action-hover",
                 destructive:
                     "bg-red-500 text-white hover:bg-red-600",
                 outline:
-                    "border border-edge-default bg-surface-neutral-default hover:bg-surface-neutral-action text-content-body",
+                    "border border-edge-neutral-default bg-transparent hover:bg-surface-neutral-action text-content-body",
                 secondary:
                     "bg-surface-neutral-action text-content-body hover:bg-surface-neutral-action-hover",
                 ghost:

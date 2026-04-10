@@ -200,9 +200,13 @@ const config: Config = {
 
         borderRadius: {
             none: "var(--border-radius-0)",
-            DEFAULT: "var(--border-radius-200)",
-            lg: "var(--border-radius-400)",
-            "2xl": "var(--border-radius-700)",
+            sm: "4px",
+            DEFAULT: "var(--border-radius-200)",  // 8px
+            md: "var(--border-radius-200)",        // 8px — alias so rounded-md works
+            lg: "var(--border-radius-400)",        // 16px
+            xl: "20px",
+            "2xl": "var(--border-radius-700)",     // 28px
+            full: "9999px",
         },
 
         borderWidth: {
