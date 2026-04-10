@@ -34,7 +34,8 @@ export function ClientFormWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<ClientCreateData>({
-    resolver: zodResolver(clientCreateSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(clientCreateSchema) as any,
     defaultValues: {
       gender: undefined,
       firstName: '',

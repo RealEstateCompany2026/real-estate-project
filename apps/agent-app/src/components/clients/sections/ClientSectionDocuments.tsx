@@ -26,10 +26,10 @@ export function ClientSectionDocuments({ clientId }: ClientSectionDocumentsProps
       const supabase = createClient();
       const { data } = await supabase
         .from('Document')
-        .select('id, title, type, format, storagePath, fileSizeBytes, createdAt')
+        .select('id, title, type, format, storagePath, fileSizeBytes, fileName, createdAt')
         .eq('clientId', clientId)
         .order('createdAt', { ascending: false });
-      setDocuments((data ?? []) as DocumentListItem[]);
+      setDocuments((data ?? []) as unknown as DocumentListItem[]);
       setIsLoading(false);
     }
     load();
@@ -72,7 +72,7 @@ export function ClientSectionDocuments({ clientId }: ClientSectionDocumentsProps
             <div className="min-w-0">
               <p className="text-sm font-medium text-neutral-anthracite truncate">{doc.title}</p>
               <p className="text-xs text-neutral-grey-bold">
-                {doc.type} · {formatFileSize(doc.fileSizeBytes)} · {formatDate(doc.createdAt)}
+                {doc.type} · {formatFileSize(doc.fileSizeBytes ?? doc.fileSizeKb)} · {formatDate(doc.createdAt)}
               </p>
             </div>
           </div>

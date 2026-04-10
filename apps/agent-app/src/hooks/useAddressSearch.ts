@@ -15,7 +15,7 @@ interface UseAddressSearchOptions {
 export function useAddressSearch({ debounceMs = 300, limit = 5 }: UseAddressSearchOptions = {}) {
   const [results, setResults] = useState<AddressResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const search = useCallback(
     (query: string) => {

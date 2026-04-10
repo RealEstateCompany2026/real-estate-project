@@ -13,27 +13,29 @@ export type PipelineStage =
 
 export interface DealListItem {
   id: string;
-  clientId: string;
-  propertyId: string | null;
-  agentId: string | null;
+  title: string;
+  clientId?: string;
+  propertyId?: string | null;
+  agentId?: string | null;
   type: DealType;
   status: DealStatus;
   pipelineStage: PipelineStage | null;
-  lastActivityDate: string | null;
+  amount: number | null;
+  lastActivityDate?: string | null;
 
   // Vente
-  saleMandateStatus: string | null;
-  finalSalePrice: number | null;
+  saleMandateStatus?: string | null;
+  finalSalePrice?: number | null;
 
   // Acquisition
-  acquisitionMinBudget: number | null;
-  acquisitionMaxBudget: number | null;
+  acquisitionMinBudget?: number | null;
+  acquisitionMaxBudget?: number | null;
 
   // Bail
-  bailMonthlyRent: number | null;
+  bailMonthlyRent?: number | null;
 
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export const DEAL_TYPE_LABELS: Record<DealType, string> = {

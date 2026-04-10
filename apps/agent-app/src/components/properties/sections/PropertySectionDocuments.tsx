@@ -24,10 +24,10 @@ export function PropertySectionDocuments({ propertyId }: PropertySectionDocument
       const supabase = createClient();
       const { data } = await supabase
         .from('Document')
-        .select('id, title, type, format, storagePath, fileSizeBytes, createdAt')
+        .select('id, title, type, format, storagePath, fileSizeBytes, fileName, createdAt')
         .eq('propertyId', propertyId)
         .order('createdAt', { ascending: false });
-      setDocuments((data ?? []) as DocumentListItem[]);
+      setDocuments((data ?? []) as unknown as DocumentListItem[]);
       setIsLoading(false);
     }
     load();

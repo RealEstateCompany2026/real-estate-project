@@ -62,7 +62,10 @@ export interface DocumentListItem {
   id: string;
   title: string;
   type: DocumentType | null;
+  format: DocumentFormat | null;
+  storagePath: string | null;
   fileName: string | null;
+  fileSizeBytes: number | null;
   fileSizeKb: number | null;
   fileFormat: DocumentFormat | null;
   createdAt: string;

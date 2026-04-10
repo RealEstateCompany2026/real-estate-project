@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { EventListItem } from '@/types/event';
 import { EVENT_TYPE_ICONS } from '@/types/event';
 import { Timeline } from '@/components/ui/Timeline';
+import { Circle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 interface PropertySectionTimelineProps {
@@ -13,8 +14,9 @@ interface PropertySectionTimelineProps {
 
 function getIcon(type: string) {
   const iconName = EVENT_TYPE_ICONS[type] || 'Circle';
-  const Icon = (LucideIcons as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
-  return Icon ? <Icon className="w-4 h-4" /> : <LucideIcons.Circle className="w-4 h-4" />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Icon = (LucideIcons as any)[iconName] as React.ComponentType<{ className?: string }> | undefined;
+  return Icon ? <Icon className="w-4 h-4" /> : <Circle className="w-4 h-4" />;
 }
 
 /**

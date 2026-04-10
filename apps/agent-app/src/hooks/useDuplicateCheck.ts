@@ -24,7 +24,7 @@ interface UseDuplicateCheckOptions {
 export function useDuplicateCheck({ debounceMs = 500, excludeId }: UseDuplicateCheckOptions = {}) {
   const [matches, setMatches] = useState<DuplicateMatch[]>([]);
   const [isChecking, setIsChecking] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const checkDuplicates = useCallback(
     (params: { email?: string; phone?: string; firstName?: string; lastName?: string }) => {

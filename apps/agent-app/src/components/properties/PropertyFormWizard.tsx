@@ -36,7 +36,8 @@ export function PropertyFormWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<PropertyCreateData>({
-    resolver: zodResolver(propertyCreateSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(propertyCreateSchema) as any,
     defaultValues: {
       type: 'APPARTEMENT',
       operationTypes: [],
