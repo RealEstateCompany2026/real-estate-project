@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/react";
+import { useEffect } from "react";
 
 // Import design system tokens (CSS custom properties)
 import "../src/tokens.css";
@@ -23,10 +24,27 @@ const preview: Preview = {
       values: [
         { name: "page", value: "#FFFFFF" },
         { name: "neutral-50", value: "#ECEDEE" },
-        { name: "dark", value: "#22252B" },
+        { name: "dark", value: "#111215" },
       ],
     },
   },
+  decorators: [
+    (Story, context) => {
+      const bg = context.globals?.backgrounds?.value || context.parameters?.backgrounds?.default;
+      const isDark = bg === "#111215" || bg === "dark";
+
+      useEffect(() => {
+        const root = document.documentElement;
+        if (isDark) {
+          root.classList.add("dark");
+        } else {
+          root.classList.remove("dark");
+        }
+      }, [isDark]);
+
+      return Story();
+    },
+  ],
 };
 
 export default preview;
