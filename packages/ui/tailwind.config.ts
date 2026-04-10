@@ -1,100 +1,254 @@
 import type { Config } from "tailwindcss";
-import tokens from "./src/tokens.json";
 
-// Mappers for Atomic Design Variables
-const colors = Object.fromEntries(
-    Object.keys(tokens.colors).map((key) => [key, `var(--color-${key})`])
-);
-
-const fontSize = Object.fromEntries(
-    Object.entries(tokens.typography).map(([key, val]) => {
-        const value: [string, { lineHeight: string; fontWeight: string }] = [
-            `var(--font-size-${key})`,
-            { lineHeight: `var(--line-height-${key})`, fontWeight: `var(--font-weight-${key})` }
-        ];
-        return [key, value];
-    })
-);
-
-const spacing = Object.fromEntries(
-    Object.keys(tokens.spacing).map((key) => [key, `var(--spacing-${key})`])
-);
-
-const borderRadius = Object.fromEntries(
-    Object.keys(tokens.radius).map((key) => [key, `var(--radius-${key})`])
-);
-
-const boxShadow = Object.fromEntries(
-    Object.keys(tokens.shadows).map((key) => [key, `var(--shadow-${key})`])
-);
+/**
+ * RealAgent Design System — Tailwind Configuration
+ *
+ * This config maps CSS custom properties (from tokens.css) to Tailwind utilities.
+ *
+ * TOKEN LAYERS:
+ *   Layer 1 (Primitives):  --neutral-500, --purple-500, etc.   → palette.neutral.500, palette.purple.500
+ *   Layer 2 (Semantic):    --branded-500, --success-500, etc.   → (used internally by Layer 3)
+ *   Layer 3 (Mapped):      --surface-*, --text-*, --icon-*, --border-*  → surface.*, text.*, icon.*, border.*
+ *
+ * RULE: Components should ONLY use Layer 3 mapped tokens.
+ *       Layer 1 palette colors are exposed for rare exceptions (scores, gradients).
+ */
 
 const config: Config = {
     content: [
         "./src/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
-        // Override Tailwind's default palette to STRICTLY use Figma tokens
         colors: {
-            transparent: 'transparent',
-            current: 'currentColor',
-            ...colors,
-            // Create semantic aliases based on extracted naming convention if needed
-            primary: `var(--color-white-couleur-primaire)`,
-            background: `var(--color-grey-ultra-background)`,
-            'background-subtle': `var(--color-grey-light-background)`,
-            'background-softBlue': `var(--color-soft-blue-background)`,
-            'neutral-grey-light': `var(--color-grey-light-textes)`,
-            'neutral-grey-bold': `var(--color-grey-bold-textes)`,
-            'neutral-anthracite': `var(--color-anthracite-textes)`,
-            'semantic-info': `var(--color-blue-couleur-fonctionnelle)`,
-            'semantic-success': `var(--color-green-couleur-fonctionnelle)`,
-            'semantic-warning': `var(--color-yellow-couleur-fonctionnelle)`,
-            'semantic-destructive': `var(--color-red-couleur-fonctionnelle)`,
+            transparent: "transparent",
+            current: "currentColor",
+            white: "var(--neutral-white)",
+            black: "var(--neutral-black)",
+
+            // ── Layer 1: Palette (use sparingly, prefer mapped tokens) ──
+            neutral: {
+                white: "var(--neutral-white)",
+                50: "var(--neutral-50)",
+                100: "var(--neutral-100)",
+                200: "var(--neutral-200)",
+                300: "var(--neutral-300)",
+                400: "var(--neutral-400)",
+                500: "var(--neutral-500)",
+                600: "var(--neutral-600)",
+                700: "var(--neutral-700)",
+                800: "var(--neutral-800)",
+                black: "var(--neutral-black)",
+            },
+            purple: {
+                50: "var(--purple-50)",
+                100: "var(--purple-100)",
+                200: "var(--purple-200)",
+                300: "var(--purple-300)",
+                400: "var(--purple-400)",
+                500: "var(--purple-500)",
+                600: "var(--purple-600)",
+                700: "var(--purple-700)",
+                800: "var(--purple-800)",
+                900: "var(--purple-900)",
+            },
+            green: {
+                50: "var(--green-50)",
+                100: "var(--green-100)",
+                200: "var(--green-200)",
+                300: "var(--green-300)",
+                400: "var(--green-400)",
+                500: "var(--green-500)",
+                600: "var(--green-600)",
+                700: "var(--green-700)",
+                800: "var(--green-800)",
+            },
+            red: {
+                50: "var(--red-50)",
+                100: "var(--red-100)",
+                200: "var(--red-200)",
+                300: "var(--red-300)",
+                400: "var(--red-400)",
+                500: "var(--red-500)",
+                600: "var(--red-600)",
+                700: "var(--red-700)",
+                800: "var(--red-800)",
+            },
+            blue: {
+                50: "var(--blue-50)",
+                100: "var(--blue-100)",
+                200: "var(--blue-200)",
+                300: "var(--blue-300)",
+                400: "var(--blue-400)",
+                500: "var(--blue-500)",
+                600: "var(--blue-600)",
+                700: "var(--blue-700)",
+                800: "var(--blue-800)",
+            },
+            orange: {
+                50: "var(--orange-50)",
+                100: "var(--orange-100)",
+                200: "var(--orange-200)",
+                300: "var(--orange-300)",
+                400: "var(--orange-400)",
+                500: "var(--orange-500)",
+                600: "var(--orange-600)",
+                700: "var(--orange-700)",
+                800: "var(--orange-800)",
+            },
+            score: {
+                green: "var(--score-green)",
+                grass: "var(--score-grass)",
+                yellow: "var(--score-yellow)",
+                orange: "var(--score-orange)",
+                red: "var(--score-red)",
+            },
+
+            // ── Layer 3: Mapped tokens (PREFERRED — use these in components) ──
+
+            // Surface colors → bg-surface-*
+            surface: {
+                page: "var(--surface-page)",
+                "neutral-default": "var(--surface-neutral-default)",
+                "neutral-action": "var(--surface-neutral-action)",
+                "neutral-action-hover": "var(--surface-neutral-action-hover)",
+                "branded-default": "var(--surface-branded-default)",
+                "branded-action": "var(--surface-branded-action)",
+                "branded-action-hover": "var(--surface-branded-action-hover)",
+                "branded-subtle": "var(--surface-branded-subtle)",
+                container: "var(--surface-container)",
+                disabled: "var(--surface-disabled)",
+                success: "var(--surface-success)",
+                "success-subtle": "var(--surface-success-subtle)",
+                error: "var(--surface-error)",
+                "error-subtle": "var(--surface-error-subtle)",
+                information: "var(--surface-information)",
+                warning: "var(--surface-warning)",
+                "warning-subtle": "var(--surface-warning-subtle)",
+            },
+
+            // Icon colors → text-icon-*
+            icon: {
+                "neutral-default": "var(--icon-neutral-default)",
+                "neutral-action": "var(--icon-neutral-action)",
+                "neutral-action-hover": "var(--icon-neutral-action-hover)",
+                "neutral-on-action": "var(--icon-neutral-on-action)",
+                "branded-default": "var(--icon-branded-default)",
+                "branded-action": "var(--icon-branded-action)",
+                "branded-action-hover": "var(--icon-branded-action-hover)",
+                "branded-on-action": "var(--icon-branded-on-action)",
+                placeholder: "var(--icon-placeholder)",
+                disabled: "var(--icon-disabled)",
+                success: "var(--icon-success)",
+                error: "var(--icon-error)",
+                information: "var(--icon-information)",
+                warning: "var(--icon-warning)",
+            },
+
+            // Text colors → text-content-*
+            content: {
+                hero: "var(--text-hero)",
+                headings: "var(--text-headings)",
+                body: "var(--text-body)",
+                caption: "var(--text-caption)",
+                strong: "var(--text-strong)",
+                subtle: "var(--text-subtle)",
+                placeholder: "var(--text-placeholder)",
+                "neutral-action": "var(--text-neutral-action)",
+                "neutral-on-action": "var(--text-neutral-on-action)",
+                "branded-action": "var(--text-branded-action)",
+                "branded-on-action": "var(--text-branded-on-action)",
+                "branded-strong": "var(--text-branded-strong)",
+                disabled: "var(--text-disabled)",
+                success: "var(--text-success)",
+                error: "var(--text-error)",
+                information: "var(--text-information)",
+                warning: "var(--text-warning)",
+            },
+
+            // Border colors → border-edge-*
+            edge: {
+                "neutral-default": "var(--border-neutral-default)",
+                "neutral-action": "var(--border-neutral-action)",
+                default: "var(--border-default)",
+                subtle: "var(--border-subtle)",
+                divider: "var(--border-divider)",
+                "branded-default": "var(--border-branded-default)",
+                "branded-action": "var(--border-branded-action)",
+                disabled: "var(--border-disabled)",
+                success: "var(--border-success)",
+                "success-default": "var(--border-success-default)",
+                error: "var(--border-error)",
+                "error-default": "var(--border-error-default)",
+                information: "var(--border-information)",
+                "information-default": "var(--border-information-default)",
+                warning: "var(--border-warning)",
+                "warning-default": "var(--border-warning-default)",
+            },
         },
+
         spacing: {
-            ...spacing,
-            '0': '0px',
-            px: '1px',
-            '0.5': '0.125rem',
-            '1': '0.25rem',
-            '1.5': '0.375rem',
-            '2': '0.5rem',
-            '3': '0.75rem',
-            '4': '1rem',
-            '5': '1.25rem',
-            '6': '1.5rem',
-            '8': '2rem',
-            '10': '2.5rem',
-            '12': '3rem',
-            '64': '16rem',
+            "0": "var(--scale-0)",
+            px: "var(--scale-25)",
+            "0.5": "var(--scale-50)",
+            "1": "var(--scale-100)",
+            "2": "var(--scale-200)",
+            "3": "var(--scale-300)",
+            "4": "var(--scale-400)",
+            "5": "var(--scale-500)",
+            "6": "var(--scale-600)",
+            "7": "var(--scale-700)",
+            "8": "var(--scale-800)",
+            "10": "var(--scale-900)",
+            "12": "var(--scale-1000)",
+            "16": "var(--scale-1200)",
+            // Extra spacing for layouts
+            "20": "80px",
+            "24": "96px",
+            "64": "256px",
         },
+
         borderRadius: {
-            ...borderRadius,
-            none: '0px',
-            sm: '0.125rem',
-            DEFAULT: '0.25rem',
-            md: '0.375rem',
-            lg: '0.5rem',
-            xl: '0.75rem',
-            '2xl': '1rem',
-            '3xl': '1.5rem',
-            full: '9999px',
+            none: "var(--border-radius-0)",
+            sm: "var(--border-radius-100)",
+            DEFAULT: "var(--border-radius-200)",
+            md: "var(--border-radius-300)",
+            lg: "var(--border-radius-400)",
+            xl: "var(--border-radius-600)",
+            "2xl": "var(--border-radius-700)",
+            full: "var(--border-radius-full)",
         },
+
+        borderWidth: {
+            "0": "var(--border-width-0)",
+            DEFAULT: "var(--border-width-25)",
+            "2": "var(--border-width-50)",
+            "4": "var(--border-width-100)",
+        },
+
         boxShadow: {
-            ...boxShadow,
-            DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-            sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-            md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-            lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-            card: '0px 4px 12px rgba(0, 0, 0, 0.05)',
+            sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+            DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+            md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+            lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+            card: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+            none: "none",
         },
+
         extend: {
             fontFamily: {
-                sans: ['var(--font-roboto)', 'sans-serif'],
+                sans: ["var(--font-family)", "sans-serif"],
             },
             fontSize: {
-                ...fontSize
-            }
+                h0: ["var(--text-h0)", { lineHeight: "var(--lh-h0)", fontWeight: "700" }],
+                h1: ["var(--text-h1)", { lineHeight: "var(--lh-h1)", fontWeight: "700" }],
+                h2: ["var(--text-h2)", { lineHeight: "var(--lh-h2)", fontWeight: "700" }],
+                h3: ["var(--text-h3)", { lineHeight: "var(--lh-h3)", fontWeight: "700" }],
+                h4: ["var(--text-h4)", { lineHeight: "var(--lh-h4)", fontWeight: "700" }],
+                lg: ["var(--text-lg)", { lineHeight: "var(--lh-lg)" }],
+                base: ["var(--text-base)", { lineHeight: "var(--lh-base)" }],
+                sm: ["var(--text-sm)", { lineHeight: "var(--lh-sm)" }],
+                xs: ["var(--text-xs)", { lineHeight: "var(--lh-xs)" }],
+            },
         },
     },
     plugins: [],
