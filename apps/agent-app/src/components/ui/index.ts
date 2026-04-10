@@ -3,6 +3,7 @@ export { AccordionSection } from './AccordionSection';
 export { AddressAutocomplete } from './AddressAutocomplete';
 export { Avatar } from './Avatar';
 export { CompletionGauge } from './CompletionGauge';
+export { DataTable } from './DataTable';
 export { DpeSelector } from './DpeSelector';
 export { DuplicateAlert } from './DuplicateAlert';
 export { EmptyState } from './EmptyState';
