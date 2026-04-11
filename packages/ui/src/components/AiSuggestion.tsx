@@ -2,14 +2,25 @@
 
 /**
  * AiSuggestion - Badge indicateur de suggestions IA
+ * Atome du design system RealAgent
+ *
+ * Figma: atome . ai . suggestion (node 1260:10651)
  *
  * États:
- * - count = 0 : Aucune suggestion (badge gris neutre avec bordure)
- * - count >= 1 : Nombre de suggestions (badge violet #7b72f9 avec texte contrasté)
+ * - count = 0 : Aucune suggestion → outlined, border-disabled, text-disabled
+ * - count >= 1 : Nombre de suggestions → filled branded, text-branded-on-action
  *
- * Dimensions: 34px × 24px
- * Border-radius: 16px
- * Font: Roboto Bold 14px/16px
+ * Specs:
+ * - Dimensions: min-w 34px × h 24px
+ * - Border-radius: 16px (border-radius/md)
+ * - Border: 1px solid
+ * - Font: Body sm Bold (14px/16px, tracking 0.14px, bold)
+ * - Padding intérieur: px-6 py-4
+ * - count>0 bg: surface-branded-default (purple-500 / purple-600 dark)
+ * - count>0 border: branded-action-hover (purple-600 / purple-500 dark)
+ * - count=0 border: border-disabled (neutral-300 / neutral-600 dark)
+ * - count=0 text: text-disabled (neutral-300 / neutral-600 dark)
+ * - Tokens Layer 3 uniquement, dark mode auto via .dark class
  */
 
 export interface AiSuggestionProps {
@@ -21,29 +32,24 @@ export function AiSuggestion({ count, className = "" }: AiSuggestionProps) {
   const hasCount = count > 0;
 
   return (
-    <div className={`relative h-[24px] min-w-[34px] rounded-[16px] ${className}`.trim()}>
-      <div
-        className={`
-          absolute inset-[0_1.47%] rounded-[16px] border border-solid
-          ${hasCount
-            ? "border-[#635cc7] bg-[#7b72f9]"
-            : "border-neutral-400 dark:border-neutral-600 bg-transparent"}
-        `}
+    <div
+      className={`inline-flex items-center justify-center h-[24px] min-w-[34px]
+        rounded-[16px] border border-solid px-[6px]
+        ${hasCount
+          ? "bg-[var(--surface-branded-default)] border-[var(--surface-branded-action-hover)]"
+          : "bg-transparent border-[var(--border-disabled)]"}
+        ${className}`}
+    >
+      <span
+        className="text-[14px] font-bold leading-[16px] tracking-[0.14px] whitespace-nowrap px-[6px] py-[4px]"
+        style={{
+          color: hasCount
+            ? "var(--text-branded-on-action)"
+            : "var(--text-disabled)",
+        }}
       >
-        <div className="flex items-center justify-center size-full px-[6px]">
-          <p
-            className={`
-              text-[14px] leading-[16px] tracking-[0.14px] font-bold
-              not-italic relative shrink-0 whitespace-nowrap px-[6px] py-[4px]
-              ${hasCount
-                ? "text-white"
-                : "text-neutral-400 dark:text-neutral-600"}
-            `}
-          >
-            {count}
-          </p>
-        </div>
-      </div>
+        {count}
+      </span>
     </div>
   );
 }

@@ -5,26 +5,17 @@ import { AiTitleWithBadge } from "./AiTitleWithBadge";
 
 /**
  * AiSuggestionDashboard - Dashboard de résumé des suggestions IA
+ * Organisme du design system RealAgent
  *
- * Affiche en tête de page un résumé des suggestions d'actions détectées par l'IA
- * Catégories: Conseil, Service, Administratif, Transaction
+ * Figma: ia . dashboard . suggestions (node 1264:1689)
  *
- * Structure:
- * - 4 catégories avec leurs badges de comptage
- * - Bouton CTA "Voir les suggestions" avec icône arrow-right
- *
- * Dimensions: width 100% (adaptatif), padding 28px 20px
- * Border-radius: 16px
- * Background: bg-surface-neutral-default (light) / dark:bg-surface-neutral-default (dark)
- *
- * Usage:
- * <AiSuggestionDashboard
- *   conseil={3}
- *   service={0}
- *   administratif={2}
- *   transaction={1}
- *   onViewAll={() => navigate('/suggestions')}
- * />
+ * Specs:
+ * - Background: surface-neutral-action (neutral-50 / neutral-700 dark)
+ * - Rounded: 16px, padding: px-20 py-28
+ * - Layout: flex, items-center, justify-between
+ * - 4 catégories (AiTitleWithBadge), gap: 36px
+ * - Bouton "Voir les suggestions": surface-branded-default, p-12, rounded-16
+ * - Tokens Layer 3 uniquement, dark mode auto
  */
 
 export interface AiSuggestionDashboardProps {
@@ -46,38 +37,36 @@ export function AiSuggestionDashboard({
 }: AiSuggestionDashboardProps) {
   return (
     <div
-      className={`relative rounded-[16px] w-full bg-surface-neutral-default dark:bg-surface-neutral-default ${className}`.trim()}
+      className={`flex items-center justify-between px-[20px] py-[28px] rounded-[16px] w-full
+        bg-surface-neutral-action ${className}`.trim()}
     >
-      <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex items-center justify-between px-[20px] py-[28px] relative w-full">
-          {/* Categories section */}
-          <div className="content-stretch flex gap-[46px] items-center relative shrink-0">
-            <AiTitleWithBadge title="Conseil" count={conseil} />
-            <AiTitleWithBadge title="Service" count={service} />
-            <AiTitleWithBadge title="Administratif" count={administratif} />
-            <AiTitleWithBadge title="Transaction" count={transaction} />
-          </div>
-
-          {/* Action button */}
-          <button
-            type="button"
-            onClick={onViewAll}
-            className="relative rounded-[16px] shrink-0 border border-solid bg-surface-branded-default dark:bg-surface-branded-default border-surface-branded-default dark:border-surface-branded-default hover:opacity-90 transition-opacity"
-          >
-            <div className="flex flex-row items-center justify-center size-full">
-              <div className="content-stretch flex gap-[8px] items-center justify-center p-[12px] relative">
-                <p className="text-[16px] leading-[20px] tracking-[0.16px] font-semibold not-italic relative shrink-0 whitespace-nowrap text-content-branded-on-action">
-                  Voir les suggestions
-                </p>
-                <ArrowRight
-                  size={20}
-                  className="text-content-branded-on-action"
-                />
-              </div>
-            </div>
-          </button>
-        </div>
+      {/* Categories */}
+      <div className="flex items-center gap-[36px] shrink-0">
+        <AiTitleWithBadge title="Conseil" count={conseil} />
+        <AiTitleWithBadge title="Service" count={service} />
+        <AiTitleWithBadge title="Administratif" count={administratif} />
+        <AiTitleWithBadge title="Transaction" count={transaction} />
       </div>
+
+      {/* Action button */}
+      <button
+        type="button"
+        onClick={onViewAll}
+        className="shrink-0 flex items-center gap-[8px] p-[12px] rounded-[16px] border border-solid
+          bg-surface-branded-default border-edge-branded-action
+          hover:opacity-90 transition-opacity"
+      >
+        <span
+          className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
+          style={{ color: "var(--text-branded-on-action)" }}
+        >
+          Voir les suggestions
+        </span>
+        <ArrowRight
+          size={20}
+          style={{ color: "var(--text-branded-on-action)" }}
+        />
+      </button>
     </div>
   );
 }

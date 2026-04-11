@@ -4,12 +4,15 @@ import { AiSuggestion } from "./AiSuggestion";
 
 /**
  * AiTitleWithBadge - Titre avec badge de suggestions IA
+ * Atome du design system RealAgent
  *
- * Variante spécialisée de l'atome "Text + Icon" pour la famille IA
- * L'icône est remplacée par le badge AiSuggestion
+ * Figma: atome . titre + icon . suggestion
  *
- * Structure: Texte + Badge (gap 8px)
- * Font: Roboto SemiBold 16px/20px
+ * Specs:
+ * - Layout: flex, items-center, gap-8px
+ * - Titre: Body md SemiBold (16px/20px), text-body, px-10 py-8
+ * - Badge: AiSuggestion atom
+ * - Tokens Layer 3, dark mode auto
  */
 
 export interface AiTitleWithBadgeProps {
@@ -24,24 +27,14 @@ export function AiTitleWithBadge({
   className = "",
 }: AiTitleWithBadgeProps) {
   return (
-    <div className={`relative shrink-0 ${className}`.trim()}>
-      <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex gap-[8px] items-center relative">
-          {/* Title text */}
-          <div className="relative shrink-0">
-            <div className="flex flex-row items-center size-full">
-              <div className="content-stretch flex items-center px-[10px] py-[8px] relative">
-                <p className="text-[16px] leading-[20px] tracking-[0.16px] font-semibold not-italic relative shrink-0 whitespace-nowrap text-content-body">
-                  {title}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* AI Suggestion Badge */}
-          <AiSuggestion count={count} />
-        </div>
-      </div>
+    <div className={`flex items-center gap-[8px] shrink-0 ${className}`.trim()}>
+      <span
+        className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap px-[10px] py-[8px]"
+        style={{ color: "var(--text-body)" }}
+      >
+        {title}
+      </span>
+      <AiSuggestion count={count} />
     </div>
   );
 }
