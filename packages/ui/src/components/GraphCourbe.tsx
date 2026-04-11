@@ -6,20 +6,18 @@ import React from "react";
  * GraphCourbe - Graphique en courbe avec indicateur de tendance
  * Organism du design system RealAgent
  *
- * Affiche une courbe de données avec échelle, dates et indicateur de point sélectionné.
- * Utilisé pour visualiser l'évolution d'une métrique dans le temps.
- *
- * Specs Figma:
- * - Hauteur: 320px
- * - Border-radius: 20px
- * - Background: surface-neutral-action (neutral-50 light / neutral-700 dark)
- * - Dropdown label: shadow, bg surface-neutral-default, rounded-2xl
- * - Indication popup: shadow, bg surface-neutral-default, rounded-2xl
- * - Courbe: couleur branded (purple-500), dégradé sous la courbe
- * - Grille: 3 lignes horizontales, couleur border-disabled
- * - Ligne verticale pointillée au point sélectionné
- * - Échelle verticale à droite, dates en bas
- * - Variantes: light / dark (auto via .dark class)
+ * Specs Figma (node 1053:16697):
+ * - Container: h-320px, rounded-20px, bg neutral-50 (surface-neutral-action)
+ * - Matrice: inset top 6.25% right 2.02% bottom 8.13% left 0
+ *   - échelle: flex row, gap-27px → lignes (94.5%) + labels Y (w-37px)
+ *   - lignes: h-200px, 3 horizontal lines très légères
+ *   - chronologie: flex row, gap-77px, dates en Body sm Bold
+ * - Dropdown: h-44px, px-20 py-12, rounded-16px, shadow 1px 1px 8px, bg white
+ * - GraphIndication: px-12 py-8, rounded-16px, shadow 0 0 8px, bg white
+ *   - H6 Bold (20px) date + Body sm (14px) label + IconText (16px) trend
+ * - Courbe: branded (purple-500), gradient fill underneath
+ * - Point sélectionné: ellipse 19px, stroke branded, fill white — HORS du SVG stretched
+ * - Ligne verticale pointillée: pleine hauteur container, fine, dashed
  * - Tokens Layer 3 uniquement, zéro couleur hardcodée
  */
 
@@ -35,11 +33,11 @@ export interface GraphCourbeProps {
   title?: string;
   /** Points de données à afficher */
   data?: DataPoint[];
-  /** Index du point sélectionné (0-based). Si null, aucun point n'est sélectionné. */
+  /** Index du point sélectionné (0-based). null = aucun. */
   selectedIndex?: number | null;
-  /** Texte descriptif affiché dans la popup (ex: "28 réactions positives") */
+  /** Texte descriptif dans la popup (ex: "28 réactions positives") */
   selectedLabel?: string;
-  /** Date/titre affiché dans la popup (ex: "22 fév 2026") */
+  /** Date/titre dans la popup (ex: "22 fév 2026") */
   selectedDate?: string;
   /** Pourcentage de variation (ex: "7%") */
   trendPercentage?: string;
@@ -51,7 +49,9 @@ export interface GraphCourbeProps {
   className?: string;
 }
 
-/* ---------- helpers ---------- */
+/* ================================================================
+   Helpers
+   ================================================================ */
 
 function buildCurvePath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return "";
@@ -70,7 +70,7 @@ function buildCurvePath(points: { x: number; y: number }[]): string {
 
 function buildAreaPath(
   points: { x: number; y: number }[],
-  viewBoxHeight: number
+  viewBoxHeight: number,
 ): string {
   if (points.length === 0) return "";
   const curvePart = buildCurvePath(points);
@@ -79,32 +79,30 @@ function buildAreaPath(
   return `${curvePart} L${lastX},${viewBoxHeight} L${firstX},${viewBoxHeight} Z`;
 }
 
-/* ---------- sub-components ---------- */
+/* ================================================================
+   Sub-components
+   ================================================================ */
 
 function TrendArrow({ direction }: { direction: "up" | "down" }) {
   const color =
     direction === "up" ? "var(--icon-success)" : "var(--icon-error)";
   return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      style={{ color }}
-    >
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <path
         d={
           direction === "up"
             ? "M10 5L14 9H6L10 5Z"
             : "M10 15L6 11H14L10 15Z"
         }
-        fill="currentColor"
+        fill={color}
       />
     </svg>
   );
 }
 
-/* ---------- defaults ---------- */
+/* ================================================================
+   Defaults
+   ================================================================ */
 
 const DEFAULT_DATA: DataPoint[] = [
   { label: "10 avr", value: 18 },
@@ -117,7 +115,9 @@ const DEFAULT_DATA: DataPoint[] = [
   { label: "29 mai", value: 38 },
 ];
 
-/* ---------- main ---------- */
+/* ================================================================
+   Main component
+   ================================================================ */
 
 export function GraphCourbe({
   title = "Label",
@@ -130,58 +130,86 @@ export function GraphCourbe({
   maxY,
   className = "",
 }: GraphCourbeProps) {
-  /* Compute scale */
+  /* ── Compute scale ── */
   const computedMax =
     maxY ?? Math.ceil(Math.max(...data.map((d) => d.value)) / 10) * 10;
   const midY = Math.round(computedMax / 2);
 
-  /* SVG viewBox */
+  /* ── SVG viewBox for the curve (stretched horizontally) ── */
   const VB_W = 1000;
   const VB_H = 200;
-  const PAD_TOP = 10;
-  const PAD_BOT = 10;
-  const usableH = VB_H - PAD_TOP - PAD_BOT;
 
-  /* Map data to SVG coords */
+  /* Map data → viewBox coordinates */
   const points = data.map((d, i) => ({
     x: data.length === 1 ? VB_W / 2 : (i / (data.length - 1)) * VB_W,
-    y: PAD_TOP + usableH - (d.value / computedMax) * usableH,
+    y: VB_H - (d.value / computedMax) * VB_H,
   }));
 
   const curvePath = buildCurvePath(points);
   const areaPath = buildAreaPath(points, VB_H);
 
-  /* Selected point */
+  /* ── Selected point: compute as percentages for CSS positioning ── */
   const sel =
-    selectedIndex != null && selectedIndex >= 0 && selectedIndex < points.length
+    selectedIndex != null &&
+    selectedIndex >= 0 &&
+    selectedIndex < points.length
       ? points[selectedIndex]
       : null;
+
+  // % positions relative to the grid-lines area
   const selPctX = sel ? (sel.x / VB_W) * 100 : null;
+  const selPctY = sel ? (sel.y / VB_H) * 100 : null;
+
+  /*
+   * Figma layout (320px container):
+   *   Matrice top: 6.25% = 20px
+   *   Grid-lines height: 200px  (62.5%)
+   *   Gap grid→dates: 10px
+   *   Dates row: ~64px (with py-8 = 8px padding)
+   *   Matrice bottom: 8.13% = 26px
+   *   Y-labels: 27px gap + 37px width to the right of grid-lines
+   *   Matrice right: 2.02% ≈ 24px
+   */
+  const GRID_TOP = 20; // px from container top
+  const GRID_H = 200; // px
+  const Y_LABEL_GAP = 27; // px between grid-lines and Y-labels
+  const Y_LABEL_W = 37; // px
+  const RIGHT_PAD = 24; // px from container right edge
 
   return (
     <div
-      className={`relative h-[320px] rounded-[20px] bg-[var(--surface-neutral-action)] ${className}`.trim()}
+      className={`relative h-[320px] rounded-[20px] overflow-hidden bg-[var(--surface-neutral-action)] ${className}`.trim()}
     >
-      {/* ── Dropdown label (top-left) ── */}
+      {/* ════════════════════════════════════════════════════
+          Dropdown label (top-left)
+          Figma: h-44, px-20 py-12, rounded-16, shadow 1px 1px 8px
+          ════════════════════════════════════════════════════ */}
       <div
-        className="absolute top-5 left-5 px-5 py-3 rounded-2xl flex items-center gap-1 z-[2]
-          bg-[var(--surface-neutral-default)]
-          shadow-[0px_0px_8px_0px_rgba(0,0,0,0.15)]"
+        className="absolute z-[4] flex items-center gap-1 rounded-[16px]
+          bg-[var(--surface-neutral-default)]"
+        style={{
+          top: `${GRID_TOP}px`,
+          left: "0px",
+          height: "44px",
+          padding: "12px 20px",
+          boxShadow: "1px 1px 8px 0px rgba(0,0,0,0.15)",
+        }}
       >
         <span
-          className="text-base font-semibold"
+          className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
           style={{ color: "var(--text-body)" }}
         >
           {title}
         </span>
         <svg
-          className="size-5"
-          fill="none"
+          width="20"
+          height="20"
           viewBox="0 0 20 20"
+          fill="none"
           style={{ color: "var(--text-body)" }}
         >
           <path
-            d="M5 7.5L10 12.5L15 7.5"
+            d="M6.5 8.5L10 12L13.5 8.5"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
@@ -190,65 +218,38 @@ export function GraphCourbe({
         </svg>
       </div>
 
-      {/* ── Chart area ── */}
-      <div className="absolute inset-[60px_50px_40px_20px]">
-        {/* Horizontal grid lines (3) */}
+      {/* ════════════════════════════════════════════════════
+          Grid-lines zone (where the curve lives)
+          ════════════════════════════════════════════════════ */}
+      <div
+        className="absolute"
+        style={{
+          top: `${GRID_TOP}px`,
+          left: "0px",
+          right: `${Y_LABEL_GAP + Y_LABEL_W + RIGHT_PAD}px`,
+          height: `${GRID_H}px`,
+        }}
+      >
+        {/* ── 3 horizontal grid lines (very subtle) ── */}
         <svg
           className="absolute inset-0 w-full h-full"
           preserveAspectRatio="none"
         >
           <line
-            x1="0"
-            y1="0%"
-            x2="100%"
-            y2="0%"
-            stroke="var(--border-disabled)"
-            strokeWidth="1"
+            x1="0" y1="0" x2="100%" y2="0"
+            stroke="var(--border-disabled)" strokeWidth="1" opacity="0.5"
           />
           <line
-            x1="0"
-            y1="50%"
-            x2="100%"
-            y2="50%"
-            stroke="var(--border-disabled)"
-            strokeWidth="1"
+            x1="0" y1="50%" x2="100%" y2="50%"
+            stroke="var(--border-disabled)" strokeWidth="1" opacity="0.5"
           />
           <line
-            x1="0"
-            y1="100%"
-            x2="100%"
-            y2="100%"
-            stroke="var(--border-disabled)"
-            strokeWidth="1"
+            x1="0" y1="100%" x2="100%" y2="100%"
+            stroke="var(--border-disabled)" strokeWidth="1" opacity="0.5"
           />
         </svg>
 
-        {/* Vertical dashed line at selected point */}
-        {selPctX != null && (
-          <svg
-            className="absolute"
-            style={{
-              left: `${selPctX}%`,
-              top: "-60px",
-              width: "2px",
-              height: "calc(100% + 60px)",
-            }}
-            preserveAspectRatio="none"
-          >
-            <line
-              x1="1"
-              y1="0"
-              x2="1"
-              y2="100%"
-              stroke="var(--border-disabled)"
-              strokeWidth="2"
-              strokeDasharray="4 3"
-              opacity="0.6"
-            />
-          </svg>
-        )}
-
-        {/* Curve + gradient fill */}
+        {/* ── Curve: gradient fill + stroke ── */}
         <svg
           className="absolute inset-0 w-full h-full"
           preserveAspectRatio="none"
@@ -256,11 +257,8 @@ export function GraphCourbe({
         >
           <defs>
             <linearGradient
-              id="graphCourbeGradient"
-              x1="0%"
-              y1="0%"
-              x2="0%"
-              y2="100%"
+              id="graphCourbeGrad"
+              x1="0%" y1="0%" x2="0%" y2="100%"
             >
               <stop
                 offset="0%"
@@ -275,80 +273,154 @@ export function GraphCourbe({
             </linearGradient>
           </defs>
 
-          {/* Filled area under curve */}
-          <path d={areaPath} fill="url(#graphCourbeGradient)" />
+          <path d={areaPath} fill="url(#graphCourbeGrad)" />
 
-          {/* Curve line */}
           <path
             d={curvePath}
             fill="none"
             stroke="var(--border-branded-default)"
             strokeWidth="3"
           />
-
-          {/* Selected dot */}
-          {sel && (
-            <circle
-              cx={sel.x}
-              cy={sel.y}
-              r="8"
-              fill="var(--surface-neutral-default)"
-              stroke="var(--border-branded-default)"
-              strokeWidth="3"
-            />
-          )}
         </svg>
 
-        {/* Y-axis labels (right side) */}
-        <div className="absolute -right-[40px] top-0 bottom-0 flex flex-col justify-between text-right">
-          <span
-            className="text-sm font-bold"
-            style={{ color: "var(--text-subtle)" }}
+        {/* ── Selected point ellipse (rendered OUTSIDE the stretched SVG to stay round) ── */}
+        {sel && selPctX != null && selPctY != null && (
+          <div
+            className="absolute z-[2] pointer-events-none"
+            style={{
+              left: `${selPctX}%`,
+              top: `${selPctY}%`,
+              transform: "translate(-50%, -50%)",
+            }}
           >
-            {computedMax}
-          </span>
-          <span
-            className="text-sm font-bold"
-            style={{ color: "var(--text-subtle)" }}
-          >
-            {midY}
-          </span>
-          <span
-            className="text-sm font-bold"
-            style={{ color: "var(--text-subtle)" }}
-          >
-            0
-          </span>
-        </div>
+            <svg width="19" height="19" viewBox="0 0 19 19" fill="none">
+              <circle
+                cx="9.5"
+                cy="9.5"
+                r="7.5"
+                fill="var(--surface-neutral-default)"
+                stroke="var(--border-branded-default)"
+                strokeWidth="3"
+              />
+            </svg>
+          </div>
+        )}
       </div>
 
-      {/* ── Indication popup ── */}
+      {/* ════════════════════════════════════════════════════
+          Vertical dashed line at selected point (full container height)
+          Figma: thin, dashed, spanning top to bottom
+          ════════════════════════════════════════════════════ */}
       {sel && selPctX != null && (
         <div
-          className="absolute z-[3] px-3 py-2 rounded-2xl
-            bg-[var(--surface-neutral-default)]
-            shadow-[0px_0px_8px_0px_rgba(0,0,0,0.15)]"
+          className="absolute top-0 bottom-0 z-[1] pointer-events-none"
           style={{
-            top: "70px",
-            left: `calc(${selPctX}% + 30px)`,
+            left: `calc((100% - ${Y_LABEL_GAP + Y_LABEL_W + RIGHT_PAD}px) * ${selPctX / 100})`,
+            width: "1px",
           }}
         >
-          <div
-            className="text-xl font-bold mb-2"
-            style={{ color: "var(--text-headings)" }}
+          <svg className="w-full h-full" preserveAspectRatio="none">
+            <line
+              x1="0" y1="0" x2="0" y2="100%"
+              stroke="var(--border-disabled)"
+              strokeWidth="1"
+              strokeDasharray="6 4"
+              opacity="0.6"
+            />
+          </svg>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════
+          Y-axis labels (right of grid lines)
+          Figma: w-37px, gap-68px, px-10 py-8, Body sm Bold
+          ════════════════════════════════════════════════════ */}
+      <div
+        className="absolute flex flex-col justify-between"
+        style={{
+          top: `${GRID_TOP}px`,
+          right: `${RIGHT_PAD}px`,
+          width: `${Y_LABEL_W}px`,
+          height: `${GRID_H}px`,
+        }}
+      >
+        {[computedMax, midY, 0].map((v) => (
+          <span
+            key={v}
+            className="text-[14px] font-bold leading-[16px] tracking-[0.14px] px-[10px] py-[8px]"
+            style={{ color: "var(--text-subtle)" }}
           >
-            {selectedDate}
-          </div>
-          <div
-            className="text-sm mb-2"
-            style={{ color: "var(--text-caption)" }}
+            {v}
+          </span>
+        ))}
+      </div>
+
+      {/* ════════════════════════════════════════════════════
+          X-axis dates (below grid lines)
+          Figma: flex row, gap-77px, px-10 py-8, Body sm Bold
+          ════════════════════════════════════════════════════ */}
+      <div
+        className="absolute flex justify-between items-center"
+        style={{
+          top: `${GRID_TOP + GRID_H + 10}px`,
+          left: "0px",
+          right: `${Y_LABEL_GAP + Y_LABEL_W + RIGHT_PAD}px`,
+        }}
+      >
+        {data.map((d, i) => (
+          <span
+            key={`${d.label}-${i}`}
+            className="text-[14px] font-bold leading-[16px] tracking-[0.14px] px-[10px] py-[8px]"
+            style={{ color: "var(--text-subtle)" }}
           >
-            {selectedLabel}
+            {d.label}
+          </span>
+        ))}
+      </div>
+
+      {/* ════════════════════════════════════════════════════
+          GraphIndication popup
+          Figma: px-12 py-8, rounded-16px, shadow 0 0 8px
+          Content: H6 Bold + Body sm Regular + icon+text md SemiBold
+          ════════════════════════════════════════════════════ */}
+      {sel && selPctX != null && (
+        <div
+          className="absolute z-[3] flex flex-col rounded-[16px]
+            bg-[var(--surface-neutral-default)]"
+          style={{
+            top: `${GRID_TOP + GRID_H * 0.15}px`,
+            left: `calc((100% - ${Y_LABEL_GAP + Y_LABEL_W + RIGHT_PAD}px) * ${selPctX / 100} + 24px)`,
+            padding: "8px 12px",
+            boxShadow: "0px 0px 8px 0px rgba(0,0,0,0.15)",
+          }}
+        >
+          {/* H6 Bold Desktop: 20px, bold, line-height 24px */}
+          <div
+            className="py-[8px]"
+          >
+            <span
+              className="text-[20px] font-bold leading-[24px] tracking-[0.2px]"
+              style={{ color: "var(--text-headings)" }}
+            >
+              {selectedDate}
+            </span>
           </div>
-          <div className="flex items-center gap-1">
+          {/* Body sm Regular: 14px, regular, line-height 16px */}
+          <div
+            className="py-[8px]"
+          >
+            <span
+              className="text-[14px] font-normal leading-[16px] tracking-[0.14px]"
+              style={{ color: "var(--text-caption)" }}
+            >
+              {selectedLabel}
+            </span>
+          </div>
+          {/* Icon + text medium: 16px SemiBold */}
+          <div className="flex items-center gap-[4px] py-[8px]">
             <TrendArrow direction={trendDirection} />
             <span
-              className="text-base font-semibold"
+              className="text-[16px] font-semibold leading-[20px] tracking-[0.16px]"
               style={{ color: "var(--text-body)" }}
             >
               {trendPercentage}
@@ -356,19 +428,6 @@ export function GraphCourbe({
           </div>
         </div>
       )}
-
-      {/* ── X-axis dates ── */}
-      <div className="absolute bottom-2 left-5 right-[50px] flex justify-between">
-        {data.map((d, i) => (
-          <span
-            key={`${d.label}-${i}`}
-            className="text-sm font-bold"
-            style={{ color: "var(--text-subtle)" }}
-          >
-            {d.label}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
