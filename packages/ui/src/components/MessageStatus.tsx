@@ -21,14 +21,14 @@ export function MessageStatus({
   const isFail = level === "fail";
 
   const getFillColor = () => {
-    if (isSuccess) return "#0DA500";
+    if (isSuccess) return "var(--green-500)";
     if (isFail) return "var(--text-body)";
     return "var(--surface-neutral-default)";
   };
 
   const getStrokeColor = () => {
-    if (isSuccess) return "#86D280";
-    return "#737780";
+    if (isSuccess) return "var(--green-200)";
+    return "var(--text-subtle)";
   };
 
   return (

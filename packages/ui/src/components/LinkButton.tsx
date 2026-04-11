@@ -79,8 +79,8 @@ export function LinkButton({
     switch (variant) {
       case "branded":
         return {
-          default: "text-[#7b72f9]",
-          hover: "hover:text-[#635cc7]",
+          default: "text-[var(--text-branded-default)]",
+          hover: "hover:text-[var(--surface-branded-action-hover)]",
         };
       case "neutral":
       default:

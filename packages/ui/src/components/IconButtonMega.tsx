@@ -40,10 +40,10 @@ export function IconButtonMega({
     switch (finalVariant) {
       case "primary":
         return {
-          background: "bg-[#7b72f9]",
+          background: "bg-[var(--surface-branded-default)]",
           color: "text-white",
-          border: "border-[#7b72f9]",
-          hoverBg: "hover:bg-[#635cc7]",
+          border: "border-[var(--surface-branded-default)]",
+          hoverBg: "hover:bg-[var(--surface-branded-action-hover)]",
         };
       case "secondary":
         return {
@@ -110,7 +110,7 @@ export function IconButtonMega({
           <div
             aria-hidden="true"
             className="absolute border-2 border-solid inset-0 pointer-events-none rounded-[28px]"
-            style={{ borderColor: "var(--focus-ring-color, #7b72f9)" }}
+            style={{ borderColor: "var(--border-branded-default)" }}
           />
         </div>
       )}

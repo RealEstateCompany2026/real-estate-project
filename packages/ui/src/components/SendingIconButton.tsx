@@ -42,25 +42,25 @@ export function SendingIconButton({
     switch (status) {
       case "sent":
         return {
-          background: "bg-[#0da500]",
-          borderColor: "#0da500",
+          background: "bg-[var(--green-500)]",
+          borderColor: "var(--green-500)",
           icon: <Check className="w-[20px] h-[20px]" />,
-          iconColor: "#ffffff",
+          iconColor: "var(--text-branded-on-action)",
         };
       case "sending":
         return {
-          background: "bg-[#635cc7]",
-          borderColor: "#635cc7",
+          background: "bg-[var(--surface-branded-action-hover)]",
+          borderColor: "var(--surface-branded-action-hover)",
           icon: <Send className="w-[20px] h-[20px]" />,
-          iconColor: "#ffffff",
+          iconColor: "var(--text-branded-on-action)",
         };
       case "idle":
       default:
         return {
-          background: "bg-[#7b72f9]",
-          borderColor: "#7b72f9",
+          background: "bg-[var(--surface-branded-default)]",
+          borderColor: "var(--surface-branded-default)",
           icon: <Send className="w-[20px] h-[20px]" />,
-          iconColor: "#ffffff",
+          iconColor: "var(--text-branded-on-action)",
         };
     }
   };
