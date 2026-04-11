@@ -1,62 +1,89 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ListPromesse, type ListPromesseItem } from "../components/ListPromesse";
+import { ListPromesse } from "../components/ListPromesse";
 
 const meta: Meta<typeof ListPromesse> = {
-  title: "Design System/Molecules/ListPromesse",
+  title: "Organisms/ListPromesse",
   component: ListPromesse,
+  parameters: {
+    layout: "padded",
+    docs: {
+      description: {
+        component:
+          "Ligne de liste promesse — 2 variantes : Vente (contact + REÇUE/TRANSMISE/ACCORD) et Recherche (contact + infos bien + ENVOYÉE/ACCEPTÉE).",
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof ListPromesse>;
 
-const mockItems: ListPromesseItem[] = [
-  {
-    id: "1",
-    title: "Promesse de vente - Dupont",
-    date: "10 avril 2024",
-    status: "EN_COURS",
-  },
-  {
-    id: "2",
-    title: "Promesse d'achat - Martin",
-    date: "8 avril 2024",
-    status: "SIGNEE",
-  },
-  {
-    id: "3",
-    title: "Promesse suspendue - Leclerc",
-    date: "5 avril 2024",
-    status: "SUSPENDUE",
-  },
-];
-
-export const Default: Story = {
+export const Vente: Story = {
   args: {
-    items: mockItems,
+    useCase: "vente",
+    contactName: "Nathalie DUFLOT",
+    workflow: { recue: "success", transmise: "success", accord: "success" },
+    aiSuggestions: 0,
   },
 };
 
-export const SingleItem: Story = {
+export const VenteEnCours: Story = {
   args: {
-    items: [mockItems[0]],
+    useCase: "vente",
+    contactName: "Pierre MARTIN",
+    workflow: { recue: "success", transmise: "warning", accord: "disabled" },
+    aiSuggestions: 1,
   },
 };
 
-export const ManyItems: Story = {
+export const Recherche: Story = {
   args: {
-    items: [
-      { id: "1", title: "Promesse 1", date: "10 avril 2024", status: "EN_COURS" },
-      { id: "2", title: "Promesse 2", date: "8 avril 2024", status: "SIGNEE" },
-      { id: "3", title: "Promesse 3", date: "5 avril 2024", status: "SUSPENDUE" },
-      { id: "4", title: "Promesse 4", date: "1 avril 2024", status: "EN_COURS" },
-      { id: "5", title: "Promesse 5", date: "28 mars 2024", status: "SIGNEE" },
-    ],
+    useCase: "recherche",
+    contactName: "Nathalie DUFLOT",
+    propertyType: "T3",
+    surface: "120m²",
+    city: "Carcassonne",
+    workflow: { envoyee: "success", acceptee: "success" },
+    aiSuggestions: 0,
   },
 };
 
-export const Empty: Story = {
+export const RechercheEnCours: Story = {
   args: {
-    items: [],
+    useCase: "recherche",
+    contactName: "Jean DUPONT",
+    propertyType: "Maison",
+    surface: "200m²",
+    city: "Montpellier",
+    workflow: { envoyee: "success", acceptee: "disabled" },
+    aiSuggestions: 2,
   },
+};
+
+export const MultipleRows: Story = {
+  render: () => (
+    <div className="flex flex-col gap-[8px]">
+      <ListPromesse
+        useCase="vente"
+        contactName="Nathalie DUFLOT"
+        workflow={{ recue: "success", transmise: "success", accord: "success" }}
+        aiSuggestions={0}
+      />
+      <ListPromesse
+        useCase="vente"
+        contactName="Pierre MARTIN"
+        workflow={{ recue: "success", transmise: "warning", accord: "disabled" }}
+        aiSuggestions={1}
+      />
+      <ListPromesse
+        useCase="recherche"
+        contactName="Jean DUPONT"
+        propertyType="T3"
+        surface="120m²"
+        city="Carcassonne"
+        workflow={{ envoyee: "success", acceptee: "disabled" }}
+        aiSuggestions={0}
+      />
+    </div>
+  ),
 };
