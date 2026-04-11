@@ -264,6 +264,7 @@
   --surface-branded-action: var(--purple-500);
   --surface-branded-action-hover: var(--purple-600);
   --surface-branded-subtle: var(--purple-50);
+  --surface-elevated: var(--neutral-white);
   --surface-container: var(--neutral-white);
   --surface-disabled: var(--neutral-50);
   --surface-success: var(--green-50);
@@ -355,6 +356,7 @@
   --surface-branded-action: var(--purple-600);
   --surface-branded-action-hover: var(--purple-500);
   --surface-branded-subtle: var(--purple-800);
+  --surface-elevated: var(--neutral-600);
   --surface-container: var(--neutral-700);
   --surface-disabled: var(--neutral-700);
   --surface-success: var(--green-700);

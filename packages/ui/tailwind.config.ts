@@ -108,6 +108,7 @@ const config: Config = {
                 "branded-action": "var(--surface-branded-action)",
                 "branded-action-hover": "var(--surface-branded-action-hover)",
                 "branded-subtle": "var(--surface-branded-subtle)",
+                elevated: "var(--surface-elevated)",
                 container: "var(--surface-container)",
                 disabled: "var(--surface-disabled)",
                 success: "var(--surface-success)",

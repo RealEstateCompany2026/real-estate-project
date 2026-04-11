@@ -186,10 +186,10 @@ export function GraphCourbe({
           ════════════════════════════════════════════════════ */}
       <div
         className="absolute z-[4] flex items-center gap-1 rounded-[16px]
-          bg-[var(--surface-neutral-default)]"
+          bg-[var(--surface-elevated)]"
         style={{
           top: `${GRID_TOP}px`,
-          left: "0px",
+          left: "16px",
           height: "44px",
           padding: "12px 20px",
           boxShadow: "1px 1px 8px 0px rgba(0,0,0,0.15)",
@@ -298,7 +298,7 @@ export function GraphCourbe({
                 cx="9.5"
                 cy="9.5"
                 r="7.5"
-                fill="var(--surface-neutral-default)"
+                fill="var(--surface-neutral-action)"
                 stroke="var(--border-branded-default)"
                 strokeWidth="3"
               />
@@ -386,7 +386,7 @@ export function GraphCourbe({
       {sel && selPctX != null && (
         <div
           className="absolute z-[3] flex flex-col rounded-[16px]
-            bg-[var(--surface-neutral-default)]"
+            bg-[var(--surface-elevated)]"
           style={{
             top: `${GRID_TOP + GRID_H * 0.15}px`,
             left: `calc((100% - ${Y_LABEL_GAP + Y_LABEL_W + RIGHT_PAD}px) * ${selPctX / 100} + 24px)`,
