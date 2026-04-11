@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ListAnnonce } from "../components/ListAnnonce";
 
 const meta: Meta<typeof ListAnnonce> = {
-  title: "Organisms/ListAnnonce",
+  title: "Design System/Organisms/ListAnnonce",
   component: ListAnnonce,
   parameters: {
     layout: "padded",

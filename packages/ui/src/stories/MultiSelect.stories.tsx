@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { MultiSelect } from "../components/MultiSelect";
 
 const meta: Meta<typeof MultiSelect> = {
-  title: "Design System/Atoms/MultiSelect",
+  title: "Design System/Molecules/MultiSelect",
   component: MultiSelect,
   argTypes: {
     label: { control: "text" },

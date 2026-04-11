@@ -4,7 +4,7 @@ import { DropdownButton } from "../components/DropdownButton";
 import { Settings, Filter, ChevronDown, User } from "lucide-react";
 
 const meta: Meta<typeof DropdownButton> = {
-  title: "Design System/Atoms/DropdownButton",
+  title: "Design System/Molecules/DropdownButton",
   component: DropdownButton,
   argTypes: {
     label: { control: "text" },

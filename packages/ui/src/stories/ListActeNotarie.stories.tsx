@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ListActeNotarie } from "../components/ListActeNotarie";
 
 const meta: Meta<typeof ListActeNotarie> = {
-  title: "Organisms/ListActeNotarie",
+  title: "Design System/Organisms/ListActeNotarie",
   component: ListActeNotarie,
   parameters: {
     layout: "padded",

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PropertyCard } from "../components/PropertyCard";
 
 const meta: Meta<typeof PropertyCard> = {
-  title: "Design System/Atoms/PropertyCard",
+  title: "Design System/Molecules/PropertyCard",
   component: PropertyCard,
 };
 export default meta;

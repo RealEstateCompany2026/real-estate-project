@@ -4,7 +4,7 @@ import { Button } from "../components/Button";
 import { Plus, Download, Trash2, ArrowRight } from "lucide-react";
 
 const meta: Meta<typeof Button> = {
-  title: "Design System/Button",
+  title: "Design System/Atoms/Button",
   component: Button,
   argTypes: {
     variant: {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ListVisite } from "../components/ListVisite";
 
 const meta: Meta<typeof ListVisite> = {
-  title: "Organisms/ListVisite",
+  title: "Design System/Organisms/ListVisite",
   component: ListVisite,
   parameters: {
     layout: "padded",

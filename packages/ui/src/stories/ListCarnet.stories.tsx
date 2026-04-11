@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ListCarnet } from "../components/ListCarnet";
 
 const meta: Meta<typeof ListCarnet> = {
-  title: "Organisms/ListCarnet",
+  title: "Design System/Organisms/ListCarnet",
   component: ListCarnet,
   parameters: {
     layout: "padded",

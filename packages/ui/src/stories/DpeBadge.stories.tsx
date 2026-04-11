@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { DpeBadge, DpeGrade } from "../components/DpeBadge";
 
 const meta: Meta<typeof DpeBadge> = {
-  title: "Atoms/DpeBadge",
+  title: "Design System/Atoms/DpeBadge",
   component: DpeBadge,
   parameters: {
     layout: "centered",

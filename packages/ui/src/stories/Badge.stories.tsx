@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Badge } from "../components/Badge";
 
 const meta: Meta<typeof Badge> = {
-  title: "Design System/Badge",
+  title: "Design System/Atoms/Badge",
   component: Badge,
   argTypes: {
     variant: {
