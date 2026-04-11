@@ -316,19 +316,10 @@ export function GraphCourbe({
           className="absolute top-0 bottom-0 z-[1] pointer-events-none"
           style={{
             left: `calc((100% - ${Y_LABEL_GAP + Y_LABEL_W + RIGHT_PAD}px) * ${selPctX / 100})`,
-            width: "1px",
+            borderLeft: "1.5px dashed var(--border-disabled)",
+            opacity: 0.5,
           }}
-        >
-          <svg className="w-full h-full" preserveAspectRatio="none">
-            <line
-              x1="0" y1="0" x2="0" y2="100%"
-              stroke="var(--border-disabled)"
-              strokeWidth="1"
-              strokeDasharray="6 4"
-              opacity="0.6"
-            />
-          </svg>
-        </div>
+        />
       )}
 
       {/* ════════════════════════════════════════════════════
