@@ -1,180 +1,143 @@
 import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Sheet } from "../components/Sheet";
-import { Button } from "../components/Button";
 
 const meta: Meta<typeof Sheet> = {
   title: "Design System/Organisms/Sheet",
   component: Sheet,
+  parameters: {
+    layout: "fullscreen",
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Sheet>;
 
-function SheetWrapper() {
-  const [isOpen, setIsOpen] = useState(false);
+/* ── Always open narrow — pour vérifier radius + shadow ── */
 
-  return (
-    <div>
-      <Button onClick={() => setIsOpen(true)}>Ouvrir le Sheet</Button>
-      <Sheet
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        title="Détails de la fiche"
-        width="narrow"
-      >
-        <div className="p-4 space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">Informations générales</h3>
-            <p className="text-sm text-content-body">
-              Affichage des détails du bien immobilier avec toutes les caractéristiques principales.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Contact</h3>
-            <p className="text-sm text-content-body">
-              Dupont, Jean-François<br />
-              jean-francois.dupont@email.fr<br />
-              +33 6 12 34 56 78
-            </p>
-          </div>
-        </div>
-      </Sheet>
-    </div>
-  );
-}
-
-function SheetWrapperWide() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div>
-      <Button onClick={() => setIsOpen(true)}>Ouvrir le formulaire</Button>
-      <Sheet
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        title="Sélectionner un bien"
-        width="wide"
-        footer={
-          <div className="flex gap-3 p-4 border-t border-edge-default">
-            <Button variant="secondary" onClick={() => setIsOpen(false)}>
-              Annuler
-            </Button>
-            <Button onClick={() => setIsOpen(false)}>
-              Valider
-            </Button>
-          </div>
-        }
-      >
-        <div className="p-4 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 border border-edge-default rounded-lg cursor-pointer hover:bg-surface-neutral-hover">
-              <h4 className="font-semibold mb-1">BIEN-2026-4521</h4>
-              <p className="text-sm text-content-body">42 rue de la Paix, Paris</p>
-            </div>
-            <div className="p-4 border border-edge-default rounded-lg cursor-pointer hover:bg-surface-neutral-hover">
-              <h4 className="font-semibold mb-1">BIEN-2026-7834</h4>
-              <p className="text-sm text-content-body">128 avenue des Champs-Élysées, Paris</p>
-            </div>
-            <div className="p-4 border border-edge-default rounded-lg cursor-pointer hover:bg-surface-neutral-hover">
-              <h4 className="font-semibold mb-1">BIEN-2026-3159</h4>
-              <p className="text-sm text-content-body">55 rue Rivoli, Paris</p>
-            </div>
-            <div className="p-4 border border-edge-default rounded-lg cursor-pointer hover:bg-surface-neutral-hover">
-              <h4 className="font-semibold mb-1">BIEN-2026-5627</h4>
-              <p className="text-sm text-content-body">12 place Vendôme, Paris</p>
-            </div>
-          </div>
-        </div>
-      </Sheet>
-    </div>
-  );
-}
-
-function SheetWrapperNoHeaderDivider() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div>
-      <Button onClick={() => setIsOpen(true)}>Ouvrir (sans divider)</Button>
-      <Sheet
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        title="Historique d'activité"
-        width="narrow"
-        showHeaderDivider={false}
-      >
-        <div className="p-4">
-          <div className="space-y-3">
-            <div className="border-l-2 border-surface-branded-default pl-4 py-2">
-              <p className="font-semibold text-sm">Bien créé</p>
-              <p className="text-xs text-content-body">10 avr 2026, 14:32</p>
-            </div>
-            <div className="border-l-2 border-surface-branded-default pl-4 py-2">
-              <p className="font-semibold text-sm">Client ajouté</p>
-              <p className="text-xs text-content-body">10 avr 2026, 13:15</p>
-            </div>
-            <div className="border-l-2 border-surface-branded-default pl-4 py-2">
-              <p className="font-semibold text-sm">Affaire créée</p>
-              <p className="text-xs text-content-body">9 avr 2026, 11:42</p>
-            </div>
-          </div>
-        </div>
-      </Sheet>
-    </div>
-  );
-}
-
-export const Narrow: Story = {
-  render: () => <SheetWrapper />,
+export const NarrowOpen: Story = {
+  args: {
+    isOpen: true,
+    onClose: () => {},
+    title: "Sheets title",
+    width: "narrow",
+    children: (
+      <div style={{ padding: 20 }}>
+        <p style={{ color: "var(--text-body)" }}>
+          Vérifie : border-radius 16px uniquement sur bords gauches (tl + bl),
+          shadow 0 0 10px 7px autour du panneau.
+        </p>
+      </div>
+    ),
+  },
 };
 
-export const Wide: Story = {
-  render: () => <SheetWrapperWide />,
+/* ── Always open wide ───────────────────────── */
+
+export const WideOpen: Story = {
+  args: {
+    isOpen: true,
+    onClose: () => {},
+    title: "Sheets title",
+    width: "wide",
+    children: (
+      <div style={{ padding: 40 }}>
+        <p style={{ color: "var(--text-body)" }}>
+          Sheet wide (1024px). Même radius gauche, même shadow.
+        </p>
+      </div>
+    ),
+  },
 };
 
-export const NoHeaderDivider: Story = {
-  render: () => <SheetWrapperNoHeaderDivider />,
-};
+/* ── Interactive narrow ─────────────────────── */
 
-export const WithFooter: StoryObj = {
+export const NarrowInteractive: Story = {
   render: () => {
     const [isOpen, setIsOpen] = useState(false);
-
     return (
-      <div>
-        <Button onClick={() => setIsOpen(true)}>Ouvrir avec footer</Button>
+      <div style={{ padding: 40 }}>
+        <button
+          onClick={() => setIsOpen(true)}
+          style={{
+            padding: "10px 20px",
+            borderRadius: 8,
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          Ouvrir narrow (420px)
+        </button>
         <Sheet
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
-          title="Créer un bien"
+          title="Détails de la fiche"
           width="narrow"
+        >
+          <div style={{ padding: 20 }}>
+            <p style={{ color: "var(--text-body)" }}>
+              Contenu du sheet narrow. Cliquer sur × ou sur le backdrop pour fermer.
+            </p>
+          </div>
+        </Sheet>
+      </div>
+    );
+  },
+};
+
+/* ── Interactive wide with footer ───────────── */
+
+export const WideWithFooter: Story = {
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <div style={{ padding: 40 }}>
+        <button
+          onClick={() => setIsOpen(true)}
+          style={{
+            padding: "10px 20px",
+            borderRadius: 8,
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          Ouvrir wide (1024px)
+        </button>
+        <Sheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Sélectionner un bien"
+          width="wide"
           footer={
-            <div className="flex gap-3 p-4 border-t border-edge-default bg-surface-neutral-default">
-              <Button variant="secondary" onClick={() => setIsOpen(false)} className="flex-1">
-                Annuler
-              </Button>
-              <Button onClick={() => setIsOpen(false)} className="flex-1">
-                Créer
-              </Button>
+            <div
+              style={{
+                padding: "16px 40px",
+                borderTop: "1px solid var(--border-neutral-default)",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+              }}
+            >
+              <button
+                onClick={() => setIsOpen(false)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 16,
+                  backgroundColor: "var(--surface-branded-default)",
+                  color: "var(--text-branded-on-action)",
+                  fontWeight: 600,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Valider
+              </button>
             </div>
           }
         >
-          <div className="p-4 space-y-4">
-            <div>
-              <label className="text-sm font-semibold mb-2 block">Adresse</label>
-              <input
-                type="text"
-                placeholder="Ex: 42 rue de la Paix"
-                className="w-full px-3 py-2 border border-edge-default rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold mb-2 block">Type de transaction</label>
-              <select className="w-full px-3 py-2 border border-edge-default rounded-lg">
-                <option>À vendre</option>
-                <option>À louer</option>
-              </select>
-            </div>
+          <div style={{ padding: 40, minHeight: 400 }}>
+            <p style={{ color: "var(--text-body)" }}>
+              Sheet wide avec footer sticky.
+            </p>
           </div>
         </Sheet>
       </div>

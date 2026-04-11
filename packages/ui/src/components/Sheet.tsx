@@ -4,68 +4,46 @@ import React, { useEffect } from "react";
 import { X } from "lucide-react";
 
 /**
- * Sheet - Panneau latéral modal
- * Organism du design system RealAgent
+ * Sheet - Panneau latéral modal (Side Sheet)
  *
- * Panneau modal qui s'affiche depuis le bord droit de l'écran.
- * Utilisé pour :
- * - Notifications / Activity logs (420px)
- * - Étapes de sélection intermédiaire dans les parcours (1024px)
+ * Figma: sheets . side . 420px / sheets . side . 1024px
  *
- * Structure :
- * - Overlay semi-transparent (backdrop)
- * - Sheet container avec animation slide-in
- * - Header : titre + bouton close
- * - Content : contenu personnalisé (children)
- * - Footer (optionnel) : sticky bottom
+ * Specs:
+ * - Border-radius: 16px uniquement sur les bords GAUCHES (tl + bl)
+ * - Shadow: 0px 0px 10px 7px rgba(0,0,0,0.05)
+ * - Background: var(--surface-neutral-default) — white (light) / neutral-800 (dark)
+ * - Title: H4 Bold 28px/34px, tracking 0.28px, var(--text-headings)
+ * - Close icon: 20×20, p-12, rounded-16
+ * - Narrow (420px): header px-20 py-47, title+close justify-between w-350
+ * - Wide (1024px): header px-40 py-51
  *
- * Variantes :
- * - narrow: 420px de large (notifications, logs)
- * - wide: 1024px de large (sélections, formulaires)
+ * Tokens Layer 3, dark mode auto via .dark class.
  */
 
 export interface SheetProps {
-  /**
-   * État d'ouverture du sheet
-   */
+  /** État d'ouverture du sheet */
   isOpen: boolean;
-  /**
-   * Callback appelé à la fermeture
-   */
+  /** Callback appelé à la fermeture */
   onClose: () => void;
-  /**
-   * Titre du sheet
-   */
+  /** Titre du sheet */
   title?: string;
-  /**
-   * Largeur du sheet
+  /** Largeur du sheet
    * @default "narrow"
    */
   width?: "narrow" | "wide";
-  /**
-   * Contenu du sheet
-   */
+  /** Contenu du sheet */
   children: React.ReactNode;
-  /**
-   * Footer sticky optionnel
-   */
+  /** Footer sticky optionnel */
   footer?: React.ReactNode;
-  /**
-   * Afficher le divider du header
-   * @default true
+  /** Afficher le divider du header
+   * @default false
    */
   showHeaderDivider?: boolean;
-  /**
-   * Classe CSS additionnelle
-   */
+  /** Classe CSS additionnelle */
   className?: string;
-  /**
-   * Icône personnalisée pour le bouton de fermeture (par défaut: X)
-   */
+  /** Icône personnalisée pour le bouton de fermeture */
   closeIcon?: React.ReactNode;
-  /**
-   * Header personnalisé (remplace le header par défaut)
-   */
+  /** Header personnalisé (remplace le header par défaut) */
   customHeader?: React.ReactNode;
 }
 
@@ -76,13 +54,13 @@ export const Sheet: React.FC<SheetProps> = ({
   width = "narrow",
   children,
   footer,
-  showHeaderDivider = true,
+  showHeaderDivider = false,
   className = "",
   closeIcon,
   customHeader,
 }: SheetProps) => {
-  // Largeur selon la variante
   const sheetWidth = width === "narrow" ? "420px" : "1024px";
+  const isNarrow = width === "narrow";
 
   // Bloquer le scroll du body quand le sheet est ouvert
   useEffect(() => {
@@ -120,9 +98,13 @@ export const Sheet: React.FC<SheetProps> = ({
 
       {/* Sheet Container */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col transition-transform duration-300 bg-surface-neutral-default ${className}`}
+        className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col
+          transition-transform duration-300
+          rounded-tl-[16px] rounded-bl-[16px]
+          ${className}`}
         style={{
           width: sheetWidth,
+          backgroundColor: "var(--surface-neutral-default)",
           boxShadow: "0px 0px 10px 7px rgba(0, 0, 0, 0.05)",
           transform: isOpen ? "translateX(0)" : "translateX(100%)",
         }}
@@ -132,7 +114,9 @@ export const Sheet: React.FC<SheetProps> = ({
           <div
             className="sticky top-0 z-10"
             style={{
-              borderBottom: showHeaderDivider ? "1px solid var(--border-default)" : "none",
+              borderBottom: showHeaderDivider
+                ? "1px solid var(--border-neutral-default)"
+                : "none",
               backgroundColor: "var(--surface-neutral-default)",
             }}
           >
@@ -140,21 +124,32 @@ export const Sheet: React.FC<SheetProps> = ({
           </div>
         ) : (
           <div
-            className="sticky top-0 z-10 flex items-center justify-between px-5 py-6 border-edge-default"
+            className="sticky top-0 z-10 flex items-center justify-between"
             style={{
-              borderBottom: showHeaderDivider ? "1px solid var(--border-default)" : "none",
+              padding: isNarrow ? "47px 20px 0 20px" : "51px 40px 0 40px",
+              borderBottom: showHeaderDivider
+                ? "1px solid var(--border-neutral-default)"
+                : "none",
               backgroundColor: "var(--surface-neutral-default)",
+              /* Inherit border-radius from container for sticky header */
+              borderTopLeftRadius: "16px",
             }}
           >
-            {/* Title */}
-            <h4 className="text-[28px] font-bold tracking-[0.28px] text-content-strong" style={{ lineHeight: "34px" }}>
-              {title}
-            </h4>
+            {/* Title — H4 Bold */}
+            <div className="flex items-center p-[10px]">
+              <h4
+                className="text-[28px] font-bold leading-[34px] tracking-[0.28px] whitespace-nowrap"
+                style={{ color: "var(--text-headings)" }}
+              >
+                {title}
+              </h4>
+            </div>
 
-            {/* Close Button */}
+            {/* Close Button — icon button */}
             <button
               onClick={onClose}
-              className="rounded-2xl p-3 transition-colors text-icon-neutral-default hover:bg-surface-neutral-action"
+              className="p-[12px] rounded-[16px] transition-colors"
+              style={{ color: "var(--text-caption)" }}
               aria-label="Fermer"
             >
               {closeIcon ? closeIcon : <X size={20} />}
