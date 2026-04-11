@@ -124,8 +124,8 @@ export function NavRail({
       style={{
         width: "90px",
         height: "100vh",
-        paddingTop: "var(--scale-300)",
-        paddingBottom: "var(--scale-300)",
+        paddingTop: "10px",
+        paddingBottom: "10px",
       }}
     >
       {/* Logo en haut */}

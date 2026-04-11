@@ -45,7 +45,7 @@ export function NavAvatar({
     // État selected : cercle avec border branded
     return (
       <button
-        className={`cursor-pointer rounded-full w-[54px] h-[54px] ${className}`.trim()}
+        className={`cursor-pointer rounded-[28px] w-[54px] h-[54px] ${className}`.trim()}
         onClick={onClick}
         aria-label={alt}
         style={{
@@ -56,7 +56,7 @@ export function NavAvatar({
         <img
           src={src}
           alt={alt}
-          className="w-full h-full object-cover rounded-full p-1"
+          className="w-full h-full object-cover rounded-[28px] p-1"
         />
       </button>
     );
@@ -68,7 +68,7 @@ export function NavAvatar({
       className={`
         cursor-pointer
         overflow-hidden
-        rounded-full
+        rounded-[28px]
         w-[54px] h-[54px]
         ${className}
       `.trim()}
@@ -78,7 +78,7 @@ export function NavAvatar({
       <img
         src={src}
         alt={alt}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover rounded-[28px]"
       />
     </button>
   );

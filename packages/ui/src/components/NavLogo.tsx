@@ -44,7 +44,7 @@ export function NavLogo({
           w-full
           flex items-center justify-center
           cursor-pointer
-          py-[24px] px-[12px]
+          py-[22px] px-[11px]
           ${className}
         `.trim()}
         onClick={onClick}

@@ -41,7 +41,7 @@ export function NavButton({
       aria-label={label}
       aria-current={selected ? "page" : undefined}
     >
-      <Icon size={20} strokeWidth={2} />
+      <Icon size={24} strokeWidth={2} />
     </button>
   );
 }
