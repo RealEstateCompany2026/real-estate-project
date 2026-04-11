@@ -158,7 +158,7 @@ export function SheetBienDetails({
       {/* Position 3: Section database (Qualification) */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" hover={false} />
+          <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
         }
         aiSuggestions={qualificationAiSuggestions}
         details={[
@@ -171,7 +171,7 @@ export function SheetBienDetails({
       {/* Position 4: Section entretien (Entretien) */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="ent" value={`${entretien}%`} percentage={entretien} variant="straight" hover={false} />
+          <KpiIndicator kpi="ent" value={`${entretien}%`} percentage={entretien} variant="straight" />
         }
         aiSuggestions={entretienAiSuggestions}
         details={[
@@ -184,7 +184,7 @@ export function SheetBienDetails({
       {/* Position 5: Section conversion (Conversion) */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" hover={false} />
+          <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
         }
         aiSuggestions={conversionAiSuggestions}
         details={[

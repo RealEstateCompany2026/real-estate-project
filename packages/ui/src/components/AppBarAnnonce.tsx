@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Building, Square, MapPin, Tag, Compass } from "lucide-react";
+import { Badge } from "./Badge";
 
 /**
  * AppBarAnnonce - Barre d'informations de l'annonce immobilière
@@ -113,11 +114,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
         </div>
 
         {/* Prix au m² - Sticker */}
-        <div className="h-5 px-2 py-1 rounded-2xl border border-solid border-edge-default">
-          <p className="font-bold text-xs text-center whitespace-nowrap text-content-body">
-            {prixM2}
-          </p>
-        </div>
+        <Badge variant="default">{prixM2}</Badge>
       </div>
     </div>
   );

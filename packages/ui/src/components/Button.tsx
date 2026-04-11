@@ -78,7 +78,7 @@ export interface IconButtonProps extends Omit<ButtonProps, "size"> {
 }
 
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-    ({ icon, children, variant = "ghost", className, ...props }, ref) => {
+    ({ icon, children, variant = "ghost", size: _iconSize, className, ...props }, ref) => {
         return (
             <Button
                 variant={variant}

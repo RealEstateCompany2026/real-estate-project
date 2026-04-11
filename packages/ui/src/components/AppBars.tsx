@@ -113,7 +113,6 @@ function AppBarBackButton({ onClick, href }: AppBarBackButtonProps) {
       variant="ghost"
       onClick={handleClick}
       title="Retour"
-      size="md"
     />
   );
 }
@@ -224,8 +223,7 @@ export function AppBarCategory({
             variant="ghost"
             onClick={onAdd}
             title="Ajouter"
-            size="md"
-          />
+                />
         )}
 
         {/* Search Button */}
@@ -235,8 +233,7 @@ export function AppBarCategory({
             variant="ghost"
             onClick={onSearch}
             title="Rechercher"
-            size="md"
-          />
+                />
         )}
       </div>
     </AppBarContainer>
@@ -296,8 +293,7 @@ export function AppBarBasic({
             variant="ghost"
             onClick={onAdd}
             title="Ajouter"
-            size="md"
-          />
+                />
         )}
 
         {/* Search Button */}
@@ -307,8 +303,7 @@ export function AppBarBasic({
             variant="ghost"
             onClick={onSearch}
             title="Rechercher"
-            size="md"
-          />
+                />
         )}
       </div>
     </AppBarContainer>
@@ -509,8 +504,7 @@ export function AppBarDetail({
           variant="ghost"
           onClick={onClose}
           title="Fermer"
-          size="md"
-        />
+            />
       )}
     </AppBarContainer>
   );

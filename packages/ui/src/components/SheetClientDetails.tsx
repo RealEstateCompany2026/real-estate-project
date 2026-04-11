@@ -80,7 +80,7 @@ export function SheetClientDetails({
       {/* Qualification */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" hover={false} />
+          <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
         }
         aiSuggestions={qualificationAiSuggestions}
         details={[
@@ -93,7 +93,7 @@ export function SheetClientDetails({
       {/* Engagement */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="eng" value={`${engagement}%`} percentage={engagement} variant="straight" hover={false} />
+          <KpiIndicator kpi="eng" value={`${engagement}%`} percentage={engagement} variant="straight" />
         }
         aiSuggestions={engagementAiSuggestions}
         details={[
@@ -107,7 +107,7 @@ export function SheetClientDetails({
       {/* Conversion */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" hover={false} />
+          <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
         }
         aiSuggestions={conversionAiSuggestions}
         details={[
@@ -119,7 +119,7 @@ export function SheetClientDetails({
       {/* Réactivation */}
       <SectionCard
         kpiComponent={
-          <KpiIndicator kpi="reac" value={`${reactivation}%`} percentage={reactivation} variant="straight" hover={false} />
+          <KpiIndicator kpi="reac" value={`${reactivation}%`} percentage={reactivation} variant="straight" />
         }
         aiSuggestions={reactivationAiSuggestions}
         details={[

@@ -13,8 +13,15 @@ import {
  * KpiIndicator - Indicateur de performance KPI
  * Atom du design system RealAgent
  *
- * Affiche un KPI avec icône, valeur et barres de progression
- * Deux variantes : vertical (9 barres empilées) et straight (1 barre horizontale)
+ * Affiche un KPI avec icône, valeur et indicateur visuel
+ * Deux variantes :
+ *   - vertical (défaut) : icône+valeur au-dessus, 9 barres verticales côte à côte en dessous (pour Lists/Cards)
+ *   - straight : icône+valeur + pastille colorée en ligne (pour App bars)
+ *
+ * Couleurs des barres via tokens Layer 3 :
+ *   - Remplies : --indicator-bar-filled-{success|error|warning} → *-500 (light) / *-600 (dark)
+ *   - Vides : --indicator-bar-empty → neutral-100 (light) / neutral-600 (dark)
+ *   - Vides hover (via group-hover) : --indicator-bar-empty-hover → neutral-200 (light) / neutral-500 (dark)
  */
 
 /** Mapping KPI type → Lucide icon + aria-label */
@@ -37,41 +44,30 @@ export interface KpiIndicatorProps {
   value: string;
   /** Pourcentage pour calcul automatique de couleur et barres (0-100) */
   percentage?: number;
-  /** Couleur des barres remplies (hex ou couleur CSS) - calculée automatiquement si percentage fourni */
+  /** Couleur des barres remplies (CSS color) - calculée automatiquement si percentage fourni */
   color?: string;
   /** Nombre de barres remplies sur 9 (pour vertical uniquement) - calculé automatiquement si percentage fourni */
   filledBars?: number;
   /** Variante de l'indicateur */
   variant?: "vertical" | "straight";
-  /** État hover */
-  hover?: boolean;
   /** Classes CSS additionnelles */
   className?: string;
 }
 
 /**
  * Calcule la couleur en fonction du pourcentage
- * < 25% = error (rouge)
- * 25-60% = warning (orange)
- * > 60% = success (vert)
+ * Uses indicator-bar-filled-* tokens that auto-switch:
+ *   - Light: *-500 (bright)
+ *   - Dark: *-600 (slightly deeper for contrast on dark bg)
  */
 function getColorFromPercentage(percentage: number): string {
   if (percentage < 25) {
-    return "var(--error-500) dark:var(--error-600)";
+    return "var(--indicator-bar-filled-error)";
   }
   if (percentage <= 60) {
-    return "var(--warning-500) dark:var(--warning-600)";
+    return "var(--indicator-bar-filled-warning)";
   }
-  return "var(--success-500) dark:var(--success-600)";
-}
-
-/**
- * Retourne la couleur pour les barres non remplies (neutral)
- */
-function getEmptyBarColor(hover: boolean = false): string {
-  return hover
-    ? "bg-neutral-100 dark:bg-neutral-500"
-    : "bg-neutral-50 dark:bg-neutral-600";
+  return "var(--indicator-bar-filled-success)";
 }
 
 /**
@@ -84,7 +80,7 @@ function getFilledBarsFromPercentage(percentage: number): number {
 }
 
 /**
- * KpiIndicator - Indicateur KPI avec icône, valeur et barres
+ * KpiIndicator - Indicateur KPI avec icône, valeur et indicateur visuel
  */
 export function KpiIndicator({
   kpi,
@@ -94,11 +90,9 @@ export function KpiIndicator({
   color,
   filledBars,
   variant = "vertical",
-  hover = false,
   className = "",
 }: KpiIndicatorProps) {
   const totalBars = 9;
-  const isVertical = variant === "vertical";
 
   // Resolve icon from kpi prop or fallback to icon prop
   const kpiConfig = kpi ? KPI_CONFIG[kpi] : null;
@@ -115,70 +109,65 @@ export function KpiIndicator({
     ? color
     : percentage !== undefined
       ? getColorFromPercentage(percentage)
-      : "var(--success-500) dark:var(--success-600)";
+      : "var(--indicator-bar-filled-success)";
   const finalFilledBars =
     filledBars !== undefined
       ? filledBars
       : percentage !== undefined
         ? getFilledBarsFromPercentage(percentage)
         : 5;
-  const emptyBarColor = getEmptyBarColor(hover);
 
-  // Rendu des barres pour la version verticale
-  const renderVerticalBars = () => {
-    return (
-      <div className="inline-grid gap-1 leading-none relative shrink-0">
-        {Array.from({ length: totalBars }).map((_, index) => (
-          <div
-            key={index}
-            className={`
-              w-6 h-1 rounded-[2px] transition-colors
-              ${index < finalFilledBars ? "bg-[var(--bar-color)]" : emptyBarColor}
-            `}
-            style={
-              index < finalFilledBars
-                ? { backgroundColor: finalColor }
-                : undefined
-            }
-          />
-        ))}
-      </div>
-    );
-  };
-
-  // Rendu de la barre horizontale pour la version straight
-  const renderStraightBar = () => {
-    const percentage = (finalFilledBars / totalBars) * 100;
-    return (
-      <div className="h-1 w-24 rounded-full overflow-hidden bg-neutral-100 dark:bg-neutral-600 flex-1">
-        <div
-          className="h-full rounded-full transition-all"
-          style={{
-            width: `${percentage}%`,
-            backgroundColor: finalColor,
-          }}
-        />
-      </div>
-    );
-  };
-
-  return (
-    <div
-      className={`
-        inline-flex items-center gap-3
-        ${className}
-      `.trim()}
-    >
+  // Icon + value row (shared between both variants)
+  const renderIconValue = () => (
+    <div className="inline-flex gap-[4px] items-center shrink-0">
       {/* Icon */}
-      <div className="shrink-0">{resolvedIcon}</div>
-
+      <div className="shrink-0 size-[20px] flex items-center justify-center">
+        {resolvedIcon}
+      </div>
       {/* Value */}
-      <div className="text-sm font-semibold text-content-body min-w-[40px]">
+      <div className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
         {value}
       </div>
+    </div>
+  );
 
-      {/* Bars */}
-      {isVertical ? renderVerticalBars() : renderStraightBar()}
+  // Variante vertical : 9 barres verticales côte à côte (6px × 14px)
+  if (variant === "vertical") {
+    return (
+      <div
+        className={`inline-flex flex-col gap-[10px] items-center ${className}`.trim()}
+      >
+        {renderIconValue()}
+        <div className="inline-flex gap-[3px]">
+          {Array.from({ length: totalBars }).map((_, index) => {
+            const isFilled = index < finalFilledBars;
+            return (
+              <div
+                key={index}
+                className={`w-[6px] h-[14px] rounded-lg transition-colors ${
+                  isFilled
+                    ? ""
+                    : "bg-[var(--indicator-bar-empty)] group-hover:bg-[var(--indicator-bar-empty-hover)]"
+                }`}
+                style={isFilled ? { backgroundColor: finalColor } : undefined}
+              />
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Variante straight : pastille colorée 14×14
+  return (
+    <div
+      className={`inline-flex gap-[10px] items-center ${className}`.trim()}
+    >
+      {renderIconValue()}
+      <div
+        className="size-[14px] rounded-lg shrink-0"
+        style={{ backgroundColor: finalColor }}
+      />
     </div>
   );
 }

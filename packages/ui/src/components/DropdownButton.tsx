@@ -45,7 +45,7 @@ export function DropdownButton({
         {LeftIcon && <LeftIcon size={20} className="shrink-0 text-content-body" />}
         {label && LeftIcon && <div className="w-1" />}
         {label && (
-          <span className="text-base font-semibold text-content-body tracking-wide whitespace-nowrap">
+          <span className="text-base font-semibold text-content-body tracking-[0.16px] whitespace-nowrap">
             {label}
           </span>
         )}
