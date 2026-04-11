@@ -12,56 +12,32 @@ type Story = StoryObj<typeof CardLog>;
 
 export const Default: Story = {
   args: {
-    date: "15 avril 2024",
+    date: "12 fév. 2026",
+    time: "12:56",
+    author: "Auteur",
+    category: "CATÉGORIE",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
+  },
+};
+
+export const RealData: Story = {
+  args: {
+    date: "15 avr. 2026",
     time: "14:32",
     author: "Marie Dupont",
-    category: "Création",
-    description: "Propriété créée - Villa à Paris 75008",
-    categoryVariant: "default",
+    category: "CRÉATION",
+    description: "Propriété créée — Villa à Paris 75008, 120m², 3 chambres.",
   },
 };
 
-export const Modified: Story = {
+export const ShortDescription: Story = {
   args: {
-    date: "14 avril 2024",
+    date: "10 mars 2026",
     time: "09:15",
     author: "Jean Bernard",
-    category: "Modification",
-    description: "Prix réduit de 50 000 € à 450 000 €",
-    categoryVariant: "primary",
-  },
-};
-
-export const Success: Story = {
-  args: {
-    date: "12 avril 2024",
-    time: "16:45",
-    author: "Sophie Martin",
-    category: "Vente conclue",
-    description: "Acte de vente signé avec acheteur",
-    categoryVariant: "success",
-  },
-};
-
-export const Warning: Story = {
-  args: {
-    date: "10 avril 2024",
-    time: "11:20",
-    author: "Luc Moreau",
-    category: "Attention",
-    description: "Diagnostic immobilier expirant dans 30 jours",
-    categoryVariant: "warning",
-  },
-};
-
-export const Error: Story = {
-  args: {
-    date: "9 avril 2024",
-    time: "10:05",
-    author: "Pierre Lefebvre",
-    category: "Erreur",
-    description: "Échec de la synchronisation - Vérifiez votre connexion",
-    categoryVariant: "error",
+    category: "MODIFICATION",
+    description: "Prix réduit de 50 000 € à 450 000 €.",
   },
 };
 
@@ -69,41 +45,26 @@ export const MultipleEntries: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       <CardLog
-        date="15 avril 2024"
+        date="15 avr. 2026"
         time="14:32"
         author="Marie Dupont"
-        category="Création"
-        description="Propriété créée"
-        categoryVariant="default"
+        category="CRÉATION"
+        description="Propriété créée — Villa à Paris 75008"
       />
       <CardLog
-        date="14 avril 2024"
+        date="14 avr. 2026"
         time="09:15"
         author="Jean Bernard"
-        category="Modification"
+        category="MODIFICATION"
         description="Prix réduit à 450 000 €"
-        categoryVariant="primary"
       />
       <CardLog
-        date="12 avril 2024"
+        date="12 avr. 2026"
         time="16:45"
         author="Sophie Martin"
-        category="Vente conclue"
-        description="Acte signé"
-        categoryVariant="success"
+        category="VENTE"
+        description="Acte de vente signé avec acheteur"
       />
     </div>
   ),
-};
-
-export const LongDescription: Story = {
-  args: {
-    date: "11 avril 2024",
-    time: "13:28",
-    author: "Isabelle Leclerc",
-    category: "Commentaire",
-    description:
-      "Contact avec le propriétaire pour discuter des conditions de la vente et des modalités de transfert de propriété.",
-    categoryVariant: "default",
-  },
 };

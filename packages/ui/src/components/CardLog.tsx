@@ -1,19 +1,30 @@
-/**
- * CardLog - Carte d'activité / log
- * Molecule du design system RealAgent
- *
- * Affiche une entrée d'activité avec date, heure, auteur, catégorie et description.
- */
-
 "use client";
 
 import React from "react";
-import { Badge } from "./Badge";
+
+/**
+ * CardLog - Carte d'activité / log
+ *
+ * Figma: card . logs (node 639:45166)
+ *
+ * Structure Figma:
+ * - Container: flex-col, items-start, px-10 py-6, w-360
+ * - Row 1 (date + time): flex items-start
+ *   - Date: Body sm Bold (14px/16px), tracking 0.14, color ~neutral-200 → --text-disabled
+ *   - Time: same specs
+ * - Row 2 (author + badge): flex items-center
+ *   - Author: Body sm Bold (14px/16px), --text-body
+ *   - Badge sticker: border 1px --border-neutral-default, rounded-16, px-8 py-4
+ *     text: xsm Bold (12px/14px), --text-caption
+ * - Row 3 (description): Body sm Regular (14px/16px), --text-caption, full width
+ *
+ * Tokens Layer 3, dark mode auto via .dark class.
+ */
 
 export interface CardLogProps {
-  /** Date de l'activité */
+  /** Date de l'activité (ex: "12 fév. 2026") */
   date: string;
-  /** Heure de l'activité */
+  /** Heure de l'activité (ex: "12:56") */
   time: string;
   /** Auteur de l'activité */
   author: string;
@@ -21,8 +32,7 @@ export interface CardLogProps {
   category: string;
   /** Description de l'activité */
   description: string;
-  /** Variante de couleur pour la catégorie */
-  categoryVariant?: "default" | "information" | "success" | "warning" | "error";
+  className?: string;
 }
 
 export const CardLog: React.FC<CardLogProps> = ({
@@ -31,38 +41,65 @@ export const CardLog: React.FC<CardLogProps> = ({
   author,
   category,
   description,
-  categoryVariant = "default",
+  className = "",
 }) => {
   return (
-    <div className="px-[10px] py-[6px]">
-      {/* Divider top */}
-      <div className="h-px mb-2 bg-[var(--border-default)]" />
-
-      {/* Contenu */}
-      <div className="space-y-2">
-        {/* Date et heure */}
-        <div className="flex items-center gap-2">
-          <div className="text-sm font-bold font-roboto text-sm leading-4 tracking-0.14 text-content-subtle">
-            {date}
+    <div
+      className={`flex flex-col items-start px-[10px] py-[6px] w-[360px] ${className}`.trim()}
+    >
+      <div className="flex flex-col items-start w-full">
+        {/* Row 1 — Date + Time */}
+        <div className="flex items-start">
+          <div className="flex items-center px-[10px] py-[8px]">
+            <span
+              className="text-[14px] font-bold leading-[16px] tracking-[0.14px] whitespace-nowrap"
+              style={{ color: "var(--text-disabled)" }}
+            >
+              {date}
+            </span>
           </div>
-          <div className="text-sm font-bold font-roboto text-sm leading-4 tracking-0.14 text-content-subtle">
-            {time}
+          <div className="flex items-center px-[10px] py-[8px]">
+            <span
+              className="text-[14px] font-bold leading-[16px] tracking-[0.14px] whitespace-nowrap"
+              style={{ color: "var(--text-disabled)" }}
+            >
+              {time}
+            </span>
           </div>
         </div>
 
-        {/* Auteur et catégorie */}
-        <div className="flex items-center gap-2">
-          <div className="text-sm font-bold font-roboto text-sm leading-4 tracking-0.14 text-content-body">
-            {author}
+        {/* Row 2 — Author + Category badge */}
+        <div className="flex items-center">
+          <div className="flex items-center px-[10px] py-[8px]">
+            <span
+              className="text-[14px] font-bold leading-[16px] tracking-[0.14px] whitespace-nowrap"
+              style={{ color: "var(--text-body)" }}
+            >
+              {author}
+            </span>
           </div>
-          <Badge variant={categoryVariant}>
-            {category}
-          </Badge>
+          <div
+            className="inline-flex items-center h-[20px] px-[8px] py-[4px]
+              rounded-[16px] border border-solid shrink-0"
+            style={{ borderColor: "var(--border-neutral-default)" }}
+          >
+            <span
+              className="text-[12px] font-bold leading-[14px] tracking-[0.12px] whitespace-nowrap text-center"
+              style={{ color: "var(--text-caption)" }}
+            >
+              {category}
+            </span>
+          </div>
         </div>
 
-        {/* Description */}
-        <div className="text-sm font-roboto text-sm leading-4 tracking-0.14 text-content-body">
-          {description}
+        {/* Row 3 — Description */}
+        <div className="flex items-start px-[10px] py-[8px] w-full">
+          <p
+            className="text-[14px] font-normal leading-[16px] tracking-[0.14px] flex-1"
+            style={{ color: "var(--text-caption)" }}
+          >
+            {description}
+          </p>
         </div>
       </div>
     </div>
