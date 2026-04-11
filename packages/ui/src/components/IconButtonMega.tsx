@@ -47,35 +47,35 @@ export function IconButtonMega({
         };
       case "secondary":
         return {
-          background: "bg-white dark:bg-neutral-800",
-          color: "text-neutral-500 dark:text-neutral-200",
+          background: "bg-white",
+          color: "text-neutral-500",
           border: outlined
-            ? "border-neutral-500 dark:border-neutral-200"
+            ? "border-neutral-500"
             : "border-transparent",
-          hoverBg: "hover:bg-neutral-100 dark:hover:bg-neutral-700",
+          hoverBg: "hover:bg-neutral-100",
         };
       case "ghost":
         return {
           background: "bg-transparent",
-          color: "text-neutral-500 dark:text-neutral-200",
+          color: "text-neutral-500",
           border: "border-transparent",
-          hoverBg: "hover:bg-neutral-100 dark:hover:bg-neutral-700",
+          hoverBg: "hover:bg-neutral-100",
         };
       case "disabled":
         return {
-          background: "bg-neutral-50 dark:bg-neutral-800",
-          color: "text-neutral-400 dark:text-neutral-600",
+          background: "bg-neutral-50",
+          color: "text-neutral-400",
           border: outlined
-            ? "border-neutral-400 dark:border-neutral-600"
+            ? "border-neutral-400"
             : "border-transparent",
           hoverBg: "hover:opacity-50",
         };
       default:
         return {
-          background: "bg-white dark:bg-neutral-800",
-          color: "text-neutral-500 dark:text-neutral-200",
+          background: "bg-white",
+          color: "text-neutral-500",
           border: "border-transparent",
-          hoverBg: "hover:bg-neutral-100 dark:hover:bg-neutral-700",
+          hoverBg: "hover:bg-neutral-100",
         };
     }
   };

@@ -29,7 +29,10 @@ export function Divider({
 }: DividerProps) {
   return (
     <div className={`${spacingMap[spacing]} ${className}`.trim()}>
-      <div className="h-px w-full bg-neutral-50 dark:bg-neutral-700" />
+      <div
+        className="h-px w-full"
+        style={{ backgroundColor: "var(--surface-neutral-action)" }}
+      />
     </div>
   );
 }

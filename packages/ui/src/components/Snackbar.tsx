@@ -77,13 +77,16 @@ export function Snackbar({
         inline-flex items-center gap-[12px]
         px-[16px] py-[12px] rounded-[8px]
         max-w-[600px] w-auto
-        bg-neutral-700 dark:bg-neutral-50
         shadow-md
         ${className}
       `.trim()}
+      style={{
+        backgroundColor: "var(--neutral-700)",
+        color: "white",
+      }}
     >
       {/* Message */}
-      <p className="flex-1 text-[16px] leading-[20px] tracking-[0.16px] text-white dark:text-neutral-600 font-roboto">
+      <p className="flex-1 text-[16px] leading-[20px] tracking-[0.16px] font-roboto">
         {message}
       </p>
 
@@ -99,11 +102,11 @@ export function Snackbar({
               transition-all duration-200
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-[-4px]
               font-roboto
-              text-white dark:text-neutral-500
               bg-transparent
-              border border-white dark:border-neutral-500
+              border border-white
               hover:opacity-80
             `}
+            style={{ color: "white" }}
           >
             {buttonLabel}
             {buttonIcon && <buttonIcon.type className="size-[20px]" strokeWidth={1.5} />}
@@ -124,10 +127,10 @@ export function Snackbar({
               transition-all duration-200
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-[-4px]
               font-roboto
-              text-white dark:text-neutral-500
               bg-transparent
               hover:opacity-80
             `}
+            style={{ color: "white" }}
           >
             {linkLabel}
             {linkIcon && <linkIcon.type className="size-[20px]" strokeWidth={1.5} />}

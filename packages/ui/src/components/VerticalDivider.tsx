@@ -19,8 +19,8 @@ export function VerticalDivider({
 }: VerticalDividerProps) {
   const getStrokeColor = () => {
     if (variant === "hover")
-      return "var(--neutral-100) dark:var(--neutral-500)";
-    return "var(--neutral-50) dark:var(--neutral-700)";
+      return "var(--surface-neutral-action-hover)";
+    return "var(--surface-neutral-action)";
   };
 
   return (

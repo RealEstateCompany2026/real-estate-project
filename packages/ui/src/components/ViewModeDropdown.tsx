@@ -40,9 +40,9 @@ export function ViewModeDropdown({
           inline-flex items-center gap-2
           px-3 py-2 rounded-lg
           border border-edge-default
-          bg-surface-neutral-default dark:bg-neutral-700
-          hover:bg-surface-neutral-action dark:hover:bg-neutral-600
-          text-content-body dark:text-neutral-200
+          bg-surface-neutral-default
+          hover:bg-surface-neutral-action
+          text-content-body
           transition-colors
         `}
       >
@@ -55,7 +55,7 @@ export function ViewModeDropdown({
         <div
           className={`
             absolute top-full right-0 mt-1
-            bg-surface-neutral-default dark:bg-neutral-700
+            bg-surface-neutral-default
             border border-edge-default
             rounded-lg shadow-lg
             z-10
@@ -71,10 +71,10 @@ export function ViewModeDropdown({
               className={`
                 w-full px-4 py-2 text-left
                 flex items-center gap-2
-                hover:bg-surface-neutral-action dark:hover:bg-neutral-600
+                hover:bg-surface-neutral-action
                 transition-colors
-                text-content-body dark:text-neutral-200
-                ${viewMode === mode.id ? "bg-surface-branded-subtle dark:bg-neutral-600" : ""}
+                text-content-body
+                ${viewMode === mode.id ? "bg-surface-branded-subtle" : ""}
               `}
             >
               {mode.icon}

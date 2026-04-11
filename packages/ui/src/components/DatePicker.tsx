@@ -204,7 +204,7 @@ export function DatePicker({
 
   return (
     <div
-      className={`relative rounded-[16px] w-[390px] bg-surface-neutral-default dark:bg-surface-neutral-default border border-surface-neutral-default dark:border-surface-neutral-default ${className}`.trim()}
+      className={`relative rounded-[16px] w-[390px] bg-surface-neutral-default border border-surface-neutral-default ${className}`.trim()}
     >
       <div className="p-[24px]">
         {/* Header - Select date */}
@@ -215,7 +215,7 @@ export function DatePicker({
         </div>
 
         {/* Selected date display */}
-        <div className="mb-[24px] px-[16px] py-[12px] rounded-[12px] flex items-center justify-between bg-surface-neutral-action dark:bg-surface-neutral-action">
+        <div className="mb-[24px] px-[16px] py-[12px] rounded-[12px] flex items-center justify-between bg-surface-neutral-action">
           <div className="flex items-center gap-[12px]">
             <CalendarIcon
               size={20}
@@ -231,7 +231,7 @@ export function DatePicker({
         <div className="flex items-center justify-between mb-[16px]">
           <button
             onClick={handlePrevMonth}
-            className="p-[8px] rounded-[8px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed bg-surface-neutral-action dark:bg-surface-neutral-action"
+            className="p-[8px] rounded-[8px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed bg-surface-neutral-action"
             type="button"
             disabled={isPrevMonthDisabled()}
           >
@@ -248,7 +248,7 @@ export function DatePicker({
 
           <button
             onClick={handleNextMonth}
-            className="p-[8px] rounded-[8px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed bg-surface-neutral-action dark:bg-surface-neutral-action"
+            className="p-[8px] rounded-[8px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed bg-surface-neutral-action"
             type="button"
             disabled={isNextMonthDisabled()}
           >

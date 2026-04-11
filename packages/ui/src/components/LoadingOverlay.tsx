@@ -76,7 +76,7 @@ export function LoadingOverlay({
   className = "",
 }: LoadingOverlayProps) {
   const bgClass = fullscreen ? "fixed" : "absolute";
-  const bgColor = backgroundOpacity > 0.3 ? "bg-black/50 dark:bg-black/70" : "bg-white/30 dark:bg-black/30";
+  const bgColor = backgroundOpacity > 0.3 ? "bg-black/50" : "bg-white/30";
 
   return (
     <div
@@ -100,7 +100,7 @@ export function LoadingOverlay({
 
       {/* Message optionnel */}
       {message && (
-        <p className="text-[16px] leading-[20px] tracking-[0.16px] font-medium text-content-body dark:text-neutral-200 font-roboto">
+        <p className="text-[16px] leading-[20px] tracking-[0.16px] font-medium text-content-body font-roboto">
           {message}
         </p>
       )}

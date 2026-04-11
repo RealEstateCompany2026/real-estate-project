@@ -66,7 +66,13 @@ export function Tooltip({
           className={`absolute z-50 ${positionClasses[side]} pointer-events-none ${className}`.trim()}
           role="tooltip"
         >
-          <div className="bg-neutral-700 dark:bg-neutral-50 text-white dark:text-neutral-600 text-sm leading-[18px] px-3 py-1.5 rounded-lg max-w-[300px] whitespace-normal shadow-md">
+          <div
+            className="text-sm leading-[18px] px-3 py-1.5 rounded-lg max-w-[300px] whitespace-normal shadow-md"
+            style={{
+              backgroundColor: "var(--neutral-700)",
+              color: "white",
+            }}
+          >
             {content}
           </div>
         </div>

@@ -45,11 +45,13 @@ export function Switch({
     }
   };
 
+  const bgColor = checked ? "bg-green-500" : "bg-neutral-200";
+
   return (
     <div
       className={`relative w-12 h-[30px] rounded-2xl transition-all duration-200 group ${
         disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"
-      } ${checked ? "bg-green-500" : "bg-neutral-200 dark:bg-neutral-500"} ${className}`.trim()}
+      } ${bgColor} ${className}`.trim()}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role="switch"
@@ -74,9 +76,10 @@ export function Switch({
 
       {/* Toggle circle */}
       <div
-        className={`absolute top-[3px] size-6 rounded-full bg-white dark:bg-neutral-800 shadow-sm transition-all duration-200 ${
+        className={`absolute top-[3px] size-6 rounded-full shadow-sm transition-all duration-200 ${
           checked ? "left-[21px]" : "left-[3px]"
         } ${!disabled ? "group-hover:opacity-90" : ""}`}
+        style={{ backgroundColor: "var(--surface-neutral-default)" }}
       />
     </div>
   );

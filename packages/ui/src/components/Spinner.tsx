@@ -30,9 +30,9 @@ const sizeMap: Record<SpinnerSize, number> = {
 };
 
 const variantClasses: Record<SpinnerVariant, string> = {
-  primary: "text-purple-500 dark:text-purple-400",
-  neutral: "text-neutral-500 dark:text-neutral-400",
-  inverse: "text-white dark:text-neutral-700",
+  primary: "text-purple-500",
+  neutral: "text-neutral-500",
+  inverse: "text-white",
 };
 
 export function Spinner({

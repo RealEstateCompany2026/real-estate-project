@@ -53,7 +53,7 @@ export function DpeScale({
               color:
                 activeClass === cls
                   ? DPE_COLORS[cls]
-                  : "var(--neutral-300) dark:var(--neutral-500)",
+                  : "var(--text-disabled)",
             }}
           >
             {cls}

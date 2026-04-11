@@ -42,10 +42,10 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <div className="rounded-lg border overflow-hidden bg-surface-neutral-default dark:bg-neutral-700 border-edge-default">
+    <div className="rounded-lg border overflow-hidden bg-surface-neutral-default border-edge-default">
       {/* Header */}
       <button
-        className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-surface-neutral-action dark:hover:bg-neutral-700"
+        className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-surface-neutral-action"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-3 flex-1 text-left">

@@ -96,8 +96,9 @@ export const Spotlight: React.FC<SpotlightProps> = ({
 
       {/* Bordure autour de la zone highlight */}
       <div
-        className="absolute border-2 pointer-events-none border-purple-500 dark:border-purple-400"
+        className="absolute border-2 pointer-events-none"
         style={{
+          borderColor: "var(--border-neutral-default)",
           top: targetRect.top - padding,
           left: targetRect.left - padding,
           width: targetRect.width + padding * 2,

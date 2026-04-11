@@ -17,16 +17,15 @@ export function HorizontalDivider({
   variant = "default",
   className = "",
 }: HorizontalDividerProps) {
+  const bgColor =
+    variant === "hover"
+      ? "var(--surface-neutral-action-hover)"
+      : "var(--surface-neutral-action)";
+
   return (
     <div
-      className={`
-        w-full h-px ${className}
-        ${
-          variant === "hover"
-            ? "bg-neutral-100 dark:bg-neutral-500"
-            : "bg-neutral-50 dark:bg-neutral-700"
-        }
-      `}
+      className={`w-full h-px ${className}`}
+      style={{ backgroundColor: bgColor }}
       aria-hidden="true"
     />
   );

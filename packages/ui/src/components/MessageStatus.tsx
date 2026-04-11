@@ -22,8 +22,8 @@ export function MessageStatus({
 
   const getFillColor = () => {
     if (isSuccess) return "#0DA500";
-    if (isFail) return "#444955 dark:var(--neutral-500)";
-    return "white dark:var(--neutral-800)";
+    if (isFail) return "var(--text-body)";
+    return "var(--surface-neutral-default)";
   };
 
   const getStrokeColor = () => {

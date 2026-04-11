@@ -67,7 +67,7 @@ export const TooltipOnboarding: React.FC<TooltipOnboardingProps> = ({
 }) => {
   return (
     <div
-      className="absolute rounded-lg shadow-lg bg-surface-neutral-default dark:bg-neutral-700 border border-edge-default"
+      className="absolute rounded-lg shadow-lg bg-surface-neutral-default border border-edge-default"
       style={{
         ...position,
         width: `${width}px`,
