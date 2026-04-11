@@ -105,90 +105,87 @@ export function ListBien({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between h-[120px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
-      {/* Image du bien */}
-      <div className="h-[120px] w-[160px] shrink-0 overflow-hidden rounded-l-2xl">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="Photo du bien"
-            className="size-full object-cover"
-          />
-        ) : (
-          <div className="size-full bg-surface-disabled flex items-center justify-center">
-            <Home size={32} style={{ color: iconColor }} />
-          </div>
-        )}
-      </div>
-
-      {/* Section infos du bien */}
-      <div className="flex flex-col gap-[24px] items-start pl-[16px] pr-[63px] shrink-0">
-        {/* Row 1: stickers + prix */}
-        <div className="flex gap-[24px] items-center">
-          <Badge variant="default">{operationType}</Badge>
-          <IconText icon={<Tag size={20} style={{ color: iconColor }} />}>
-            {price}
-          </IconText>
-          {hasCarnet && <Badge variant="success">CARNET</Badge>}
+      {/* Section image + infos du bien */}
+      <div className="flex items-center shrink-0 h-[120px]">
+        {/* Image du bien */}
+        <div className="h-[120px] w-[160px] shrink-0 overflow-hidden rounded-l-2xl">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="Photo du bien"
+              className="size-full object-cover"
+            />
+          ) : (
+            <div className="size-full bg-surface-disabled flex items-center justify-center">
+              <Home size={32} style={{ color: iconColor }} />
+            </div>
+          )}
         </div>
 
-        {/* Row 2: ville + type + surface + DPE */}
-        <div className="flex gap-[24px] items-center">
-          <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
-            {city}
-          </IconText>
-          <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
-            {propertyType}
-          </IconText>
-          <IconText
-            icon={<Maximize2 size={20} style={{ color: iconColor }} />}
-          >
-            {surface}
-          </IconText>
-          {dpeGrade && <DpeBadge grade={dpeGrade} />}
+        {/* Infos du bien */}
+        <div className="flex flex-col gap-[24px] items-start pl-[16px]">
+          {/* Row 1: stickers + prix */}
+          <div className="flex gap-[24px] items-center">
+            <Badge variant="default">{operationType}</Badge>
+            <IconText icon={<Tag size={20} style={{ color: iconColor }} />}>
+              {price}
+            </IconText>
+            {hasCarnet && <Badge variant="success">CARNET</Badge>}
+          </div>
+
+          {/* Row 2: ville + type + surface + DPE */}
+          <div className="flex gap-[24px] items-center">
+            <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
+              {city}
+            </IconText>
+            <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
+              {propertyType}
+            </IconText>
+            <IconText
+              icon={<Maximize2 size={20} style={{ color: iconColor }} />}
+            >
+              {surface}
+            </IconText>
+            {dpeGrade && <DpeBadge grade={dpeGrade} />}
+          </div>
         </div>
       </div>
 
       <VerticalDivider />
 
       {/* KPI Qualification */}
-      <div className="px-[38px]">
-        <KpiIndicator
-          kpi="qual"
-          value={`${kpis.qualification}%`}
-          percentage={kpis.qualification}
-          variant="vertical"
-          className="w-[77px]"
-        />
-      </div>
+      <KpiIndicator
+        kpi="qual"
+        value={`${kpis.qualification}%`}
+        percentage={kpis.qualification}
+        variant="vertical"
+        className="w-[77px]"
+      />
 
       <VerticalDivider />
 
       {/* KPI Entretien */}
-      <div className="px-[38px]">
-        <KpiIndicator
-          kpi="ent"
-          value={`${kpis.entretien}`}
-          percentage={kpis.entretien}
-          variant="vertical"
-          className="w-[78px]"
-        />
-      </div>
+      <KpiIndicator
+        kpi="ent"
+        value={`${kpis.entretien}`}
+        percentage={kpis.entretien}
+        variant="vertical"
+        className="w-[78px]"
+      />
 
       <VerticalDivider />
 
       {/* KPI Conversion */}
-      <div className="px-[38px]">
-        <KpiIndicator
-          kpi="conv"
-          value={`${kpis.conversion}%`}
-          percentage={kpis.conversion}
-          variant="vertical"
-          className="w-[78px]"
-        />
-      </div>
+      <KpiIndicator
+        kpi="conv"
+        value={`${kpis.conversion}%`}
+        percentage={kpis.conversion}
+        variant="vertical"
+        className="w-[78px]"
+      />
 
       <VerticalDivider />
 
