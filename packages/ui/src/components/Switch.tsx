@@ -45,7 +45,7 @@ export function Switch({
     }
   };
 
-  const bgColor = checked ? "bg-green-500" : "bg-neutral-200";
+  const bgColor = checked ? "bg-green-500" : "bg-surface-neutral-action-hover";
 
   return (
     <div

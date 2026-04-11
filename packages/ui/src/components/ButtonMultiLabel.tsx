@@ -34,11 +34,11 @@ export function ButtonMultiLabel({
 
     return {
       background: isSelected
-        ? "bg-neutral-100"
-        : "bg-white",
+        ? "bg-surface-neutral-action-hover"
+        : "bg-surface-neutral-default",
       textColor: isSelected
-        ? "text-neutral-600"
-        : "text-neutral-500",
+        ? "text-content-headings"
+        : "text-content-body",
       fontWeight: isSelected ? "font-bold" : "font-semibold",
       borderRadius: isFirst
         ? "rounded-l-[16px]"
@@ -64,7 +64,7 @@ export function ButtonMultiLabel({
             onClick={() => onChange(option)}
             className={`
               relative flex items-center justify-center p-[6px]
-              transition-all border border-solid border-neutral-100
+              transition-all border border-solid border-edge-subtle
               ${styles.borderRadius}
               ${fullWidth ? "flex-1" : ""}
               ${isSelected ? "cursor-default" : "cursor-pointer hover:opacity-80"}

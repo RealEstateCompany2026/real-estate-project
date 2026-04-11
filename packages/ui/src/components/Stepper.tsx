@@ -132,7 +132,7 @@ export function Stepper({
                     transition-all duration-200
                     text-[var(--text-sm)]
                     tracking-[0.14px]
-                    ${isActive ? "font-bold text-purple-500" : isCompleted ? "font-medium text-content-body" : "font-medium text-content-placeholder"}
+                    ${isActive ? "font-bold text-content-branded-action" : isCompleted ? "font-medium text-content-body" : "font-medium text-content-placeholder"}
                   `}
                 >
                   {step}

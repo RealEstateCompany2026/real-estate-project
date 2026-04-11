@@ -47,35 +47,35 @@ export function IconButtonMega({
         };
       case "secondary":
         return {
-          background: "bg-white",
-          color: "text-neutral-500",
+          background: "bg-surface-neutral-default",
+          color: "text-content-body",
           border: outlined
-            ? "border-neutral-500"
+            ? "border-edge-neutral-default"
             : "border-transparent",
-          hoverBg: "hover:bg-neutral-100",
+          hoverBg: "hover:bg-surface-neutral-action-hover",
         };
       case "ghost":
         return {
           background: "bg-transparent",
-          color: "text-neutral-500",
+          color: "text-content-body",
           border: "border-transparent",
-          hoverBg: "hover:bg-neutral-100",
+          hoverBg: "hover:bg-surface-neutral-action-hover",
         };
       case "disabled":
         return {
-          background: "bg-neutral-50",
-          color: "text-neutral-400",
+          background: "bg-surface-neutral-action",
+          color: "text-content-subtle",
           border: outlined
-            ? "border-neutral-400"
+            ? "border-edge-subtle"
             : "border-transparent",
           hoverBg: "hover:opacity-50",
         };
       default:
         return {
-          background: "bg-white",
-          color: "text-neutral-500",
+          background: "bg-surface-neutral-default",
+          color: "text-content-body",
           border: "border-transparent",
-          hoverBg: "hover:bg-neutral-100",
+          hoverBg: "hover:bg-surface-neutral-action-hover",
         };
     }
   };

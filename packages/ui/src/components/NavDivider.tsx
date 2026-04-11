@@ -21,7 +21,7 @@ export interface NavDividerProps {
 export function NavDivider({ className = "" }: NavDividerProps) {
   return (
     <div
-      className={`bg-neutral-400 ${className}`}
+      className={`bg-edge-subtle ${className}`}
       style={{
         width: "10px",
         height: "1px",

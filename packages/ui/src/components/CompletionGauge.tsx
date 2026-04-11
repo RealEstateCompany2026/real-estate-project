@@ -36,7 +36,7 @@ export function CompletionGauge({
 
   const colorClass =
     clamped >= 100 ? "bg-green-500"
-    : clamped >= 75 ? "bg-purple-500"
+    : clamped >= 75 ? "bg-surface-branded-default"
     : clamped >= 50 ? "bg-orange-500"
     : "bg-red-300";
 

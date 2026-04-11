@@ -22,7 +22,7 @@ const statusColorClasses = {
   success: "bg-green-500",
   error: "bg-red-500",
   warning: "bg-orange-500",
-  neutral: "bg-neutral-400",
+  neutral: "bg-edge-subtle",
 };
 
 export function IconWithStatus({

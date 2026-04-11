@@ -64,7 +64,7 @@ function ToggleSwitch({
       }`}
     >
       <span
-        className={`inline-block size-[24px] rounded-full bg-white shadow transition-transform ${
+        className={`inline-block size-[24px] rounded-full bg-surface-neutral-default shadow transition-transform ${
           active ? "translate-x-[18px]" : "translate-x-0"
         }`}
       />

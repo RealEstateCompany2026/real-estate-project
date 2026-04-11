@@ -77,7 +77,7 @@ export function Menu({
           <div className="relative self-stretch shrink-0">
             <div className="flex flex-row justify-center size-full">
               <div className="content-stretch flex h-full items-start justify-center p-[8px] relative">
-                <div className="h-[49px] rounded-[16px] shrink-0 w-[5px] bg-neutral-600" />
+                <div className="h-[49px] rounded-[16px] shrink-0 w-[5px] bg-surface-neutral-action-hover" />
               </div>
             </div>
           </div>

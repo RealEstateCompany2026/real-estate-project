@@ -91,7 +91,7 @@ export function InputField({
 
       {/* Hint text */}
       {hintText && (
-        <div className="flex flex-col justify-center leading-[0] not-italic text-[14px] tracking-[0.14px] text-neutral-500 font-roboto">
+        <div className="flex flex-col justify-center leading-[0] not-italic text-[14px] tracking-[0.14px] text-content-body font-roboto">
           <p className="leading-[16px]">{hintText}</p>
         </div>
       )}

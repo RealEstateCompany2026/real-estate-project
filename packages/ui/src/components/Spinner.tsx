@@ -30,8 +30,8 @@ const sizeMap: Record<SpinnerSize, number> = {
 };
 
 const variantClasses: Record<SpinnerVariant, string> = {
-  primary: "text-purple-500",
-  neutral: "text-neutral-500",
+  primary: "text-content-branded-action",
+  neutral: "text-content-body",
   inverse: "text-white",
 };
 

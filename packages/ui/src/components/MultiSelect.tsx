@@ -96,11 +96,11 @@ export function MultiSelect({
                 <div
                   className={`size-5 rounded shrink-0 flex items-center justify-center border ${
                     isSelected
-                      ? "bg-purple-500 border-purple-500"
+                      ? "bg-surface-branded-default border-surface-branded-default"
                       : "bg-surface-neutral-default border-edge-default"
                   }`}
                 >
-                  {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
+                  {isSelected && <Check size={14} className="text-content-branded-on-action" strokeWidth={3} />}
                 </div>
                 <span className="text-base font-semibold text-content-body tracking-wide text-left">
                   {option}

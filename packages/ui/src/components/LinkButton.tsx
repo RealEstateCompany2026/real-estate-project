@@ -71,8 +71,8 @@ export function LinkButton({
   const getVariantStyles = () => {
     if (disabled) {
       return {
-        default: "text-neutral-400",
-        hover: "text-neutral-400",
+        default: "text-content-subtle",
+        hover: "text-content-subtle",
       };
     }
 
@@ -85,8 +85,8 @@ export function LinkButton({
       case "neutral":
       default:
         return {
-          default: "text-neutral-600",
-          hover: "hover:text-neutral-700",
+          default: "text-content-headings",
+          hover: "hover:text-content-headings",
         };
     }
   };

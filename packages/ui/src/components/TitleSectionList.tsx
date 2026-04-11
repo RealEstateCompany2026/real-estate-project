@@ -30,7 +30,7 @@ export function TitleSectionList({
     <div
       className={`
         relative leading-[20px] not-italic text-[16px] tracking-[0.16px]
-        whitespace-nowrap text-neutral-200
+        whitespace-nowrap text-content-caption
         ${className}
       `}
       style={{

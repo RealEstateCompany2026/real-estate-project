@@ -29,7 +29,7 @@ const buttonVariants = cva(
                     "text-content-body hover:bg-surface-neutral-action",
                 // Extensions (not in Figma DS, but used in app)
                 destructive:
-                    "bg-red-500 text-white border border-red-500 hover:bg-red-600",
+                    "bg-red-500 text-content-branded-on-action border border-red-500 hover:bg-red-600",
                 secondary:
                     "bg-surface-neutral-action text-content-body hover:bg-surface-neutral-action-hover",
                 link:

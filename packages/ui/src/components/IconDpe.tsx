@@ -70,7 +70,7 @@ export function IconDpe({
       }}
     >
       <p
-        className="text-center whitespace-nowrap font-bold text-white"
+        className="text-center whitespace-nowrap font-bold text-content-branded-on-action"
         style={{
           fontSize: `${dimensions.fontSize}px`,
           lineHeight: `${dimensions.height}px`,

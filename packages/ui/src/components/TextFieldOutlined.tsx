@@ -118,17 +118,17 @@ export function TextFieldOutlined({
   const [isFocused, setIsFocused] = useState(false);
 
   const getBorderColor = () => {
-    if (disabled) return "border-neutral-200";
+    if (disabled) return "border-edge-disabled";
     if (error) return "border-red-500";
     if (isFocused)
-      return "border-neutral-500";
-    return "border-neutral-200";
+      return "border-edge-neutral-default";
+    return "border-edge-disabled";
   };
 
   const getBackgroundColor = () => {
-    if (disabled) return "bg-neutral-50";
+    if (disabled) return "bg-surface-neutral-action";
     if (error) return "bg-red-50";
-    return "bg-white";
+    return "bg-surface-neutral-default";
   };
 
   return (
@@ -175,7 +175,7 @@ export function TextFieldOutlined({
         }}
         className={`
           flex-1 bg-transparent text-[16px] leading-[20px]
-          placeholder:text-neutral-400
+          placeholder:text-content-subtle
           focus:outline-none
           text-content-body font-semibold
         `}

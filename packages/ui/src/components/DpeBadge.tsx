@@ -35,7 +35,7 @@ export function DpeBadge({ grade, className = "" }: DpeBadgeProps) {
       className={`flex items-center justify-center rounded-2xl size-[20px] shrink-0 ${className}`.trim()}
       style={{ backgroundColor: DPE_COLORS[grade] }}
     >
-      <span className="text-[14px] leading-[16px] tracking-[0.14px] font-bold text-white text-center whitespace-nowrap font-roboto">
+      <span className="text-[14px] leading-[16px] tracking-[0.14px] font-bold text-content-branded-on-action text-center whitespace-nowrap font-roboto">
         {grade}
       </span>
     </div>

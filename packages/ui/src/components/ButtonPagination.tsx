@@ -68,7 +68,7 @@ export function ButtonPagination({
             shrink-0 rounded-[16px] transition-all
             p-[12px] w-[44px] h-[44px]
             flex items-center justify-center
-            bg-neutral-100
+            bg-surface-neutral-action-hover
             ${canGoNext ? "cursor-pointer hover:opacity-80" : "cursor-not-allowed opacity-50"}
           `}
         >
