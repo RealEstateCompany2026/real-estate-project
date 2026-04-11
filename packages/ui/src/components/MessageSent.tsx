@@ -1,6 +1,6 @@
 "use client";
 
-import { Reply } from "lucide-react";
+import { Paperclip, ArrowRightCircle } from "lucide-react";
 import { MessageBadge } from "./MessageBadge";
 import { MessageStatusDot, MessageStatus } from "./MessageStatusDot";
 import { MessageTimestamp } from "./MessageTimestamp";
@@ -10,68 +10,39 @@ import { ReactNode } from "react";
 /**
  * MessageSent - Message envoyé complet
  *
- * Message envoyé avec header (badge, status, date, icône) et bulle de contenu.
- * Support deux variantes : standard (Figma) et chat (WhatsApp).
+ * Figma: organisme . message . envoyé
  *
- * Variante Standard:
- * - Badge "ENVOYÉ" visible (à droite)
- * - Status dot visible
- * - Timestamp complet
- * - Icône reply
- * - Fond gris #ecedee
- * - Gap: 10px
- * - Alignement à droite
+ * Structure Figma (miroir de reçu, aligné à droite):
+ * - Container: flex-col, gap-10px, items-end, w-420px, ml-auto
+ * - Header: flex, gap-8px, items-center, justify-end
+ *   - Arrow circle right icon: 20×20px, text-caption
+ *   - Date + time: Regular 14px/16px, text-caption
+ *   - Status dot: 18×18px
+ *   - Badge "ENVOYÉ": border-neutral-default, text-caption
+ * - Bubble: bg surface-neutral-action, border same, rounded-16, p-10
+ *   - Text: Body md Regular 16px/22px, text-body
+ *   - Attachment button (optional)
  *
- * Variante Chat:
- * - Pas de badge
- * - Status dot discret
- * - Timestamp plus petit
- * - Pas d'icône reply
- * - Fond vert #DCF8C6
- * - Gap: 4px
- * - Alignement à droite
- *
- * Usage:
- * <MessageSent
- *   variant="standard"
- *   date="le 12 fév 2026"
- *   time="à 12:47"
- *   status="success"
- *   showBadge={true}
- * >
- *   <p>Message content...</p>
- * </MessageSent>
+ * Tokens Layer 3, dark mode auto via .dark class.
  */
 
 export interface MessageSentProps {
-  /**
-   * Contenu du message
-   */
+  /** Contenu texte du message */
   children: ReactNode;
-  /**
-   * Date du message
-   */
+  /** Date du message */
   date: string;
-  /**
-   * Heure du message
-   */
+  /** Heure du message */
   time: string;
-  /**
-   * Statut du message
-   */
+  /** Statut du message */
   status?: MessageStatus;
-  /**
-   * Variante de style
-   */
+  /** Variante de style */
   variant?: "standard" | "chat";
-  /**
-   * Afficher le badge ENVOYÉ (standard uniquement)
-   */
+  /** Afficher le badge ENVOYÉ (standard uniquement) */
   showBadge?: boolean;
-  /**
-   * Afficher l'icône reply (standard uniquement)
-   */
+  /** Afficher l'icône arrow (standard uniquement) */
   showArrow?: boolean;
+  /** Pièces jointes à afficher */
+  attachments?: { label: string; onClick?: () => void }[];
   className?: string;
 }
 
@@ -83,31 +54,38 @@ export function MessageSent({
   variant = "standard",
   showBadge = true,
   showArrow = true,
+  attachments = [],
   className = "",
 }: MessageSentProps) {
   const isChat = variant === "chat";
 
   return (
-    <div className={`relative w-full max-w-[420px] ml-auto ${className}`.trim()}>
-      <div className={`content-stretch flex flex-col items-end relative w-full ${isChat ? "gap-1" : "gap-2.5"}`}>
+    <div className={`w-full max-w-[420px] ml-auto ${className}`.trim()}>
+      <div
+        className={`flex flex-col items-end w-full ${
+          isChat ? "gap-[4px]" : "gap-[10px]"
+        }`}
+      >
         {/* Header */}
-        <div className={`content-stretch flex gap-2 items-center justify-end relative shrink-0 w-full ${isChat ? "opacity-70" : ""}`}>
-          {/* Arrow icon (standard only) */}
+        <div className="flex gap-[8px] items-center justify-end w-full">
+          {/* Arrow circle right icon (standard only) */}
           {!isChat && showArrow && (
-            <div className="relative shrink-0 size-5">
-              <Reply
-                className="w-5 h-5"
-                strokeWidth={1.5}
-                style={{ color: "var(--neutral-600)" }}
-              />
-            </div>
+            <ArrowRightCircle
+              size={20}
+              strokeWidth={1.5}
+              style={{ color: "var(--text-caption)" }}
+              className="shrink-0"
+            />
           )}
 
           {/* Timestamp */}
           {isChat ? (
-            <p className="text-xs leading-tight tracking-tighter text-content-disabled">
+            <span
+              className="text-[12px] leading-tight tracking-tighter"
+              style={{ color: "var(--text-caption)" }}
+            >
               {time.replace("à ", "")}
-            </p>
+            </span>
           ) : (
             <MessageTimestamp date={date} time={time} />
           )}
@@ -121,7 +99,38 @@ export function MessageSent({
 
         {/* Message bubble */}
         <MessageBubble variant={variant} align="right">
-          {children}
+          {/* Text content */}
+          <div className="px-[10px] py-[8px] w-full">
+            <div
+              className="text-[16px] font-normal leading-[22px] tracking-[0.16px]"
+              style={{ color: "var(--text-body)" }}
+            >
+              {children}
+            </div>
+          </div>
+
+          {/* Attachment buttons */}
+          {attachments.map((attachment, index) => (
+            <button
+              key={index}
+              onClick={attachment.onClick}
+              className="flex items-center gap-[8px] p-[12px] rounded-[16px]"
+              style={{
+                backgroundColor: "var(--surface-neutral-default)",
+              }}
+            >
+              <Paperclip
+                size={20}
+                style={{ color: "var(--text-neutral-action)" }}
+              />
+              <span
+                className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
+                style={{ color: "var(--text-neutral-action)" }}
+              >
+                {attachment.label}
+              </span>
+            </button>
+          ))}
         </MessageBubble>
       </div>
     </div>

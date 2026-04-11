@@ -10,51 +10,42 @@ const meta: Meta<typeof MessageEdit> = {
 export default meta;
 type Story = StoryObj<typeof MessageEdit>;
 
-export const Default: Story = {
+export const Standard: Story = {
   args: {
-    message: "Bonjour, j'aimerais avoir plus de détails sur cette propriété.",
-    onSave: (message) => console.log("Message mis à jour:", message),
-    onCancel: () => console.log("Édition annulée"),
+    variant: "standard",
+    placeholder: "Votre message...",
+    onSend: (html, text, files) =>
+      console.log("Send:", { html, text, files }),
   },
 };
 
-export const WithLongMessage: Story = {
+export const StandardEditing: Story = {
   args: {
-    message:
-      "Bonjour,\n\nJ'aimerais avoir plus de détails sur cette propriété. Pouvez-vous me fournir:\n- Les dimensions exactes\n- L'année de construction\n- Les détails des travaux de rénovation\n- Le diagnostic énergétique\n\nCordialement",
-    onSave: (message) => console.log("Message sauvegardé:", message),
-    onCancel: () => console.log("Annulation"),
+    variant: "standard",
+    isEditing: true,
+    defaultValue: "Bonjour, j'aimerais avoir plus de détails sur cette propriété.",
+    onSend: (html, text, files) =>
+      console.log("Save:", { html, text, files }),
+    onCancel: () => console.log("Cancel"),
   },
 };
 
-export const EmptyMessage: Story = {
+export const Chat: Story = {
   args: {
-    message: "",
-    onSave: (message) => console.log("Message:", message),
-    onCancel: () => console.log("Annulé"),
+    variant: "chat",
+    placeholder: "Tapez un message...",
+    onSend: (html, text, files) =>
+      console.log("Send:", { html, text, files }),
   },
 };
 
-export const Interactive: Story = {
-  render: () => {
-    const [message, setMessage] = React.useState(
-      "Ceci est un message à éditer"
-    );
-    const [saved, setSaved] = React.useState(false);
-
-    return (
-      <div>
-        <MessageEdit
-          message={message}
-          onSave={(newMessage) => {
-            setMessage(newMessage);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
-          }}
-          onCancel={() => console.log("Annulé")}
-        />
-        {saved && <p style={{ marginTop: "16px", color: "green" }}>Message sauvegardé!</p>}
-      </div>
-    );
+export const ChatEditing: Story = {
+  args: {
+    variant: "chat",
+    isEditing: true,
+    defaultValue: "Message en cours d'édition",
+    onSend: (html, text, files) =>
+      console.log("Save:", { html, text, files }),
+    onCancel: () => console.log("Cancel"),
   },
 };

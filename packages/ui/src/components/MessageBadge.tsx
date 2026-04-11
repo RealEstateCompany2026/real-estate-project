@@ -3,43 +3,38 @@
 /**
  * MessageBadge - Badge de statut de message
  *
- * Badge affichant le statut du message : REÇU, ENVOYÉ, MODIFIÉ.
+ * Figma: atome . sticker (inside organisme . message . reçu / envoyé)
  *
  * Specs:
  * - Height: 20px (auto width)
  * - Padding: 4px × 8px
- * - Border-radius: 16px
- * - Border: 1px solid
- * - Font: Roboto Bold 12px/14px
+ * - Border-radius: border-radius-md (16px)
+ * - Border: 1px solid var(--border-neutral-default)
+ * - Font: Roboto Bold 12px/14px, tracking 0.12px
+ * - Color: var(--text-caption)
+ * Tokens Layer 3, dark mode auto via .dark class.
  */
 
 export interface MessageBadgeProps {
-  /**
-   * Texte du badge
-   */
+  /** Texte du badge */
   label: string;
   className?: string;
 }
 
-export function MessageBadge({
-  label,
-  className = "",
-}: MessageBadgeProps) {
+export function MessageBadge({ label, className = "" }: MessageBadgeProps) {
   return (
     <div
-      className={`
-        h-[20px] relative rounded-[16px] shrink-0
-        border border-solid border-edge-neutral-default
-        ${className}
-      `.trim()}
+      className={`inline-flex items-center h-[20px] px-[8px] py-[4px]
+        rounded-[16px] border border-solid shrink-0
+        ${className}`.trim()}
+      style={{ borderColor: "var(--border-neutral-default)" }}
     >
-      <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex h-full items-center px-[8px] py-[4px] relative">
-          <p className="text-[12px] leading-[14px] text-center tracking-[0.12px] whitespace-nowrap font-bold text-content-caption">
-            {label}
-          </p>
-        </div>
-      </div>
+      <span
+        className="text-[12px] font-bold leading-[14px] tracking-[0.12px] whitespace-nowrap text-center"
+        style={{ color: "var(--text-caption)" }}
+      >
+        {label}
+      </span>
     </div>
   );
 }

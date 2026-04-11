@@ -1,15 +1,16 @@
 "use client";
 
 /**
- * MessageStatusDot — Aligned with Figma DS (file 09EiMQjcDWgb7MzykS8zU0)
+ * MessageStatusDot — atome . message . status
  *
- * Figma name: "atome . message . status"
- * Figma specs: 18×18px, border-radius 8px, border 1px solid
+ * Figma: 18×18px, border-radius 8px, border 1px solid
  *
  * Variants:
- *   none    → empty circle (neutral border, transparent/white fill)
- *   success → green filled circle
- *   fail    → gray filled circle
+ *   none    → bg surface-neutral-default, border border-disabled
+ *   success → bg green-500, border green-200
+ *   fail    → bg neutral-200, border neutral-400
+ *
+ * Tokens Layer 3, dark mode auto via .dark class.
  */
 
 export type MessageStatus = "none" | "success" | "fail";
@@ -23,15 +24,30 @@ export function MessageStatusDot({
   status = "none",
   className = "",
 }: MessageStatusDotProps) {
-  const colorClasses = {
-    none: "bg-surface-neutral-default border border-edge-disabled",
-    success: "bg-[var(--green-500)] border border-[var(--green-200)]",
-    fail: "bg-[var(--neutral-200)] border border-[var(--neutral-400)]",
+  const styles: Record<MessageStatus, { bg: string; border: string }> = {
+    none: {
+      bg: "var(--surface-neutral-default)",
+      border: "var(--border-disabled)",
+    },
+    success: {
+      bg: "var(--green-500)",
+      border: "var(--green-200)",
+    },
+    fail: {
+      bg: "var(--neutral-200)",
+      border: "var(--neutral-400)",
+    },
   };
+
+  const s = styles[status];
 
   return (
     <div
-      className={`rounded-[8px] size-[18px] ${colorClasses[status]} ${className}`.trim()}
+      className={`rounded-[8px] size-[18px] border border-solid shrink-0 ${className}`.trim()}
+      style={{
+        backgroundColor: s.bg,
+        borderColor: s.border,
+      }}
     />
   );
 }
