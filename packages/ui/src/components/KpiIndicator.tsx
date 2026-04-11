@@ -147,7 +147,7 @@ export function KpiIndicator({
                 className={`w-[6px] h-[14px] rounded-lg transition-colors ${
                   isFilled
                     ? ""
-                    : "bg-[var(--indicator-bar-empty)] group-hover:bg-[var(--indicator-bar-empty-hover)]"
+                    : "indicator-bar-empty bg-[var(--indicator-bar-empty)]"
                 }`}
                 style={isFilled ? { backgroundColor: finalColor } : undefined}
               />

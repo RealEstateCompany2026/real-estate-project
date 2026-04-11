@@ -47,14 +47,14 @@ export interface CardClientProps {
 /** Divider horizontal pleine largeur */
 function HorizontalDivider() {
   return (
-    <div className="w-full h-px bg-[var(--border-divider)] group-hover:bg-[var(--border-default)] transition-colors" />
+    <div className="divider w-full h-px bg-[var(--border-divider)] transition-colors" />
   );
 }
 
 /** Divider vertical 84px */
 function VerticalDivider() {
   return (
-    <div className="h-[84px] w-px bg-[var(--border-divider)] group-hover:bg-[var(--border-default)] shrink-0 transition-colors" />
+    <div className="divider h-[84px] w-px bg-[var(--border-divider)] shrink-0 transition-colors" />
   );
 }
 

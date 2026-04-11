@@ -398,3 +398,14 @@
   --color-foreground: var(--foreground);
   --color-border: var(--border);
 }
+
+/* ==================== GROUP-HOVER UTILITIES ==================== */
+/* Tailwind JIT ne génère pas toujours group-hover:bg-[var(--token)] */
+
+.group:hover .divider {
+  background-color: var(--border-default);
+}
+
+.group:hover .indicator-bar-empty {
+  background-color: var(--indicator-bar-empty-hover);
+}
