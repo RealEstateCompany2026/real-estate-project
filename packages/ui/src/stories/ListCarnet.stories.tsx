@@ -1,57 +1,95 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ListCarnet, type ListCarnetItem } from "../components/ListCarnet";
+import { ListCarnet } from "../components/ListCarnet";
 
 const meta: Meta<typeof ListCarnet> = {
-  title: "Design System/Molecules/ListCarnet",
+  title: "Organisms/ListCarnet",
   component: ListCarnet,
+  parameters: {
+    layout: "padded",
+    docs: {
+      description: {
+        component:
+          "Ligne de liste carnet d'entretien — infos bien + propriétaire + statut + date + suggestions IA.",
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof ListCarnet>;
 
-const mockItems: ListCarnetItem[] = [
-  {
-    id: "1",
-    title: "Carnets d'adresses - Clients",
-    count: 145,
-  },
-  {
-    id: "2",
-    title: "Contacts notaires",
-    count: 32,
-  },
-  {
-    id: "3",
-    title: "Fournisseurs",
-    count: 18,
-  },
-];
-
 export const Default: Story = {
   args: {
-    items: mockItems,
+    city: "Montpellier",
+    propertyType: "T3",
+    surface: "120m²",
+    dpeGrade: "A",
+    ownerName: "RASTAPOPULOS, Roberto",
+    status: "active",
+    date: "12 fév. 2026",
+    aiSuggestions: 1,
   },
 };
 
-export const SingleItem: Story = {
+export const Dormant: Story = {
   args: {
-    items: [mockItems[0]],
+    city: "Lyon",
+    propertyType: "Maison",
+    surface: "200m²",
+    dpeGrade: "D",
+    ownerName: "DUPONT, Marie",
+    status: "dormant",
+    date: "3 janv. 2025",
+    aiSuggestions: 0,
   },
 };
 
-export const ManyItems: Story = {
+export const Pending: Story = {
   args: {
-    items: Array.from({ length: 8 }).map((_, i) => ({
-      id: `${i}`,
-      title: `Carnet ${i + 1}`,
-      count: Math.floor(Math.random() * 200) + 10,
-    })),
+    city: "Paris",
+    propertyType: "T2",
+    surface: "45m²",
+    dpeGrade: "C",
+    ownerName: "MARTIN, Jean",
+    status: "pending",
+    date: "8 mars 2026",
+    aiSuggestions: 2,
   },
 };
 
-export const Empty: Story = {
-  args: {
-    items: [],
-  },
+export const MultipleRows: Story = {
+  render: () => (
+    <div className="flex flex-col gap-[8px]">
+      <ListCarnet
+        city="Montpellier"
+        propertyType="T3"
+        surface="120m²"
+        dpeGrade="A"
+        ownerName="RASTAPOPULOS, Roberto"
+        status="active"
+        date="12 fév. 2026"
+        aiSuggestions={1}
+      />
+      <ListCarnet
+        city="Lyon"
+        propertyType="Maison"
+        surface="200m²"
+        dpeGrade="D"
+        ownerName="DUPONT, Marie"
+        status="dormant"
+        date="3 janv. 2025"
+        aiSuggestions={0}
+      />
+      <ListCarnet
+        city="Paris"
+        propertyType="T2"
+        surface="45m²"
+        dpeGrade="C"
+        ownerName="MARTIN, Jean"
+        status="pending"
+        date="8 mars 2026"
+        aiSuggestions={2}
+      />
+    </div>
+  ),
 };

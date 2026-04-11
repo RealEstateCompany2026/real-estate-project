@@ -1,134 +1,128 @@
-/**
- * MOLECULE: ListAnnonce
- *
- * Liste des annonces avec informations détaillées et badges de workflow
- * Composé exclusivement d'atoms du design system :
- * - Chip (avec icônes) pour les informations texte+icône
- * - IconDpe pour le badge DPE
- * - Badge pour les statuts de workflow (ÉDITION, RÉVISION, PUBLICATION)
- * - Button pour l'action "Voir"
- * - AiSuggestion pour les suggestions IA
- *
- * Les 3 badges de workflow sont TOUJOURS présents :
- * - Édition : disabled / warning / success
- * - Révision : disabled / warning / success
- * - Publication : disabled / warning / success
- *
- * Supporte les modes light et dark via tokens CSS
- */
-
 "use client";
 
 import React from "react";
-import { IconDpe, DpeType } from "./IconDpe";
+import { MapPin, Home, Maximize2, UserCircle, ArrowRight } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
-import { AiSuggestion } from "./AiSuggestion";
 import { Button } from "./Button";
-import { Chip } from "./Chip";
-import {
-  LocationIcon,
-  HomeIcon,
-  FormatSquareIcon,
-  ProfileCircleIcon,
-  ArrowRightIcon
-} from "./icons";
+import { AiSuggestion } from "./AiSuggestion";
+import { DpeBadge, DpeGrade } from "./DpeBadge";
 
-export interface ListAnnonceItem {
-  location: string;
-  type: string;
-  surface: string;
-  dpe: DpeType;
-  owner: string;
-  editionStatus: BadgeVariant; // Statut du badge Édition (disabled / warning / success)
-  revisionStatus: BadgeVariant; // Statut du badge Révision (disabled / warning / success)
-  publicationStatus: BadgeVariant; // Statut du badge Publication (disabled / warning / success)
-  aiSuggestions?: number;
-  onView?: () => void;
+/**
+ * ListAnnonce - Ligne de liste annonce immobilière
+ * Organism du design system RealAgent
+ *
+ * Ligne simple (70px) :
+ * - Gauche : ville, type, surface, DPE, propriétaire
+ * - Droite : 3 badges workflow (édition, révision, publication), bouton "Voir >", AI suggestions
+ *
+ * Les 3 badges de workflow sont TOUJOURS présents avec chacun leur statut :
+ *   disabled = étape non commencée
+ *   warning  = étape en cours
+ *   success  = étape terminée
+ *
+ * Figma : "List . annonce" — h=70px, pl=34, pr=31, py=25, justify-between
+ */
+
+export interface AnnonceWorkflow {
+  edition: BadgeVariant;
+  revision: BadgeVariant;
+  publication: BadgeVariant;
 }
 
 export interface ListAnnonceProps {
-  items?: ListAnnonceItem[];
+  /** Ville / commune */
+  city: string;
+  /** Type de bien (T3, Maison, etc.) */
+  propertyType: string;
+  /** Surface (ex: "120m²") */
+  surface: string;
+  /** Note DPE (A-G) */
+  dpeGrade?: DpeGrade;
+  /** Nom du propriétaire */
+  ownerName: string;
+  /** Statuts des 3 étapes du workflow */
+  workflow: AnnonceWorkflow;
+  /** Nombre de suggestions IA */
+  aiSuggestions?: number;
+  /** Callback au clic sur "Voir" */
+  onView?: () => void;
+  /** Callback au clic sur la ligne */
+  onClick?: () => void;
+  /** Classes CSS additionnelles */
+  className?: string;
 }
 
-const defaultItems: ListAnnonceItem[] = [
-  {
-    location: "Montpellier",
-    type: "T3",
-    surface: "120m²",
-    dpe: "A",
-    owner: "RASTAPOPULOS, Roberto",
-    editionStatus: "success",
-    revisionStatus: "success",
-    publicationStatus: "warning",
-    aiSuggestions: 1,
-  },
-];
-
-export const ListAnnonce: React.FC<ListAnnonceProps> = ({
-  items = defaultItems,
-}) => {
+/**
+ * Icon+Text atom
+ */
+function IconText({
+  icon,
+  children,
+}: {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="space-y-2">
-      {items.map((item, index) => (
-        <div
-          key={index}
-          className="content-stretch flex flex-col items-start pl-[34px] pr-[31px] relative rounded-[16px] bg-surface-neutral-default border border-edge-default h-[70px]"
-        >
-          <div className="content-stretch flex items-center justify-between relative shrink-0 w-full h-full">
-            {/* Partie gauche : Informations principales */}
-            <div className="content-stretch flex gap-[24px] items-center relative shrink-0">
-              {/* Localisation */}
-              <Chip icon={<LocationIcon />} size="medium">
-                {item.location}
-              </Chip>
-
-              {/* Type de bien */}
-              <Chip icon={<HomeIcon />} size="medium">
-                {item.type}
-              </Chip>
-
-              {/* Surface */}
-              <Chip icon={<FormatSquareIcon />} size="medium">
-                {item.surface}
-              </Chip>
-
-              {/* DPE */}
-              <IconDpe classe={item.dpe} size="small" />
-
-              {/* Propriétaire */}
-              <Chip icon={<ProfileCircleIcon />} size="medium">
-                {item.owner}
-              </Chip>
-            </div>
-
-            {/* Partie droite : Workflow + Action + AI Suggestion */}
-            <div className="content-stretch flex gap-[24px] items-center relative shrink-0">
-              {/* Badges de workflow */}
-              <Badge key="edition" variant={item.editionStatus}>
-                ÉDITION
-              </Badge>
-              <Badge key="revision" variant={item.revisionStatus}>
-                RÉVISION
-              </Badge>
-              <Badge key="publication" variant={item.publicationStatus}>
-                PUBLICATION
-              </Badge>
-
-              {/* Bouton "Voir" */}
-              <Button
-                variant="neutral"
-                iconRight={<ArrowRightIcon />}
-                onClick={item.onView}
-              >
-                Voir
-              </Button>
-
-              {/* Badge AI suggestion */}
-              <AiSuggestion count={item.aiSuggestions ?? 0} />
-            </div>
-          </div>
-        </div>
-      ))}
+    <div className="inline-flex gap-[4px] items-center shrink-0">
+      <div className="shrink-0 size-[20px] flex items-center justify-center">
+        {icon}
+      </div>
+      <span className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
+        {children}
+      </span>
     </div>
   );
-};
+}
+
+export function ListAnnonce({
+  city,
+  propertyType,
+  surface,
+  dpeGrade,
+  ownerName,
+  workflow,
+  aiSuggestions = 0,
+  onView,
+  onClick,
+  className = "",
+}: ListAnnonceProps) {
+  const iconColor = "var(--icon-neutral-default)";
+
+  return (
+    <div
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between h-[70px] pl-[34px] pr-[31px] cursor-pointer transition-colors ${className}`.trim()}
+      onClick={onClick}
+    >
+      {/* Gauche : infos du bien + propriétaire */}
+      <div className="flex gap-[24px] items-center shrink-0">
+        <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
+          {city}
+        </IconText>
+        <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
+          {propertyType}
+        </IconText>
+        <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
+          {surface}
+        </IconText>
+        {dpeGrade && <DpeBadge grade={dpeGrade} />}
+        <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
+          {ownerName}
+        </IconText>
+      </div>
+
+      {/* Droite : workflow badges + bouton Voir + AI suggestions */}
+      <div className="flex gap-[24px] items-center shrink-0">
+        <Badge variant={workflow.edition}>ÉDITION</Badge>
+        <Badge variant={workflow.revision}>RÉVISION</Badge>
+        <Badge variant={workflow.publication}>PUBLICATION</Badge>
+
+        <Button variant="ghost" size="default" onClick={onView}>
+          Voir
+          <ArrowRight size={20} />
+        </Button>
+
+        <AiSuggestion count={aiSuggestions} />
+      </div>
+    </div>
+  );
+}

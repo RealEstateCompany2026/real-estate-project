@@ -1,61 +1,89 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ListAnnonce, type ListAnnonceItem } from "../components/ListAnnonce";
+import { ListAnnonce } from "../components/ListAnnonce";
 
 const meta: Meta<typeof ListAnnonce> = {
-  title: "Design System/Molecules/ListAnnonce",
+  title: "Organisms/ListAnnonce",
   component: ListAnnonce,
+  parameters: {
+    layout: "padded",
+    docs: {
+      description: {
+        component:
+          "Ligne de liste annonce immobilière — infos bien + propriétaire + 3 badges workflow (édition, révision, publication) + bouton Voir + suggestions IA.",
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof ListAnnonce>;
 
-const mockItems: ListAnnonceItem[] = [
-  {
-    id: "1",
-    title: "Appartement 3 pièces - Paris 8ème",
-    price: "850 000 €",
-    status: "PUBLIEE",
-  },
-  {
-    id: "2",
-    title: "Maison 5 pièces - Boulogne",
-    price: "1 200 000 €",
-    status: "BROUILLON",
-  },
-  {
-    id: "3",
-    title: "Studio - Marais",
-    price: "450 000 €",
-    status: "ARCHIVEE",
-  },
-];
-
 export const Default: Story = {
   args: {
-    items: mockItems,
+    city: "Montpellier",
+    propertyType: "T3",
+    surface: "120m²",
+    dpeGrade: "A",
+    ownerName: "RASTAPOPULOS, Roberto",
+    workflow: { edition: "success", revision: "success", publication: "warning" },
+    aiSuggestions: 1,
   },
 };
 
-export const SingleItem: Story = {
+export const AllDone: Story = {
   args: {
-    items: [mockItems[0]],
+    city: "Lyon",
+    propertyType: "Maison",
+    surface: "200m²",
+    dpeGrade: "B",
+    ownerName: "DUPONT, Marie",
+    workflow: { edition: "success", revision: "success", publication: "success" },
+    aiSuggestions: 0,
   },
 };
 
-export const ManyItems: Story = {
+export const EarlyStage: Story = {
   args: {
-    items: Array.from({ length: 10 }).map((_, i) => ({
-      id: `${i}`,
-      title: `Propriété ${i + 1}`,
-      price: `${400000 + i * 50000} €`,
-      status: ["PUBLIEE", "BROUILLON", "ARCHIVEE"][i % 3] as any,
-    })),
+    city: "Paris",
+    propertyType: "T2",
+    surface: "45m²",
+    dpeGrade: "D",
+    ownerName: "MARTIN, Jean",
+    workflow: { edition: "warning", revision: "disabled", publication: "disabled" },
+    aiSuggestions: 3,
   },
 };
 
-export const Empty: Story = {
-  args: {
-    items: [],
-  },
+export const MultipleRows: Story = {
+  render: () => (
+    <div className="flex flex-col gap-[8px]">
+      <ListAnnonce
+        city="Montpellier"
+        propertyType="T3"
+        surface="120m²"
+        dpeGrade="A"
+        ownerName="RASTAPOPULOS, Roberto"
+        workflow={{ edition: "success", revision: "success", publication: "warning" }}
+        aiSuggestions={1}
+      />
+      <ListAnnonce
+        city="Lyon"
+        propertyType="Maison"
+        surface="200m²"
+        dpeGrade="B"
+        ownerName="DUPONT, Marie"
+        workflow={{ edition: "success", revision: "success", publication: "success" }}
+        aiSuggestions={0}
+      />
+      <ListAnnonce
+        city="Paris"
+        propertyType="T2"
+        surface="45m²"
+        dpeGrade="D"
+        ownerName="MARTIN, Jean"
+        workflow={{ edition: "warning", revision: "disabled", publication: "disabled" }}
+        aiSuggestions={3}
+      />
+    </div>
+  ),
 };
