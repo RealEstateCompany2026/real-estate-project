@@ -220,40 +220,48 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
           {/* Grille 3 colonnes : Identité / Contact / Professionnel */}
           <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px] mb-[50px]">
-            {/* Colonne 1 — Informations d'identité */}
+            {/* En-têtes colonnes */}
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
               Informations d&apos;identité
             </p>
-            {/* Colonne 2 — Informations de contact */}
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
               Informations de contact
             </p>
-            {/* Colonne 3 — Informations professionnelles */}
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
               Informations professionnelles
             </p>
 
             {/* Row 1 */}
-            <ProfileField label="Nom" value={client.lastName} />
-            <ProfileField label="Réside" value={client.address} />
+            <ProfileField label="Genre" value={client.gender} />
+            <ProfileField label="Adresse" value={client.address} />
             <ProfileField label="Profession" value={client.jobTitle} />
 
             {/* Row 2 */}
-            <ProfileField label="Prénom" value={client.firstName} />
+            <ProfileField label="Nom" value={client.lastName} />
             <ProfileField label="Tél. Mobile" value={client.mobilePhone} />
-            <ProfileField label="Revenus" value={client.incomeBracket} />
+            <ProfileField label="Employeur" value={client.employer} />
 
             {/* Row 3 */}
-            <ProfileField label="Né le" value={client.dateOfBirth ? new Date(client.dateOfBirth).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : null} />
+            <ProfileField label="Prénom" value={client.firstName} />
             <ProfileField label="Email (1)" value={client.primaryEmail} />
-            <div />
+            <ProfileField label="Revenus" value={client.incomeBracket} />
 
             {/* Row 4 */}
-            <ProfileField label="À" value={client.placeOfBirth} />
+            <ProfileField label="Né le" value={client.dateOfBirth ? new Date(client.dateOfBirth).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : null} />
             <ProfileField label="Email (2)" value={client.secondaryEmail} />
             <div />
 
             {/* Row 5 */}
+            <ProfileField label="Lieu de naissance" value={client.placeOfBirth} />
+            <ProfileField label="Canal préféré" value={client.preferredChannel} />
+            <div />
+
+            {/* Row 6 */}
+            <ProfileField label="Nationalité" value={client.nationality} />
+            <div />
+            <div />
+
+            {/* Row 7 */}
             <ProfileField label="Statut marital" value={client.maritalStatus} />
             <div />
             <div />
