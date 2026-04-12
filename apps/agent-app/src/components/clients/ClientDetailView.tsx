@@ -13,6 +13,7 @@ import { Spinner } from '@real-estate/ui/spinner';
 import { Badge } from '@real-estate/ui/badge';
 import { Button } from '@real-estate/ui/button';
 import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
+import { CardLog } from '@real-estate/ui/card-log';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -34,11 +35,20 @@ interface GraphDataPoint {
   value: number;
 }
 
+interface ActivityLog {
+  date: string;
+  time: string;
+  author: string;
+  category: string;
+  description: string;
+}
+
 interface ClientDetailData {
   client: Client;
   kpis: ClientKpis;
   aiSuggestions: number;
   graphData: GraphDataPoint[];
+  activities: ActivityLog[];
 }
 
 // ---------------------------------------------------------------------------
@@ -64,6 +74,39 @@ function mockGraphData(): GraphDataPoint[] {
     { label: '15 mai', value: 28 },
     { label: '22 mai', value: 22 },
     { label: '29 mai', value: 38 },
+  ];
+}
+
+function mockActivities(): ActivityLog[] {
+  return [
+    {
+      date: '12 fév. 2026',
+      time: '12:56',
+      author: 'Jean Dupont',
+      category: 'Appel',
+      description: 'Appel sortant pour confirmer la visite du bien rue de Rivoli.',
+    },
+    {
+      date: '10 fév. 2026',
+      time: '09:30',
+      author: 'Marie Martin',
+      category: 'Email',
+      description: 'Envoi du dossier de présentation du bien à Neuilly-sur-Seine.',
+    },
+    {
+      date: '07 fév. 2026',
+      time: '14:15',
+      author: 'Jean Dupont',
+      category: 'Visite',
+      description: 'Visite du T4 boulevard Haussmann avec le client.',
+    },
+    {
+      date: '03 fév. 2026',
+      time: '16:42',
+      author: 'Sophie Leclerc',
+      category: 'Note',
+      description: 'Client intéressé par les biens avec terrasse, budget revu à la hausse.',
+    },
   ];
 }
 
@@ -130,6 +173,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         kpis: mockKpis(),
         aiSuggestions: Math.floor(Math.random() * 15) + 1,
         graphData: mockGraphData(),
+        activities: mockActivities(),
       });
       setIsLoading(false);
     }
@@ -157,7 +201,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
-  const { client, kpis, aiSuggestions, graphData } = data;
+  const { client, kpis, aiSuggestions, graphData, activities } = data;
   const clientName = `${client.lastName?.toUpperCase()}, ${client.firstName}`;
   const tags = statusToTags(client.status ?? []);
 
@@ -276,7 +320,29 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
         {/* Bloc 3 — Activités */}
         <section ref={setSectionRef('activites')} id="activites" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Activités */}
+          {/* Header : titre + badge count */}
+          <div className="flex items-center gap-[4px] mb-[50px]">
+            <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+              Activités
+            </h3>
+            <Badge variant="default">{activities.length}</Badge>
+          </div>
+
+          {/* Liste des activités */}
+          <div className="flex flex-col">
+            {activities.map((activity, index) => (
+              <div key={index} className="border-t border-edge-default">
+                <CardLog
+                  date={activity.date}
+                  time={activity.time}
+                  author={activity.author}
+                  category={activity.category}
+                  description={activity.description}
+                  className="w-full"
+                />
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Bloc 4 — Affaires */}

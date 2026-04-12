@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Badge } from "./Badge";
 
 /**
  * CardLog - Carte d'activité / log
@@ -78,18 +79,9 @@ export const CardLog: React.FC<CardLogProps> = ({
               {author}
             </span>
           </div>
-          <div
-            className="inline-flex items-center h-[20px] px-[8px] py-[4px]
-              rounded-[16px] border border-solid shrink-0"
-            style={{ borderColor: "var(--border-neutral-default)" }}
-          >
-            <span
-              className="text-[12px] font-bold leading-[14px] tracking-[0.12px] whitespace-nowrap text-center"
-              style={{ color: "var(--text-caption)" }}
-            >
-              {category}
-            </span>
-          </div>
+          <Badge variant="default">
+            {category}
+          </Badge>
         </div>
 
         {/* Row 3 — Description */}
