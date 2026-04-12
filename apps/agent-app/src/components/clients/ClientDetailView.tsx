@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Pencil } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -10,6 +10,9 @@ import { GraphCourbe } from '@real-estate/ui/graph-courbe';
 import { AppBarClientAncres } from '@real-estate/ui/app-bar-client-ancres';
 import { IconButtonMega } from '@real-estate/ui/icon-button-mega';
 import { Spinner } from '@real-estate/ui/spinner';
+import { Badge } from '@real-estate/ui/badge';
+import { Button } from '@real-estate/ui/button';
+import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -78,6 +81,20 @@ function statusToTags(status: ClientStatus[]): string[] {
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
+
+/** Label/valeur pour la grille Profil — correspond au "Body . md . light" du Figma */
+function ProfileField({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="flex gap-[16px] py-[8px]">
+      <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption shrink-0 w-[112px]">
+        {label}
+      </span>
+      <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-body">
+        {value || '-'}
+      </span>
+    </div>
+  );
+}
 
 interface ClientDetailViewProps {
   clientId: string;
@@ -184,7 +201,69 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       <div className="flex flex-col">
         {/* Bloc 2 — Profil */}
         <section ref={setSectionRef('profil')} id="profil" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Profil */}
+          {/* Header : titre + badge count + bouton Éditer */}
+          <div className="flex items-center justify-between mb-[50px]">
+            <div className="flex items-center gap-[4px]">
+              <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+                Profil
+              </h3>
+              <Badge variant="default">{client.completionScore}</Badge>
+            </div>
+            <Button
+              variant="ghost"
+              onClick={() => router.push(`/clients/${client.id}/edit`)}
+            >
+              <Pencil size={16} />
+              Éditer
+            </Button>
+          </div>
+
+          {/* Grille 3 colonnes : Identité / Contact / Professionnel */}
+          <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px] mb-[50px]">
+            {/* Colonne 1 — Informations d'identité */}
+            <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+              Informations d&apos;identité
+            </p>
+            {/* Colonne 2 — Informations de contact */}
+            <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+              Informations de contact
+            </p>
+            {/* Colonne 3 — Informations professionnelles */}
+            <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+              Informations professionnelles
+            </p>
+
+            {/* Row 1 */}
+            <ProfileField label="Nom" value={client.lastName} />
+            <ProfileField label="Réside" value={client.address} />
+            <ProfileField label="Profession" value={client.jobTitle} />
+
+            {/* Row 2 */}
+            <ProfileField label="Prénom" value={client.firstName} />
+            <ProfileField label="Tél. Mobile" value={client.mobilePhone} />
+            <ProfileField label="Revenus" value={client.incomeBracket} />
+
+            {/* Row 3 */}
+            <ProfileField label="Né le" value={client.dateOfBirth ? new Date(client.dateOfBirth).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : null} />
+            <ProfileField label="Email (1)" value={client.primaryEmail} />
+            <div />
+
+            {/* Row 4 */}
+            <ProfileField label="À" value={client.placeOfBirth} />
+            <ProfileField label="Email (2)" value={client.secondaryEmail} />
+            <div />
+
+            {/* Row 5 */}
+            <ProfileField label="Statut marital" value={client.maritalStatus} />
+            <div />
+            <div />
+          </div>
+
+          {/* AiSuggestionBanner */}
+          <AiSuggestionBanner
+            suggestion="Suggestion d'actions pour compléter la fiche contact du client. Suggestion d'actions pour compléter la fiche contact du client"
+            actionLabel="Programmer"
+          />
         </section>
 
         {/* Bloc 3 — Activités */}
