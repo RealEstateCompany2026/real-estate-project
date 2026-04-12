@@ -14,6 +14,7 @@ import { Badge } from '@real-estate/ui/badge';
 import { Button } from '@real-estate/ui/button';
 import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
+import { Chip } from '@real-estate/ui/chip';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -41,6 +42,7 @@ interface ActivityLog {
   author: string;
   category: string;
   description: string;
+  badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled';
 }
 
 interface ClientDetailData {
@@ -82,30 +84,34 @@ function mockActivities(): ActivityLog[] {
     {
       date: '12 fév. 2026',
       time: '12:56',
-      author: 'Jean Dupont',
-      category: 'Appel',
-      description: 'Appel sortant pour confirmer la visite du bien rue de Rivoli.',
+      author: 'Le client',
+      category: 'QUALIFICATION',
+      description: 'Le client a fait le des place d\'dentist coutume.',
+      badgeVariant: 'success',
     },
     {
       date: '10 fév. 2026',
       time: '09:30',
-      author: 'Marie Martin',
-      category: 'Email',
-      description: 'Envoi du dossier de présentation du bien à Neuilly-sur-Seine.',
+      author: 'Système',
+      category: 'ENGAGEMENT',
+      description: 'Un message a été envoyé au client pour lui confirmer un primo-a conversation de la transaction.',
+      badgeVariant: 'information',
     },
     {
       date: '07 fév. 2026',
       time: '14:15',
-      author: 'Jean Dupont',
-      category: 'Visite',
-      description: 'Visite du T4 boulevard Haussmann avec le client.',
+      author: 'Titre le registre',
+      category: 'QUALIFICATION',
+      description: 'Le client a été scruté à trouver une pièce d\'identité valide.',
+      badgeVariant: 'success',
     },
     {
       date: '03 fév. 2026',
       time: '16:42',
-      author: 'Sophie Leclerc',
-      category: 'Note',
-      description: 'Client intéressé par les biens avec terrasse, budget revu à la hausse.',
+      author: 'Mail',
+      category: 'CONVERSION',
+      description: "L'offre de montant de vente forfaits a été envoyée au client.",
+      badgeVariant: 'warning',
     },
   ];
 }
@@ -320,27 +326,38 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
         {/* Bloc 3 — Activités */}
         <section ref={setSectionRef('activites')} id="activites" className="py-[50px] border-t border-edge-default">
-          {/* Header : titre + badge count */}
-          <div className="flex items-center gap-[4px] mb-[50px]">
-            <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
-              Activités
-            </h3>
-            <Badge variant="default">{activities.length}</Badge>
+          {/* Header : titre + badge + chips filtre + bouton Voir tout */}
+          <div className="flex items-center justify-between mb-[50px]">
+            <div className="flex items-center gap-[12px]">
+              <div className="flex items-center gap-[4px]">
+                <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+                  Activités
+                </h3>
+                <Badge variant="default">{activities.length}</Badge>
+              </div>
+              <Chip selected onClick={() => {}} label="Tout" />
+              <Chip onClick={() => {}} label="Qualification" />
+              <Chip onClick={() => {}} label="Engagement" />
+              <Chip onClick={() => {}} label="Conversion" />
+            </div>
+            <Button variant="ghost" onClick={() => {}}>
+              Voir tout &gt;
+            </Button>
           </div>
 
           {/* Liste des activités */}
           <div className="flex flex-col">
             {activities.map((activity, index) => (
-              <div key={index} className="border-t border-edge-default">
-                <CardLog
-                  date={activity.date}
-                  time={activity.time}
-                  author={activity.author}
-                  category={activity.category}
-                  description={activity.description}
-                  className="w-full"
-                />
-              </div>
+              <CardLog
+                key={index}
+                date={activity.date}
+                time={activity.time}
+                author={activity.author}
+                category={activity.category}
+                description={activity.description}
+                badgeVariant={activity.badgeVariant}
+                className="w-full"
+              />
             ))}
           </div>
         </section>

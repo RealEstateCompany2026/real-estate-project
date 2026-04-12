@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Badge } from "./Badge";
+import { Badge, type BadgeVariant } from "./Badge";
 
 /**
  * CardLog - Carte d'activité / log
@@ -33,6 +33,8 @@ export interface CardLogProps {
   category: string;
   /** Description de l'activité */
   description: string;
+  /** Variant couleur du badge catégorie (default, success, warning, error, information, disabled) */
+  badgeVariant?: BadgeVariant;
   className?: string;
 }
 
@@ -42,6 +44,7 @@ export const CardLog: React.FC<CardLogProps> = ({
   author,
   category,
   description,
+  badgeVariant = "default",
   className = "",
 }) => {
   return (
@@ -79,7 +82,7 @@ export const CardLog: React.FC<CardLogProps> = ({
               {author}
             </span>
           </div>
-          <Badge variant="default">
+          <Badge variant={badgeVariant}>
             {category}
           </Badge>
         </div>
