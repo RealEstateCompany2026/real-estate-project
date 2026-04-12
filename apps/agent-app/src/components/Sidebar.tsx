@@ -66,7 +66,7 @@ export function Sidebar() {
               className={`flex flex-col items-center justify-center gap-0.5 w-full py-2 rounded-lg transition-colors ${
                 active
                   ? 'bg-surface-neutral-action text-icon-neutral-action font-bold'
-                  : 'text-neutral-300 hover:bg-surface-neutral-action-hover hover:text-icon-branded-action-hover'
+                  : 'text-icon-placeholder hover:bg-surface-neutral-action-hover hover:text-icon-branded-action-hover'
               }`}
               title={item.label}
             >
