@@ -14,3 +14,46 @@ body {
   color: var(--text-body);
   background: var(--surface-neutral-default);
 }
+
+/* ═══════════════════════════════════════════════════════
+   Page content wrapper — constrain width like Figma
+   Figma ref: 1440px screen, NavRail 90px, content 1191px
+   Applied via (app)/layout.tsx on all app pages.
+   Components inside NEVER set their own max-width.
+   ═══════════════════════════════════════════════════════ */
+.page-content {
+  width: 100%;
+  max-width: 1191px;
+}
+
+/* Large screens: content stays at 1191px, centered */
+@media (min-width: 1440px) {
+  .page-content {
+    max-width: 1191px;
+  }
+}
+
+/* Medium-large: slightly tighter, still fluid */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .page-content {
+    max-width: 100%;
+  }
+}
+
+/* Tablet: reduce horizontal padding */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .page-content {
+    max-width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* Compact */
+@media (max-width: 1023px) {
+  .page-content {
+    max-width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
