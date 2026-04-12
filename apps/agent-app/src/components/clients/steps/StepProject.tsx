@@ -2,6 +2,7 @@
 
 import { useFormContext } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
+import { InputField } from '@real-estate/ui/input-field';
 
 /**
  * Étape 3 — Résumé du projet (CLI-05).
@@ -15,27 +16,18 @@ export function StepProject() {
   return (
     <div className="space-y-6">
       <div>
-        <label htmlFor="searchCriteriaSummary" className="block text-sm font-bold text-neutral-anthracite mb-1">
-          Résumé du projet
-        </label>
-        <p className="text-xs text-neutral-grey-bold mb-3">
-          Décrivez brièvement le projet du client (achat, vente, location...). Les critères détaillés
-          seront saisis dans le Mandat/Affaire (P10).
-        </p>
-        <textarea
+        <InputField
+          label="Résumé du projet"
           id="searchCriteriaSummary"
-          {...register('searchCriteriaSummary')}
+          as="textarea"
           rows={5}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors resize-y"
+          {...register('searchCriteriaSummary')}
           placeholder="Ex : Recherche T3/T4 à Paris 11ème, budget 500-650k€, pour résidence principale..."
           maxLength={500}
+          error={errors.searchCriteriaSummary?.message}
+          helperText={`${summary.length}/500`}
+          description="Décrivez brièvement le projet du client (achat, vente, location...). Les critères détaillés seront saisis dans le Mandat/Affaire (P10)."
         />
-        <div className="flex justify-between mt-1">
-          {errors.searchCriteriaSummary && (
-            <p className="text-xs text-semantic-destructive">{errors.searchCriteriaSummary.message}</p>
-          )}
-          <p className="text-xs text-neutral-grey-bold ml-auto">{summary.length}/500</p>
-        </div>
       </div>
 
       <div className="p-4 rounded-lg bg-background-softBlue/50 border border-primary/10">

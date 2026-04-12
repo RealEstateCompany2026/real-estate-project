@@ -34,7 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <ToastProvider>
-      <div className="flex min-h-screen bg-[var(--surface-page)]">
+      <div className="flex min-h-screen bg-surface-page">
         <Sidebar />
         <main className="flex-1 pl-[90px]">{children}</main>
       </div>

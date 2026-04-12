@@ -2,6 +2,7 @@
 
 import { useFormContext } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
+import { InputField } from '@real-estate/ui/input-field';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { useDuplicateCheck } from '@/hooks/useDuplicateCheck';
 import { DuplicateAlert } from '@/components/ui/DuplicateAlert';
@@ -38,57 +39,37 @@ export function StepContact() {
       <DuplicateAlert matches={matches} onDismiss={dismiss} />
 
       {/* Email principal */}
-      <div>
-        <label htmlFor="primaryEmail" className="block text-sm font-bold text-neutral-anthracite mb-1">
-          Email <span className="text-semantic-destructive">*</span>
-        </label>
-        <input
-          id="primaryEmail"
-          type="email"
-          {...register('primaryEmail')}
-          onBlur={handleEmailBlur}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors"
-          placeholder="email@exemple.com"
-        />
-        {errors.primaryEmail && (
-          <p className="text-xs text-semantic-destructive mt-1">{errors.primaryEmail.message}</p>
-        )}
-      </div>
+      <InputField
+        label="Email"
+        id="primaryEmail"
+        type="email"
+        {...register('primaryEmail')}
+        onBlur={handleEmailBlur}
+        placeholder="email@exemple.com"
+        error={errors.primaryEmail?.message}
+        required
+      />
 
       {/* Email secondaire */}
-      <div>
-        <label htmlFor="secondaryEmail" className="block text-sm font-bold text-neutral-anthracite mb-1">
-          Email secondaire
-        </label>
-        <input
-          id="secondaryEmail"
-          type="email"
-          {...register('secondaryEmail')}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors"
-          placeholder="email-secondaire@exemple.com"
-        />
-        {errors.secondaryEmail && (
-          <p className="text-xs text-semantic-destructive mt-1">{errors.secondaryEmail.message}</p>
-        )}
-      </div>
+      <InputField
+        label="Email secondaire"
+        id="secondaryEmail"
+        type="email"
+        {...register('secondaryEmail')}
+        placeholder="email-secondaire@exemple.com"
+        error={errors.secondaryEmail?.message}
+      />
 
       {/* Téléphone */}
-      <div>
-        <label htmlFor="mobilePhone" className="block text-sm font-bold text-neutral-anthracite mb-1">
-          Téléphone mobile
-        </label>
-        <input
-          id="mobilePhone"
-          type="tel"
-          {...register('mobilePhone')}
-          onBlur={handlePhoneBlur}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors"
-          placeholder="06 12 34 56 78"
-        />
-        {errors.mobilePhone && (
-          <p className="text-xs text-semantic-destructive mt-1">{errors.mobilePhone.message}</p>
-        )}
-      </div>
+      <InputField
+        label="Téléphone mobile"
+        id="mobilePhone"
+        type="tel"
+        {...register('mobilePhone')}
+        onBlur={handlePhoneBlur}
+        placeholder="06 12 34 56 78"
+        error={errors.mobilePhone?.message}
+      />
 
       {/* Adresse */}
       <div>

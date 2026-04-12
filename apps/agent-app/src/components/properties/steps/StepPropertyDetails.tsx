@@ -4,6 +4,8 @@ import { useFormContext } from 'react-hook-form';
 import type { PropertyCreateData } from '@/lib/validations/property';
 import { PROPERTY_CONDITION_LABELS } from '@/types/property';
 import type { PropertyCondition } from '@/types/property';
+import { InputField } from '@real-estate/ui/input-field';
+import { Chip } from '@real-estate/ui/chip';
 
 const CONDITION_OPTIONS: { value: PropertyCondition; label: string }[] = [
   { value: 'NEUF', label: PROPERTY_CONDITION_LABELS.NEUF },
@@ -28,49 +30,32 @@ export function StepPropertyDetails() {
       </p>
 
       <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label htmlFor="floorLevel" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Étage
-          </label>
-          <input
-            id="floorLevel"
-            type="number"
-            min={0}
-            {...register('floorLevel', { valueAsNumber: true })}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-            placeholder="3"
-          />
-        </div>
-        <div>
-          <label htmlFor="numberOfFloors" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Nombre de niveaux
-          </label>
-          <input
-            id="numberOfFloors"
-            type="number"
-            min={0}
-            {...register('numberOfFloors', { valueAsNumber: true })}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-            placeholder="1"
-          />
-        </div>
-        <div>
-          <label htmlFor="constructionYear" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Année de construction
-          </label>
-          <input
-            id="constructionYear"
-            type="number"
-            min={1800}
-            max={new Date().getFullYear() + 2}
-            {...register('constructionYear', { valueAsNumber: true })}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-            placeholder="2005"
-          />
-          {errors.constructionYear && (
-            <p className="text-xs text-semantic-destructive mt-1">{errors.constructionYear.message}</p>
-          )}
-        </div>
+        <InputField
+          label="Étage"
+          id="floorLevel"
+          type="number"
+          min={0}
+          {...register('floorLevel', { valueAsNumber: true })}
+          placeholder="3"
+        />
+        <InputField
+          label="Nombre de niveaux"
+          id="numberOfFloors"
+          type="number"
+          min={0}
+          {...register('numberOfFloors', { valueAsNumber: true })}
+          placeholder="1"
+        />
+        <InputField
+          label="Année de construction"
+          id="constructionYear"
+          type="number"
+          min={1800}
+          max={new Date().getFullYear() + 2}
+          {...register('constructionYear', { valueAsNumber: true })}
+          placeholder="2005"
+          error={errors.constructionYear?.message}
+        />
       </div>
 
       {/* État général */}
@@ -80,18 +65,13 @@ export function StepPropertyDetails() {
         </label>
         <div className="flex flex-wrap gap-2">
           {CONDITION_OPTIONS.map((opt) => (
-            <button
+            <Chip
               key={opt.value}
-              type="button"
+              label={opt.label}
               onClick={() => setValue('condition', opt.value, { shouldValidate: true })}
-              className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-                selectedCondition === opt.value
-                  ? 'border-primary bg-background-softBlue text-primary font-bold'
-                  : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
-              }`}
-            >
-              {opt.label}
-            </button>
+              selected={selectedCondition === opt.value}
+              variant={selectedCondition === opt.value ? 'filled' : 'outlined'}
+            />
           ))}
         </div>
       </div>

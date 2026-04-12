@@ -7,6 +7,7 @@ import type { DealListItem } from '@/types/deal';
 import { DEAL_TYPE_LABELS, DEAL_STATUS_LABELS, PIPELINE_STAGE_LABELS } from '@/types/deal';
 import type { DealType, DealStatus, PipelineStage } from '@/types/deal';
 import { formatPrice, formatDate } from '@/lib/utils/format';
+import { Spinner } from '@real-estate/ui/spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 interface ClientSectionDealsProps {
@@ -38,7 +39,7 @@ export function ClientSectionDeals({ clientId }: ClientSectionDealsProps) {
   }, [clientId]);
 
   if (isLoading) {
-    return <div className="h-20 flex items-center justify-center text-sm text-neutral-grey-bold">Chargement...</div>;
+    return <div className="h-20 flex items-center justify-center"><Spinner /></div>;
   }
 
   if (deals.length === 0) {

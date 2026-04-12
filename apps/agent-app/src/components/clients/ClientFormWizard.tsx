@@ -6,6 +6,8 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { clientCreateSchema, type ClientCreateData } from '@/lib/validations/client';
 import { createClient } from '@/lib/supabase/client';
+import { Button } from '@real-estate/ui/button';
+import { Divider } from '@real-estate/ui/divider';
 import { useToast } from '@/components/ui/Toast';
 
 import { StepIdentity } from './steps/StepIdentity';
@@ -132,32 +134,29 @@ export function ClientFormWizard() {
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-neutral-grey-light">
-          <button
-            type="button"
+        <Divider className="my-8" />
+        <div className="flex items-center justify-between">
+          <Button
+            variant="secondary"
             onClick={goBack}
             disabled={currentStep === 0}
-            className="px-6 py-2.5 rounded-lg text-sm font-bold text-neutral-grey-bold hover:text-neutral-anthracite hover:bg-background-subtle transition-colors disabled:opacity-0"
           >
             Retour
-          </button>
+          </Button>
 
           {isLastStep ? (
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-2.5 rounded-lg text-sm font-bold text-white bg-primary hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {isSubmitting ? 'Création...' : 'Créer le client'}
-            </button>
+            </Button>
           ) : (
-            <button
-              type="button"
+            <Button
               onClick={goNext}
-              className="px-8 py-2.5 rounded-lg text-sm font-bold text-white bg-primary hover:opacity-90 transition-opacity"
             >
               Continuer
-            </button>
+            </Button>
           )}
         </div>
       </form>

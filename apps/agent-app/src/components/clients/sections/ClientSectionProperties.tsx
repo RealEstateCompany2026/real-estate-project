@@ -8,6 +8,8 @@ import type { PropertyListItem } from '@/types/property';
 import { PROPERTY_TYPE_LABELS, PROPERTY_STATUS_LABELS, PROPERTY_STATUS_COLORS } from '@/types/property';
 import type { PropertyType, PropertyStatus } from '@/types/property';
 import { formatPrice, formatSurface } from '@/lib/utils/format';
+import { Button } from '@real-estate/ui/button';
+import { Spinner } from '@real-estate/ui/spinner';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { EmptyState } from '@/components/ui/EmptyState';
 
@@ -39,7 +41,7 @@ export function ClientSectionProperties({ clientId }: ClientSectionPropertiesPro
   }, [clientId]);
 
   if (isLoading) {
-    return <div className="h-20 flex items-center justify-center text-sm text-neutral-grey-bold">Chargement...</div>;
+    return <div className="h-20 flex items-center justify-center"><Spinner /></div>;
   }
 
   if (properties.length === 0) {
@@ -49,12 +51,12 @@ export function ClientSectionProperties({ clientId }: ClientSectionPropertiesPro
         title="Aucun bien"
         description="Les biens associés à ce client apparaîtront ici."
         action={
-          <Link
+          <Button
+            as={Link}
             href="/properties/new"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-primary bg-background-softBlue hover:bg-primary hover:text-white transition-colors"
           >
             Ajouter un bien
-          </Link>
+          </Button>
         }
       />
     );
@@ -101,13 +103,12 @@ export function ClientSectionProperties({ clientId }: ClientSectionPropertiesPro
       ))}
 
       {!showAll && properties.length > 3 && (
-        <button
-          type="button"
+        <Button
+          variant="link"
           onClick={() => setShowAll(true)}
-          className="text-sm text-primary font-bold hover:underline"
         >
           Voir tout ({properties.length})
-        </button>
+        </Button>
       )}
     </div>
   );

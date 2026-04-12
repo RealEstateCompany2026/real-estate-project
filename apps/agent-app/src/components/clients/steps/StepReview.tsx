@@ -5,6 +5,8 @@ import type { ClientCreateData } from '@/lib/validations/client';
 import { CLIENT_STATUS_LABELS, CLIENT_GENDER_LABELS, CLIENT_SOURCE_LABELS } from '@/types/client';
 import type { ClientGender, ClientStatus, ClientSource } from '@/types/client';
 import { useCompletionScore } from '@/hooks/useCompletionScore';
+import { Badge } from '@real-estate/ui/badge';
+import { Chip } from '@real-estate/ui/chip';
 import { CompletionGauge } from '@/components/ui/CompletionGauge';
 
 /**
@@ -66,14 +68,13 @@ export function StepReview() {
             </div>
           )}
           {data.tags && data.tags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
+            <div className="mt-2 flex flex-wrap gap-2">
               {data.tags.map((tag) => (
-                <span
+                <Chip
                   key={tag}
-                  className="px-2 py-0.5 rounded-md bg-background-softBlue text-primary text-xs font-bold"
-                >
-                  {tag}
-                </span>
+                  label={tag}
+                  variant="filled"
+                />
               ))}
             </div>
           )}

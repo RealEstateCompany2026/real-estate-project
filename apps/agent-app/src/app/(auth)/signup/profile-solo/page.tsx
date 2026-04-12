@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { StepperDots } from '@/components/auth'
 import { profileSoloSchema } from '@/lib/validations/auth'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
+import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function ProfileSoloPage() {
   const [firstName, setFirstName] = useState('')
@@ -84,55 +87,33 @@ export default function ProfileSoloPage() {
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-              Prénom *
-            </label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-              Nom *
-            </label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Téléphone mobile *
-          </label>
-          <input
-            type="tel"
-            value={mobilePhone}
-            onChange={(e) => setMobilePhone(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-            placeholder="+33 6 00 00 00 00"
+          <TextField
+            type="text"
+            value={firstName}
+            onChange={setFirstName}
+            required
+          />
+          <TextField
+            type="text"
+            value={lastName}
+            onChange={setLastName}
             required
           />
         </div>
 
+        <TextField
+          type="tel"
+          value={mobilePhone}
+          onChange={setMobilePhone}
+          placeholder="+33 6 00 00 00 00"
+          required
+        />
+
         <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            N° carte professionnelle (T) *
-          </label>
-          <input
+          <TextField
             type="text"
             value={rsacNumber}
-            onChange={(e) => setRsacNumber(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
+            onChange={setRsacNumber}
             placeholder="CPI XXXX XXXX XXXX"
             required
           />
@@ -146,26 +127,26 @@ export default function ProfileSoloPage() {
         </p>
 
         {error && (
-          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
-            {error}
-          </div>
+          <InlineMessage type="error" message={error} />
         )}
 
         <div className="flex gap-4 pt-2">
-          <button
+          <Button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors"
+            variant="outline"
+            className="flex-1"
           >
             Retour
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={!isValid || isLoading}
-            className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            className="flex-1"
           >
             {isLoading ? 'Enregistrement…' : 'Continuer'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

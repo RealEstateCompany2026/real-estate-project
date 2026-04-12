@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { StepperDots, InfoCard } from '@/components/auth'
 import { X } from 'lucide-react'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
 
 export default function TeamInvitationPage() {
   const [email, setEmail] = useState('')
@@ -45,30 +47,23 @@ export default function TeamInvitationPage() {
       </p>
 
       <div className="mt-8 space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Email du collaborateur
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMember())}
-              className="flex-1 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-              placeholder="collegue@agence.com"
-            />
-          </div>
-        </div>
+        <TextField
+          type="email"
+          value={email}
+          onChange={setEmail}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMember())}
+          placeholder="collegue@agence.com"
+        />
 
-        <button
+        <Button
           type="button"
           onClick={handleAddMember}
           disabled={!email}
-          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+          variant="primary"
+          className="w-full"
         >
           + Ajouter un collaborateur
-        </button>
+        </Button>
 
         {/* Invited list */}
         {invitedEmails.length > 0 && (
@@ -103,21 +98,23 @@ export default function TeamInvitationPage() {
       </div>
 
       <div className="flex gap-4 mt-8">
-        <button
+        <Button
           type="button"
           onClick={() => router.push('/signup/confirmation')}
-          className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors"
+          variant="outline"
+          className="flex-1"
         >
           Passer cette étape
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={handleContinue}
           disabled={invitedEmails.length === 0 || isLoading}
-          className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="primary"
+          className="flex-1"
         >
           {isLoading ? 'Envoi…' : 'Continuer'}
-        </button>
+        </Button>
       </div>
     </div>
   )

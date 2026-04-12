@@ -4,6 +4,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
 import { CLIENT_SOURCE_LABELS } from '@/types/client';
 import type { ClientSource } from '@/types/client';
+import { InputField } from '@real-estate/ui/input-field';
 import { TagsInput } from '@/components/ui/TagsInput';
 
 const SOURCE_OPTIONS: { value: ClientSource; label: string }[] = [
@@ -23,43 +24,31 @@ export function StepNotes() {
   return (
     <div className="space-y-6">
       {/* Source */}
-      <div>
-        <label htmlFor="source" className="block text-sm font-bold text-neutral-anthracite mb-1">
-          Source
-        </label>
-        <select
-          id="source"
-          {...register('source')}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors bg-white"
-        >
-          {SOURCE_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <InputField
+        label="Source"
+        id="source"
+        as="select"
+        {...register('source')}
+      >
+        {SOURCE_OPTIONS.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </InputField>
 
       {/* Notes */}
-      <div>
-        <label htmlFor="notes" className="block text-sm font-bold text-neutral-anthracite mb-1">
-          Notes internes
-        </label>
-        <textarea
-          id="notes"
-          {...register('notes')}
-          rows={4}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors resize-y"
-          placeholder="Notes visibles uniquement par l'équipe..."
-          maxLength={2000}
-        />
-        <div className="flex justify-between mt-1">
-          {errors.notes && (
-            <p className="text-xs text-semantic-destructive">{errors.notes.message}</p>
-          )}
-          <p className="text-xs text-neutral-grey-bold ml-auto">{notes.length}/2000</p>
-        </div>
-      </div>
+      <InputField
+        label="Notes internes"
+        id="notes"
+        as="textarea"
+        rows={4}
+        {...register('notes')}
+        placeholder="Notes visibles uniquement par l'équipe..."
+        maxLength={2000}
+        error={errors.notes?.message}
+        helperText={`${notes.length}/2000`}
+      />
 
       {/* Tags */}
       <div>

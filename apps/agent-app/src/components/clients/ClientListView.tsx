@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Users, Download, Upload } from 'lucide-react';
+import { Button } from '@real-estate/ui/button';
 import { createClient } from '@/lib/supabase/client';
 import { DataTable, Avatar, StatusBadge, EmptyState } from '@/components/ui';
 import type { Column } from '@/components/ui/DataTable';
@@ -142,28 +143,22 @@ export function ClientListView() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-edge-default text-content-body hover:bg-surface-neutral-action transition-colors"
-          >
+          <Button variant="outline" size="sm">
             <Upload className="w-4 h-4" />
             Importer
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border border-edge-default text-content-body hover:bg-surface-neutral-action transition-colors"
-          >
+          </Button>
+          <Button variant="outline" size="sm">
             <Download className="w-4 h-4" />
             Exporter
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => router.push('/clients/new')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg text-content-branded-on-action bg-surface-branded-action hover:bg-surface-branded-action-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             Nouveau client
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -179,18 +174,15 @@ export function ClientListView() {
         filters={
           <div className="flex items-center gap-1.5">
             {STATUS_FILTERS.map((f) => (
-              <button
+              <Button
                 key={f.value}
-                type="button"
+                variant={statusFilter === f.value ? 'primary' : 'outline'}
+                size="sm"
                 onClick={() => setStatusFilter(f.value)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-                  statusFilter === f.value
-                    ? 'bg-surface-branded-action text-content-branded-on-action border-edge-branded-action'
-                    : 'bg-surface-neutral-default text-content-body border-edge-default hover:border-edge-neutral-default'
-                }`}
+                className="rounded-full"
               >
                 {f.label}
-              </button>
+              </Button>
             ))}
           </div>
         }
@@ -200,14 +192,14 @@ export function ClientListView() {
             title="Aucun client"
             description="Ajoutez votre premier client pour commencer."
             action={
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => router.push('/clients/new')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-content-branded-on-action bg-surface-branded-action hover:bg-surface-branded-action-hover transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Nouveau client
-              </button>
+              </Button>
             }
           />
         }

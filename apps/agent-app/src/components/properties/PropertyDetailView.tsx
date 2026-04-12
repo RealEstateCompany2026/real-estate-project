@@ -16,6 +16,8 @@ import type { PropertyType, PropertyStatus, DpeClass } from '@/types/property';
 import { createClient } from '@/lib/supabase/client';
 import { useCompletionScore } from '@/hooks/useCompletionScore';
 import { formatPrice, formatSurface } from '@/lib/utils/format';
+import { Button } from '@real-estate/ui/button';
+import { Spinner } from '@real-estate/ui/spinner';
 import { AccordionSection } from '@/components/ui/AccordionSection';
 import { CompletionGauge } from '@/components/ui/CompletionGauge';
 import { SectionNav } from '@/components/ui/SectionNav';
@@ -109,7 +111,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   if (isLoading || !property) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }
@@ -121,13 +123,12 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       {/* Header (FIB-01) */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
-            className="p-2 rounded-lg hover:bg-background-subtle transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-neutral-grey-bold" />
-          </button>
+            size="sm"
+            icon={<ArrowLeft className="w-5 h-5" />}
+          />
 
           {/* Photo cover thumbnail */}
           <div className="w-16 h-12 rounded-lg overflow-hidden bg-neutral-grey-light shrink-0">
@@ -170,12 +171,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
 
         <div className="flex items-center gap-2">
           <CompletionGauge score={completion.score} level={completion.level} size="sm" />
-          <button type="button" className="p-2 rounded-lg text-neutral-grey-bold hover:bg-background-subtle transition-colors" title="Partager">
-            <Share2 className="w-5 h-5" />
-          </button>
-          <button type="button" className="p-2 rounded-lg text-neutral-grey-bold hover:bg-background-subtle transition-colors" title="Exporter PDF">
-            <FileDown className="w-5 h-5" />
-          </button>
+          <Button variant="ghost" size="sm" icon={<Share2 className="w-5 h-5" />} title="Partager" />
+          <Button variant="ghost" size="sm" icon={<FileDown className="w-5 h-5" />} title="Exporter PDF" />
         </div>
       </div>
 

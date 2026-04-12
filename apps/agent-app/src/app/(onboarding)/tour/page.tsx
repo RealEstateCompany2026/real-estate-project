@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogoBadge } from '@/components/auth'
+import { Button } from '@real-estate/ui/button'
+import { Stepper } from '@real-estate/ui/stepper'
 import {
   LayoutDashboard,
   Compass,
@@ -92,22 +94,22 @@ export default function OnboardingTourPage() {
           ))}
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
           onClick={() => setStep(0)}
-          className="mt-10 w-full max-w-sm py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          className="mt-10 w-full max-w-sm flex items-center justify-center gap-2"
         >
           Démarrer le tour
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => router.push('/setup')}
-          className="mt-3 text-sm text-[var(--text-caption)] hover:underline"
+          className="mt-3 text-sm"
         >
           Passer le tour
-        </button>
+        </Button>
       </div>
     )
   }
@@ -127,14 +129,14 @@ export default function OnboardingTourPage() {
           réglages essentiels.
         </p>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
           onClick={() => router.push('/setup')}
-          className="mt-10 w-full max-w-sm py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          className="mt-10 w-full max-w-sm flex items-center justify-center gap-2"
         >
           Configurer mon espace
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     )
   }
@@ -157,47 +159,41 @@ export default function OnboardingTourPage() {
         {slide.description}
       </p>
 
-      {/* Dots */}
-      <div className="flex items-center gap-2 mt-10">
-        {slides.map((_, i) => (
-          <div
-            key={i}
-            className={`h-2 rounded-full transition-all ${
-              i === step
-                ? 'w-6 bg-[var(--surface-branded-action)]'
-                : 'w-2 bg-[var(--border-default)]'
-            }`}
-          />
-        ))}
-      </div>
+      {/* Stepper */}
+      <Stepper
+        steps={slides.map(s => s.title)}
+        currentStep={step}
+        variant="minimal"
+        className="mt-10"
+      />
 
       {/* Navigation */}
       <div className="flex gap-4 mt-10 w-full max-w-sm">
-        <button
-          type="button"
+        <Button
+          variant="outline"
           onClick={() => setStep(step - 1)}
-          className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors flex items-center justify-center gap-2"
+          className="flex-1 flex items-center justify-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" />
           Précédent
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="primary"
           onClick={() => setStep(step + 1)}
-          className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          className="flex-1 flex items-center justify-center gap-2"
         >
           {step === totalSlides - 1 ? 'Terminer' : 'Suivant'}
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
 
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={() => router.push('/setup')}
-        className="mt-4 text-sm text-[var(--text-caption)] hover:underline"
+        className="mt-4 text-sm"
       >
         Passer le tour
-      </button>
+      </Button>
     </div>
   )
 }

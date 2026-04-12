@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { LogoBadge, InfoCard } from '@/components/auth'
 import { useCountdown } from '@/hooks/useCountdown'
+import { Button } from '@real-estate/ui/button'
 
 export default function AccountLockedPage() {
   const { formatted, isFinished } = useCountdown(300) // 5 minutes
@@ -42,16 +43,17 @@ export default function AccountLockedPage() {
           Mot de passe oublié ?
         </Link>
 
-        <button
+        <Button
           type="button"
           disabled={!isFinished}
           onClick={() => {
             if (isFinished) window.location.href = '/login'
           }}
-          className="w-full py-3 rounded-xl bg-[var(--border-default)] text-[var(--text-caption)] font-semibold text-sm cursor-not-allowed disabled:opacity-70"
+          variant="default"
+          className="w-full"
         >
           {isFinished ? 'Retour à la connexion' : 'Compte verrouillé'}
-        </button>
+        </Button>
       </div>
     </div>
   )

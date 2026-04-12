@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { EventListItem } from '@/types/event';
 import { EVENT_TYPE_ICONS } from '@/types/event';
+import { Spinner } from '@real-estate/ui/spinner';
 import { Timeline } from '@/components/ui/Timeline';
 import { Circle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -43,7 +44,7 @@ export function PropertySectionTimeline({ propertyId }: PropertySectionTimelineP
   }, [propertyId]);
 
   if (isLoading) {
-    return <div className="h-20 flex items-center justify-center text-sm text-neutral-grey-bold">Chargement...</div>;
+    return <div className="h-20 flex items-center justify-center"><Spinner /></div>;
   }
 
   const timelineEvents = events.map((e) => ({

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoBadge, InfoCard } from '@/components/auth'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
 
 export default function LinkExpiredPage() {
   const [email, setEmail] = useState('')
@@ -38,26 +40,21 @@ export default function LinkExpiredPage() {
 
         {!sent ? (
           <>
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                placeholder="vous@agence.com"
-              />
-            </div>
-            <button
+            <TextField
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="vous@agence.com"
+            />
+            <Button
               type="button"
               onClick={handleResend}
               disabled={!email}
-              className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+              variant="primary"
+              className="w-full"
             >
               Renvoyer un lien
-            </button>
+            </Button>
           </>
         ) : (
           <div className="text-center text-sm text-[var(--text-success)] font-medium">

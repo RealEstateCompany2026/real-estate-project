@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { StepperDots, LogoBadge, InfoCard } from '@/components/auth'
 import { useCountdown } from '@/hooks/useCountdown'
 import { CheckCircle } from 'lucide-react'
+import { Button } from '@real-estate/ui/button'
 
 const confirmationItems = [
   'Votre compte est activé',
@@ -67,16 +68,16 @@ export default function SignupConfirmationPage() {
           Redirection automatique dans <strong className="text-[var(--text-branded-action)]">{seconds}</strong> secondes
         </p>
 
-        <button
-          type="button"
+        <Button
           onClick={() => router.push('/tour')}
-          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          variant="primary"
+          className="w-full flex items-center justify-center gap-2"
         >
           Commencer maintenant
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </button>
+        </Button>
       </div>
     </div>
   )

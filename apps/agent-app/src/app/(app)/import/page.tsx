@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { Button } from '@real-estate/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import {
   Users,
@@ -100,8 +101,6 @@ export default function ImportPage() {
 
   /* ─── Shared styles ─── */
   const cardCls = 'bg-white rounded-xl border border-[var(--border-default)] p-6'
-  const btnPrimary = 'py-3 px-6 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
-  const btnSecondary = 'py-3 px-6 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors flex items-center justify-center gap-2'
 
   /* ─── IMP-01 : Choix du type ─── */
   if (step === 'choose') {
@@ -129,14 +128,15 @@ export default function ImportPage() {
           ))}
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="link"
+          size="sm"
           onClick={() => setStep('history')}
-          className="mt-6 text-sm text-[var(--surface-branded-action)] hover:underline flex items-center gap-1"
+          className="mt-6"
         >
           <Clock className="w-4 h-4" />
           Voir l&apos;historique des imports
-        </button>
+        </Button>
       </div>
     )
   }
@@ -145,9 +145,14 @@ export default function ImportPage() {
   if (step === 'upload') {
     return (
       <div className="p-10 max-w-3xl mx-auto">
-        <button type="button" onClick={() => setStep('choose')} className="text-sm text-[var(--text-caption)] hover:underline flex items-center gap-1 mb-6">
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => setStep('choose')}
+          className="mb-6"
+        >
           <ChevronLeft className="w-4 h-4" /> Retour
-        </button>
+        </Button>
 
         <h1 className="text-2xl font-bold text-[var(--text-headings)]">
           Importer des {importType === 'clients' ? 'clients' : importType === 'properties' ? 'biens' : 'documents'}
@@ -248,12 +253,12 @@ export default function ImportPage() {
         </div>
 
         <div className="flex gap-4 mt-8">
-          <button type="button" onClick={() => setStep('upload')} className={btnSecondary}>
+          <Button variant="outline" onClick={() => setStep('upload')}>
             <ChevronLeft className="w-4 h-4" /> Retour
-          </button>
-          <button type="button" onClick={() => setStep('preview')} className={btnPrimary}>
+          </Button>
+          <Button variant="primary" onClick={() => setStep('preview')}>
             Aperçu <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -268,6 +273,14 @@ export default function ImportPage() {
 
     return (
       <div className="p-10 max-w-4xl mx-auto">
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => setStep('mapping')}
+          className="mb-6"
+        >
+          <ChevronLeft className="w-4 h-4" /> Retour
+        </Button>
         <h1 className="text-2xl font-bold text-[var(--text-headings)]">
           Aperçu des données
         </h1>
@@ -307,12 +320,12 @@ export default function ImportPage() {
         </p>
 
         <div className="flex gap-4 mt-8">
-          <button type="button" onClick={() => setStep('mapping')} className={btnSecondary}>
+          <Button variant="outline" onClick={() => setStep('mapping')}>
             <ChevronLeft className="w-4 h-4" /> Modifier le mapping
-          </button>
-          <button type="button" onClick={simulateImport} className={btnPrimary}>
+          </Button>
+          <Button variant="primary" onClick={simulateImport}>
             Lancer l&apos;import <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -384,22 +397,23 @@ export default function ImportPage() {
             <p className="text-xs text-[var(--text-caption)] mt-1">
               Les lignes en erreur n&apos;ont pas été importées. Vous pouvez télécharger le rapport d&apos;erreurs.
             </p>
-            <button
-              type="button"
-              className="mt-2 text-xs text-[var(--surface-branded-action)] hover:underline"
+            <Button
+              variant="link"
+              size="sm"
+              className="mt-2"
             >
               Télécharger le rapport d&apos;erreurs (CSV)
-            </button>
+            </Button>
           </div>
         )}
 
         <div className="flex gap-4 mt-8">
-          <button type="button" onClick={() => { setStep('choose'); setFile(null); setImportType(null) }} className={btnSecondary}>
+          <Button variant="outline" onClick={() => { setStep('choose'); setFile(null); setImportType(null) }}>
             Nouvel import
-          </button>
-          <button type="button" onClick={() => router.push('/dashboard')} className={btnPrimary}>
+          </Button>
+          <Button variant="primary" onClick={() => router.push('/dashboard')}>
             Aller au dashboard <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -414,9 +428,14 @@ export default function ImportPage() {
 
   return (
     <div className="p-10 max-w-3xl mx-auto">
-      <button type="button" onClick={() => setStep('choose')} className="text-sm text-[var(--text-caption)] hover:underline flex items-center gap-1 mb-6">
+      <Button
+        variant="link"
+        size="sm"
+        onClick={() => setStep('choose')}
+        className="mb-6"
+      >
         <ChevronLeft className="w-4 h-4" /> Retour
-      </button>
+      </Button>
 
       <h1 className="text-2xl font-bold text-[var(--text-headings)]">
         Historique des imports

@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoBadge } from '@/components/auth'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
+import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -57,10 +60,10 @@ export default function LoginPage() {
       {/* Form area */}
       <div className="w-full mt-10">
         {/* Google button */}
-        <button
-          type="button"
+        <Button
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] hover:bg-[var(--surface-neutral-action)] transition-colors text-sm font-medium text-[var(--text-headings)]"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-3"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path
@@ -81,7 +84,7 @@ export default function LoginPage() {
             />
           </svg>
           Continuer avec Google
-        </button>
+        </Button>
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-6">
@@ -92,35 +95,23 @@ export default function LoginPage() {
 
         {/* Email/password form */}
         <form onSubmit={handleEmailLogin} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-              placeholder="vous@agence.com"
-              required
-              autoComplete="email"
-            />
-          </div>
+          <TextField
+            type="email"
+            value={email}
+            onChange={setEmail}
+            placeholder="vous@agence.com"
+            required
+            autoComplete="email"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-              Mot de passe
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-            />
-          </div>
+          <TextField
+            type="password"
+            value={password}
+            onChange={setPassword}
+            placeholder="••••••••"
+            required
+            autoComplete="current-password"
+          />
 
           {/* Forgot password link */}
           <div className="text-right">
@@ -133,18 +124,17 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="bg-[var(--surface-error)] border border-[var(--text-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
-              {error}
-            </div>
+            <InlineMessage type="error" message={error} />
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            className="w-full"
           >
             {isLoading ? 'Connexion en cours…' : 'Se connecter'}
-          </button>
+          </Button>
         </form>
 
         {/* Bottom link */}

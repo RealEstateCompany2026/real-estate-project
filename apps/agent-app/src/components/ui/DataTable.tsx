@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useMemo, type ReactNode } from 'react';
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@real-estate/ui/button';
+import { SearchBar } from '@real-estate/ui/search-bar';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -155,14 +157,12 @@ export function DataTable<T>({
       {(searchableFields?.length || filters) && (
         <div className="flex flex-wrap items-center gap-3">
           {searchableFields?.length ? (
-            <div className="relative flex-1 min-w-[220px] max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-icon-placeholder" />
-              <input
-                type="text"
+            <div className="flex-1 min-w-[220px] max-w-sm">
+              <SearchBar
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={setSearch}
                 placeholder={searchPlaceholder}
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-edge-default bg-surface-neutral-default text-content-body placeholder:text-content-placeholder focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-edge-branded-default transition-colors"
+                size="sm"
               />
             </div>
           ) : null}
@@ -231,25 +231,25 @@ export function DataTable<T>({
             {search && ` pour « ${search} »`}
           </span>
           <div className="flex items-center gap-1">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon"
               disabled={page === 0}
               onClick={() => setPage((p) => p - 1)}
-              className="p-1.5 rounded-lg hover:bg-surface-neutral-action-hover disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
-            </button>
+            </Button>
             <span className="px-2 font-medium">
               {page + 1} / {totalPages}
             </span>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon"
               disabled={page >= totalPages - 1}
               onClick={() => setPage((p) => p + 1)}
-              className="p-1.5 rounded-lg hover:bg-surface-neutral-action-hover disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
       )}

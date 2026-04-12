@@ -5,6 +5,8 @@ import { FileText, Upload, Eye, Download } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { DocumentListItem } from '@/types/document';
 import { formatDate, formatFileSize } from '@/lib/utils/format';
+import { Button } from '@real-estate/ui/button';
+import { Spinner } from '@real-estate/ui/spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 interface PropertySectionDocumentsProps {
@@ -34,7 +36,7 @@ export function PropertySectionDocuments({ propertyId }: PropertySectionDocument
   }, [propertyId]);
 
   if (isLoading) {
-    return <div className="h-20 flex items-center justify-center text-sm text-neutral-grey-bold">Chargement...</div>;
+    return <div className="h-20 flex items-center justify-center"><Spinner /></div>;
   }
 
   if (documents.length === 0) {
@@ -44,13 +46,11 @@ export function PropertySectionDocuments({ propertyId }: PropertySectionDocument
         title="Aucun document"
         description="Les diagnostics et documents du bien apparaîtront ici."
         action={
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-primary bg-background-softBlue hover:bg-primary hover:text-white transition-colors"
+          <Button
+            icon={<Upload className="w-4 h-4" />}
           >
-            <Upload className="w-4 h-4" />
             Ajouter un document
-          </button>
+          </Button>
         }
       />
     );
@@ -75,24 +75,19 @@ export function PropertySectionDocuments({ propertyId }: PropertySectionDocument
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <button type="button" className="p-1.5 rounded hover:bg-background-subtle" title="Voir">
-              <Eye className="w-4 h-4 text-neutral-grey-bold" />
-            </button>
-            <button type="button" className="p-1.5 rounded hover:bg-background-subtle" title="Télécharger">
-              <Download className="w-4 h-4 text-neutral-grey-bold" />
-            </button>
+            <Button variant="ghost" size="sm" icon={<Eye className="w-4 h-4" />} title="Voir" />
+            <Button variant="ghost" size="sm" icon={<Download className="w-4 h-4" />} title="Télécharger" />
           </div>
         </div>
       ))}
 
       {!showAll && documents.length > 3 && (
-        <button
-          type="button"
+        <Button
+          variant="link"
           onClick={() => setShowAll(true)}
-          className="text-sm text-primary font-bold hover:underline"
         >
           Voir tout ({documents.length})
-        </button>
+        </Button>
       )}
     </div>
   );

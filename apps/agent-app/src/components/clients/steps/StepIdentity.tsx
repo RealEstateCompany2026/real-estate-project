@@ -4,6 +4,8 @@ import { useFormContext } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
 import { CLIENT_STATUS_LABELS } from '@/types/client';
 import type { ClientGender, ClientStatus } from '@/types/client';
+import { InputField } from '@real-estate/ui/input-field';
+import { Chip } from '@real-estate/ui/chip';
 
 const GENDER_OPTIONS: { value: ClientGender; label: string }[] = [
   { value: 'HOMME', label: 'M.' },
@@ -64,36 +66,24 @@ export function StepIdentity() {
 
       {/* Prénom & Nom */}
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="firstName" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Prénom <span className="text-semantic-destructive">*</span>
-          </label>
-          <input
-            id="firstName"
-            type="text"
-            {...register('firstName')}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors"
-            placeholder="Prénom du client"
-          />
-          {errors.firstName && (
-            <p className="text-xs text-semantic-destructive mt-1">{errors.firstName.message}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="lastName" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Nom <span className="text-semantic-destructive">*</span>
-          </label>
-          <input
-            id="lastName"
-            type="text"
-            {...register('lastName')}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors"
-            placeholder="Nom du client"
-          />
-          {errors.lastName && (
-            <p className="text-xs text-semantic-destructive mt-1">{errors.lastName.message}</p>
-          )}
-        </div>
+        <InputField
+          label="Prénom"
+          id="firstName"
+          type="text"
+          {...register('firstName')}
+          placeholder="Prénom du client"
+          error={errors.firstName?.message}
+          required
+        />
+        <InputField
+          label="Nom"
+          id="lastName"
+          type="text"
+          {...register('lastName')}
+          placeholder="Nom du client"
+          error={errors.lastName?.message}
+          required
+        />
       </div>
 
       {/* Type(s) de client */}
@@ -108,18 +98,13 @@ export function StepIdentity() {
           {STATUS_OPTIONS.map((opt) => {
             const isSelected = selectedStatus.includes(opt.value);
             return (
-              <button
+              <Chip
                 key={opt.value}
-                type="button"
+                label={opt.label}
                 onClick={() => toggleStatus(opt.value)}
-                className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-                  isSelected
-                    ? 'border-primary bg-background-softBlue text-primary font-bold'
-                    : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
-                }`}
-              >
-                {opt.label}
-              </button>
+                selected={isSelected}
+                variant={isSelected ? 'filled' : 'outlined'}
+              />
             );
           })}
         </div>

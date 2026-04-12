@@ -9,6 +9,7 @@ import {
   OPERATION_TYPE_LABELS,
 } from '@/types/property';
 import type { PropertyType, PropertyCategory, OperationType } from '@/types/property';
+import { Chip } from '@real-estate/ui/chip';
 import { Home, Building, TreePine, Warehouse } from 'lucide-react';
 import { type ReactNode } from 'react';
 
@@ -64,18 +65,13 @@ export function StepPropertyType() {
             </div>
             <div className="flex flex-wrap gap-2 pl-7">
               {PROPERTY_CATEGORY_TYPES[cat].map((type) => (
-                <button
+                <Chip
                   key={type}
-                  type="button"
+                  label={PROPERTY_TYPE_LABELS[type]}
                   onClick={() => selectType(type)}
-                  className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${
-                    selectedType === type
-                      ? 'border-primary bg-background-softBlue text-primary font-bold'
-                      : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
-                  }`}
-                >
-                  {PROPERTY_TYPE_LABELS[type]}
-                </button>
+                  selected={selectedType === type}
+                  variant={selectedType === type ? 'filled' : 'outlined'}
+                />
               ))}
             </div>
           </div>
@@ -94,18 +90,13 @@ export function StepPropertyType() {
           {OPERATION_OPTIONS.map((opt) => {
             const isSelected = selectedOps.includes(opt.value);
             return (
-              <button
+              <Chip
                 key={opt.value}
-                type="button"
+                label={opt.label}
                 onClick={() => toggleOperation(opt.value)}
-                className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
-                  isSelected
-                    ? 'border-primary bg-background-softBlue text-primary font-bold'
-                    : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
-                }`}
-              >
-                {opt.label}
-              </button>
+                selected={isSelected}
+                variant={isSelected ? 'filled' : 'outlined'}
+              />
             );
           })}
         </div>

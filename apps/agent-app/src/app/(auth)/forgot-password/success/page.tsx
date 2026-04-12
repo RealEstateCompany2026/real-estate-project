@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogoBadge, InfoCard } from '@/components/auth'
 import { useCountdown } from '@/hooks/useCountdown'
+import { Button } from '@real-estate/ui/button'
 
 export default function PasswordResetSuccessPage() {
   const router = useRouter()

@@ -11,6 +11,8 @@ import { CLIENT_STATUS_LABELS, CLIENT_STATUS_COLORS, CLIENT_GENDER_LABELS } from
 import type { ClientGender, ClientStatus } from '@/types/client';
 import { createClient } from '@/lib/supabase/client';
 import { useCompletionScore } from '@/hooks/useCompletionScore';
+import { Button } from '@real-estate/ui/button';
+import { Spinner } from '@real-estate/ui/spinner';
 import { AccordionSection } from '@/components/ui/AccordionSection';
 import { Avatar } from '@/components/ui/Avatar';
 import { CompletionGauge } from '@/components/ui/CompletionGauge';
@@ -108,7 +110,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   if (isLoading || !client) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }
@@ -118,13 +120,12 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       {/* Header (FIC-01) */}
       <div className="flex items-start justify-between mb-8">
         <div className="flex items-center gap-4">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
-            className="p-2 rounded-lg hover:bg-background-subtle transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-neutral-grey-bold" />
-          </button>
+            size="sm"
+            icon={<ArrowLeft className="w-5 h-5" />}
+          />
 
           <Avatar firstName={client.firstName} lastName={client.lastName} size="lg" />
 
@@ -153,21 +154,19 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
         <div className="flex items-center gap-2">
           <CompletionGauge score={completion.score} level={completion.level} suggestion={completion.suggestion} size="sm" />
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={handleArchive}
-            className="p-2 rounded-lg text-neutral-grey-bold hover:bg-semantic-destructive/10 hover:text-semantic-destructive transition-colors"
+            size="sm"
+            icon={<Archive className="w-5 h-5" />}
             title="Archiver"
-          >
-            <Archive className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            className="p-2 rounded-lg text-neutral-grey-bold hover:bg-background-subtle transition-colors"
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<FileDown className="w-5 h-5" />}
             title="Exporter PDF"
-          >
-            <FileDown className="w-5 h-5" />
-          </button>
+          />
         </div>
       </div>
 

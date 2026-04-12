@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoBadge, InfoCard } from '@/components/auth'
+import { Button } from '@real-estate/ui/button'
 
 function InvitationContent() {
   const searchParams = useSearchParams()
@@ -51,10 +52,11 @@ function InvitationContent() {
           </div>
         </InfoCard>
 
-        <button
+        <Button
           type="button"
           onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] hover:bg-[var(--surface-neutral-action)] transition-colors text-sm font-medium text-[var(--text-headings)]"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-3"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -63,7 +65,7 @@ function InvitationContent() {
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>
           Continuer avec Google
-        </button>
+        </Button>
 
         <Link
           href={`/signup/email?email=${encodeURIComponent(email)}`}

@@ -6,6 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import { LogoBadge } from '@/components/auth'
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator'
 import { passwordSchema } from '@/lib/validations/auth'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
+import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
@@ -49,49 +52,36 @@ export default function ResetPasswordPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="w-full mt-8 space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Nouveau mot de passe
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </div>
+        <TextField
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="••••••••"
+          autoComplete="new-password"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Confirmer le mot de passe
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </div>
+        <TextField
+          type="password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          placeholder="••••••••"
+          autoComplete="new-password"
+        />
 
         <PasswordStrengthIndicator password={password} />
 
         {error && (
-          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
-            {error}
-          </div>
+          <InlineMessage type="error" message={error} />
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={!canSubmit || isLoading}
-          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="primary"
+          className="w-full"
         >
           {isLoading ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
-        </button>
+        </Button>
       </form>
     </div>
   )

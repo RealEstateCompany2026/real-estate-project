@@ -8,6 +8,9 @@ import { clientQuickCreateSchema, type ClientQuickCreateData } from '@/lib/valid
 import { CLIENT_STATUS_LABELS } from '@/types/client';
 import type { ClientStatus } from '@/types/client';
 import { createClient } from '@/lib/supabase/client';
+import { Button } from '@real-estate/ui/button';
+import { InputField } from '@real-estate/ui/input-field';
+import { Chip } from '@real-estate/ui/chip';
 
 interface ClientQuickCreateProps {
   isOpen: boolean;
@@ -110,71 +113,53 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
             <UserPlus className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-bold text-neutral-anthracite">Création rapide client</h2>
           </div>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onClose}
-            className="p-1 rounded-md hover:bg-background-subtle transition-colors"
-          >
-            <X className="w-5 h-5 text-neutral-grey-bold" />
-          </button>
+            size="sm"
+            icon={<X className="w-5 h-5" />}
+          />
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Prénom & Nom */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="qc-firstName" className="block text-sm font-bold text-neutral-anthracite mb-1">
-                Prénom <span className="text-semantic-destructive">*</span>
-              </label>
-              <input
-                id="qc-firstName"
-                type="text"
-                {...register('firstName')}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-                placeholder="Prénom"
-              />
-              {errors.firstName && (
-                <p className="text-xs text-semantic-destructive mt-0.5">{errors.firstName.message}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="qc-lastName" className="block text-sm font-bold text-neutral-anthracite mb-1">
-                Nom <span className="text-semantic-destructive">*</span>
-              </label>
-              <input
-                id="qc-lastName"
-                type="text"
-                {...register('lastName')}
-                className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-                placeholder="Nom"
-              />
-              {errors.lastName && (
-                <p className="text-xs text-semantic-destructive mt-0.5">{errors.lastName.message}</p>
-              )}
-            </div>
+            <InputField
+              label="Prénom"
+              id="qc-firstName"
+              type="text"
+              {...register('firstName')}
+              placeholder="Prénom"
+              error={errors.firstName?.message}
+              required
+            />
+            <InputField
+              label="Nom"
+              id="qc-lastName"
+              type="text"
+              {...register('lastName')}
+              placeholder="Nom"
+              error={errors.lastName?.message}
+              required
+            />
           </div>
 
           {/* Type */}
           <div>
-            <label className="block text-sm font-bold text-neutral-anthracite mb-1">
+            <label className="block text-sm font-bold text-neutral-anthracite mb-2">
               Type <span className="text-semantic-destructive">*</span>
             </label>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {STATUS_OPTIONS.map((opt) => {
                 const isSelected = selectedStatus.includes(opt.value);
                 return (
-                  <button
+                  <Chip
                     key={opt.value}
-                    type="button"
+                    label={opt.label}
                     onClick={() => toggleStatus(opt.value)}
-                    className={`px-3 py-1.5 rounded-lg border text-xs transition-colors ${
-                      isSelected
-                        ? 'border-primary bg-background-softBlue text-primary font-bold'
-                        : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
+                    selected={isSelected}
+                    variant={isSelected ? 'filled' : 'outlined'}
+                  />
                 );
               })}
             </div>
@@ -184,35 +169,24 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
           </div>
 
           {/* Email */}
-          <div>
-            <label htmlFor="qc-email" className="block text-sm font-bold text-neutral-anthracite mb-1">
-              Email <span className="text-semantic-destructive">*</span>
-            </label>
-            <input
-              id="qc-email"
-              type="email"
-              {...register('primaryEmail')}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-              placeholder="email@exemple.com"
-            />
-            {errors.primaryEmail && (
-              <p className="text-xs text-semantic-destructive mt-0.5">{errors.primaryEmail.message}</p>
-            )}
-          </div>
+          <InputField
+            label="Email"
+            id="qc-email"
+            type="email"
+            {...register('primaryEmail')}
+            placeholder="email@exemple.com"
+            error={errors.primaryEmail?.message}
+            required
+          />
 
           {/* Téléphone */}
-          <div>
-            <label htmlFor="qc-phone" className="block text-sm font-bold text-neutral-anthracite mb-1">
-              Téléphone
-            </label>
-            <input
-              id="qc-phone"
-              type="tel"
-              {...register('mobilePhone')}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-              placeholder="06 12 34 56 78"
-            />
-          </div>
+          <InputField
+            label="Téléphone"
+            id="qc-phone"
+            type="tel"
+            {...register('mobilePhone')}
+            placeholder="06 12 34 56 78"
+          />
 
           {/* Error */}
           {error && (
@@ -223,20 +197,18 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-sm font-bold text-neutral-grey-bold hover:bg-background-subtle transition-colors"
             >
               Annuler
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {isSubmitting ? 'Création...' : 'Créer'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

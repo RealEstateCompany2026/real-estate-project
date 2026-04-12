@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { LogoBadge } from '@/components/auth'
 import { CheckCircle } from 'lucide-react'
+import { Button } from '@real-estate/ui/button'
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams()
@@ -46,13 +47,13 @@ function VerifyEmailContent() {
         {/* Demo mode section */}
         <div className="mt-8 pt-6 border-t border-[var(--border-default)]">
           <p className="text-xs text-[var(--text-caption)] mb-3">Mode demo</p>
-          <button
-            type="button"
+          <Button
             onClick={handleSimulateVerification}
-            className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+            variant="primary"
+            className="w-full"
           >
             Simuler vérification email
-          </button>
+          </Button>
         </div>
       </div>
 

@@ -7,6 +7,9 @@ import { createClient } from '@/lib/supabase/client'
 import { LogoBadge } from '@/components/auth'
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator'
 import { signupSchema } from '@/lib/validations/auth'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
+import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function SignupEmailPage() {
   const [email, setEmail] = useState('')
@@ -55,64 +58,45 @@ export default function SignupEmailPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="w-full mt-8 space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-            placeholder="vous@agence.com"
-            required
-            autoComplete="email"
-          />
-        </div>
+        <TextField
+          type="email"
+          value={email}
+          onChange={setEmail}
+          placeholder="vous@agence.com"
+          required
+          autoComplete="email"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Mot de passe
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </div>
+        <TextField
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="••••••••"
+          autoComplete="new-password"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Confirmer le mot de passe
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </div>
+        <TextField
+          type="password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          placeholder="••••••••"
+          autoComplete="new-password"
+        />
 
         {password.length > 0 && <PasswordStrengthIndicator password={password} />}
 
         {error && (
-          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
-            {error}
-          </div>
+          <InlineMessage type="error" message={error} />
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={!validation.success || isLoading}
-          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="primary"
+          className="w-full"
         >
           {isLoading ? 'Création en cours…' : 'Créer mon compte'}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-8 text-sm text-[var(--text-caption)]">

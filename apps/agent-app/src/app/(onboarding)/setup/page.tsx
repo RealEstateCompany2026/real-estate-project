@@ -3,6 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
+import { Switch } from '@real-estate/ui/switch'
+import { FileUpload } from '@real-estate/ui/file-upload'
+import { Stepper } from '@real-estate/ui/stepper'
 import {
   User,
   Building2,
@@ -41,6 +46,7 @@ export default function OnboardingSetupPage() {
     pushNotifications: true,
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [docsFile, setDocsFile] = useState<File | null>(null)
 
   async function handleFinish() {
     setIsLoading(true)
@@ -92,14 +98,14 @@ export default function OnboardingSetupPage() {
           ))}
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
           onClick={() => setStep(0)}
-          className="mt-8 w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          className="mt-8 w-full flex items-center justify-center gap-2"
         >
           Commencer
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     )
   }
@@ -120,23 +126,23 @@ export default function OnboardingSetupPage() {
         </p>
 
         <div className="flex gap-4 mt-10 w-full">
-          <button
-            type="button"
+          <Button
+            variant="outline"
             onClick={() => router.push('/import')}
-            className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors flex items-center justify-center gap-2"
+            className="flex-1 flex items-center justify-center gap-2"
           >
             <Upload className="w-4 h-4" />
             Importer ma BDD
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="primary"
             onClick={handleFinish}
             disabled={isLoading}
-            className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 flex items-center justify-center gap-2"
           >
             Accéder au dashboard
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -144,49 +150,35 @@ export default function OnboardingSetupPage() {
 
   /* ─── Steps stepper ─── */
   const stepperBar = (
-    <div className="flex items-center gap-1 mb-8">
-      {setupSteps.map((s, i) => (
-        <div key={s.label} className="flex-1 flex flex-col items-center gap-2">
-          <div
-            className={`h-1.5 w-full rounded-full ${
-              i <= step
-                ? 'bg-[var(--surface-branded-action)]'
-                : 'bg-[var(--border-default)]'
-            }`}
-          />
-          <span className={`text-xs ${i === step ? 'text-[var(--text-headings)] font-medium' : 'text-[var(--text-caption)]'}`}>
-            {s.label}
-          </span>
-        </div>
-      ))}
-    </div>
+    <Stepper
+      steps={setupSteps.map(s => s.label)}
+      currentStep={step}
+      variant="default"
+      className="mb-8"
+    />
   )
 
   const navButtons = (
     <div className="flex gap-4 mt-8">
-      <button
-        type="button"
+      <Button
+        variant="outline"
         onClick={() => setStep(step - 1)}
-        className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors flex items-center justify-center gap-2"
+        className="flex-1 flex items-center justify-center gap-2"
       >
         <ChevronLeft className="w-4 h-4" />
         Retour
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button
+        variant="primary"
         onClick={() => setStep(step + 1)}
-        className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+        className="flex-1 flex items-center justify-center gap-2"
       >
         {step === 3 ? 'Terminer' : 'Suivant'}
         <ChevronRight className="w-4 h-4" />
-      </button>
+      </Button>
     </div>
   )
 
-  const inputCls =
-    'w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--surface-branded-action)] text-sm'
-  const labelCls =
-    'block text-sm font-medium text-[var(--text-headings)] mb-1.5'
 
   /* ─── OBS-01 : Profil professionnel ─── */
   if (step === 0) {
@@ -201,27 +193,34 @@ export default function OnboardingSetupPage() {
         </p>
         <div className="mt-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Prénom</label>
-              <input className={inputCls} value={profileData.firstName} onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })} />
-            </div>
-            <div>
-              <label className={labelCls}>Nom</label>
-              <input className={inputCls} value={profileData.lastName} onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })} />
-            </div>
+            <TextField
+              placeholder="Prénom"
+              value={profileData.firstName}
+              onChange={(value) => setProfileData({ ...profileData, firstName: value })}
+            />
+            <TextField
+              placeholder="Nom"
+              value={profileData.lastName}
+              onChange={(value) => setProfileData({ ...profileData, lastName: value })}
+            />
           </div>
-          <div>
-            <label className={labelCls}>Email professionnel</label>
-            <input type="email" className={inputCls} value={profileData.email} onChange={(e) => setProfileData({ ...profileData, email: e.target.value })} />
-          </div>
-          <div>
-            <label className={labelCls}>Téléphone mobile</label>
-            <input type="tel" className={inputCls} value={profileData.mobilePhone} onChange={(e) => setProfileData({ ...profileData, mobilePhone: e.target.value })} placeholder="+33 6 00 00 00 00" />
-          </div>
-          <div>
-            <label className={labelCls}>N° carte professionnelle (T)</label>
-            <input className={inputCls} value={profileData.rsacNumber} onChange={(e) => setProfileData({ ...profileData, rsacNumber: e.target.value })} placeholder="CPI XXXX XXXX XXXX" />
-          </div>
+          <TextField
+            type="email"
+            placeholder="Email professionnel"
+            value={profileData.email}
+            onChange={(value) => setProfileData({ ...profileData, email: value })}
+          />
+          <TextField
+            type="tel"
+            placeholder="+33 6 00 00 00 00"
+            value={profileData.mobilePhone}
+            onChange={(value) => setProfileData({ ...profileData, mobilePhone: value })}
+          />
+          <TextField
+            placeholder="CPI XXXX XXXX XXXX"
+            value={profileData.rsacNumber}
+            onChange={(value) => setProfileData({ ...profileData, rsacNumber: value })}
+          />
         </div>
         {navButtons}
       </div>
@@ -240,28 +239,35 @@ export default function OnboardingSetupPage() {
           Renseignez les coordonnées de votre agence.
         </p>
         <div className="mt-6 space-y-4">
-          <div>
-            <label className={labelCls}>Nom de l&apos;agence</label>
-            <input className={inputCls} value={orgData.name} onChange={(e) => setOrgData({ ...orgData, name: e.target.value })} />
-          </div>
+          <TextField
+            placeholder="Nom de l'agence"
+            value={orgData.name}
+            onChange={(value) => setOrgData({ ...orgData, name: value })}
+          />
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Email agence</label>
-              <input type="email" className={inputCls} value={orgData.email} onChange={(e) => setOrgData({ ...orgData, email: e.target.value })} />
-            </div>
-            <div>
-              <label className={labelCls}>Téléphone</label>
-              <input type="tel" className={inputCls} value={orgData.phone} onChange={(e) => setOrgData({ ...orgData, phone: e.target.value })} />
-            </div>
+            <TextField
+              type="email"
+              placeholder="Email agence"
+              value={orgData.email}
+              onChange={(value) => setOrgData({ ...orgData, email: value })}
+            />
+            <TextField
+              type="tel"
+              placeholder="Téléphone"
+              value={orgData.phone}
+              onChange={(value) => setOrgData({ ...orgData, phone: value })}
+            />
           </div>
-          <div>
-            <label className={labelCls}>Adresse</label>
-            <input className={inputCls} value={orgData.address} onChange={(e) => setOrgData({ ...orgData, address: e.target.value })} />
-          </div>
-          <div>
-            <label className={labelCls}>SIRET</label>
-            <input className={inputCls} value={orgData.siret} onChange={(e) => setOrgData({ ...orgData, siret: e.target.value.replace(/\D/g, '').slice(0, 14) })} placeholder="14 chiffres" />
-          </div>
+          <TextField
+            placeholder="Adresse"
+            value={orgData.address}
+            onChange={(value) => setOrgData({ ...orgData, address: value })}
+          />
+          <TextField
+            placeholder="14 chiffres"
+            value={orgData.siret}
+            onChange={(value) => setOrgData({ ...orgData, siret: value.replace(/\D/g, '').slice(0, 14) })}
+          />
         </div>
         {navButtons}
       </div>
@@ -280,29 +286,13 @@ export default function OnboardingSetupPage() {
           Téléversez vos documents réglementaires.
         </p>
         <div className="mt-6 space-y-4">
-          <div
-            className="border-2 border-dashed border-[var(--border-default)] rounded-xl p-8 text-center cursor-pointer hover:border-[var(--surface-branded-action)] transition-colors"
-            onClick={() => setDocsUploaded(true)}
-          >
-            {docsUploaded ? (
-              <div className="flex flex-col items-center gap-2">
-                <Check className="w-8 h-8 text-[var(--icon-success)]" />
-                <p className="text-sm font-medium text-[var(--text-headings)]">
-                  Document téléversé
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-2">
-                <Upload className="w-8 h-8 text-[var(--text-caption)]" />
-                <p className="text-sm font-medium text-[var(--text-headings)]">
-                  Assurance RCP
-                </p>
-                <p className="text-xs text-[var(--text-caption)]">
-                  Cliquez ou glissez-déposez votre fichier (PDF, JPG, PNG — max 10 Mo)
-                </p>
-              </div>
-            )}
-          </div>
+          <FileUpload
+            accept=".pdf,.jpg,.png"
+            maxSize={10 * 1024 * 1024}
+            selectedFile={docsFile}
+            onFileSelect={(file) => setDocsFile(file)}
+            onFileRemove={() => setDocsFile(null)}
+          />
           <p className="text-xs text-[var(--text-caption)]">
             Vous pourrez ajouter d&apos;autres documents plus tard depuis la section Documents.
           </p>
@@ -324,9 +314,8 @@ export default function OnboardingSetupPage() {
       </p>
       <div className="mt-6 space-y-5">
         <div>
-          <label className={labelCls}>Langue</label>
           <select
-            className={inputCls}
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--surface-branded-action)] text-sm"
             value={settings.language}
             onChange={(e) => setSettings({ ...settings, language: e.target.value })}
           >
@@ -335,9 +324,8 @@ export default function OnboardingSetupPage() {
           </select>
         </div>
         <div>
-          <label className={labelCls}>Fuseau horaire</label>
           <select
-            className={inputCls}
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--surface-branded-action)] text-sm"
             value={settings.timezone}
             onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
           >
@@ -353,25 +341,19 @@ export default function OnboardingSetupPage() {
             <span className="text-sm text-[var(--text-headings)]">
               Notifications par email
             </span>
-            <button
-              type="button"
-              onClick={() => setSettings({ ...settings, emailNotifications: !settings.emailNotifications })}
-              className={`w-11 h-6 rounded-full transition-colors ${settings.emailNotifications ? 'bg-[var(--surface-branded-action)]' : 'bg-[var(--border-default)]'}`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.emailNotifications ? 'translate-x-5' : 'translate-x-0.5'}`} />
-            </button>
+            <Switch
+              checked={settings.emailNotifications}
+              onChange={(checked) => setSettings({ ...settings, emailNotifications: checked })}
+            />
           </label>
           <label className="flex items-center justify-between cursor-pointer">
             <span className="text-sm text-[var(--text-headings)]">
               Notifications push
             </span>
-            <button
-              type="button"
-              onClick={() => setSettings({ ...settings, pushNotifications: !settings.pushNotifications })}
-              className={`w-11 h-6 rounded-full transition-colors ${settings.pushNotifications ? 'bg-[var(--surface-branded-action)]' : 'bg-[var(--border-default)]'}`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.pushNotifications ? 'translate-x-5' : 'translate-x-0.5'}`} />
-            </button>
+            <Switch
+              checked={settings.pushNotifications}
+              onChange={(checked) => setSettings({ ...settings, pushNotifications: checked })}
+            />
           </label>
         </div>
       </div>

@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { StepperDots } from '@/components/auth'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
+import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function ProfileAgencyPage() {
   // Agent fields
@@ -109,44 +112,26 @@ export default function ProfileAgencyPage() {
           </h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                  Prénom *
-                </label>
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                  Nom *
-                </label>
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                Téléphone mobile *
-              </label>
-              <input
-                type="tel"
-                value={mobilePhone}
-                onChange={(e) => setMobilePhone(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                placeholder="+33 6 00 00 00 00"
+              <TextField
+                type="text"
+                value={firstName}
+                onChange={setFirstName}
+                required
+              />
+              <TextField
+                type="text"
+                value={lastName}
+                onChange={setLastName}
                 required
               />
             </div>
+            <TextField
+              type="tel"
+              value={mobilePhone}
+              onChange={setMobilePhone}
+              placeholder="+33 6 00 00 00 00"
+              required
+            />
           </div>
         </div>
 
@@ -157,70 +142,40 @@ export default function ProfileAgencyPage() {
           </h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                  Nom de l&apos;agence *
-                </label>
-                <input
-                  type="text"
-                  value={agencyName}
-                  onChange={(e) => setAgencyName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                  SIRET *
-                </label>
-                <input
-                  type="text"
-                  value={siret}
-                  onChange={(e) => setSiret(e.target.value.replace(/\D/g, '').slice(0, 14))}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                  placeholder="14 chiffres"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                Adresse *
-              </label>
-              <input
+              <TextField
                 type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
+                value={agencyName}
+                onChange={setAgencyName}
+                required
+              />
+              <TextField
+                type="text"
+                value={siret}
+                onChange={(val) => setSiret(val.replace(/\D/g, '').slice(0, 14))}
+                placeholder="14 chiffres"
                 required
               />
             </div>
+            <TextField
+              type="text"
+              value={address}
+              onChange={setAddress}
+              required
+            />
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                  Ville *
-                </label>
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-                  Code postal *
-                </label>
-                <input
-                  type="text"
-                  value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
-                  placeholder="75001"
-                  required
-                />
-              </div>
+              <TextField
+                type="text"
+                value={city}
+                onChange={setCity}
+                required
+              />
+              <TextField
+                type="text"
+                value={postalCode}
+                onChange={(val) => setPostalCode(val.replace(/\D/g, '').slice(0, 5))}
+                placeholder="75001"
+                required
+              />
             </div>
             <p className="text-xs text-[var(--text-caption)]">
               Ces informations apparaîtront sur vos documents et annonces officielles.
@@ -229,26 +184,26 @@ export default function ProfileAgencyPage() {
         </div>
 
         {error && (
-          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
-            {error}
-          </div>
+          <InlineMessage type="error" message={error} />
         )}
 
         <div className="flex gap-4">
-          <button
+          <Button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors"
+            variant="outline"
+            className="flex-1"
           >
             Retour
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={!isValid || isLoading}
-            className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            className="flex-1"
           >
             {isLoading ? 'Enregistrement…' : 'Continuer'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

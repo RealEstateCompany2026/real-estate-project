@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { LogoBadge, InfoCard } from '@/components/auth'
 import { useCountdown } from '@/hooks/useCountdown'
 import { Suspense } from 'react'
+import { Button } from '@real-estate/ui/button'
+import { TextField } from '@real-estate/ui/text-field'
 
 function ConfirmationContent() {
   const searchParams = useSearchParams()
@@ -32,26 +34,21 @@ function ConfirmationContent() {
       </p>
 
       <div className="w-full mt-8 space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            readOnly
-            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-action)] text-sm text-[var(--text-caption)]"
-          />
-        </div>
+        <TextField
+          type="email"
+          value={email}
+          disabled
+        />
 
-        <button
+        <Button
           type="button"
           disabled={!isFinished}
           onClick={handleResend}
-          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="primary"
+          className="w-full"
         >
           {isFinished ? 'Renvoyer le lien' : `Renvoyer dans ${seconds}s`}
-        </button>
+        </Button>
 
         <InfoCard>
           <p className="text-sm text-[var(--text-caption)]">

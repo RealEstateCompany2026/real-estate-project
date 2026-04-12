@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { LogoBadge } from '@/components/auth'
 import { User, Building2 } from 'lucide-react'
+import { Button } from '@real-estate/ui/button'
 
 const personas = [
   {
@@ -37,11 +38,11 @@ export default function PersonaRoutingPage() {
 
       <div className="w-full mt-8 space-y-4">
         {personas.map((p) => (
-          <button
+          <Button
             key={p.id}
-            type="button"
             onClick={() => router.push(p.route)}
-            className="w-full flex items-start gap-4 p-5 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] hover:border-[var(--border-branded-default)] hover:bg-[var(--surface-neutral-action)] transition-all text-left group"
+            variant="outline"
+            className="w-full flex items-start gap-4 p-5 rounded-xl text-left group"
           >
             <div className="w-10 h-10 rounded-xl bg-[var(--surface-neutral-action)] group-hover:bg-[var(--surface-branded-action)]/10 flex items-center justify-center flex-shrink-0">
               <p.icon className="w-5 h-5 text-[var(--text-caption)] group-hover:text-[var(--text-branded-action)]" />
@@ -54,7 +55,7 @@ export default function PersonaRoutingPage() {
                 {p.description}
               </p>
             </div>
-          </button>
+          </Button>
         ))}
       </div>
 

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { PropertyCreateData } from '@/lib/validations/property';
+import { InputField } from '@real-estate/ui/input-field';
+import { Button } from '@real-estate/ui/button';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { ClientQuickCreate } from '@/components/clients/ClientQuickCreate';
 import { createClient } from '@/lib/supabase/client';
@@ -88,55 +90,35 @@ export function StepPropertyKey() {
 
       {/* Surface, Pièces, Prix */}
       <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label htmlFor="livingAreaSqm" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Surface (m²) <span className="text-semantic-destructive">*</span>
-          </label>
-          <input
-            id="livingAreaSqm"
-            type="number"
-            step="0.1"
-            {...register('livingAreaSqm', { valueAsNumber: true })}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-            placeholder="75"
-          />
-          {errors.livingAreaSqm && (
-            <p className="text-xs text-semantic-destructive mt-1">{errors.livingAreaSqm.message}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="numberOfRooms" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Pièces <span className="text-semantic-destructive">*</span>
-          </label>
-          <input
-            id="numberOfRooms"
-            type="number"
-            {...register('numberOfRooms', { valueAsNumber: true })}
-            className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-            placeholder="3"
-          />
-          {errors.numberOfRooms && (
-            <p className="text-xs text-semantic-destructive mt-1">{errors.numberOfRooms.message}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="desiredSellingPrice" className="block text-sm font-bold text-neutral-anthracite mb-1">
-            Prix souhaité <span className="text-semantic-destructive">*</span>
-          </label>
-          <div className="relative">
-            <input
-              id="desiredSellingPrice"
-              type="number"
-              {...register('desiredSellingPrice', { valueAsNumber: true })}
-              className="w-full px-3 py-2.5 pr-8 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-              placeholder="350000"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-grey-bold">€</span>
-          </div>
-          {errors.desiredSellingPrice && (
-            <p className="text-xs text-semantic-destructive mt-1">{errors.desiredSellingPrice.message}</p>
-          )}
-        </div>
+        <InputField
+          label="Surface (m²)"
+          id="livingAreaSqm"
+          type="number"
+          step="0.1"
+          {...register('livingAreaSqm', { valueAsNumber: true })}
+          placeholder="75"
+          error={errors.livingAreaSqm?.message}
+          required
+        />
+        <InputField
+          label="Pièces"
+          id="numberOfRooms"
+          type="number"
+          {...register('numberOfRooms', { valueAsNumber: true })}
+          placeholder="3"
+          error={errors.numberOfRooms?.message}
+          required
+        />
+        <InputField
+          label="Prix souhaité"
+          id="desiredSellingPrice"
+          type="number"
+          {...register('desiredSellingPrice', { valueAsNumber: true })}
+          placeholder="350000"
+          error={errors.desiredSellingPrice?.message}
+          suffix="€"
+          required
+        />
       </div>
 
       {/* Propriétaire (Client) */}
@@ -150,29 +132,26 @@ export function StepPropertyKey() {
             <span className="text-sm font-medium text-primary">
               {selectedClient.firstName} {selectedClient.lastName} — {selectedClient.primaryEmail}
             </span>
-            <button
-              type="button"
+            <Button
+              variant="link"
               onClick={() => {
                 setSelectedClient(null);
                 setValue('clientId', '', { shouldValidate: true });
               }}
-              className="text-xs text-primary hover:underline"
             >
               Changer
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-grey-bold" />
-              <input
-                type="text"
-                value={clientSearch}
-                onChange={(e) => setClientSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
-                placeholder="Rechercher un client existant..."
-              />
-            </div>
+            <InputField
+              id="client-search"
+              type="text"
+              value={clientSearch}
+              onChange={(e) => setClientSearch(e.target.value)}
+              placeholder="Rechercher un client existant..."
+              icon={<Search className="w-4 h-4" />}
+            />
 
             {/* Résultats recherche client */}
             {clientResults.length > 0 && (
@@ -195,14 +174,13 @@ export function StepPropertyKey() {
             )}
 
             {/* Création rapide */}
-            <button
-              type="button"
+            <Button
+              variant="link"
               onClick={() => setShowQuickCreate(true)}
-              className="inline-flex items-center gap-1.5 text-sm text-primary font-bold hover:underline"
+              icon={<UserPlus className="w-4 h-4" />}
             >
-              <UserPlus className="w-4 h-4" />
               Créer un nouveau client
-            </button>
+            </Button>
           </div>
         )}
         {errors.clientId && (
