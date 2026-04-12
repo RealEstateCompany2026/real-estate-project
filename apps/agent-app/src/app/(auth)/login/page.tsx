@@ -47,10 +47,10 @@ export default function LoginPage() {
     <div className="flex flex-col items-center">
       {/* Header */}
       <LogoBadge />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Connexion
       </h1>
-      <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-1 text-sm text-[var(--text-caption)]">
         Accédez à votre espace
       </p>
 
@@ -60,7 +60,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white hover:bg-[var(--color-grey-ultra-background)] transition-colors text-sm font-medium text-[var(--color-anthracite-textes)]"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] hover:bg-[var(--surface-neutral-action)] transition-colors text-sm font-medium text-[var(--text-headings)]"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path
@@ -85,22 +85,22 @@ export default function LoginPage() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-px bg-[var(--color-grey-light-couleur-primaire)]" />
-          <span className="text-xs text-[var(--color-grey-bold-textes)]">ou</span>
-          <div className="flex-1 h-px bg-[var(--color-grey-light-couleur-primaire)]" />
+          <div className="flex-1 h-px bg-[var(--border-default)]" />
+          <span className="text-xs text-[var(--text-caption)]">ou</span>
+          <div className="flex-1 h-px bg-[var(--border-default)]" />
         </div>
 
         {/* Email/password form */}
         <form onSubmit={handleEmailLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
               Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
               placeholder="vous@agence.com"
               required
               autoComplete="email"
@@ -108,14 +108,14 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
               Mot de passe
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
               placeholder="••••••••"
               required
               autoComplete="current-password"
@@ -126,14 +126,14 @@ export default function LoginPage() {
           <div className="text-right">
             <Link
               href="/forgot-password"
-              className="text-sm text-[var(--color-indigo-couleur-fonctionnelle)] hover:underline"
+              className="text-sm text-[var(--text-branded-action)] hover:underline"
             >
               Mot de passe oublié ?
             </Link>
           </div>
 
           {error && (
-            <div className="bg-[var(--color-soft-red-background)] border border-[var(--color-red-couleur-fonctionnelle)] text-[var(--color-red-couleur-fonctionnelle)] text-sm px-4 py-3 rounded-xl">
+            <div className="bg-[var(--surface-error)] border border-[var(--text-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
               {error}
             </div>
           )}
@@ -141,18 +141,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Connexion en cours…' : 'Se connecter'}
           </button>
         </form>
 
         {/* Bottom link */}
-        <p className="mt-8 text-center text-sm text-[var(--color-grey-bold-textes)]">
+        <p className="mt-8 text-center text-sm text-[var(--text-caption)]">
           Pas encore de compte ?{' '}
           <Link
             href="/signup"
-            className="font-semibold text-[var(--color-anthracite-textes)] hover:underline"
+            className="font-semibold text-[var(--text-headings)] hover:underline"
           >
             Créer un compte
           </Link>

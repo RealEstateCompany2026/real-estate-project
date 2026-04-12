@@ -11,8 +11,8 @@ const rules = [
 
 export function PasswordStrengthIndicator({ password }: { password: string }) {
   return (
-    <div className="rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-[var(--color-grey-ultra-background)] px-5 py-4">
-      <p className="text-sm font-bold text-[var(--color-anthracite-textes)] mb-3">
+    <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-action)] px-5 py-4">
+      <p className="text-sm font-bold text-[var(--text-headings)] mb-3">
         Le mot de passe doit contenir
       </p>
       <ul className="space-y-1.5">
@@ -21,15 +21,15 @@ export function PasswordStrengthIndicator({ password }: { password: string }) {
           return (
             <li key={rule.label} className="flex items-center gap-2 text-sm">
               {passed ? (
-                <Check className="w-4 h-4 text-[var(--color-green-couleur-fonctionnelle)]" />
+                <Check className="w-4 h-4 text-[var(--icon-success)]" />
               ) : (
-                <X className="w-4 h-4 text-[var(--color-grey-bold-icons)]" />
+                <X className="w-4 h-4 text-[var(--icon-neutral-default)]" />
               )}
               <span
                 className={
                   passed
-                    ? 'text-[var(--color-green-couleur-fonctionnelle)]'
-                    : 'text-[var(--color-grey-bold-textes)]'
+                    ? 'text-[var(--icon-success)]'
+                    : 'text-[var(--text-caption)]'
                 }
               >
                 {rule.label}

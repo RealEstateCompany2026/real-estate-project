@@ -41,37 +41,37 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex flex-col items-center">
       <LogoBadge />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Nouveau mot de passe
       </h1>
-      <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-1 text-sm text-[var(--text-caption)]">
         Choisissez un mot de passe sécurisé pour votre compte.
       </p>
 
       <form onSubmit={handleSubmit} className="w-full mt-8 space-y-5">
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             Nouveau mot de passe
           </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
             placeholder="••••••••"
             autoComplete="new-password"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             Confirmer le mot de passe
           </label>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
             placeholder="••••••••"
             autoComplete="new-password"
           />
@@ -80,7 +80,7 @@ export default function ResetPasswordPage() {
         <PasswordStrengthIndicator password={password} />
 
         {error && (
-          <div className="bg-[var(--color-soft-red-background)] text-[var(--color-red-couleur-fonctionnelle)] text-sm px-4 py-3 rounded-xl">
+          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
             {error}
           </div>
         )}
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={!canSubmit || isLoading}
-          className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
         </button>

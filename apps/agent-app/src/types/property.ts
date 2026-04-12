@@ -200,13 +200,13 @@ export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
 };
 
 export const PROPERTY_STATUS_COLORS: Record<PropertyStatus, string> = {
-  OFF_MARKET: 'var(--color-neutral-400)',
-  A_VENDRE: 'var(--color-green-500)',
-  A_LOUER: 'var(--color-blue-500)',
-  VENDU: 'var(--color-purple-500)',
-  LOUE: 'var(--color-purple-500)',
-  EN_VIAGER: 'var(--color-orange-500)',
-  OTHER: 'var(--color-neutral-400)',
+  OFF_MARKET: 'var(--neutral-400)',
+  A_VENDRE: 'var(--green-500)',
+  A_LOUER: 'var(--blue-500)',
+  VENDU: 'var(--purple-500)',
+  LOUE: 'var(--purple-500)',
+  EN_VIAGER: 'var(--orange-500)',
+  OTHER: 'var(--neutral-400)',
 };
 
 export const PROPERTY_CONDITION_LABELS: Record<PropertyCondition, string> = {

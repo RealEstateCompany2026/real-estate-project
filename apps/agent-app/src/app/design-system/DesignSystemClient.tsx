@@ -42,26 +42,9 @@ const F = {
   rFull:          '9999px',
 } as const
 
-// ─── Dark mode CSS variable overrides ────────────────────────────────────────
-const DARK_VARS: React.CSSProperties = {
-  '--color-white-background': '#1a1a1a',
-  '--color-grey-ultra-background': '#111111',
-  '--color-grey-light-background': '#1e1e1e',
-  '--color-grey-background': '#2a2a2a',
-  '--color-anthracite-textes': '#f0f0f0',
-  '--color-grey-bold-textes': '#b8b8b8',
-  '--color-grey-textes': '#777777',
-  '--color-grey-light-textes': '#3a3a3a',
-  '--color-white-textes-tons-foncés': '#f0f0f0',
-  '--color-anthracite-icons': '#f0f0f0',
-  '--color-grey-bold-icons': '#b8b8b8',
-  '--color-grey-icons': '#777777',
-  '--color-grey-ultra-contour': '#2a2a2a',
-  '--color-grey-contour': '#444444',
-  '--color-soft-blue-background': '#0a1e2d',
-  '--color-soft-red-background': '#2d1515',
-  '--color-soft-yellow-background': '#2a2700',
-} as React.CSSProperties
+// ─── Dark mode styles (no longer using deprecated --color-* variables) ────────
+// Old variables replaced with L3 tokens and .dark class toggle
+// To enable dark mode in the future, use CSS custom properties or Tailwind's dark mode
 
 // ─── Token comparison table (Figma ↔ local project) ──────────────────────────
 const TOKEN_MAP = [
@@ -856,7 +839,7 @@ export function DesignSystemClient() {
   return (
     <div
       className="h-screen flex flex-col overflow-hidden font-sans"
-      style={{ ...(dark ? DARK_VARS : {}), backgroundColor: dark ? '#111111' : '#f5f5f5', color: dark ? '#f0f0f0' : F.nDefault } as React.CSSProperties}
+      style={{ backgroundColor: dark ? '#111111' : '#f5f5f5', color: dark ? '#f0f0f0' : F.nDefault } as React.CSSProperties}
     >
       {/* ── Header ── */}
       <header

@@ -75,78 +75,78 @@ export default function ProfileSoloPage() {
     <div className="flex flex-col">
       <StepperDots steps={3} currentStep={0} />
 
-      <h1 className="mt-7 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-7 text-2xl font-bold text-[var(--text-headings)]">
         Complétez votre profil
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-2 text-sm text-[var(--text-caption)]">
         Ces informations apparaîtront sur vos documents et annonces officielles.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
               Prénom *
             </label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+            <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
               Nom *
             </label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
               required
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             Téléphone mobile *
           </label>
           <input
             type="tel"
             value={mobilePhone}
             onChange={(e) => setMobilePhone(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
             placeholder="+33 6 00 00 00 00"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             N° carte professionnelle (T) *
           </label>
           <input
             type="text"
             value={rsacNumber}
             onChange={(e) => setRsacNumber(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
             placeholder="CPI XXXX XXXX XXXX"
             required
           />
-          <p className="mt-1.5 text-xs text-[var(--color-grey-bold-textes)]">
+          <p className="mt-1.5 text-xs text-[var(--text-caption)]">
             Votre carte professionnelle délivrée par la CCI
           </p>
         </div>
 
-        <p className="text-xs text-[var(--color-grey-bold-textes)]">
+        <p className="text-xs text-[var(--text-caption)]">
           Ces informations apparaîtront sur vos documents et annonces officielles.
         </p>
 
         {error && (
-          <div className="bg-[var(--color-soft-red-background)] text-[var(--color-red-couleur-fonctionnelle)] text-sm px-4 py-3 rounded-xl">
+          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
             {error}
           </div>
         )}
@@ -155,14 +155,14 @@ export default function ProfileSoloPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] text-[var(--color-anthracite-textes)] font-semibold text-sm hover:bg-[var(--color-grey-ultra-background)] transition-colors"
+            className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors"
           >
             Retour
           </button>
           <button
             type="submit"
             disabled={!isValid || isLoading}
-            className="flex-1 py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Enregistrement…' : 'Continuer'}
           </button>

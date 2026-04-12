@@ -66,10 +66,10 @@ export default function OnboardingSetupPage() {
   if (step === -1) {
     return (
       <div className="flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-[var(--color-anthracite-textes)]">
+        <h1 className="text-3xl font-bold text-[var(--text-headings)]">
           Configurez votre espace
         </h1>
-        <p className="mt-3 text-[var(--color-grey-bold-textes)] text-center max-w-md">
+        <p className="mt-3 text-[var(--text-caption)] text-center max-w-md">
           4 étapes rapides pour personnaliser votre CRM et être opérationnel.
         </p>
 
@@ -77,16 +77,16 @@ export default function OnboardingSetupPage() {
           {setupSteps.map((s, i) => (
             <div
               key={s.label}
-              className="flex items-center gap-4 p-4 rounded-xl border border-[var(--color-grey-light-couleur-primaire)]"
+              className="flex items-center gap-4 p-4 rounded-xl border border-[var(--border-default)]"
             >
-              <div className="w-10 h-10 rounded-xl bg-[var(--color-grey-ultra-background)] flex items-center justify-center text-[var(--color-grey-bold-textes)] flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[var(--surface-neutral-action)] flex items-center justify-center text-[var(--text-caption)] flex-shrink-0">
                 <s.icon className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-[var(--color-anthracite-textes)]">
+                <p className="text-sm font-semibold text-[var(--text-headings)]">
                   Étape {i + 1} — {s.label}
                 </p>
-                <p className="text-xs text-[var(--color-grey-bold-textes)]">{s.description}</p>
+                <p className="text-xs text-[var(--text-caption)]">{s.description}</p>
               </div>
             </div>
           ))}
@@ -95,7 +95,7 @@ export default function OnboardingSetupPage() {
         <button
           type="button"
           onClick={() => setStep(0)}
-          className="mt-8 w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          className="mt-8 w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
         >
           Commencer
           <ChevronRight className="w-4 h-4" />
@@ -108,13 +108,13 @@ export default function OnboardingSetupPage() {
   if (step >= 4) {
     return (
       <div className="flex flex-col items-center text-center">
-        <div className="w-16 h-16 rounded-full bg-[var(--color-green-couleur-fonctionnelle)] flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-[var(--icon-success)] flex items-center justify-center">
           <Check className="w-8 h-8 text-white" />
         </div>
-        <h1 className="mt-6 text-3xl font-bold text-[var(--color-anthracite-textes)]">
+        <h1 className="mt-6 text-3xl font-bold text-[var(--text-headings)]">
           Configuration terminée !
         </h1>
-        <p className="mt-3 text-[var(--color-grey-bold-textes)] max-w-md">
+        <p className="mt-3 text-[var(--text-caption)] max-w-md">
           Votre espace de travail est prêt. Vous pouvez maintenant importer vos données
           ou accéder directement au dashboard.
         </p>
@@ -123,7 +123,7 @@ export default function OnboardingSetupPage() {
           <button
             type="button"
             onClick={() => router.push('/import')}
-            className="flex-1 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] text-[var(--color-anthracite-textes)] font-semibold text-sm hover:bg-[var(--color-grey-ultra-background)] transition-colors flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors flex items-center justify-center gap-2"
           >
             <Upload className="w-4 h-4" />
             Importer ma BDD
@@ -132,7 +132,7 @@ export default function OnboardingSetupPage() {
             type="button"
             onClick={handleFinish}
             disabled={isLoading}
-            className="flex-1 py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
           >
             Accéder au dashboard
             <ChevronRight className="w-4 h-4" />
@@ -150,11 +150,11 @@ export default function OnboardingSetupPage() {
           <div
             className={`h-1.5 w-full rounded-full ${
               i <= step
-                ? 'bg-[var(--color-indigo-couleur-fonctionnelle)]'
-                : 'bg-[var(--color-grey-light-couleur-primaire)]'
+                ? 'bg-[var(--surface-branded-action)]'
+                : 'bg-[var(--border-default)]'
             }`}
           />
-          <span className={`text-xs ${i === step ? 'text-[var(--color-anthracite-textes)] font-medium' : 'text-[var(--color-grey-bold-textes)]'}`}>
+          <span className={`text-xs ${i === step ? 'text-[var(--text-headings)] font-medium' : 'text-[var(--text-caption)]'}`}>
             {s.label}
           </span>
         </div>
@@ -167,7 +167,7 @@ export default function OnboardingSetupPage() {
       <button
         type="button"
         onClick={() => setStep(step - 1)}
-        className="flex-1 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] text-[var(--color-anthracite-textes)] font-semibold text-sm hover:bg-[var(--color-grey-ultra-background)] transition-colors flex items-center justify-center gap-2"
+        className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors flex items-center justify-center gap-2"
       >
         <ChevronLeft className="w-4 h-4" />
         Retour
@@ -175,7 +175,7 @@ export default function OnboardingSetupPage() {
       <button
         type="button"
         onClick={() => setStep(step + 1)}
-        className="flex-1 py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+        className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
       >
         {step === 3 ? 'Terminer' : 'Suivant'}
         <ChevronRight className="w-4 h-4" />
@@ -184,19 +184,19 @@ export default function OnboardingSetupPage() {
   )
 
   const inputCls =
-    'w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm'
+    'w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--surface-branded-action)] text-sm'
   const labelCls =
-    'block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5'
+    'block text-sm font-medium text-[var(--text-headings)] mb-1.5'
 
   /* ─── OBS-01 : Profil professionnel ─── */
   if (step === 0) {
     return (
       <div>
         {stepperBar}
-        <h2 className="text-xl font-bold text-[var(--color-anthracite-textes)]">
+        <h2 className="text-xl font-bold text-[var(--text-headings)]">
           Profil professionnel
         </h2>
-        <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+        <p className="mt-1 text-sm text-[var(--text-caption)]">
           Vérifiez et complétez vos informations personnelles.
         </p>
         <div className="mt-6 space-y-4">
@@ -233,10 +233,10 @@ export default function OnboardingSetupPage() {
     return (
       <div>
         {stepperBar}
-        <h2 className="text-xl font-bold text-[var(--color-anthracite-textes)]">
+        <h2 className="text-xl font-bold text-[var(--text-headings)]">
           Organisation
         </h2>
-        <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+        <p className="mt-1 text-sm text-[var(--text-caption)]">
           Renseignez les coordonnées de votre agence.
         </p>
         <div className="mt-6 space-y-4">
@@ -273,37 +273,37 @@ export default function OnboardingSetupPage() {
     return (
       <div>
         {stepperBar}
-        <h2 className="text-xl font-bold text-[var(--color-anthracite-textes)]">
+        <h2 className="text-xl font-bold text-[var(--text-headings)]">
           Documents légaux
         </h2>
-        <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+        <p className="mt-1 text-sm text-[var(--text-caption)]">
           Téléversez vos documents réglementaires.
         </p>
         <div className="mt-6 space-y-4">
           <div
-            className="border-2 border-dashed border-[var(--color-grey-light-couleur-primaire)] rounded-xl p-8 text-center cursor-pointer hover:border-[var(--color-indigo-couleur-fonctionnelle)] transition-colors"
+            className="border-2 border-dashed border-[var(--border-default)] rounded-xl p-8 text-center cursor-pointer hover:border-[var(--surface-branded-action)] transition-colors"
             onClick={() => setDocsUploaded(true)}
           >
             {docsUploaded ? (
               <div className="flex flex-col items-center gap-2">
-                <Check className="w-8 h-8 text-[var(--color-green-couleur-fonctionnelle)]" />
-                <p className="text-sm font-medium text-[var(--color-anthracite-textes)]">
+                <Check className="w-8 h-8 text-[var(--icon-success)]" />
+                <p className="text-sm font-medium text-[var(--text-headings)]">
                   Document téléversé
                 </p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <Upload className="w-8 h-8 text-[var(--color-grey-bold-textes)]" />
-                <p className="text-sm font-medium text-[var(--color-anthracite-textes)]">
+                <Upload className="w-8 h-8 text-[var(--text-caption)]" />
+                <p className="text-sm font-medium text-[var(--text-headings)]">
                   Assurance RCP
                 </p>
-                <p className="text-xs text-[var(--color-grey-bold-textes)]">
+                <p className="text-xs text-[var(--text-caption)]">
                   Cliquez ou glissez-déposez votre fichier (PDF, JPG, PNG — max 10 Mo)
                 </p>
               </div>
             )}
           </div>
-          <p className="text-xs text-[var(--color-grey-bold-textes)]">
+          <p className="text-xs text-[var(--text-caption)]">
             Vous pourrez ajouter d&apos;autres documents plus tard depuis la section Documents.
           </p>
         </div>
@@ -316,10 +316,10 @@ export default function OnboardingSetupPage() {
   return (
     <div>
       {stepperBar}
-      <h2 className="text-xl font-bold text-[var(--color-anthracite-textes)]">
+      <h2 className="text-xl font-bold text-[var(--text-headings)]">
         Paramètres
       </h2>
-      <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-1 text-sm text-[var(--text-caption)]">
         Personnalisez votre expérience.
       </p>
       <div className="mt-6 space-y-5">
@@ -350,25 +350,25 @@ export default function OnboardingSetupPage() {
 
         <div className="space-y-3 pt-2">
           <label className="flex items-center justify-between cursor-pointer">
-            <span className="text-sm text-[var(--color-anthracite-textes)]">
+            <span className="text-sm text-[var(--text-headings)]">
               Notifications par email
             </span>
             <button
               type="button"
               onClick={() => setSettings({ ...settings, emailNotifications: !settings.emailNotifications })}
-              className={`w-11 h-6 rounded-full transition-colors ${settings.emailNotifications ? 'bg-[var(--color-indigo-couleur-fonctionnelle)]' : 'bg-[var(--color-grey-light-couleur-primaire)]'}`}
+              className={`w-11 h-6 rounded-full transition-colors ${settings.emailNotifications ? 'bg-[var(--surface-branded-action)]' : 'bg-[var(--border-default)]'}`}
             >
               <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.emailNotifications ? 'translate-x-5' : 'translate-x-0.5'}`} />
             </button>
           </label>
           <label className="flex items-center justify-between cursor-pointer">
-            <span className="text-sm text-[var(--color-anthracite-textes)]">
+            <span className="text-sm text-[var(--text-headings)]">
               Notifications push
             </span>
             <button
               type="button"
               onClick={() => setSettings({ ...settings, pushNotifications: !settings.pushNotifications })}
-              className={`w-11 h-6 rounded-full transition-colors ${settings.pushNotifications ? 'bg-[var(--color-indigo-couleur-fonctionnelle)]' : 'bg-[var(--color-grey-light-couleur-primaire)]'}`}
+              className={`w-11 h-6 rounded-full transition-colors ${settings.pushNotifications ? 'bg-[var(--surface-branded-action)]' : 'bg-[var(--border-default)]'}`}
             >
               <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.pushNotifications ? 'translate-x-5' : 'translate-x-0.5'}`} />
             </button>

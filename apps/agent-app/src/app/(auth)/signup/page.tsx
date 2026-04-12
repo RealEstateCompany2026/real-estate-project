@@ -19,10 +19,10 @@ export default function SignupMethodPage() {
   return (
     <div className="flex flex-col items-center">
       <LogoBadge />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Créer un compte
       </h1>
-      <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-1 text-sm text-[var(--text-caption)]">
         Commencez gratuitement
       </p>
 
@@ -31,7 +31,7 @@ export default function SignupMethodPage() {
         <button
           type="button"
           onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white hover:bg-[var(--color-grey-ultra-background)] transition-colors text-sm font-medium text-[var(--color-anthracite-textes)]"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] hover:bg-[var(--surface-neutral-action)] transition-colors text-sm font-medium text-[var(--text-headings)]"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -44,25 +44,25 @@ export default function SignupMethodPage() {
 
         {/* Divider */}
         <div className="flex items-center gap-4">
-          <div className="flex-1 h-px bg-[var(--color-grey-light-couleur-primaire)]" />
-          <span className="text-xs text-[var(--color-grey-bold-textes)]">ou</span>
-          <div className="flex-1 h-px bg-[var(--color-grey-light-couleur-primaire)]" />
+          <div className="flex-1 h-px bg-[var(--border-default)]" />
+          <span className="text-xs text-[var(--text-caption)]">ou</span>
+          <div className="flex-1 h-px bg-[var(--border-default)]" />
         </div>
 
         {/* Email */}
         <Link
           href="/signup/email"
-          className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+          className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
         >
           Continuer avec un email
         </Link>
       </div>
 
-      <p className="mt-10 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-10 text-sm text-[var(--text-caption)]">
         Vous avez déjà un compte ?{' '}
         <Link
           href="/login"
-          className="font-semibold text-[var(--color-anthracite-textes)] hover:underline"
+          className="font-semibold text-[var(--text-headings)] hover:underline"
         >
           Se connecter
         </Link>

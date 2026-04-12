@@ -23,24 +23,24 @@ function ConfirmationContent() {
   return (
     <div className="flex flex-col items-center">
       <LogoBadge />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Vérifiez votre boîte mail
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-grey-bold-textes)] text-center max-w-[340px]">
+      <p className="mt-2 text-sm text-[var(--text-caption)] text-center max-w-[340px]">
         Nous avons envoyé un lien de réinitialisation à{' '}
-        <strong className="text-[var(--color-anthracite-textes)]">{email}</strong>
+        <strong className="text-[var(--text-headings)]">{email}</strong>
       </p>
 
       <div className="w-full mt-8 space-y-6">
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             Email
           </label>
           <input
             type="email"
             value={email}
             readOnly
-            className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-[var(--color-grey-ultra-background)] text-sm text-[var(--color-grey-bold-textes)]"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-action)] text-sm text-[var(--text-caption)]"
           />
         </div>
 
@@ -48,13 +48,13 @@ function ConfirmationContent() {
           type="button"
           disabled={!isFinished}
           onClick={handleResend}
-          className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isFinished ? 'Renvoyer le lien' : `Renvoyer dans ${seconds}s`}
         </button>
 
         <InfoCard>
-          <p className="text-sm text-[var(--color-grey-bold-textes)]">
+          <p className="text-sm text-[var(--text-caption)]">
             Si vous ne trouvez pas l&apos;email, vérifiez vos <strong>spams</strong> ou{' '}
             <strong>courriers indésirables</strong>.
           </p>
@@ -63,7 +63,7 @@ function ConfirmationContent() {
 
       <Link
         href="/login"
-        className="mt-8 text-sm font-semibold text-[var(--color-anthracite-textes)] hover:underline"
+        className="mt-8 text-sm font-semibold text-[var(--text-headings)] hover:underline"
       >
         Retour à la connexion
       </Link>

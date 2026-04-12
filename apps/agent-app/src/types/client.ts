@@ -105,10 +105,10 @@ export const CLIENT_STATUS_LABELS: Record<ClientStatus, string> = {
 };
 
 export const CLIENT_STATUS_COLORS: Record<ClientStatus, string> = {
-  PROPRIETAIRE: 'var(--color-blue-500)',
-  ACQUEREUR: 'var(--color-green-500)',
-  BAILLEUR: 'var(--color-purple-500)',
-  LOCATAIRE: 'var(--color-orange-500)',
+  PROPRIETAIRE: 'var(--blue-500)',
+  ACQUEREUR: 'var(--green-500)',
+  BAILLEUR: 'var(--purple-500)',
+  LOCATAIRE: 'var(--orange-500)',
 };
 
 export const CLIENT_GENDER_LABELS: Record<ClientGender, string> = {

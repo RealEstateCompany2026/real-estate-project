@@ -43,7 +43,7 @@ export function CompletionGauge({ score, level, suggestion, size = 'md' }: Compl
             cy={width / 2}
             r={radius}
             fill="none"
-            stroke="var(--color-grey-light-background, #F3F4F6)"
+            stroke="var(--border-default)"
             strokeWidth={stroke}
           />
           {/* Progress arc */}

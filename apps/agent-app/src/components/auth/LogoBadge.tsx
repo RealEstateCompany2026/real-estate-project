@@ -3,9 +3,9 @@
 type LogoBadgeVariant = 'default' | 'success' | 'error'
 
 const variantStyles: Record<LogoBadgeVariant, string> = {
-  default: 'bg-[var(--color-indigo-couleur-fonctionnelle)]',
-  success: 'bg-[var(--color-green-couleur-fonctionnelle)]',
-  error: 'bg-[var(--color-red-couleur-fonctionnelle)]',
+  default: 'bg-[var(--surface-branded-action)]',
+  success: 'bg-[var(--icon-success)]',
+  error: 'bg-[var(--text-error)]',
 }
 
 export function LogoBadge({ variant = 'default' }: { variant?: LogoBadgeVariant }) {

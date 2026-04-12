@@ -6,10 +6,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-10 max-w-[1600px] mx-auto">
-      <h1 className="text-3xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="text-3xl font-bold text-[var(--text-headings)]">
         Bonjour{user?.email ? `, ${user.email.split('@')[0]}` : ''} !
       </h1>
-      <p className="mt-2 text-[var(--color-grey-bold-textes)]">
+      <p className="mt-2 text-[var(--text-caption)]">
         Bienvenue sur votre espace Agent Immobilier.
       </p>
 
@@ -18,10 +18,10 @@ export default async function DashboardPage() {
         {['Clients actifs', 'Biens en portefeuille', 'Affaires en cours'].map((label) => (
           <div
             key={label}
-            className="bg-white rounded-xl border border-[var(--color-grey-light-couleur-primaire)] p-6"
+            className="bg-[var(--surface-neutral-default)] rounded-xl border border-[var(--border-default)] p-6"
           >
-            <p className="text-sm text-[var(--color-grey-bold-textes)]">{label}</p>
-            <p className="mt-2 text-3xl font-bold text-[var(--color-anthracite-textes)]">—</p>
+            <p className="text-sm text-[var(--text-caption)]">{label}</p>
+            <p className="mt-2 text-3xl font-bold text-[var(--text-headings)]">—</p>
           </div>
         ))}
       </div>

@@ -11,6 +11,6 @@
 
 body {
   font-family: var(--font-roboto);
-  color: var(--color-anthracite-textes);
-  background: var(--color-white-background);
+  color: var(--text-body);
+  background: var(--surface-neutral-default);
 }

@@ -30,10 +30,10 @@ export default function SignupConfirmationPage() {
         <LogoBadge variant="success" />
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Félicitations !
       </h1>
-      <p className="mt-1 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-1 text-sm text-[var(--text-caption)]">
         Votre compte a été créé avec succès
       </p>
 
@@ -42,8 +42,8 @@ export default function SignupConfirmationPage() {
           <div className="space-y-3">
             {confirmationItems.map((item) => (
               <div key={item} className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-[var(--color-green-couleur-fonctionnelle)] flex-shrink-0" />
-                <p className="text-sm font-medium text-[var(--color-anthracite-textes)]">
+                <CheckCircle className="w-5 h-5 text-[var(--icon-success)] flex-shrink-0" />
+                <p className="text-sm font-medium text-[var(--text-headings)]">
                   {item}
                 </p>
               </div>
@@ -54,23 +54,23 @@ export default function SignupConfirmationPage() {
 
       <div className="w-full mt-8 space-y-4">
         <div>
-          <p className="text-sm font-semibold text-[var(--color-anthracite-textes)]">
+          <p className="text-sm font-semibold text-[var(--text-headings)]">
             Prochaine étape
           </p>
-          <p className="text-sm text-[var(--color-grey-bold-textes)] mt-1">
+          <p className="text-sm text-[var(--text-caption)] mt-1">
             Nous allons vous guider pour configurer votre espace de travail et découvrir
             les fonctionnalités principales
           </p>
         </div>
 
-        <p className="text-sm text-[var(--color-anthracite-textes)] text-center font-medium">
-          Redirection automatique dans <strong className="text-[var(--color-indigo-couleur-fonctionnelle)]">{seconds}</strong> secondes
+        <p className="text-sm text-[var(--text-headings)] text-center font-medium">
+          Redirection automatique dans <strong className="text-[var(--text-branded-action)]">{seconds}</strong> secondes
         </p>
 
         <button
           type="button"
           onClick={() => router.push('/tour')}
-          className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
         >
           Commencer maintenant
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

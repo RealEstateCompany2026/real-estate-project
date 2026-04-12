@@ -14,8 +14,8 @@ export function StepperDots({
           key={i}
           className={`h-2 rounded-full transition-all duration-300 ${
             i === currentStep
-              ? 'w-6 bg-[var(--color-indigo-couleur-fonctionnelle)]'
-              : 'w-2 bg-[var(--color-grey-light-couleur-primaire)]'
+              ? 'w-6 bg-[var(--surface-branded-action)]'
+              : 'w-2 bg-[var(--border-default)]'
           }`}
         />
       ))}

@@ -5,9 +5,9 @@ import type { ReactNode } from 'react'
 type InfoCardVariant = 'info' | 'warning' | 'success'
 
 const variantStyles: Record<InfoCardVariant, string> = {
-  info: 'border-[var(--color-grey-light-couleur-primaire)] bg-[var(--color-grey-ultra-background)]',
-  warning: 'border-[var(--color-yellow-couleur-fonctionnelle)] bg-[var(--color-soft-yellow-background)]',
-  success: 'border-[var(--color-green-couleur-fonctionnelle)] bg-white',
+  info: 'border-[var(--border-default)] bg-[var(--surface-neutral-action)]',
+  warning: 'border-[var(--border-warning-default)] bg-[var(--surface-warning)]',
+  success: 'border-[var(--icon-success)] bg-[var(--surface-neutral-default)]',
 }
 
 export function InfoCard({

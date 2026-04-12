@@ -37,16 +37,16 @@ export default function TeamInvitationPage() {
     <div className="flex flex-col">
       <StepperDots steps={3} currentStep={1} />
 
-      <h1 className="mt-7 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-7 text-2xl font-bold text-[var(--text-headings)]">
         Invitez votre équipe
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-grey-bold-textes)]">
+      <p className="mt-2 text-sm text-[var(--text-caption)]">
         Ajoutez les membres de votre équipe. Ils recevront une invitation par email.
       </p>
 
       <div className="mt-8 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             Email du collaborateur
           </label>
           <div className="flex gap-2">
@@ -55,7 +55,7 @@ export default function TeamInvitationPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMember())}
-              className="flex-1 px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+              className="flex-1 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
               placeholder="collegue@agence.com"
             />
           </div>
@@ -65,7 +65,7 @@ export default function TeamInvitationPage() {
           type="button"
           onClick={handleAddMember}
           disabled={!email}
-          className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           + Ajouter un collaborateur
         </button>
@@ -76,13 +76,13 @@ export default function TeamInvitationPage() {
             {invitedEmails.map((e) => (
               <div
                 key={e}
-                className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[var(--color-grey-ultra-background)] text-sm"
+                className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[var(--surface-neutral-action)] text-sm"
               >
-                <span className="text-[var(--color-anthracite-textes)]">{e}</span>
+                <span className="text-[var(--text-headings)]">{e}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveMember(e)}
-                  className="text-[var(--color-grey-bold-textes)] hover:text-[var(--color-red-couleur-fonctionnelle)]"
+                  className="text-[var(--text-caption)] hover:text-[var(--text-error)]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -92,10 +92,10 @@ export default function TeamInvitationPage() {
         )}
 
         <InfoCard>
-          <p className="text-sm font-semibold text-[var(--color-anthracite-textes)] mb-1">
+          <p className="text-sm font-semibold text-[var(--text-headings)] mb-1">
             Comment ça marche ?
           </p>
-          <p className="text-sm text-[var(--color-grey-bold-textes)]">
+          <p className="text-sm text-[var(--text-caption)]">
             Chaque collaborateur recevra un email d&apos;invitation avec un lien pour
             créer son compte et rejoindre votre espace de travail.
           </p>
@@ -106,7 +106,7 @@ export default function TeamInvitationPage() {
         <button
           type="button"
           onClick={() => router.push('/signup/confirmation')}
-          className="flex-1 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] text-[var(--color-anthracite-textes)] font-semibold text-sm hover:bg-[var(--color-grey-ultra-background)] transition-colors"
+          className="flex-1 py-3 rounded-xl border border-[var(--border-default)] text-[var(--text-headings)] font-semibold text-sm hover:bg-[var(--surface-neutral-action)] transition-colors"
         >
           Passer cette étape
         </button>
@@ -114,7 +114,7 @@ export default function TeamInvitationPage() {
           type="button"
           onClick={handleContinue}
           disabled={invitedEmails.length === 0 || isLoading}
-          className="flex-1 py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Envoi…' : 'Continuer'}
         </button>

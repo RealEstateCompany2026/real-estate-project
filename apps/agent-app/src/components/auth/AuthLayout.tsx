@@ -28,9 +28,9 @@ export function AuthLayout({ children }: { children: ReactNode }) {
             >
               <path
                 d="M8 8V24H12V18H20V24H24V8H20V14H12V8H8Z"
-                fill="var(--color-indigo-couleur-fonctionnelle)"
+                fill="var(--surface-branded-action)"
               />
-              <path d="M16 4L18 7H14L16 4Z" fill="var(--color-indigo-couleur-fonctionnelle)" opacity="0.6" />
+              <path d="M16 4L18 7H14L16 4Z" fill="var(--surface-branded-action)" opacity="0.6" />
             </svg>
           </div>
           <p className="text-white text-2xl font-light tracking-wide">
@@ -40,11 +40,11 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Right side — Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-white relative">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-[var(--surface-neutral-default)] relative">
         <div className="w-full max-w-[415px]">{children}</div>
 
         {/* Footer */}
-        <p className="absolute bottom-6 text-xs text-[var(--color-grey-bold-textes)]">
+        <p className="absolute bottom-6 text-xs text-[var(--text-caption)]">
           © RealAgent
         </p>
       </div>

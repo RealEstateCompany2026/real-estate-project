@@ -28,11 +28,11 @@ function InvitationContent() {
   return (
     <div className="flex flex-col items-center">
       <LogoBadge />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Rejoignez votre équipe
       </h1>
       {inviterName && orgName && (
-        <p className="mt-2 text-sm text-[var(--color-grey-bold-textes)] text-center max-w-[340px]">
+        <p className="mt-2 text-sm text-[var(--text-caption)] text-center max-w-[340px]">
           {inviterName} vous a invité à rejoindre {orgName}
         </p>
       )}
@@ -41,12 +41,12 @@ function InvitationContent() {
         <InfoCard>
           <div className="space-y-3">
             <div>
-              <p className="text-sm font-bold text-[var(--color-anthracite-textes)]">Email</p>
-              <p className="text-sm text-[var(--color-grey-bold-textes)]">{email}</p>
+              <p className="text-sm font-bold text-[var(--text-headings)]">Email</p>
+              <p className="text-sm text-[var(--text-caption)]">{email}</p>
             </div>
             <div>
-              <p className="text-sm font-bold text-[var(--color-anthracite-textes)]">Rôle</p>
-              <p className="text-sm text-[var(--color-grey-bold-textes)]">{role}</p>
+              <p className="text-sm font-bold text-[var(--text-headings)]">Rôle</p>
+              <p className="text-sm text-[var(--text-caption)]">{role}</p>
             </div>
           </div>
         </InfoCard>
@@ -54,7 +54,7 @@ function InvitationContent() {
         <button
           type="button"
           onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white hover:bg-[var(--color-grey-ultra-background)] transition-colors text-sm font-medium text-[var(--color-anthracite-textes)]"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] hover:bg-[var(--surface-neutral-action)] transition-colors text-sm font-medium text-[var(--text-headings)]"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -67,7 +67,7 @@ function InvitationContent() {
 
         <Link
           href={`/signup/email?email=${encodeURIComponent(email)}`}
-          className="block text-center text-sm font-semibold text-[var(--color-anthracite-textes)] hover:underline"
+          className="block text-center text-sm font-semibold text-[var(--text-headings)] hover:underline"
         >
           ou utiliser un mot de passe
         </Link>

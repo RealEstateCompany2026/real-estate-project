@@ -21,16 +21,16 @@ export default function LinkExpiredPage() {
   return (
     <div className="flex flex-col items-center">
       <LogoBadge variant="error" />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Lien expiré
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-grey-bold-textes)] text-center max-w-[340px]">
+      <p className="mt-2 text-sm text-[var(--text-caption)] text-center max-w-[340px]">
         Le lien de réinitialisation que vous avez utilisé a expiré.
       </p>
 
       <div className="w-full mt-8 space-y-6">
         <InfoCard>
-          <p className="text-sm text-[var(--color-grey-bold-textes)]">
+          <p className="text-sm text-[var(--text-caption)]">
             Pour des raisons de sécurité, les liens de réinitialisation expirent après{' '}
             <strong>1 heure</strong>. Veuillez demander un nouveau lien.
           </p>
@@ -39,14 +39,14 @@ export default function LinkExpiredPage() {
         {!sent ? (
           <>
             <div>
-              <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+              <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
                 placeholder="vous@agence.com"
               />
             </div>
@@ -54,13 +54,13 @@ export default function LinkExpiredPage() {
               type="button"
               onClick={handleResend}
               disabled={!email}
-              className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               Renvoyer un lien
             </button>
           </>
         ) : (
-          <div className="text-center text-sm text-[var(--color-green-couleur-fonctionnelle)] font-medium">
+          <div className="text-center text-sm text-[var(--text-success)] font-medium">
             Un nouveau lien a été envoyé à votre adresse email.
           </div>
         )}
@@ -68,7 +68,7 @@ export default function LinkExpiredPage() {
 
       <Link
         href="/login"
-        className="mt-8 text-sm font-semibold text-[var(--color-anthracite-textes)] hover:underline"
+        className="mt-8 text-sm font-semibold text-[var(--text-headings)] hover:underline"
       >
         Retour à la connexion
       </Link>

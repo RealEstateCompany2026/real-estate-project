@@ -35,23 +35,23 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex flex-col items-center">
       <LogoBadge />
-      <h1 className="mt-4 text-2xl font-bold text-[var(--color-anthracite-textes)]">
+      <h1 className="mt-4 text-2xl font-bold text-[var(--text-headings)]">
         Mot de passe oublié
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-grey-bold-textes)] text-center max-w-[320px]">
+      <p className="mt-2 text-sm text-[var(--text-caption)] text-center max-w-[320px]">
         Entrez votre adresse email et nous vous enverrons un lien de réinitialisation.
       </p>
 
       <form onSubmit={handleSubmit} className="w-full mt-8 space-y-6">
         <div>
-          <label className="block text-sm font-medium text-[var(--color-anthracite-textes)] mb-1.5">
+          <label className="block text-sm font-medium text-[var(--text-headings)] mb-1.5">
             Email
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-[var(--color-grey-light-couleur-primaire)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-indigo-couleur-fonctionnelle)] text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-neutral-default)] focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
             placeholder="vous@agence.com"
             required
             autoComplete="email"
@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {error && (
-          <div className="bg-[var(--color-soft-red-background)] text-[var(--color-red-couleur-fonctionnelle)] text-sm px-4 py-3 rounded-xl">
+          <div className="bg-[var(--surface-error)] text-[var(--text-error)] text-sm px-4 py-3 rounded-xl">
             {error}
           </div>
         )}
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isLoading || !email}
-          className="w-full py-3 rounded-xl bg-[var(--color-indigo-couleur-fonctionnelle)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-xl bg-[var(--surface-branded-action)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Envoi en cours…' : 'Envoyer le lien'}
         </button>
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
 
       <Link
         href="/login"
-        className="mt-8 text-sm font-semibold text-[var(--color-anthracite-textes)] hover:underline"
+        className="mt-8 text-sm font-semibold text-[var(--text-headings)] hover:underline"
       >
         Retour à la connexion
       </Link>
