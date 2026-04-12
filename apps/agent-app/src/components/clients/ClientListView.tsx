@@ -1,106 +1,101 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Users, Download, Upload } from 'lucide-react';
+import { Filter, Plus, X } from 'lucide-react';
+
+// ── DS Components (from packages/ui) ──
+import { AppBarCategory } from '@real-estate/ui/app-bar-category';
+import { GraphCourbe } from '@real-estate/ui/graph-courbe';
+import { ListClient } from '@real-estate/ui/list-client';
+import { CardClient } from '@real-estate/ui/card-client';
+import { Sheet } from '@real-estate/ui/sheet';
+import { ButtonSort } from '@real-estate/ui/button-sort';
+import { ButtonPagination } from '@real-estate/ui/button-pagination';
+import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
+import { Chip } from '@real-estate/ui/chip';
+import { KpiIndicator } from '@real-estate/ui/kpi-indicator';
 import { Button } from '@real-estate/ui/button';
+
+// ── App-level ──
 import { createClient } from '@/lib/supabase/client';
-import { DataTable, Avatar, StatusBadge, EmptyState } from '@/components/ui';
-import type { Column } from '@/components/ui/DataTable';
 import type { ClientListItem, ClientStatus } from '@/types/client';
-import { CLIENT_STATUS_LABELS, CLIENT_STATUS_COLORS } from '@/types/client';
-import { formatRelativeDate } from '@/lib/utils/format';
 
 // ---------------------------------------------------------------------------
-// Filter chips
+// Types
 // ---------------------------------------------------------------------------
 
-const STATUS_FILTERS: { label: string; value: ClientStatus | 'ALL' }[] = [
-  { label: 'Tous', value: 'ALL' },
-  { label: 'Propriétaires', value: 'PROPRIETAIRE' },
-  { label: 'Acquéreurs', value: 'ACQUEREUR' },
-  { label: 'Bailleurs', value: 'BAILLEUR' },
-  { label: 'Locataires', value: 'LOCATAIRE' },
+interface ClientKpis {
+  qualification: number;
+  engagement: number;
+  conversion: number;
+  reactivation: number;
+}
+
+interface ClientWithKpis extends ClientListItem {
+  kpis: ClientKpis;
+  aiSuggestions: number;
+  badges: Array<{ label: string; variant?: 'default' | 'success' | 'error' | 'warning' | 'information' }>;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Map client status to badge config */
+function statusToBadges(status: ClientStatus[]): ClientWithKpis['badges'] {
+  const map: Record<string, { label: string; variant?: 'default' }> = {
+    PROPRIETAIRE: { label: 'PROPRIÉTAIRE' },
+    ACQUEREUR: { label: 'ACQUÉREUR' },
+    BAILLEUR: { label: 'BAILLEUR' },
+    LOCATAIRE: { label: 'LOCATAIRE' },
+    VENDEUR: { label: 'VENDEUR' },
+  };
+  return status.map((s) => map[s] ?? { label: s });
+}
+
+/** Generate mock KPIs (replace with real RPC call later) */
+function mockKpis(): ClientKpis {
+  return {
+    qualification: Math.floor(Math.random() * 60) + 20,
+    engagement: Math.floor(Math.random() * 60) + 20,
+    conversion: Math.floor(Math.random() * 40) + 10,
+    reactivation: Math.floor(Math.random() * 60) + 20,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Filter chips config
+// ---------------------------------------------------------------------------
+
+const CATEGORY_FILTERS = [
+  { label: 'tous', value: 'ALL' as const },
+  { label: 'propriétaires', value: 'PROPRIETAIRE' as const },
+  { label: 'acquéreurs', value: 'ACQUEREUR' as const },
+  { label: 'bailleurs', value: 'BAILLEUR' as const },
+  { label: 'locataires', value: 'LOCATAIRE' as const },
 ];
 
 // ---------------------------------------------------------------------------
-// Columns
+// Graph data (mock — replace with real analytics)
 // ---------------------------------------------------------------------------
 
-const columns: Column<ClientListItem>[] = [
-  {
-    key: 'lastName',
-    label: 'Client',
-    sortable: true,
-    className: 'min-w-[200px]',
-    render: (row) => (
-      <div className="flex items-center gap-3">
-        <Avatar firstName={row.firstName} lastName={row.lastName} size="sm" />
-        <div className="min-w-0">
-          <p className="font-medium text-content-headings truncate">
-            {row.firstName} {row.lastName}
-          </p>
-          <p className="text-xs text-content-subtle truncate">{row.primaryEmail}</p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    key: 'status',
-    label: 'Statut',
-    render: (row) => (
-      <div className="flex flex-wrap gap-1">
-        {row.status.map((s) => (
-          <StatusBadge
-            key={s}
-            label={CLIENT_STATUS_LABELS[s]}
-            color={CLIENT_STATUS_COLORS[s]}
-            variant="outlined"
-            size="sm"
-          />
-        ))}
-      </div>
-    ),
-  },
-  {
-    key: 'mobilePhone',
-    label: 'Téléphone',
-    render: (row) => (
-      <span className="text-content-body">{row.mobilePhone ?? '—'}</span>
-    ),
-  },
-  {
-    key: 'completionScore',
-    label: 'Complétude',
-    sortable: true,
-    className: 'w-28',
-    render: (row) => {
-      const score = row.completionScore;
-      const color =
-        score >= 75 ? 'var(--green-500)' : score >= 50 ? 'var(--orange-400)' : score >= 25 ? 'var(--orange-500)' : 'var(--red-500)';
-      return (
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-surface-neutral-action-hover rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${score}%`, backgroundColor: color }}
-            />
-          </div>
-          <span className="text-xs font-medium" style={{ color }}>{score}%</span>
-        </div>
-      );
-    },
-  },
-  {
-    key: 'createdAt',
-    label: 'Ajouté',
-    sortable: true,
-    className: 'w-32',
-    render: (row) => (
-      <span className="text-content-subtle text-xs">{formatRelativeDate(row.createdAt)}</span>
-    ),
-  },
+const GRAPH_DATA = [
+  { label: '10 avr', value: 18 },
+  { label: '17 avr', value: 30 },
+  { label: '24 avr', value: 25 },
+  { label: '01 mai', value: 35 },
+  { label: '08 mai', value: 32 },
+  { label: '15 mai', value: 28 },
+  { label: '22 mai', value: 22 },
+  { label: '22 mai', value: 38 },
 ];
+
+// ---------------------------------------------------------------------------
+// Page size
+// ---------------------------------------------------------------------------
+
+const PAGE_SIZE = 25;
 
 // ---------------------------------------------------------------------------
 // Component
@@ -108,10 +103,22 @@ const columns: Column<ClientListItem>[] = [
 
 export function ClientListView() {
   const router = useRouter();
-  const [clients, setClients] = useState<ClientListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<ClientStatus | 'ALL'>('ALL');
 
+  // ── Data state ──
+  const [clients, setClients] = useState<ClientWithKpis[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ── UI state ──
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
+
+  // ── Sheet state ──
+  const [selectedClient, setSelectedClient] = useState<ClientWithKpis | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // ── Fetch clients ──
   useEffect(() => {
     async function load() {
       const supabase = createClient();
@@ -120,90 +127,249 @@ export function ClientListView() {
         .select('id, firstName, lastName, status, primaryEmail, mobilePhone, agentId, completionScore, isActive, createdAt')
         .eq('isActive', true)
         .order('createdAt', { ascending: false });
-      setClients((data ?? []) as unknown as ClientListItem[]);
+
+      const enriched: ClientWithKpis[] = ((data ?? []) as unknown as ClientListItem[]).map((c) => ({
+        ...c,
+        kpis: mockKpis(),
+        aiSuggestions: Math.floor(Math.random() * 20),
+        badges: statusToBadges(c.status),
+      }));
+
+      setClients(enriched);
       setIsLoading(false);
     }
     load();
   }, []);
 
-  // Apply local status filter
-  const filtered =
-    statusFilter === 'ALL'
-      ? clients
-      : clients.filter((c) => c.status.includes(statusFilter));
+  // ── Filtering ──
+  const filtered = clients.filter((c) => {
+    if (categoryFilter !== 'ALL' && !c.status.includes(categoryFilter as ClientStatus)) return false;
+    // Additional active filters could be applied here
+    return true;
+  });
+
+  // ── Pagination ──
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  // ── Handlers ──
+  const handleClientClick = useCallback((client: ClientWithKpis) => {
+    setSelectedClient(client);
+    setSheetOpen(true);
+  }, []);
+
+  const handleRemoveFilter = useCallback((filter: string) => {
+    setActiveFilters((prev) => prev.filter((f) => f !== filter));
+  }, []);
+
+  // ── Loading skeleton ──
+  if (isLoading) {
+    return (
+      <div className="space-y-3 p-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-[120px] bg-surface-neutral-action-hover rounded-2xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-h5 text-content-headings">Clients</h1>
-          <p className="text-sm text-content-subtle mt-0.5">
-            {clients.length} client{clients.length > 1 ? 's' : ''} actif{clients.length > 1 ? 's' : ''}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4" />
-            Importer
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4" />
-            Exporter
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => router.push('/clients/new')}
+    <>
+      {/* ═══════════════════════════════════════════════════════
+          1. AppBarCategory — "Clients" + dropdown + add + search
+          ═══════════════════════════════════════════════════════ */}
+      <AppBarCategory
+        title="Clients"
+        filterLabel={CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'tous'}
+        filterItems={CATEGORY_FILTERS.map((f) => ({
+          label: f.label,
+          onClick: () => {
+            setCategoryFilter(f.value);
+            setPage(0);
+          },
+        }))}
+        onAdd={() => router.push('/clients/new')}
+        onSearch={() => {
+          // TODO: open search overlay
+        }}
+      />
+
+      {/* ═══════════════════════════════════════════════════════
+          2. GraphCourbe — Engagement curve
+          ═══════════════════════════════════════════════════════ */}
+      <GraphCourbe
+        title="Label"
+        data={GRAPH_DATA}
+        selectedIndex={5}
+        selectedDate="22 fév 2026"
+        selectedLabel="28 réactions positives"
+        trendPercentage="7%"
+        trendDirection="down"
+      />
+
+      {/* ═══════════════════════════════════════════════════════
+          3. Filter bar — filter icon + chips + view mode toggle
+          ═══════════════════════════════════════════════════════ */}
+      <div className="flex items-center justify-between px-0 py-[10px]">
+        <div className="flex items-center gap-[8px]">
+          {/* Filter icon */}
+          <button
+            type="button"
+            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
+            aria-label="Filtrer"
           >
-            <Plus className="w-4 h-4" />
-            Nouveau client
-          </Button>
+            <Filter size={20} style={{ color: 'var(--icon-neutral-default)' }} />
+          </button>
+
+          {/* Active filter chips */}
+          {activeFilters.map((filter) => (
+            <Chip key={filter} size="medium">
+              {filter}
+              <button
+                onClick={() => handleRemoveFilter(filter)}
+                className="ml-1"
+                aria-label={`Supprimer le filtre ${filter}`}
+              >
+                <X size={14} style={{ color: 'var(--icon-neutral-default)' }} />
+              </button>
+            </Chip>
+          ))}
+
+          {/* Add filter button */}
+          <button
+            type="button"
+            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
+            aria-label="Ajouter un filtre"
+          >
+            <Plus size={20} style={{ color: 'var(--icon-neutral-default)' }} />
+          </button>
         </div>
+
+        {/* View mode toggle */}
+        <ViewModeDropdown
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
       </div>
 
-      {/* DataTable */}
-      <DataTable
-        columns={columns}
-        data={filtered}
-        isLoading={isLoading}
-        searchableFields={['firstName', 'lastName', 'primaryEmail', 'mobilePhone']}
-        searchPlaceholder="Rechercher un client…"
-        onRowClick={(row) => router.push(`/clients/${row.id}`)}
-        pageSize={25}
-        filters={
-          <div className="flex items-center gap-1.5">
-            {STATUS_FILTERS.map((f) => (
+      {/* ═══════════════════════════════════════════════════════
+          4. Client list / grid
+          ═══════════════════════════════════════════════════════ */}
+      {viewMode === 'list' ? (
+        /* ── MODE LIST : ListClient rows ── */
+        <div className="flex flex-col gap-[17px]">
+          {paginated.map((client) => (
+            <ListClient
+              key={client.id}
+              firstName={client.firstName}
+              lastName={client.lastName}
+              badges={client.badges}
+              kpis={client.kpis}
+              aiSuggestions={client.aiSuggestions}
+              onClick={() => handleClientClick(client)}
+            />
+          ))}
+        </div>
+      ) : (
+        /* ── MODE GRID : CardClient cards ── */
+        <div className="grid grid-cols-3 gap-[17px]">
+          {paginated.map((client) => (
+            <CardClient
+              key={client.id}
+              firstName={client.firstName}
+              lastName={client.lastName}
+              badges={client.badges}
+              kpis={client.kpis}
+              aiSuggestions={client.aiSuggestions}
+              onClick={() => handleClientClick(client)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
+          5. Pagination bar — ButtonSort + ButtonPagination
+          ═══════════════════════════════════════════════════════ */}
+      <div className="flex items-center justify-end gap-[12px] py-[20px]">
+        <ButtonSort
+          label=""
+          count={filtered.length}
+          sortDirection="none"
+        />
+        <ButtonPagination
+          onPrevious={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          canGoPrevious={page > 0}
+          canGoNext={page < totalPages - 1}
+        />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          6. Sheet — Client detail (opens on click)
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={sheetOpen}
+        onClose={() => {
+          setSheetOpen(false);
+          setSelectedClient(null);
+        }}
+        title={selectedClient ? `${selectedClient.firstName} ${selectedClient.lastName}` : ''}
+        width="narrow"
+        footer={
+          selectedClient ? (
+            <div className="flex gap-[12px] p-[20px] border-t border-edge-default">
               <Button
-                key={f.value}
-                variant={statusFilter === f.value ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter(f.value)}
-                className="rounded-full"
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setSheetOpen(false);
+                  router.push(`/clients/${selectedClient.id}`);
+                }}
               >
-                {f.label}
+                Voir la fiche
               </Button>
-            ))}
-          </div>
-        }
-        emptyState={
-          <EmptyState
-            icon={<Users className="w-6 h-6" />}
-            title="Aucun client"
-            description="Ajoutez votre premier client pour commencer."
-            action={
               <Button
                 variant="primary"
-                size="sm"
-                onClick={() => router.push('/clients/new')}
+                className="flex-1"
               >
-                <Plus className="w-4 h-4" />
-                Nouveau client
+                Voir les actions
               </Button>
-            }
-          />
+            </div>
+          ) : undefined
         }
-      />
-    </div>
+      >
+        {selectedClient && (
+          <div className="flex flex-col gap-[24px] px-[20px] py-[24px]">
+            {/* KPI Cards */}
+            <div className="flex flex-col gap-[16px]">
+              <KpiIndicator
+                kpi="qual"
+                value={`${selectedClient.kpis.qualification}%`}
+                percentage={selectedClient.kpis.qualification}
+                variant="vertical"
+              />
+              <KpiIndicator
+                kpi="eng"
+                value={`${selectedClient.kpis.engagement}%`}
+                percentage={selectedClient.kpis.engagement}
+                variant="vertical"
+              />
+              <KpiIndicator
+                kpi="conv"
+                value={`${selectedClient.kpis.conversion}%`}
+                percentage={selectedClient.kpis.conversion}
+                variant="vertical"
+              />
+              <KpiIndicator
+                kpi="reac"
+                value={`${selectedClient.kpis.reactivation}%`}
+                percentage={selectedClient.kpis.reactivation}
+                variant="vertical"
+              />
+            </div>
+          </div>
+        )}
+      </Sheet>
+    </>
   );
 }

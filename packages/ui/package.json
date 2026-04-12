@@ -47,7 +47,15 @@
         "./menu": "./src/components/Menu.tsx",
         "./sheet": "./src/components/Sheet.tsx",
         "./tooltip": "./src/components/Tooltip.tsx",
-        "./app-bar-category": "./src/components/AppBarCategory.tsx"
+        "./app-bar-category": "./src/components/AppBarCategory.tsx",
+        "./list-client": "./src/components/ListClient.tsx",
+        "./card-client": "./src/components/CardClient.tsx",
+        "./graph-courbe": "./src/components/GraphCourbe.tsx",
+        "./button-sort": "./src/components/ButtonSort.tsx",
+        "./button-pagination": "./src/components/ButtonPagination.tsx",
+        "./view-mode-dropdown": "./src/components/ViewModeDropdown.tsx",
+        "./kpi-indicator": "./src/components/KpiIndicator.tsx",
+        "./ai-suggestion": "./src/components/AiSuggestion.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
