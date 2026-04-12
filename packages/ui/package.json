@@ -56,7 +56,17 @@
         "./button-pagination": "./src/components/ButtonPagination.tsx",
         "./view-mode-dropdown": "./src/components/ViewModeDropdown.tsx",
         "./kpi-indicator": "./src/components/KpiIndicator.tsx",
-        "./ai-suggestion": "./src/components/AiSuggestion.tsx"
+        "./ai-suggestion": "./src/components/AiSuggestion.tsx",
+        "./app-bar-fiche-client": "./src/components/AppBarFicheClient.tsx",
+        "./app-bar-client-ancres": "./src/components/AppBarClientAncres.tsx",
+        "./ai-suggestion-banner": "./src/components/AiSuggestionBanner.tsx",
+        "./card-log": "./src/components/CardLog.tsx",
+        "./section-list-affaire": "./src/components/SectionListAffaire.tsx",
+        "./list-carnet": "./src/components/ListCarnet.tsx",
+        "./message-received": "./src/components/MessageReceived.tsx",
+        "./message-sent": "./src/components/MessageSent.tsx",
+        "./image-bien": "./src/components/ImageBien.tsx",
+        "./icon-dpe": "./src/components/IconDpe.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",

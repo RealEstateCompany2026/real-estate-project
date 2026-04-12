@@ -1,113 +1,138 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft, Pencil, Archive, FileDown,
-  User, Phone, Briefcase, FileText, Home, Clock, Settings,
-} from 'lucide-react';
-import type { Client } from '@/types/client';
-import { CLIENT_STATUS_LABELS, CLIENT_STATUS_COLORS, CLIENT_GENDER_LABELS } from '@/types/client';
-import type { ClientGender, ClientStatus } from '@/types/client';
-import { createClient } from '@/lib/supabase/client';
-import { useCompletionScore } from '@/hooks/useCompletionScore';
-import { Button } from '@real-estate/ui/button';
+import { Sparkles } from 'lucide-react';
+
+// ── DS Components ──
+import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
+import { GraphCourbe } from '@real-estate/ui/graph-courbe';
+import { AppBarClientAncres } from '@real-estate/ui/app-bar-client-ancres';
+import { IconButtonMega } from '@real-estate/ui/icon-button-mega';
 import { Spinner } from '@real-estate/ui/spinner';
-import { AccordionSection } from '@/components/ui/AccordionSection';
-import { Avatar } from '@/components/ui/Avatar';
-import { CompletionGauge } from '@/components/ui/CompletionGauge';
-import { SectionNav } from '@/components/ui/SectionNav';
-import { StatusBadge } from '@/components/ui/StatusBadge';
-import { useToast } from '@/components/ui/Toast';
 
-import { ClientSectionIdentity } from './sections/ClientSectionIdentity';
-import { ClientSectionDocuments } from './sections/ClientSectionDocuments';
-import { ClientSectionProperties } from './sections/ClientSectionProperties';
-import { ClientSectionTimeline } from './sections/ClientSectionTimeline';
-import { ClientSectionDeals } from './sections/ClientSectionDeals';
-import { ClientSectionNotes } from './sections/ClientSectionNotes';
+// ── App-level ──
+import { createClient } from '@/lib/supabase/client';
+import type { Client, ClientStatus } from '@/types/client';
 
-const SECTIONS = [
-  { id: 'identity', label: 'Identité & Coordonnées' },
-  { id: 'documents', label: 'Documents' },
-  { id: 'properties', label: 'Biens' },
-  { id: 'deals', label: 'Affaires' },
-  { id: 'timeline', label: 'Historique' },
-  { id: 'notes', label: 'Notes & Tags' },
-];
+// ---------------------------------------------------------------------------
+// Types — prêts pour la dynamisation
+// ---------------------------------------------------------------------------
+
+interface ClientKpis {
+  qualification: number;
+  engagement: number;
+  conversion: number;
+  reactivation: number;
+}
+
+interface GraphDataPoint {
+  label: string;
+  value: number;
+}
+
+interface ClientDetailData {
+  client: Client;
+  kpis: ClientKpis;
+  aiSuggestions: number;
+  graphData: GraphDataPoint[];
+}
+
+// ---------------------------------------------------------------------------
+// Helpers — mock data (à remplacer par des appels RPC réels)
+// ---------------------------------------------------------------------------
+
+function mockKpis(): ClientKpis {
+  return {
+    qualification: Math.floor(Math.random() * 60) + 20,
+    engagement: Math.floor(Math.random() * 60) + 20,
+    conversion: Math.floor(Math.random() * 40) + 10,
+    reactivation: Math.floor(Math.random() * 60) + 20,
+  };
+}
+
+function mockGraphData(): GraphDataPoint[] {
+  return [
+    { label: '10 avr', value: 18 },
+    { label: '17 avr', value: 30 },
+    { label: '24 avr', value: 25 },
+    { label: '01 mai', value: 35 },
+    { label: '08 mai', value: 32 },
+    { label: '15 mai', value: 28 },
+    { label: '22 mai', value: 22 },
+    { label: '29 mai', value: 38 },
+  ];
+}
+
+function statusToTags(status: ClientStatus[]): string[] {
+  const map: Record<string, string> = {
+    PROPRIETAIRE: 'PROPRIÉTAIRE',
+    ACQUEREUR: 'ACQUÉREUR',
+    BAILLEUR: 'BAILLEUR',
+    LOCATAIRE: 'LOCATAIRE',
+    VENDEUR: 'VENDEUR',
+  };
+  return status.map((s) => map[s] ?? s);
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 interface ClientDetailViewProps {
   clientId: string;
 }
 
-/**
- * Vue principale de la fiche client (P08).
- * Layout : header sticky + contenu scrollable avec SectionNav latérale.
- */
 export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const router = useRouter();
-  const { toast } = useToast();
-  const [client, setClient] = useState<Client | null>(null);
+
+  // ── Data ──
+  const [data, setData] = useState<ClientDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const completion = useCompletionScore(
-    'client',
-    (client ?? {}) as Record<string, unknown>
-  );
+  // ── Section refs for anchor navigation ──
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
+  // ── Fetch ──
   useEffect(() => {
     async function load() {
       const supabase = createClient();
-      const { data, error } = await supabase
+      const { data: clientData, error } = await supabase
         .from('Client')
         .select('*')
         .eq('id', clientId)
         .single();
 
-      if (error || !data) {
-        toast('Client introuvable', 'error');
+      if (error || !clientData) {
         router.push('/clients');
         return;
       }
-      setClient(data as Client);
+
+      setData({
+        client: clientData as Client,
+        kpis: mockKpis(),
+        aiSuggestions: Math.floor(Math.random() * 15) + 1,
+        graphData: mockGraphData(),
+      });
       setIsLoading(false);
     }
     load();
-  }, [clientId, router, toast]);
+  }, [clientId, router]);
 
-  async function handleArchive() {
-    if (!client) return;
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('Client')
-      .update({ isActive: false })
-      .eq('id', client.id);
-
-    if (error) {
-      toast('Erreur lors de l\'archivage', 'error');
-    } else {
-      toast('Client archivé', 'success');
-      router.push('/clients');
+  // ── Anchor navigation ──
+  const handleAnchorClick = useCallback((sectionId: string) => {
+    const el = sectionRefs.current[sectionId];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }
+  }, []);
 
-  async function handleFieldUpdate(field: string, value: unknown) {
-    if (!client) return;
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('Client')
-      .update({ [field]: value })
-      .eq('id', client.id);
+  const setSectionRef = useCallback((id: string) => (el: HTMLElement | null) => {
+    sectionRefs.current[id] = el;
+  }, []);
 
-    if (error) {
-      toast('Erreur lors de la mise à jour', 'error');
-      return;
-    }
-    setClient((prev) => prev ? { ...prev, [field]: value } : null);
-    toast('Mis à jour', 'success');
-  }
-
-  if (isLoading || !client) {
+  // ── Loading ──
+  if (isLoading || !data) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Spinner />
@@ -115,97 +140,89 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
+  const { client, kpis, aiSuggestions, graphData } = data;
+  const clientName = `${client.lastName?.toUpperCase()}, ${client.firstName}`;
+  const tags = statusToTags(client.status ?? []);
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-6">
-      {/* Header (FIC-01) */}
-      <div className="flex items-start justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            size="sm"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+    <div className="relative">
+      {/* ═══════════════════════════════════════════════════════
+          Bloc 1a — AppBarFicheClient
+          ═══════════════════════════════════════════════════════ */}
+      <AppBarFicheClient
+        clientName={clientName}
+        tags={tags}
+        qualification={kpis.qualification}
+        engagement={kpis.engagement}
+        conversion={kpis.conversion}
+        reactivation={kpis.reactivation}
+        aiSuggestions={aiSuggestions}
+        onBack={() => router.push('/clients')}
+      />
 
-          <Avatar firstName={client.firstName} lastName={client.lastName} size="lg" />
+      {/* ═══════════════════════════════════════════════════════
+          Bloc 1b — GraphCourbe
+          ═══════════════════════════════════════════════════════ */}
+      <GraphCourbe
+        title="Activité"
+        data={graphData}
+        selectedIndex={5}
+        selectedDate="22 fév 2026"
+        selectedLabel="28 réactions positives"
+        trendPercentage="7%"
+        trendDirection="down"
+      />
 
-          <div>
-            <div className="flex items-center gap-2">
-              {client.gender && (
-                <span className="text-sm text-content-caption">
-                  {CLIENT_GENDER_LABELS[client.gender as ClientGender]}
-                </span>
-              )}
-              <h1 className="text-xl font-bold text-content-headings">
-                {client.firstName} {client.lastName}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              {client.status?.map((s) => (
-                <StatusBadge
-                  key={s}
-                  label={CLIENT_STATUS_LABELS[s as ClientStatus]}
-                  color={CLIENT_STATUS_COLORS[s as ClientStatus]}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* ═══════════════════════════════════════════════════════
+          Bloc 1c — AppBarClientAncres (navigation par ancres)
+          ═══════════════════════════════════════════════════════ */}
+      <AppBarClientAncres onItemClick={handleAnchorClick} />
 
-        <div className="flex items-center gap-2">
-          <CompletionGauge score={completion.score} level={completion.level} suggestion={completion.suggestion} size="sm" />
-          <Button
-            variant="ghost"
-            onClick={handleArchive}
-            size="sm"
-            title="Archiver"
-          >
-            <Archive className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            title="Exporter PDF"
-          >
-            <FileDown className="w-5 h-5" />
-          </Button>
-        </div>
+      {/* ═══════════════════════════════════════════════════════
+          Sections (Blocs 2-8 — à implémenter)
+          ═══════════════════════════════════════════════════════ */}
+      <div className="flex flex-col">
+        {/* Bloc 2 — Profil */}
+        <section ref={setSectionRef('profil')} id="profil" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Profil */}
+        </section>
+
+        {/* Bloc 3 — Activités */}
+        <section ref={setSectionRef('activites')} id="activites" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Activités */}
+        </section>
+
+        {/* Bloc 4 — Affaires */}
+        <section ref={setSectionRef('affaires')} id="affaires" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Affaires */}
+        </section>
+
+        {/* Bloc 5 — Biens */}
+        <section ref={setSectionRef('biens')} id="biens" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Biens */}
+        </section>
+
+        {/* Bloc 6 — Carnets */}
+        <section ref={setSectionRef('carnet')} id="carnet" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Carnets */}
+        </section>
+
+        {/* Bloc 7 — Documents */}
+        <section ref={setSectionRef('documents')} id="documents" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Documents */}
+        </section>
+
+        {/* Bloc 8 — Messages */}
+        <section ref={setSectionRef('messages')} id="messages" className="py-[50px] border-t border-edge-default">
+          {/* TODO: Section Messages */}
+        </section>
       </div>
 
-      {/* Body : SectionNav + Sections */}
-      <div className="flex gap-8">
-        {/* Navigation latérale */}
-        <aside className="hidden lg:block w-48 shrink-0">
-          <SectionNav sections={SECTIONS} />
-        </aside>
-
-        {/* Sections */}
-        <div className="flex-1 space-y-4 min-w-0">
-          <AccordionSection id="identity" title="Identité & Coordonnées" icon={<User className="w-4 h-4" />}>
-            <ClientSectionIdentity client={client} onUpdate={handleFieldUpdate} />
-          </AccordionSection>
-
-          <AccordionSection id="documents" title="Documents" icon={<FileText className="w-4 h-4" />}>
-            <ClientSectionDocuments clientId={client.id} />
-          </AccordionSection>
-
-          <AccordionSection id="properties" title="Biens" icon={<Home className="w-4 h-4" />}>
-            <ClientSectionProperties clientId={client.id} />
-          </AccordionSection>
-
-          <AccordionSection id="deals" title="Affaires" icon={<Briefcase className="w-4 h-4" />} defaultOpen={false}>
-            <ClientSectionDeals clientId={client.id} />
-          </AccordionSection>
-
-          <AccordionSection id="timeline" title="Historique" icon={<Clock className="w-4 h-4" />}>
-            <ClientSectionTimeline clientId={client.id} />
-          </AccordionSection>
-
-          <AccordionSection id="notes" title="Notes & Tags" icon={<Settings className="w-4 h-4" />}>
-            <ClientSectionNotes client={client} onUpdate={handleFieldUpdate} />
-          </AccordionSection>
-        </div>
+      {/* ═══════════════════════════════════════════════════════
+          Bloc 9 — IconButtonMega (bouton IA flottant)
+          ═══════════════════════════════════════════════════════ */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <IconButtonMega icon={<Sparkles size={24} />} variant="primary" />
       </div>
     </div>
   );
