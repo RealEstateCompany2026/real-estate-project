@@ -37,7 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="flex min-h-screen bg-surface-page">
         <Sidebar />
         <main className="flex-1 pl-[90px]">
-          <div className="page-content mx-auto px-[25px]">
+          <div className="page-content ml-[25px]">
             {children}
           </div>
         </main>

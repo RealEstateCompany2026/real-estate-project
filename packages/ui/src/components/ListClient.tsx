@@ -74,11 +74,11 @@ export function ListClient({
 }: ListClientProps) {
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center gap-[38px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
       onClick={onClick}
     >
       {/* Section nom du client */}
-      <div className="flex flex-col items-start pl-[30px] pr-[138px] py-[34px] shrink-0 w-[425px] h-[120px]">
+      <div className="flex flex-col items-start pl-[30px] pr-[20px] py-[34px] flex-1 min-w-[200px] h-[120px]">
         <div className="flex flex-col gap-[12px] items-start w-[259px]">
           {/* Badges */}
           <div className="flex gap-[12px] items-center">
@@ -95,55 +95,53 @@ export function ListClient({
         </div>
       </div>
 
-      <VerticalDivider />
+      {/* KPI zone — dividers + indicators + AI */}
+      <div className="flex items-center gap-[16px] shrink-0 pr-[20px]">
+        <VerticalDivider />
 
-      {/* KPI Qualification */}
-      <KpiIndicator
-        kpi="qual"
-        value={`${kpis.qualification}%`}
-        percentage={kpis.qualification}
-        variant="vertical"
-        className="w-[77px]"
-      />
+        <KpiIndicator
+          kpi="qual"
+          value={`${kpis.qualification}%`}
+          percentage={kpis.qualification}
+          variant="vertical"
+          className="w-[77px]"
+        />
 
-      <VerticalDivider />
+        <VerticalDivider />
 
-      {/* KPI Engagement */}
-      <KpiIndicator
-        kpi="eng"
-        value={`${kpis.engagement}%`}
-        percentage={kpis.engagement}
-        variant="vertical"
-        className="w-[78px]"
-      />
+        <KpiIndicator
+          kpi="eng"
+          value={`${kpis.engagement}%`}
+          percentage={kpis.engagement}
+          variant="vertical"
+          className="w-[78px]"
+        />
 
-      <VerticalDivider />
+        <VerticalDivider />
 
-      {/* KPI Conversion */}
-      <KpiIndicator
-        kpi="conv"
-        value={`${kpis.conversion}%`}
-        percentage={kpis.conversion}
-        variant="vertical"
-        className="w-[78px]"
-      />
+        <KpiIndicator
+          kpi="conv"
+          value={`${kpis.conversion}%`}
+          percentage={kpis.conversion}
+          variant="vertical"
+          className="w-[78px]"
+        />
 
-      <VerticalDivider />
+        <VerticalDivider />
 
-      {/* KPI Réactivation */}
-      <KpiIndicator
-        kpi="reac"
-        value={`${kpis.reactivation}%`}
-        percentage={kpis.reactivation}
-        variant="vertical"
-        className="w-[78px]"
-      />
+        <KpiIndicator
+          kpi="reac"
+          value={`${kpis.reactivation}%`}
+          percentage={kpis.reactivation}
+          variant="vertical"
+          className="w-[78px]"
+        />
 
-      <VerticalDivider />
+        <VerticalDivider />
 
-      {/* AI Suggestions */}
-      <div className="flex flex-col items-center justify-center pr-[38px] py-[48px] shrink-0 w-[86px] h-[120px]">
-        <AiSuggestion count={aiSuggestions} />
+        <div className="flex flex-col items-center justify-center py-[48px] shrink-0">
+          <AiSuggestion count={aiSuggestions} />
+        </div>
       </div>
     </div>
   );
