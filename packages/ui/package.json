@@ -46,6 +46,7 @@
         "./multi-select": "./src/components/MultiSelect.tsx",
         "./menu": "./src/components/Menu.tsx",
         "./sheet": "./src/components/Sheet.tsx",
+        "./sheet-client-details": "./src/components/SheetClientDetails.tsx",
         "./tooltip": "./src/components/Tooltip.tsx",
         "./app-bar-category": "./src/components/AppBarCategory.tsx",
         "./list-client": "./src/components/ListClient.tsx",

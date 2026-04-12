@@ -15,6 +15,11 @@
 import { KpiIndicator } from "./KpiIndicator";
 import { AiSuggestion } from "./AiSuggestion";
 
+export interface KpiDetail {
+  label: string;
+  value?: string;
+}
+
 export interface SheetClientDetailsProps {
   qualification: number;
   engagement: number;
@@ -24,6 +29,11 @@ export interface SheetClientDetailsProps {
   engagementAiSuggestions?: number;
   conversionAiSuggestions?: number;
   reactivationAiSuggestions?: number;
+  /** Sous-métriques dynamiques par section KPI */
+  qualificationDetails?: KpiDetail[];
+  engagementDetails?: KpiDetail[];
+  conversionDetails?: KpiDetail[];
+  reactivationDetails?: KpiDetail[];
 }
 
 export function SheetClientDetails({
@@ -32,9 +42,13 @@ export function SheetClientDetails({
   conversion,
   reactivation,
   qualificationAiSuggestions = 0,
-  engagementAiSuggestions = 2,
+  engagementAiSuggestions = 0,
   conversionAiSuggestions = 0,
-  reactivationAiSuggestions = 1,
+  reactivationAiSuggestions = 0,
+  qualificationDetails = [],
+  engagementDetails = [],
+  conversionDetails = [],
+  reactivationDetails = [],
 }: SheetClientDetailsProps) {
   // Section Card
   const SectionCard = ({
@@ -83,11 +97,7 @@ export function SheetClientDetails({
           <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
         }
         aiSuggestions={qualificationAiSuggestions}
-        details={[
-          { label: "Informations de profil :", value: "78%" },
-          { label: "Informations de contact :", value: "80%" },
-          { label: "Informations professionnelles :", value: "20%" },
-        ]}
+        details={qualificationDetails}
       />
 
       {/* Engagement */}
@@ -96,12 +106,7 @@ export function SheetClientDetails({
           <KpiIndicator kpi="eng" value={`${engagement}%`} percentage={engagement} variant="straight" />
         }
         aiSuggestions={engagementAiSuggestions}
-        details={[
-          { label: "Taux d'ouverture :", value: "62%" },
-          { label: "Taux de clics :", value: "18%" },
-          { label: "Taux de passage à l'action :", value: "18%" },
-          { label: "Taux de réponses :", value: "33%" },
-        ]}
+        details={engagementDetails}
       />
 
       {/* Conversion */}
@@ -110,10 +115,7 @@ export function SheetClientDetails({
           <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
         }
         aiSuggestions={conversionAiSuggestions}
-        details={[
-          { label: "Date dernier mandat : > 2 ans" },
-          { label: "Projection prochain mandat : > 6 mois" },
-        ]}
+        details={conversionDetails}
       />
 
       {/* Réactivation */}
@@ -122,12 +124,7 @@ export function SheetClientDetails({
           <KpiIndicator kpi="reac" value={`${reactivation}%`} percentage={reactivation} variant="straight" />
         }
         aiSuggestions={reactivationAiSuggestions}
-        details={[
-          { label: "Dernière activité :", value: "18 jours" },
-          { label: "Réceptivité :", value: "52%" },
-          { label: "Engagement :", value: "61%" },
-          { label: "Intentionalité :", value: "48%" },
-        ]}
+        details={reactivationDetails}
       />
     </div>
   );

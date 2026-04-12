@@ -14,8 +14,8 @@ import { ButtonSort } from '@real-estate/ui/button-sort';
 import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
 import { Chip } from '@real-estate/ui/chip';
-import { KpiIndicator } from '@real-estate/ui/kpi-indicator';
 import { Button } from '@real-estate/ui/button';
+import { SheetClientDetails, type KpiDetail } from '@real-estate/ui/sheet-client-details';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -32,8 +32,20 @@ interface ClientKpis {
   reactivation: number;
 }
 
+interface ClientKpiDetails {
+  qualificationDetails: KpiDetail[];
+  engagementDetails: KpiDetail[];
+  conversionDetails: KpiDetail[];
+  reactivationDetails: KpiDetail[];
+  qualificationAiSuggestions: number;
+  engagementAiSuggestions: number;
+  conversionAiSuggestions: number;
+  reactivationAiSuggestions: number;
+}
+
 interface ClientWithKpis extends ClientListItem {
   kpis: ClientKpis;
+  kpiDetails: ClientKpiDetails;
   aiSuggestions: number;
   badges: Array<{ label: string; variant?: 'default' | 'success' | 'error' | 'warning' | 'information' }>;
 }
@@ -61,6 +73,37 @@ function mockKpis(): ClientKpis {
     engagement: Math.floor(Math.random() * 60) + 20,
     conversion: Math.floor(Math.random() * 40) + 10,
     reactivation: Math.floor(Math.random() * 60) + 20,
+  };
+}
+
+/** Generate mock KPI sub-details per section (replace with real data later) */
+function mockKpiDetails(kpis: ClientKpis): ClientKpiDetails {
+  const rp = () => `${Math.floor(Math.random() * 80) + 10}%`;
+  return {
+    qualificationDetails: [
+      { label: 'Informations de profil :', value: rp() },
+      { label: 'Informations de contact :', value: rp() },
+      { label: 'Informations professionnelles :', value: rp() },
+    ],
+    engagementDetails: [
+      { label: "Taux d'ouverture :", value: rp() },
+      { label: 'Taux de clics :', value: rp() },
+      { label: "Taux de passage à l'action :", value: rp() },
+      { label: 'Taux de réponses :', value: rp() },
+    ],
+    conversionDetails: [
+      { label: `Date dernier mandat : > ${Math.floor(Math.random() * 3) + 1} ans` },
+      { label: `Projection prochain mandat : > ${Math.floor(Math.random() * 12) + 1} mois` },
+    ],
+    reactivationDetails: [
+      { label: 'Dernière activité :', value: `${Math.floor(Math.random() * 60) + 1} jours` },
+      { label: 'Réceptivité :', value: rp() },
+      { label: 'Engagement :', value: rp() },
+    ],
+    qualificationAiSuggestions: Math.floor(Math.random() * 3),
+    engagementAiSuggestions: Math.floor(Math.random() * 4),
+    conversionAiSuggestions: Math.floor(Math.random() * 2),
+    reactivationAiSuggestions: Math.floor(Math.random() * 3),
   };
 }
 
@@ -128,12 +171,16 @@ export function ClientListView() {
         .eq('isActive', true)
         .order('createdAt', { ascending: false });
 
-      const enriched: ClientWithKpis[] = ((data ?? []) as unknown as ClientListItem[]).map((c) => ({
-        ...c,
-        kpis: mockKpis(),
-        aiSuggestions: Math.floor(Math.random() * 20),
-        badges: statusToBadges(c.status),
-      }));
+      const enriched: ClientWithKpis[] = ((data ?? []) as unknown as ClientListItem[]).map((c) => {
+        const kpis = mockKpis();
+        return {
+          ...c,
+          kpis,
+          kpiDetails: mockKpiDetails(kpis),
+          aiSuggestions: Math.floor(Math.random() * 20),
+          badges: statusToBadges(c.status),
+        };
+      });
 
       setClients(enriched);
       setIsLoading(false);
@@ -339,35 +386,20 @@ export function ClientListView() {
         }
       >
         {selectedClient && (
-          <div className="flex flex-col gap-[24px] px-[20px] py-[24px]">
-            {/* KPI Cards */}
-            <div className="flex flex-col gap-[16px]">
-              <KpiIndicator
-                kpi="qual"
-                value={`${selectedClient.kpis.qualification}%`}
-                percentage={selectedClient.kpis.qualification}
-                variant="vertical"
-              />
-              <KpiIndicator
-                kpi="eng"
-                value={`${selectedClient.kpis.engagement}%`}
-                percentage={selectedClient.kpis.engagement}
-                variant="vertical"
-              />
-              <KpiIndicator
-                kpi="conv"
-                value={`${selectedClient.kpis.conversion}%`}
-                percentage={selectedClient.kpis.conversion}
-                variant="vertical"
-              />
-              <KpiIndicator
-                kpi="reac"
-                value={`${selectedClient.kpis.reactivation}%`}
-                percentage={selectedClient.kpis.reactivation}
-                variant="vertical"
-              />
-            </div>
-          </div>
+          <SheetClientDetails
+            qualification={selectedClient.kpis.qualification}
+            engagement={selectedClient.kpis.engagement}
+            conversion={selectedClient.kpis.conversion}
+            reactivation={selectedClient.kpis.reactivation}
+            qualificationAiSuggestions={selectedClient.kpiDetails.qualificationAiSuggestions}
+            engagementAiSuggestions={selectedClient.kpiDetails.engagementAiSuggestions}
+            conversionAiSuggestions={selectedClient.kpiDetails.conversionAiSuggestions}
+            reactivationAiSuggestions={selectedClient.kpiDetails.reactivationAiSuggestions}
+            qualificationDetails={selectedClient.kpiDetails.qualificationDetails}
+            engagementDetails={selectedClient.kpiDetails.engagementDetails}
+            conversionDetails={selectedClient.kpiDetails.conversionDetails}
+            reactivationDetails={selectedClient.kpiDetails.reactivationDetails}
+          />
         )}
       </Sheet>
     </>
