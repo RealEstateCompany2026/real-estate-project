@@ -33,8 +33,8 @@ export function ClientFormStepper({ steps, currentStep, onStepClick }: ClientFor
                   isCompleted
                     ? 'bg-semantic-success text-white'
                     : isCurrent
-                      ? 'bg-primary text-white'
-                      : 'bg-neutral-grey-light text-neutral-grey-bold'
+                      ? 'bg-surface-branded-action text-white'
+                      : 'bg-surface-neutral-action text-content-caption'
                 }`}
               >
                 {isCompleted ? <Check className="w-4 h-4" /> : i + 1}
@@ -42,10 +42,10 @@ export function ClientFormStepper({ steps, currentStep, onStepClick }: ClientFor
               <span
                 className={`text-sm whitespace-nowrap ${
                   isCurrent
-                    ? 'font-bold text-neutral-anthracite'
+                    ? 'font-bold text-content-headings'
                     : isCompleted
                       ? 'text-semantic-success'
-                      : 'text-neutral-grey-bold'
+                      : 'text-content-caption'
                 }`}
               >
                 {label}
@@ -56,7 +56,7 @@ export function ClientFormStepper({ steps, currentStep, onStepClick }: ClientFor
             {i < steps.length - 1 && (
               <div
                 className={`flex-1 h-px min-w-[20px] ${
-                  i < currentStep ? 'bg-semantic-success' : 'bg-neutral-grey-light'
+                  i < currentStep ? 'bg-semantic-success' : 'bg-edge-default'
                 }`}
               />
             )}

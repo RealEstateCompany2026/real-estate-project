@@ -39,7 +39,7 @@ export function StepPropertyPhotos() {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-neutral-grey-bold">
+      <p className="text-xs text-content-caption">
         Ajoutez des photos du bien. Elles seront uploadées après la création.
         Vous pourrez en ajouter d&apos;autres depuis la fiche du bien.
       </p>
@@ -47,7 +47,7 @@ export function StepPropertyPhotos() {
       {/* Grille photos */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {photos.map((photo, i) => (
-          <div key={photo.preview} className="relative group aspect-[4/3] rounded-lg overflow-hidden bg-neutral-grey-light border border-neutral-grey-light">
+          <div key={photo.preview} className="relative group aspect-[4/3] rounded-lg overflow-hidden bg-surface-neutral-action border border-edge-default">
             <img
               src={photo.preview}
               alt={photo.file.name}
@@ -62,7 +62,7 @@ export function StepPropertyPhotos() {
               ✕
             </button>
             {i === 0 && (
-              <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary text-white">
+              <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-surface-branded-action text-white">
                 Couverture
               </span>
             )}
@@ -70,9 +70,9 @@ export function StepPropertyPhotos() {
         ))}
 
         {photos.length < 30 && (
-          <label className="aspect-[4/3] rounded-lg border-2 border-dashed border-neutral-grey-light hover:border-primary hover:bg-background-softBlue flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors">
-            <ImagePlus className="w-6 h-6 text-neutral-grey-bold" />
-            <span className="text-xs text-neutral-grey-bold">Ajouter</span>
+          <label className="aspect-[4/3] rounded-lg border-2 border-dashed border-edge-default hover:border-edge-branded-default hover:bg-surface-information flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors">
+            <ImagePlus className="w-6 h-6 text-content-caption" />
+            <span className="text-xs text-content-caption">Ajouter</span>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
@@ -84,7 +84,7 @@ export function StepPropertyPhotos() {
         )}
       </div>
 
-      <p className="text-xs text-neutral-grey-bold">
+      <p className="text-xs text-content-caption">
         {photos.length}/30 photos — JPEG, PNG ou WebP, max 10 Mo chacune
       </p>
     </div>

@@ -43,14 +43,14 @@ export function PropertySectionCharacteristics({ property }: PropertySectionChar
       {/* Pièces */}
       {rooms.length > 0 && (
         <div>
-          <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-3">Pièces</h4>
+          <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-3">Pièces</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {rooms.map((r) => (
-              <div key={r.label} className="flex items-center gap-2 p-3 rounded-lg bg-background-subtle">
-                <span className="text-primary">{r.icon}</span>
+              <div key={r.label} className="flex items-center gap-2 p-3 rounded-lg bg-surface-neutral-action">
+                <span className="text-content-branded-action">{r.icon}</span>
                 <div>
-                  <p className="text-lg font-bold text-neutral-anthracite">{r.value}</p>
-                  <p className="text-xs text-neutral-grey-bold">{r.label}</p>
+                  <p className="text-lg font-bold text-content-headings">{r.value}</p>
+                  <p className="text-xs text-content-caption">{r.label}</p>
                 </div>
               </div>
             ))}
@@ -61,12 +61,12 @@ export function PropertySectionCharacteristics({ property }: PropertySectionChar
       {/* Surfaces */}
       {surfaces.length > 1 && (
         <div>
-          <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-3">Surfaces</h4>
+          <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-3">Surfaces</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {surfaces.map((s) => (
-              <div key={s.label} className="p-3 rounded-lg bg-background-subtle">
-                <p className="text-sm font-bold text-neutral-anthracite">{formatSurface(s.value)}</p>
-                <p className="text-xs text-neutral-grey-bold">{s.label}</p>
+              <div key={s.label} className="p-3 rounded-lg bg-surface-neutral-action">
+                <p className="text-sm font-bold text-content-headings">{formatSurface(s.value)}</p>
+                <p className="text-xs text-content-caption">{s.label}</p>
               </div>
             ))}
           </div>
@@ -77,18 +77,18 @@ export function PropertySectionCharacteristics({ property }: PropertySectionChar
       <div className="grid grid-cols-2 gap-6">
         {property.heatingType && (
           <div>
-            <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Chauffage</h4>
-            <p className="text-sm text-neutral-anthracite">{property.heatingType.replace(/_/g, ' ').toLowerCase()}</p>
+            <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Chauffage</h4>
+            <p className="text-sm text-content-headings">{property.heatingType.replace(/_/g, ' ').toLowerCase()}</p>
           </div>
         )}
         {property.exposures && property.exposures.length > 0 && (
           <div>
-            <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Exposition</h4>
+            <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Exposition</h4>
             <div className="flex gap-1">
               {property.exposures.map((exp) => (
                 <span
                   key={exp}
-                  className="w-8 h-8 rounded-md bg-background-softBlue text-primary text-xs font-bold flex items-center justify-center"
+                  className="w-8 h-8 rounded-md bg-surface-information text-content-branded-action text-xs font-bold flex items-center justify-center"
                 >
                   {exp}
                 </span>
@@ -101,8 +101,8 @@ export function PropertySectionCharacteristics({ property }: PropertySectionChar
       {/* Parking */}
       {property.parkingType && property.parkingType !== 'AUCUN' && (
         <div className="flex items-center gap-2">
-          <Car className="w-4 h-4 text-primary" />
-          <span className="text-sm text-neutral-anthracite">
+          <Car className="w-4 h-4 text-content-branded-action" />
+          <span className="text-sm text-content-headings">
             {property.parkingType.replace(/_/g, ' ').toLowerCase()}
             {property.parkingSpotCount ? ` (${property.parkingSpotCount} place${property.parkingSpotCount > 1 ? 's' : ''})` : ''}
           </span>
@@ -112,14 +112,14 @@ export function PropertySectionCharacteristics({ property }: PropertySectionChar
       {/* Équipements */}
       {hasEquipment && (
         <div>
-          <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Équipements</h4>
+          <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Équipements</h4>
           <div className="flex flex-wrap gap-2">
             {equipment
               .filter((e) => e.active)
               .map((e) => (
                 <span
                   key={e.label}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background-softBlue text-primary text-xs font-bold"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-information text-content-branded-action text-xs font-bold"
                 >
                   {e.icon}
                   {e.label}

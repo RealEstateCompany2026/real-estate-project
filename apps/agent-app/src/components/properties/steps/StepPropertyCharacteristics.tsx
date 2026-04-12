@@ -35,14 +35,14 @@ export function StepPropertyCharacteristics() {
 
   return (
     <div className="space-y-6">
-      <p className="text-xs text-neutral-grey-bold">
+      <p className="text-xs text-content-caption">
         Toutes ces informations sont facultatives et améliorent la visibilité de l&apos;annonce.
       </p>
 
       {/* Pièces détaillées */}
       <div className="grid grid-cols-4 gap-3">
         <div>
-          <label htmlFor="bedroomCount" className="block text-xs font-bold text-neutral-anthracite mb-1">
+          <label htmlFor="bedroomCount" className="block text-xs font-bold text-content-headings mb-1">
             Chambres
           </label>
           <input
@@ -50,11 +50,11 @@ export function StepPropertyCharacteristics() {
             type="number"
             min={0}
             {...register('bedroomCount', { valueAsNumber: true })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full px-3 py-2 rounded-lg border border-edge-default text-sm focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
           />
         </div>
         <div>
-          <label htmlFor="bathroomCount" className="block text-xs font-bold text-neutral-anthracite mb-1">
+          <label htmlFor="bathroomCount" className="block text-xs font-bold text-content-headings mb-1">
             Salles de bain
           </label>
           <input
@@ -62,11 +62,11 @@ export function StepPropertyCharacteristics() {
             type="number"
             min={0}
             {...register('bathroomCount', { valueAsNumber: true })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full px-3 py-2 rounded-lg border border-edge-default text-sm focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
           />
         </div>
         <div>
-          <label htmlFor="showerRoomCount" className="block text-xs font-bold text-neutral-anthracite mb-1">
+          <label htmlFor="showerRoomCount" className="block text-xs font-bold text-content-headings mb-1">
             Salles d&apos;eau
           </label>
           <input
@@ -74,11 +74,11 @@ export function StepPropertyCharacteristics() {
             type="number"
             min={0}
             {...register('showerRoomCount', { valueAsNumber: true })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full px-3 py-2 rounded-lg border border-edge-default text-sm focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
           />
         </div>
         <div>
-          <label htmlFor="toiletCount" className="block text-xs font-bold text-neutral-anthracite mb-1">
+          <label htmlFor="toiletCount" className="block text-xs font-bold text-content-headings mb-1">
             WC
           </label>
           <input
@@ -86,7 +86,7 @@ export function StepPropertyCharacteristics() {
             type="number"
             min={0}
             {...register('toiletCount', { valueAsNumber: true })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full px-3 py-2 rounded-lg border border-edge-default text-sm focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
           />
         </div>
       </div>
@@ -94,7 +94,7 @@ export function StepPropertyCharacteristics() {
       {/* Surfaces complémentaires */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="landAreaSqm" className="block text-xs font-bold text-neutral-anthracite mb-1">
+          <label htmlFor="landAreaSqm" className="block text-xs font-bold text-content-headings mb-1">
             Surface terrain (m²)
           </label>
           <input
@@ -102,12 +102,12 @@ export function StepPropertyCharacteristics() {
             type="number"
             step="0.1"
             {...register('landAreaSqm', { valueAsNumber: true })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full px-3 py-2 rounded-lg border border-edge-default text-sm focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
             placeholder="500"
           />
         </div>
         <div>
-          <label htmlFor="parkingSpotCount" className="block text-xs font-bold text-neutral-anthracite mb-1">
+          <label htmlFor="parkingSpotCount" className="block text-xs font-bold text-content-headings mb-1">
             Places de parking
           </label>
           <input
@@ -115,20 +115,20 @@ export function StepPropertyCharacteristics() {
             type="number"
             min={0}
             {...register('parkingSpotCount', { valueAsNumber: true })}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-grey-light text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full px-3 py-2 rounded-lg border border-edge-default text-sm focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
           />
         </div>
       </div>
 
       {/* Chauffage */}
       <div>
-        <label htmlFor="heatingType" className="block text-sm font-bold text-neutral-anthracite mb-1">
+        <label htmlFor="heatingType" className="block text-sm font-bold text-content-headings mb-1">
           Chauffage
         </label>
         <select
           id="heatingType"
           {...register('heatingType')}
-          className="w-full px-3 py-2.5 rounded-lg border border-neutral-grey-light text-sm bg-white focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none"
+          className="w-full px-3 py-2.5 rounded-lg border border-edge-default text-sm bg-white focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none"
         >
           <option value="">— Sélectionner —</option>
           {HEATING_OPTIONS.map((opt) => (
@@ -139,7 +139,7 @@ export function StepPropertyCharacteristics() {
 
       {/* Exposition */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-2">
+        <label className="block text-sm font-bold text-content-headings mb-2">
           Exposition
         </label>
         <div className="flex flex-wrap gap-1.5">
@@ -150,8 +150,8 @@ export function StepPropertyCharacteristics() {
               onClick={() => toggleExposure(exp)}
               className={`w-10 h-10 rounded-lg border text-xs font-bold transition-colors ${
                 exposures.includes(exp)
-                  ? 'border-primary bg-background-softBlue text-primary'
-                  : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
+                  ? 'border-edge-branded-default bg-surface-information text-content-branded-action'
+                  : 'border-edge-default text-content-caption hover:border-edge-branded-default'
               }`}
             >
               {exp}
@@ -176,7 +176,7 @@ export function StepPropertyCharacteristics() {
 
       {/* Équipements */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-2">
+        <label className="block text-sm font-bold text-content-headings mb-2">
           Équipements
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -190,9 +190,9 @@ export function StepPropertyCharacteristics() {
               <input
                 type="checkbox"
                 {...register(field as keyof PropertyCreateData)}
-                className="w-4 h-4 rounded border-neutral-grey-light text-primary focus:ring-primary"
+                className="w-4 h-4 rounded border-edge-default text-content-branded-action focus:ring-[var(--border-branded-default)]"
               />
-              <span className="text-sm text-neutral-anthracite">{label}</span>
+              <span className="text-sm text-content-headings">{label}</span>
             </label>
           ))}
         </div>

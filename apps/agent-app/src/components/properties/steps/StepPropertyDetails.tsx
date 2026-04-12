@@ -25,7 +25,7 @@ export function StepPropertyDetails() {
 
   return (
     <div className="space-y-6">
-      <p className="text-xs text-neutral-grey-bold">
+      <p className="text-xs text-content-caption">
         Ces informations sont facultatives. Vous pourrez les compléter plus tard depuis la fiche du bien.
       </p>
 
@@ -60,7 +60,7 @@ export function StepPropertyDetails() {
 
       {/* État général */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-2">
+        <label className="block text-sm font-bold text-content-headings mb-2">
           État général
         </label>
         <div className="flex flex-wrap gap-2">

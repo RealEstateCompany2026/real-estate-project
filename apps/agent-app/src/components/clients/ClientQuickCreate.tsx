@@ -110,15 +110,16 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
       <div className="relative bg-white rounded-xl shadow-lg w-full max-w-md mx-4 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-neutral-anthracite">Création rapide client</h2>
+            <UserPlus className="w-5 h-5 text-content-branded-action" />
+            <h2 className="text-lg font-bold text-content-headings">Création rapide client</h2>
           </div>
           <Button
             variant="ghost"
             onClick={onClose}
             size="sm"
-            icon={<X className="w-5 h-5" />}
-          />
+          >
+            <X className="w-5 h-5" />
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -146,7 +147,7 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
 
           {/* Type */}
           <div>
-            <label className="block text-sm font-bold text-neutral-anthracite mb-2">
+            <label className="block text-sm font-bold text-content-headings mb-2">
               Type <span className="text-semantic-destructive">*</span>
             </label>
             <div className="flex flex-wrap gap-2">

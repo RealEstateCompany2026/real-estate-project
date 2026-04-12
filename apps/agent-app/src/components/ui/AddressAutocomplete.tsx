@@ -93,7 +93,7 @@ export function AddressAutocomplete({
   return (
     <div ref={wrapperRef} className="relative">
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-grey-bold" />
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-caption" />
         <input
           type="text"
           value={query}
@@ -102,19 +102,19 @@ export function AddressAutocomplete({
           onFocus={() => { if (results.length > 0) setIsOpen(true); }}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-9 pr-8 py-2.5 rounded-lg border border-neutral-grey-light bg-white text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-colors disabled:opacity-50"
+          className="w-full pl-9 pr-8 py-2.5 rounded-lg border border-edge-default bg-white text-sm text-content-headings placeholder:text-content-caption focus:border-edge-branded-default focus:ring-1 focus:ring-[var(--border-branded-default)]/20 outline-none transition-colors disabled:opacity-50"
           role="combobox"
           aria-expanded={isOpen}
           aria-autocomplete="list"
         />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-grey-bold animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-caption animate-spin" />
         )}
       </div>
 
       {isOpen && (
         <ul
-          className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-neutral-grey-light shadow-lg max-h-60 overflow-y-auto"
+          className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-edge-default shadow-lg max-h-60 overflow-y-auto"
           role="listbox"
         >
           {results.map((r, i) => (
@@ -124,14 +124,14 @@ export function AddressAutocomplete({
               aria-selected={i === highlightIndex}
               className={`px-4 py-3 cursor-pointer text-sm transition-colors ${
                 i === highlightIndex
-                  ? 'bg-background-softBlue text-primary'
-                  : 'text-neutral-anthracite hover:bg-background-subtle'
+                  ? 'bg-surface-information text-content-branded-action'
+                  : 'text-content-headings hover:bg-surface-neutral-action'
               }`}
               onClick={() => handleSelect(r)}
               onMouseEnter={() => setHighlightIndex(i)}
             >
               <div className="font-medium">{r.street}</div>
-              <div className="text-xs text-neutral-grey-bold">
+              <div className="text-xs text-content-caption">
                 {r.zipCode} {r.city}
               </div>
             </li>

@@ -79,14 +79,14 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       role="alert"
     >
       {ICONS[toast.variant]}
-      <p className="text-sm text-neutral-anthracite flex-1">{toast.message}</p>
+      <p className="text-sm text-content-headings flex-1">{toast.message}</p>
       <button
         type="button"
         onClick={() => onRemove(toast.id)}
-        className="p-0.5 rounded hover:bg-neutral-grey-light transition-colors"
+        className="p-0.5 rounded hover:bg-surface-neutral-action transition-colors"
         aria-label="Fermer"
       >
-        <X className="w-4 h-4 text-neutral-grey-bold" />
+        <X className="w-4 h-4 text-content-caption" />
       </button>
     </div>
   );

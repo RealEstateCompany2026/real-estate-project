@@ -24,10 +24,10 @@ export function StepPropertyReview() {
   return (
     <div className="space-y-6">
       {/* Score */}
-      <div className="flex items-center justify-between p-4 rounded-lg bg-background-subtle border border-neutral-grey-light">
+      <div className="flex items-center justify-between p-4 rounded-lg bg-surface-neutral-action border border-edge-default">
         <div>
-          <h3 className="text-sm font-bold text-neutral-anthracite">Score de complétude</h3>
-          <p className="text-xs text-neutral-grey-bold mt-0.5">{completion.suggestion}</p>
+          <h3 className="text-sm font-bold text-content-headings">Score de complétude</h3>
+          <p className="text-xs text-content-caption mt-0.5">{completion.suggestion}</p>
         </div>
         <CompletionGauge score={completion.score} level={completion.level} size="lg" />
       </div>
@@ -72,7 +72,7 @@ export function StepPropertyReview() {
           )}
           {data.dpeEnergyClass && (
             <div className="flex items-center gap-4">
-              <span className="text-xs text-neutral-grey-bold min-w-[120px]">DPE Énergie</span>
+              <span className="text-xs text-content-caption min-w-[120px]">DPE Énergie</span>
               <span
                 className="inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold text-white"
                 style={{ backgroundColor: DPE_COLORS[data.dpeEnergyClass as DpeClass] }}
@@ -83,7 +83,7 @@ export function StepPropertyReview() {
           )}
           {data.dpeGasEmissionClass && (
             <div className="flex items-center gap-4">
-              <span className="text-xs text-neutral-grey-bold min-w-[120px]">DPE GES</span>
+              <span className="text-xs text-content-caption min-w-[120px]">DPE GES</span>
               <span
                 className="inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold text-white"
                 style={{ backgroundColor: DPE_COLORS[data.dpeGasEmissionClass as DpeClass] }}
@@ -99,7 +99,7 @@ export function StepPropertyReview() {
       {(data.notes || (data.tags && data.tags.length > 0)) && (
         <ReviewSection title="Notes & Tags">
           {data.notes && (
-            <p className="text-sm text-neutral-anthracite bg-white p-2 rounded border border-neutral-grey-light">
+            <p className="text-sm text-content-headings bg-white p-2 rounded border border-edge-default">
               {data.notes}
             </p>
           )}
@@ -108,7 +108,7 @@ export function StepPropertyReview() {
               {data.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 rounded-md bg-background-softBlue text-primary text-xs font-bold"
+                  className="px-2 py-0.5 rounded-md bg-surface-information text-content-branded-action text-xs font-bold"
                 >
                   {tag}
                 </span>
@@ -123,8 +123,8 @@ export function StepPropertyReview() {
 
 function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="p-4 rounded-lg border border-neutral-grey-light">
-      <h3 className="text-sm font-bold text-neutral-anthracite mb-3">{title}</h3>
+    <div className="p-4 rounded-lg border border-edge-default">
+      <h3 className="text-sm font-bold text-content-headings mb-3">{title}</h3>
       <div className="space-y-2">{children}</div>
     </div>
   );
@@ -133,8 +133,8 @@ function ReviewSection({ title, children }: { title: string; children: React.Rea
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-xs text-neutral-grey-bold min-w-[120px]">{label}</span>
-      <span className="text-sm text-neutral-anthracite">{value}</span>
+      <span className="text-xs text-content-caption min-w-[120px]">{label}</span>
+      <span className="text-sm text-content-headings">{value}</span>
     </div>
   );
 }

@@ -127,27 +127,28 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             variant="ghost"
             onClick={() => router.back()}
             size="sm"
-            icon={<ArrowLeft className="w-5 h-5" />}
-          />
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
 
           {/* Photo cover thumbnail */}
-          <div className="w-16 h-12 rounded-lg overflow-hidden bg-neutral-grey-light shrink-0">
+          <div className="w-16 h-12 rounded-lg overflow-hidden bg-surface-neutral-action shrink-0">
             {coverPhoto ? (
               <img src={coverPhoto.storagePath} alt="Cover" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Home className="w-6 h-6 text-neutral-grey-bold" />
+                <Home className="w-6 h-6 text-content-caption" />
               </div>
             )}
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-neutral-anthracite">
+              <h1 className="text-xl font-bold text-content-headings">
                 {PROPERTY_TYPE_LABELS[property.type as PropertyType]}
               </h1>
               {property.internalRef && (
-                <span className="text-sm text-neutral-grey-bold">({property.internalRef})</span>
+                <span className="text-sm text-content-caption">({property.internalRef})</span>
               )}
             </div>
             <div className="flex items-center gap-2 mt-1">
@@ -155,14 +156,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
                 color={PROPERTY_STATUS_COLORS[property.status as PropertyStatus]}
               />
-              <span className="text-sm text-neutral-grey-bold flex items-center gap-1">
+              <span className="text-sm text-content-caption flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
                 {property.addressCity ?? property.address}
               </span>
-              <span className="text-sm font-bold text-neutral-anthracite">
+              <span className="text-sm font-bold text-content-headings">
                 {formatPrice(property.desiredSellingPrice)}
               </span>
-              <span className="text-sm text-neutral-grey-bold">
+              <span className="text-sm text-content-caption">
                 {formatSurface(property.livingAreaSqm)}
               </span>
             </div>
@@ -171,8 +172,12 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
 
         <div className="flex items-center gap-2">
           <CompletionGauge score={completion.score} level={completion.level} size="sm" />
-          <Button variant="ghost" size="sm" icon={<Share2 className="w-5 h-5" />} title="Partager" />
-          <Button variant="ghost" size="sm" icon={<FileDown className="w-5 h-5" />} title="Exporter PDF" />
+          <Button variant="ghost" size="sm" title="Partager">
+            <Share2 className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="sm" title="Exporter PDF">
+            <FileDown className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 

@@ -51,12 +51,9 @@ export function ClientSectionProperties({ clientId }: ClientSectionPropertiesPro
         title="Aucun bien"
         description="Les biens associés à ce client apparaîtront ici."
         action={
-          <Button
-            as={Link}
-            href="/properties/new"
-          >
-            Ajouter un bien
-          </Button>
+          <Link href="/properties/new">
+            <Button>Ajouter un bien</Button>
+          </Link>
         }
       />
     );
@@ -70,20 +67,20 @@ export function ClientSectionProperties({ clientId }: ClientSectionPropertiesPro
         <Link
           key={prop.id}
           href={`/properties/${prop.id}`}
-          className="flex items-center justify-between px-3 py-3 rounded-lg border border-neutral-grey-light hover:bg-background-subtle transition-colors"
+          className="flex items-center justify-between px-3 py-3 rounded-lg border border-edge-default hover:bg-surface-neutral-action transition-colors"
         >
           <div className="flex items-start gap-3 min-w-0">
-            <Home className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <Home className="w-4 h-4 text-content-branded-action shrink-0 mt-0.5" />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-neutral-anthracite">
+                <span className="text-sm font-medium text-content-headings">
                   {PROPERTY_TYPE_LABELS[prop.type as PropertyType]}
                 </span>
                 {prop.internalRef && (
-                  <span className="text-xs text-neutral-grey-bold">{prop.internalRef}</span>
+                  <span className="text-xs text-content-caption">{prop.internalRef}</span>
                 )}
               </div>
-              <div className="flex items-center gap-1 text-xs text-neutral-grey-bold mt-0.5">
+              <div className="flex items-center gap-1 text-xs text-content-caption mt-0.5">
                 <MapPin className="w-3 h-3" />
                 <span className="truncate">{prop.addressCity ?? prop.address}</span>
               </div>
@@ -91,8 +88,8 @@ export function ClientSectionProperties({ clientId }: ClientSectionPropertiesPro
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <div className="text-right">
-              <p className="text-sm font-bold text-neutral-anthracite">{formatPrice(prop.desiredSellingPrice)}</p>
-              <p className="text-xs text-neutral-grey-bold">{formatSurface(prop.livingAreaSqm)}</p>
+              <p className="text-sm font-bold text-content-headings">{formatPrice(prop.desiredSellingPrice)}</p>
+              <p className="text-xs text-content-caption">{formatSurface(prop.livingAreaSqm)}</p>
             </div>
             <StatusBadge
               label={PROPERTY_STATUS_LABELS[prop.status as PropertyStatus]}

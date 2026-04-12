@@ -51,7 +51,7 @@ export function PhotoGallery({
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="relative group aspect-[4/3] rounded-lg overflow-hidden bg-neutral-grey-light border border-neutral-grey-light"
+            className="relative group aspect-[4/3] rounded-lg overflow-hidden bg-surface-neutral-action border border-edge-default"
           >
             <img
               src={photo.storagePath}
@@ -62,7 +62,7 @@ export function PhotoGallery({
 
             {/* Badge cover */}
             {photo.isCover && (
-              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary text-white text-xs font-bold flex items-center gap-1">
+              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-surface-branded-action text-white text-xs font-bold flex items-center gap-1">
                 <Star className="w-3 h-3 fill-current" />
                 Couverture
               </div>
@@ -76,7 +76,7 @@ export function PhotoGallery({
                   <button
                     type="button"
                     onClick={() => onSetCover(photo.id)}
-                    className="p-2 rounded-full bg-white/90 text-primary hover:bg-white transition-colors"
+                    className="p-2 rounded-full bg-white/90 text-content-branded-action hover:bg-white transition-colors"
                     title="Définir comme couverture"
                   >
                     <Star className="w-4 h-4" />
@@ -101,14 +101,14 @@ export function PhotoGallery({
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={isUploading}
-            className="aspect-[4/3] rounded-lg border-2 border-dashed border-neutral-grey-light hover:border-primary hover:bg-background-softBlue flex flex-col items-center justify-center gap-2 transition-colors disabled:opacity-50"
+            className="aspect-[4/3] rounded-lg border-2 border-dashed border-edge-default hover:border-edge-branded-default hover:bg-surface-information flex flex-col items-center justify-center gap-2 transition-colors disabled:opacity-50"
           >
             {isUploading ? (
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-surface-branded-action border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
-                <ImagePlus className="w-6 h-6 text-neutral-grey-bold" />
-                <span className="text-xs text-neutral-grey-bold">Ajouter</span>
+                <ImagePlus className="w-6 h-6 text-content-caption" />
+                <span className="text-xs text-content-caption">Ajouter</span>
               </>
             )}
           </button>
@@ -124,7 +124,7 @@ export function PhotoGallery({
         className="hidden"
       />
 
-      <p className="text-xs text-neutral-grey-bold mt-2">
+      <p className="text-xs text-content-caption mt-2">
         {photos.length}/{maxPhotos} photos — JPEG, PNG ou WebP, max 10 Mo chacune
       </p>
 

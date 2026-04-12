@@ -24,35 +24,45 @@ export function StepNotes() {
   return (
     <div className="space-y-6">
       {/* Source */}
-      <InputField
-        label="Source"
-        id="source"
-        as="select"
-        {...register('source')}
-      >
-        {SOURCE_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </InputField>
+      <div className="flex flex-col gap-[12px]">
+        <label className="text-sm font-bold text-content-headings" htmlFor="source">
+          Source
+        </label>
+        <select
+          id="source"
+          {...register('source')}
+          className="w-full px-4 py-3 rounded-lg border border-edge-default bg-surface-neutral-default text-content-body placeholder:text-content-placeholder focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
+        >
+          {SOURCE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Notes */}
-      <InputField
-        label="Notes internes"
-        id="notes"
-        as="textarea"
-        rows={4}
-        {...register('notes')}
-        placeholder="Notes visibles uniquement par l'équipe..."
-        maxLength={2000}
-        error={errors.notes?.message}
-        helperText={`${notes.length}/2000`}
-      />
+      <div className="flex flex-col gap-[12px]">
+        <label className="text-sm font-bold text-content-headings" htmlFor="notes">
+          Notes internes
+        </label>
+        <textarea
+          id="notes"
+          rows={4}
+          {...register('notes')}
+          placeholder="Notes visibles uniquement par l'équipe..."
+          maxLength={2000}
+          className="w-full px-4 py-3 rounded-lg border border-edge-default bg-surface-neutral-default text-content-body placeholder:text-content-placeholder focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)] text-sm"
+        />
+        {errors.notes?.message && (
+          <span className="text-xs text-content-error">{errors.notes.message}</span>
+        )}
+        <span className="text-xs text-content-caption">{notes.length}/2000</span>
+      </div>
 
       {/* Tags */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-1">
+        <label className="block text-sm font-bold text-content-headings mb-1">
           Tags
         </label>
         <Controller
@@ -69,18 +79,18 @@ export function StepNotes() {
       </div>
 
       {/* Consentement email */}
-      <div className="p-4 rounded-lg border border-neutral-grey-light bg-background-subtle">
+      <div className="p-4 rounded-lg border border-edge-default bg-surface-neutral-action">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
             {...register('emailConsent')}
-            className="mt-0.5 w-4 h-4 rounded border-neutral-grey-light text-primary focus:ring-primary"
+            className="mt-0.5 w-4 h-4 rounded border-edge-default text-content-branded-action focus:ring-[var(--border-branded-default)]"
           />
           <div>
-            <span className="text-sm font-medium text-neutral-anthracite">
+            <span className="text-sm font-medium text-content-headings">
               Consentement email (RGPD)
             </span>
-            <p className="text-xs text-neutral-grey-bold mt-0.5">
+            <p className="text-xs text-content-caption mt-0.5">
               Le client autorise la réception d&apos;emails commerciaux et d&apos;informations sur ses biens.
             </p>
           </div>

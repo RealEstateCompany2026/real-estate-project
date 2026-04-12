@@ -54,8 +54,8 @@ export function SectionNav({ sections }: SectionNavProps) {
           onClick={() => scrollTo(s.id)}
           className={`block w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
             activeId === s.id
-              ? 'bg-background-softBlue text-primary font-bold'
-              : 'text-neutral-grey-bold hover:text-neutral-anthracite hover:bg-background-subtle'
+              ? 'bg-surface-information text-content-branded-action font-bold'
+              : 'text-content-caption hover:text-content-headings hover:bg-surface-neutral-action'
           }`}
         >
           {s.label}

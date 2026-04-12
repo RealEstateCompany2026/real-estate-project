@@ -73,7 +73,7 @@ export function StepContact() {
 
       {/* Adresse */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-1">
+        <label className="block text-sm font-bold text-content-headings mb-1">
           Adresse
         </label>
         <AddressAutocomplete

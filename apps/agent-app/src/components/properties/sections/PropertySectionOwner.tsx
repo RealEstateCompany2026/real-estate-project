@@ -50,7 +50,7 @@ export function PropertySectionOwner({ clientId }: PropertySectionOwnerProps) {
   }, [clientId]);
 
   if (isLoading) {
-    return <div className="h-20 flex items-center justify-center text-sm text-neutral-grey-bold">Chargement...</div>;
+    return <div className="h-20 flex items-center justify-center text-sm text-content-caption">Chargement...</div>;
   }
 
   if (!client) {
@@ -64,16 +64,16 @@ export function PropertySectionOwner({ clientId }: PropertySectionOwnerProps) {
   }
 
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg border border-neutral-grey-light">
+    <div className="flex items-center justify-between p-4 rounded-lg border border-edge-default">
       <div className="flex items-center gap-3">
         <Avatar firstName={client.firstName} lastName={client.lastName} />
         <div>
-          <p className="text-sm font-bold text-neutral-anthracite">
+          <p className="text-sm font-bold text-content-headings">
             {client.firstName} {client.lastName}
           </p>
-          <p className="text-xs text-neutral-grey-bold">{client.primaryEmail}</p>
+          <p className="text-xs text-content-caption">{client.primaryEmail}</p>
           {client.mobilePhone && (
-            <p className="text-xs text-neutral-grey-bold">{client.mobilePhone}</p>
+            <p className="text-xs text-content-caption">{client.mobilePhone}</p>
           )}
           <div className="flex gap-1 mt-1">
             {client.status?.map((s) => (
@@ -89,7 +89,7 @@ export function PropertySectionOwner({ clientId }: PropertySectionOwnerProps) {
       </div>
       <Link
         href={`/clients/${client.id}`}
-        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-primary bg-background-softBlue hover:bg-primary hover:text-white transition-colors"
+        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-content-branded-action bg-surface-information hover:bg-surface-branded-action hover:text-white transition-colors"
       >
         Voir la fiche
         <ExternalLink className="w-3 h-3" />

@@ -62,7 +62,7 @@ export function StepPropertyKey() {
     <div className="space-y-6">
       {/* Adresse */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-1">
+        <label className="block text-sm font-bold text-content-headings mb-1">
           Adresse <span className="text-semantic-destructive">*</span>
         </label>
         <Controller
@@ -123,13 +123,13 @@ export function StepPropertyKey() {
 
       {/* Propriétaire (Client) */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-1">
+        <label className="block text-sm font-bold text-content-headings mb-1">
           Propriétaire <span className="text-semantic-destructive">*</span>
         </label>
 
         {selectedClient ? (
-          <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-primary bg-background-softBlue">
-            <span className="text-sm font-medium text-primary">
+          <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-edge-branded-default bg-surface-information">
+            <span className="text-sm font-medium text-content-branded-action">
               {selectedClient.firstName} {selectedClient.lastName} — {selectedClient.primaryEmail}
             </span>
             <Button
@@ -155,18 +155,18 @@ export function StepPropertyKey() {
 
             {/* Résultats recherche client */}
             {clientResults.length > 0 && (
-              <ul className="border border-neutral-grey-light rounded-lg divide-y divide-neutral-grey-light max-h-48 overflow-y-auto">
+              <ul className="border border-edge-default rounded-lg divide-y divide-edge-default max-h-48 overflow-y-auto">
                 {clientResults.map((c) => (
                   <li key={c.id}>
                     <button
                       type="button"
                       onClick={() => selectClient(c)}
-                      className="w-full text-left px-3 py-2 hover:bg-background-subtle transition-colors"
+                      className="w-full text-left px-3 py-2 hover:bg-surface-neutral-action transition-colors"
                     >
-                      <span className="text-sm font-medium text-neutral-anthracite">
+                      <span className="text-sm font-medium text-content-headings">
                         {c.firstName} {c.lastName}
                       </span>
-                      <span className="text-xs text-neutral-grey-bold ml-2">{c.primaryEmail}</span>
+                      <span className="text-xs text-content-caption ml-2">{c.primaryEmail}</span>
                     </button>
                   </li>
                 ))}
@@ -177,8 +177,8 @@ export function StepPropertyKey() {
             <Button
               variant="link"
               onClick={() => setShowQuickCreate(true)}
-              icon={<UserPlus className="w-4 h-4" />}
             >
+              <UserPlus className="w-4 h-4" />
               Créer un nouveau client
             </Button>
           </div>

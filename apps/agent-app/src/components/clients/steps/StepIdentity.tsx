@@ -41,15 +41,15 @@ export function StepIdentity() {
     <div className="space-y-6">
       {/* Civilité */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-2">Civilité</label>
+        <label className="block text-sm font-bold text-content-headings mb-2">Civilité</label>
         <div className="flex gap-2">
           {GENDER_OPTIONS.map((opt) => (
             <label
               key={opt.value}
               className={`flex items-center justify-center px-4 py-2 rounded-lg border cursor-pointer transition-colors text-sm ${
                 watch('gender') === opt.value
-                  ? 'border-primary bg-background-softBlue text-primary font-bold'
-                  : 'border-neutral-grey-light text-neutral-grey-bold hover:border-primary/50'
+                  ? 'border-edge-branded-default bg-surface-information text-content-branded-action font-bold'
+                  : 'border-edge-default text-content-caption hover:border-edge-branded-default'
               }`}
             >
               <input
@@ -88,10 +88,10 @@ export function StepIdentity() {
 
       {/* Type(s) de client */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-2">
+        <label className="block text-sm font-bold text-content-headings mb-2">
           Type de client <span className="text-semantic-destructive">*</span>
         </label>
-        <p className="text-xs text-neutral-grey-bold mb-2">
+        <p className="text-xs text-content-caption mb-2">
           Un client peut avoir plusieurs rôles (ex : propriétaire et acquéreur).
         </p>
         <div className="flex flex-wrap gap-2">

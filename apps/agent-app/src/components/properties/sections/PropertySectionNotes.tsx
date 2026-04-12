@@ -22,7 +22,7 @@ export function PropertySectionNotes({ property, onUpdate }: PropertySectionNote
     <div className="space-y-4">
       {/* Notes */}
       <div>
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Notes internes</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Notes internes</h4>
         <InlineEdit
           value={property.notes ?? ''}
           onSave={(v) => onUpdate('notes', v || null)}
@@ -33,7 +33,7 @@ export function PropertySectionNotes({ property, onUpdate }: PropertySectionNote
 
       {/* Tags */}
       <div>
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Tags</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Tags</h4>
         <Controller
           name="tags"
           control={control}
@@ -50,16 +50,16 @@ export function PropertySectionNotes({ property, onUpdate }: PropertySectionNote
       </div>
 
       {/* Status */}
-      <div className="pt-3 border-t border-neutral-grey-light">
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Statut du bien</h4>
+      <div className="pt-3 border-t border-edge-default">
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Statut du bien</h4>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <span className="text-xs text-neutral-grey-bold">Référence interne</span>
-            <p className="text-neutral-anthracite font-mono">{property.internalRef ?? '—'}</p>
+            <span className="text-xs text-content-caption">Référence interne</span>
+            <p className="text-content-headings font-mono">{property.internalRef ?? '—'}</p>
           </div>
           <div>
-            <span className="text-xs text-neutral-grey-bold">Score complétude</span>
-            <p className="text-neutral-anthracite">{property.completionScore ?? 0}%</p>
+            <span className="text-xs text-content-caption">Score complétude</span>
+            <p className="text-content-headings">{property.completionScore ?? 0}%</p>
           </div>
         </div>
       </div>

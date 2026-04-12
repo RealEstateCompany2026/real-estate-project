@@ -21,7 +21,7 @@ export function PropertySectionDpe({ property, onUpdate }: PropertySectionDpePro
     <div className="space-y-6">
       {/* DPE Énergie */}
       <div>
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-3">
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-3">
           Consommation énergétique (kWh/m²/an)
         </h4>
         <DpeBars selectedClass={property.dpeEnergyClass} value={property.dpeEnergyKwh} unit="kWh/m²/an" />
@@ -36,7 +36,7 @@ export function PropertySectionDpe({ property, onUpdate }: PropertySectionDpePro
 
       {/* DPE GES */}
       <div>
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-3">
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-3">
           Émissions de gaz à effet de serre (kgCO₂/m²/an)
         </h4>
         <DpeBars selectedClass={property.dpeGasEmissionClass} value={property.dpeGasGco2} unit="kgCO₂/m²/an" />
@@ -85,7 +85,7 @@ function DpeBars({
               </span>
             </div>
             {isSelected && value != null && (
-              <span className="text-xs font-bold text-neutral-anthracite">
+              <span className="text-xs font-bold text-content-headings">
                 {value} {unit}
               </span>
             )}

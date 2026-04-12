@@ -53,15 +53,15 @@ export function StepPropertyType() {
     <div className="space-y-8">
       {/* Catégories & sous-types */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-4">
+        <label className="block text-sm font-bold text-content-headings mb-4">
           Type de bien <span className="text-semantic-destructive">*</span>
         </label>
 
         {(Object.keys(PROPERTY_CATEGORY_TYPES) as PropertyCategory[]).map((cat) => (
           <div key={cat} className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-primary">{CATEGORY_ICONS[cat]}</span>
-              <span className="text-sm font-bold text-neutral-anthracite">{CATEGORY_LABELS[cat]}</span>
+              <span className="text-content-branded-action">{CATEGORY_ICONS[cat]}</span>
+              <span className="text-sm font-bold text-content-headings">{CATEGORY_LABELS[cat]}</span>
             </div>
             <div className="flex flex-wrap gap-2 pl-7">
               {PROPERTY_CATEGORY_TYPES[cat].map((type) => (
@@ -80,10 +80,10 @@ export function StepPropertyType() {
 
       {/* Type(s) d'opération */}
       <div>
-        <label className="block text-sm font-bold text-neutral-anthracite mb-2">
+        <label className="block text-sm font-bold text-content-headings mb-2">
           Type d&apos;opération <span className="text-semantic-destructive">*</span>
         </label>
-        <p className="text-xs text-neutral-grey-bold mb-3">
+        <p className="text-xs text-content-caption mb-3">
           Un bien peut être en vente et en location simultanément.
         </p>
         <div className="flex flex-wrap gap-2">

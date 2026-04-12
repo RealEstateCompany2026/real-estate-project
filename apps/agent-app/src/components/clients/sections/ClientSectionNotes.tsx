@@ -23,7 +23,7 @@ export function ClientSectionNotes({ client, onUpdate }: ClientSectionNotesProps
     <div className="space-y-4">
       {/* Notes */}
       <div>
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Notes internes</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Notes internes</h4>
         <InlineEdit
           value={client.notes ?? ''}
           onSave={(v) => onUpdate('notes', v || null)}
@@ -34,7 +34,7 @@ export function ClientSectionNotes({ client, onUpdate }: ClientSectionNotesProps
 
       {/* Tags */}
       <div>
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Tags</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Tags</h4>
         <Controller
           name="tags"
           control={control}
@@ -51,24 +51,24 @@ export function ClientSectionNotes({ client, onUpdate }: ClientSectionNotesProps
       </div>
 
       {/* Infos CRM */}
-      <div className="pt-3 border-t border-neutral-grey-light">
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider mb-2">Informations CRM</h4>
+      <div className="pt-3 border-t border-edge-default">
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider mb-2">Informations CRM</h4>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <span className="text-xs text-neutral-grey-bold">Source</span>
-            <p className="text-neutral-anthracite">{client.source ?? '—'}</p>
+            <span className="text-xs text-content-caption">Source</span>
+            <p className="text-content-headings">{client.source ?? '—'}</p>
           </div>
           <div>
-            <span className="text-xs text-neutral-grey-bold">Lifecycle</span>
-            <p className="text-neutral-anthracite">{client.lifecycleStage ?? '—'}</p>
+            <span className="text-xs text-content-caption">Lifecycle</span>
+            <p className="text-content-headings">{client.lifecycleStage ?? '—'}</p>
           </div>
           <div>
-            <span className="text-xs text-neutral-grey-bold">Consentement email</span>
-            <p className="text-neutral-anthracite">{client.emailConsent ? 'Oui' : 'Non'}</p>
+            <span className="text-xs text-content-caption">Consentement email</span>
+            <p className="text-content-headings">{client.emailConsent ? 'Oui' : 'Non'}</p>
           </div>
           <div>
-            <span className="text-xs text-neutral-grey-bold">Langue</span>
-            <p className="text-neutral-anthracite">{client.language?.toUpperCase() ?? 'FR'}</p>
+            <span className="text-xs text-content-caption">Langue</span>
+            <p className="text-content-headings">{client.language?.toUpperCase() ?? 'FR'}</p>
           </div>
         </div>
       </div>

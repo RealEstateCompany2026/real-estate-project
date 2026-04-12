@@ -76,10 +76,10 @@ export function InlineEdit({
   if (disabled || !isEditing) {
     return (
       <div className="group flex items-start gap-2">
-        {label && <span className="text-xs text-neutral-grey-bold min-w-[100px] pt-0.5">{label}</span>}
+        {label && <span className="text-xs text-content-caption min-w-[100px] pt-0.5">{label}</span>}
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <span
-            className={`text-sm ${value ? 'text-neutral-anthracite' : 'text-neutral-grey-bold italic'}`}
+            className={`text-sm ${value ? 'text-content-headings' : 'text-content-caption italic'}`}
           >
             {renderDisplay ? renderDisplay(value) : value || placeholder}
           </span>
@@ -87,10 +87,10 @@ export function InlineEdit({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-background-subtle"
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-surface-neutral-action"
               aria-label="Modifier"
             >
-              <Pencil className="w-3.5 h-3.5 text-neutral-grey-bold" />
+              <Pencil className="w-3.5 h-3.5 text-content-caption" />
             </button>
           )}
         </div>
@@ -99,11 +99,11 @@ export function InlineEdit({
   }
 
   const inputClasses =
-    'w-full px-2 py-1.5 rounded-md border border-primary bg-white text-sm text-neutral-anthracite outline-none focus:ring-1 focus:ring-primary/20';
+    'w-full px-2 py-1.5 rounded-md border border-edge-branded-default bg-white text-sm text-content-headings outline-none focus:ring-1 focus:ring-[var(--border-branded-default)]/20';
 
   return (
     <div className="flex items-start gap-2">
-      {label && <span className="text-xs text-neutral-grey-bold min-w-[100px] pt-2">{label}</span>}
+      {label && <span className="text-xs text-content-caption min-w-[100px] pt-2">{label}</span>}
       <div className="flex items-start gap-1.5 flex-1">
         {type === 'textarea' ? (
           <textarea
@@ -137,7 +137,7 @@ export function InlineEdit({
           <button
             type="button"
             onClick={handleCancel}
-            className="p-1 rounded-md bg-neutral-grey-light text-neutral-grey-bold hover:bg-neutral-grey-bold hover:text-white transition-colors"
+            className="p-1 rounded-md bg-surface-neutral-action text-content-caption hover:bg-neutral-grey-bold hover:text-white transition-colors"
             aria-label="Annuler"
           >
             <X className="w-3.5 h-3.5" />

@@ -19,7 +19,7 @@ const DPE_CLASSES: DpeClass[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 export function DpeSelector({ label, value, onChange, disabled = false }: DpeSelectorProps) {
   return (
     <div>
-      <label className="block text-sm font-bold text-neutral-anthracite mb-2">{label}</label>
+      <label className="block text-sm font-bold text-content-headings mb-2">{label}</label>
       <div className="flex gap-1">
         {DPE_CLASSES.map((cls) => {
           const isSelected = value === cls;

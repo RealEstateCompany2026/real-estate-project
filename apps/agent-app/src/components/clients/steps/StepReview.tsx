@@ -22,10 +22,10 @@ export function StepReview() {
   return (
     <div className="space-y-6">
       {/* Score de complétude */}
-      <div className="flex items-center justify-between p-4 rounded-lg bg-background-subtle border border-neutral-grey-light">
+      <div className="flex items-center justify-between p-4 rounded-lg bg-surface-neutral-action border border-edge-default">
         <div>
-          <h3 className="text-sm font-bold text-neutral-anthracite">Score de complétude</h3>
-          <p className="text-xs text-neutral-grey-bold mt-0.5">{completion.suggestion}</p>
+          <h3 className="text-sm font-bold text-content-headings">Score de complétude</h3>
+          <p className="text-xs text-content-caption mt-0.5">{completion.suggestion}</p>
         </div>
         <CompletionGauge score={completion.score} level={completion.level} size="lg" />
       </div>
@@ -53,7 +53,7 @@ export function StepReview() {
 
         {data.searchCriteriaSummary && (
           <ReviewSection title="Projet">
-            <p className="text-sm text-neutral-anthracite">{data.searchCriteriaSummary}</p>
+            <p className="text-sm text-content-headings">{data.searchCriteriaSummary}</p>
           </ReviewSection>
         )}
 
@@ -61,8 +61,8 @@ export function StepReview() {
           <ReviewRow label="Source" value={CLIENT_SOURCE_LABELS[(data.source ?? 'MANUEL') as ClientSource]} />
           {data.notes && (
             <div className="mt-2">
-              <p className="text-xs text-neutral-grey-bold mb-1">Notes :</p>
-              <p className="text-sm text-neutral-anthracite bg-white p-2 rounded border border-neutral-grey-light">
+              <p className="text-xs text-content-caption mb-1">Notes :</p>
+              <p className="text-sm text-content-headings bg-white p-2 rounded border border-edge-default">
                 {data.notes}
               </p>
             </div>
@@ -87,8 +87,8 @@ export function StepReview() {
 
 function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="p-4 rounded-lg border border-neutral-grey-light">
-      <h3 className="text-sm font-bold text-neutral-anthracite mb-3">{title}</h3>
+    <div className="p-4 rounded-lg border border-edge-default">
+      <h3 className="text-sm font-bold text-content-headings mb-3">{title}</h3>
       <div className="space-y-2">{children}</div>
     </div>
   );
@@ -97,8 +97,8 @@ function ReviewSection({ title, children }: { title: string; children: React.Rea
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-xs text-neutral-grey-bold min-w-[120px]">{label}</span>
-      <span className="text-sm text-neutral-anthracite">{value}</span>
+      <span className="text-xs text-content-caption min-w-[120px]">{label}</span>
+      <span className="text-sm text-content-headings">{value}</span>
     </div>
   );
 }

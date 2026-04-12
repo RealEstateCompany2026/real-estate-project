@@ -29,14 +29,14 @@ export function DuplicateAlert({ matches, onMerge, onDismiss }: DuplicateAlertPr
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-semantic-warning shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-neutral-anthracite">
+            <p className="text-sm font-bold text-content-headings">
               {matches.length === 1 ? 'Doublon potentiel détecté' : `${matches.length} doublons potentiels détectés`}
             </p>
             <ul className="mt-2 space-y-2">
               {matches.map((m) => (
                 <li key={m.id} className="flex items-center justify-between gap-4">
-                  <div className="text-sm text-neutral-grey-bold">
-                    <span className="font-medium text-neutral-anthracite">
+                  <div className="text-sm text-content-caption">
+                    <span className="font-medium text-content-headings">
                       {m.firstName} {m.lastName}
                     </span>
                     {' — '}
@@ -47,7 +47,7 @@ export function DuplicateAlert({ matches, onMerge, onDismiss }: DuplicateAlertPr
                     <button
                       type="button"
                       onClick={() => onMerge(m.id)}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-primary bg-background-softBlue hover:bg-primary hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-content-branded-action bg-surface-information hover:bg-surface-branded-action hover:text-white transition-colors"
                     >
                       <Merge className="w-3 h-3" />
                       Fusionner
@@ -62,10 +62,10 @@ export function DuplicateAlert({ matches, onMerge, onDismiss }: DuplicateAlertPr
           <button
             type="button"
             onClick={onDismiss}
-            className="p-1 rounded-md hover:bg-neutral-grey-light transition-colors"
+            className="p-1 rounded-md hover:bg-surface-neutral-action transition-colors"
             aria-label="Fermer l'alerte"
           >
-            <X className="w-4 h-4 text-neutral-grey-bold" />
+            <X className="w-4 h-4 text-content-caption" />
           </button>
         )}
       </div>

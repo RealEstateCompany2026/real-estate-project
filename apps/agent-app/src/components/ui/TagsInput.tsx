@@ -47,7 +47,7 @@ export function TagsInput({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-lg border border-neutral-grey-light bg-white focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-colors ${
+      className={`flex flex-wrap items-center gap-1.5 px-3 py-2 rounded-lg border border-edge-default bg-white focus-within:border-edge-branded-default focus-within:ring-1 focus-within:ring-[var(--border-branded-default)]/20 transition-colors ${
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-text'
       }`}
       onClick={() => inputRef.current?.focus()}
@@ -55,7 +55,7 @@ export function TagsInput({
       {value.map((tag, i) => (
         <span
           key={tag}
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-background-softBlue text-primary text-xs font-bold"
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-information text-content-branded-action text-xs font-bold"
         >
           {tag}
           {!disabled && (
@@ -82,7 +82,7 @@ export function TagsInput({
           onKeyDown={handleKeyDown}
           onBlur={() => { if (input) addTag(input); }}
           placeholder={value.length === 0 ? placeholder : ''}
-          className="flex-1 min-w-[80px] outline-none text-sm text-neutral-anthracite placeholder:text-neutral-grey-bold bg-transparent"
+          className="flex-1 min-w-[80px] outline-none text-sm text-content-headings placeholder:text-content-caption bg-transparent"
           disabled={disabled}
         />
       )}

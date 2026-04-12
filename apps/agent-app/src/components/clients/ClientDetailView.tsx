@@ -124,19 +124,20 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             variant="ghost"
             onClick={() => router.back()}
             size="sm"
-            icon={<ArrowLeft className="w-5 h-5" />}
-          />
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
 
           <Avatar firstName={client.firstName} lastName={client.lastName} size="lg" />
 
           <div>
             <div className="flex items-center gap-2">
               {client.gender && (
-                <span className="text-sm text-neutral-grey-bold">
+                <span className="text-sm text-content-caption">
                   {CLIENT_GENDER_LABELS[client.gender as ClientGender]}
                 </span>
               )}
-              <h1 className="text-xl font-bold text-neutral-anthracite">
+              <h1 className="text-xl font-bold text-content-headings">
                 {client.firstName} {client.lastName}
               </h1>
             </div>
@@ -158,15 +159,17 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             variant="ghost"
             onClick={handleArchive}
             size="sm"
-            icon={<Archive className="w-5 h-5" />}
             title="Archiver"
-          />
+          >
+            <Archive className="w-5 h-5" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"
-            icon={<FileDown className="w-5 h-5" />}
             title="Exporter PDF"
-          />
+          >
+            <FileDown className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 

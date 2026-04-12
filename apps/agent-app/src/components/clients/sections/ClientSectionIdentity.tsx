@@ -16,7 +16,7 @@ export function ClientSectionIdentity({ client, onUpdate }: ClientSectionIdentit
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
       {/* Colonne gauche — Identité */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider">Identité</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider">Identité</h4>
         <InlineEdit
           label="Prénom"
           value={client.firstName}
@@ -43,7 +43,7 @@ export function ClientSectionIdentity({ client, onUpdate }: ClientSectionIdentit
 
       {/* Colonne droite — Coordonnées */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider">Coordonnées</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider">Coordonnées</h4>
         <InlineEdit
           label="Email"
           value={client.primaryEmail}
@@ -72,8 +72,8 @@ export function ClientSectionIdentity({ client, onUpdate }: ClientSectionIdentit
 
       {/* Professionnel */}
       {(client.jobTitle || client.employer) && (
-        <div className="space-y-3 md:col-span-2 pt-3 border-t border-neutral-grey-light">
-          <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider">Professionnel</h4>
+        <div className="space-y-3 md:col-span-2 pt-3 border-t border-edge-default">
+          <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider">Professionnel</h4>
           <div className="grid grid-cols-2 gap-x-8 gap-y-3">
             <InlineEdit
               label="Poste"

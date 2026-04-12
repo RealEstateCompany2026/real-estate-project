@@ -23,26 +23,26 @@ export function PropertySectionGeneral({ property, onUpdate }: PropertySectionGe
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
       {/* Colonne gauche */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider">Identité du bien</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider">Identité du bien</h4>
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-neutral-grey-bold min-w-[100px]">Type</span>
-          <span className="text-sm text-neutral-anthracite">
+          <span className="text-xs text-content-caption min-w-[100px]">Type</span>
+          <span className="text-sm text-content-headings">
             {PROPERTY_TYPE_LABELS[property.type as PropertyType]}
           </span>
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-neutral-grey-bold min-w-[100px]">Opération</span>
-          <span className="text-sm text-neutral-anthracite">
+          <span className="text-xs text-content-caption min-w-[100px]">Opération</span>
+          <span className="text-sm text-content-headings">
             {property.operationTypes?.map((o) => OPERATION_TYPE_LABELS[o as OperationType]).join(', ') || '—'}
           </span>
         </div>
 
         {property.condition && (
           <div className="flex items-center gap-4">
-            <span className="text-xs text-neutral-grey-bold min-w-[100px]">État</span>
-            <span className="text-sm text-neutral-anthracite">
+            <span className="text-xs text-content-caption min-w-[100px]">État</span>
+            <span className="text-sm text-content-headings">
               {PROPERTY_CONDITION_LABELS[property.condition as PropertyCondition]}
             </span>
           </div>
@@ -50,15 +50,15 @@ export function PropertySectionGeneral({ property, onUpdate }: PropertySectionGe
 
         {property.internalRef && (
           <div className="flex items-center gap-4">
-            <span className="text-xs text-neutral-grey-bold min-w-[100px]">Réf. interne</span>
-            <span className="text-sm font-mono text-neutral-anthracite">{property.internalRef}</span>
+            <span className="text-xs text-content-caption min-w-[100px]">Réf. interne</span>
+            <span className="text-sm font-mono text-content-headings">{property.internalRef}</span>
           </div>
         )}
       </div>
 
       {/* Colonne droite */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-neutral-grey-bold uppercase tracking-wider">Localisation & Prix</h4>
+        <h4 className="text-xs font-bold text-content-caption uppercase tracking-wider">Localisation & Prix</h4>
 
         <InlineEdit
           label="Adresse"
@@ -67,26 +67,26 @@ export function PropertySectionGeneral({ property, onUpdate }: PropertySectionGe
         />
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-neutral-grey-bold min-w-[100px]">Surface</span>
-          <span className="text-sm text-neutral-anthracite">{formatSurface(property.livingAreaSqm)}</span>
+          <span className="text-xs text-content-caption min-w-[100px]">Surface</span>
+          <span className="text-sm text-content-headings">{formatSurface(property.livingAreaSqm)}</span>
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-neutral-grey-bold min-w-[100px]">Pièces</span>
-          <span className="text-sm text-neutral-anthracite">{property.numberOfRooms ?? '—'}</span>
+          <span className="text-xs text-content-caption min-w-[100px]">Pièces</span>
+          <span className="text-sm text-content-headings">{property.numberOfRooms ?? '—'}</span>
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-neutral-grey-bold min-w-[100px]">Prix</span>
-          <span className="text-sm font-bold text-neutral-anthracite">
+          <span className="text-xs text-content-caption min-w-[100px]">Prix</span>
+          <span className="text-sm font-bold text-content-headings">
             {formatPrice(property.desiredSellingPrice)}
           </span>
         </div>
 
         {property.floorLevel != null && (
           <div className="flex items-center gap-4">
-            <span className="text-xs text-neutral-grey-bold min-w-[100px]">Étage</span>
-            <span className="text-sm text-neutral-anthracite">
+            <span className="text-xs text-content-caption min-w-[100px]">Étage</span>
+            <span className="text-sm text-content-headings">
               {property.floorLevel === 0 ? 'RDC' : property.floorLevel}
               {property.numberOfFloors ? ` / ${property.numberOfFloors}` : ''}
             </span>
@@ -95,8 +95,8 @@ export function PropertySectionGeneral({ property, onUpdate }: PropertySectionGe
 
         {property.constructionYear && (
           <div className="flex items-center gap-4">
-            <span className="text-xs text-neutral-grey-bold min-w-[100px]">Construction</span>
-            <span className="text-sm text-neutral-anthracite">{property.constructionYear}</span>
+            <span className="text-xs text-content-caption min-w-[100px]">Construction</span>
+            <span className="text-sm text-content-headings">{property.constructionYear}</span>
           </div>
         )}
       </div>

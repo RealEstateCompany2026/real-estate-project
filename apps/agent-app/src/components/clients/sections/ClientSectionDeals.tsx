@@ -57,20 +57,20 @@ export function ClientSectionDeals({ clientId }: ClientSectionDealsProps) {
       {deals.map((deal) => (
         <div
           key={deal.id}
-          className="flex items-center justify-between px-3 py-3 rounded-lg border border-neutral-grey-light hover:bg-background-subtle transition-colors"
+          className="flex items-center justify-between px-3 py-3 rounded-lg border border-edge-default hover:bg-surface-neutral-action transition-colors"
         >
           <div>
-            <p className="text-sm font-medium text-neutral-anthracite">{deal.title}</p>
-            <p className="text-xs text-neutral-grey-bold mt-0.5">
+            <p className="text-sm font-medium text-content-headings">{deal.title}</p>
+            <p className="text-xs text-content-caption mt-0.5">
               {DEAL_TYPE_LABELS[deal.type as DealType]} · {DEAL_STATUS_LABELS[deal.status as DealStatus]}
               {deal.pipelineStage && ` · ${PIPELINE_STAGE_LABELS[deal.pipelineStage as PipelineStage]}`}
             </p>
           </div>
           <div className="text-right">
             {deal.amount != null && (
-              <p className="text-sm font-bold text-neutral-anthracite">{formatPrice(deal.amount)}</p>
+              <p className="text-sm font-bold text-content-headings">{formatPrice(deal.amount)}</p>
             )}
-            <p className="text-xs text-neutral-grey-bold">{formatDate(deal.createdAt)}</p>
+            <p className="text-xs text-content-caption">{formatDate(deal.createdAt)}</p>
           </div>
         </div>
       ))}

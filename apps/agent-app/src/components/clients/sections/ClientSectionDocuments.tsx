@@ -48,9 +48,8 @@ export function ClientSectionDocuments({ clientId }: ClientSectionDocumentsProps
         title="Aucun document"
         description="Les documents rattachés au client apparaîtront ici."
         action={
-          <Button
-            icon={<Upload className="w-4 h-4" />}
-          >
+          <Button>
+            <Upload className="w-4 h-4" />
             Ajouter un document
           </Button>
         }
@@ -65,20 +64,24 @@ export function ClientSectionDocuments({ clientId }: ClientSectionDocumentsProps
       {visible.map((doc) => (
         <div
           key={doc.id}
-          className="flex items-center justify-between px-3 py-2 rounded-lg border border-neutral-grey-light hover:bg-background-subtle transition-colors"
+          className="flex items-center justify-between px-3 py-2 rounded-lg border border-edge-default hover:bg-surface-neutral-action transition-colors"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <FileText className="w-4 h-4 text-primary shrink-0" />
+            <FileText className="w-4 h-4 text-content-branded-action shrink-0" />
             <div className="min-w-0">
-              <p className="text-sm font-medium text-neutral-anthracite truncate">{doc.title}</p>
-              <p className="text-xs text-neutral-grey-bold">
+              <p className="text-sm font-medium text-content-headings truncate">{doc.title}</p>
+              <p className="text-xs text-content-caption">
                 {doc.type} · {formatFileSize(doc.fileSizeBytes ?? doc.fileSizeKb)} · {formatDate(doc.createdAt)}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" icon={<Eye className="w-4 h-4" />} title="Voir" />
-            <Button variant="ghost" size="sm" icon={<Download className="w-4 h-4" />} title="Télécharger" />
+            <Button variant="ghost" size="sm" title="Voir">
+              <Eye className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" title="Télécharger">
+              <Download className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       ))}

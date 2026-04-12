@@ -68,7 +68,7 @@ export function CompletionGauge({ score, level, suggestion, size = 'md' }: Compl
         </span>
       </div>
       {suggestion && (
-        <p className="text-xs text-neutral-grey-bold max-w-[180px]">{suggestion}</p>
+        <p className="text-xs text-content-caption max-w-[180px]">{suggestion}</p>
       )}
     </div>
   );
