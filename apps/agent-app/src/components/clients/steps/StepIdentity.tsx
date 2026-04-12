@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
 import { CLIENT_STATUS_LABELS } from '@/types/client';
 import type { ClientGender, ClientStatus } from '@/types/client';
@@ -25,7 +25,7 @@ const STATUS_OPTIONS: { value: ClientStatus; label: string }[] = [
  * Champs : civilité, prénom, nom, type(s) de client.
  */
 export function StepIdentity() {
-  const { register, formState: { errors }, watch, setValue } = useFormContext<ClientCreateData>();
+  const { register, formState: { errors }, watch, setValue, control } = useFormContext<ClientCreateData>();
   const selectedStatus = watch('status') ?? [];
 
   function toggleStatus(status: ClientStatus) {
@@ -66,24 +66,42 @@ export function StepIdentity() {
 
       {/* Prénom & Nom */}
       <div className="grid grid-cols-2 gap-4">
-        <InputField
-          label="Prénom"
-          id="firstName"
-          type="text"
-          {...register('firstName')}
-          placeholder="Prénom du client"
-          error={errors.firstName?.message}
-          required
-        />
-        <InputField
-          label="Nom"
-          id="lastName"
-          type="text"
-          {...register('lastName')}
-          placeholder="Nom du client"
-          error={errors.lastName?.message}
-          required
-        />
+        <div>
+          <Controller
+            name="firstName"
+            control={control}
+            render={({ field }) => (
+              <InputField
+                label="Prénom"
+                id="firstName"
+                type="text"
+                {...field}
+                placeholder="Prénom du client"
+                error={!!errors.firstName?.message}
+                required
+              />
+            )}
+          />
+          {errors.firstName?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.firstName.message}</p>}
+        </div>
+        <div>
+          <Controller
+            name="lastName"
+            control={control}
+            render={({ field }) => (
+              <InputField
+                label="Nom"
+                id="lastName"
+                type="text"
+                {...field}
+                placeholder="Nom du client"
+                error={!!errors.lastName?.message}
+                required
+              />
+            )}
+          />
+          {errors.lastName?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.lastName.message}</p>}
+        </div>
       </div>
 
       {/* Type(s) de client */}

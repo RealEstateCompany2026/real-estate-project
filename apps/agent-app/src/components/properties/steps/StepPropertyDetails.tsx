@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import type { PropertyCreateData } from '@/lib/validations/property';
 import { PROPERTY_CONDITION_LABELS } from '@/types/property';
 import type { PropertyCondition } from '@/types/property';
@@ -20,7 +20,7 @@ const CONDITION_OPTIONS: { value: PropertyCondition; label: string }[] = [
  * Champs facultatifs : étage, niveaux, année, état général.
  */
 export function StepPropertyDetails() {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<PropertyCreateData>();
+  const { register, watch, setValue, formState: { errors }, control } = useFormContext<PropertyCreateData>();
   const selectedCondition = watch('condition');
 
   return (
@@ -30,32 +30,52 @@ export function StepPropertyDetails() {
       </p>
 
       <div className="grid grid-cols-3 gap-4">
-        <InputField
-          label="Étage"
-          id="floorLevel"
-          type="number"
-          min={0}
-          {...register('floorLevel', { valueAsNumber: true })}
-          placeholder="3"
+        <Controller
+          name="floorLevel"
+          control={control}
+          render={({ field: { value, ...field } }) => (
+            <InputField
+              label="Étage"
+              id="floorLevel"
+              type="number"
+              {...field}
+              value={value ? String(value) : ''}
+              placeholder="3"
+            />
+          )}
         />
-        <InputField
-          label="Nombre de niveaux"
-          id="numberOfFloors"
-          type="number"
-          min={0}
-          {...register('numberOfFloors', { valueAsNumber: true })}
-          placeholder="1"
+        <Controller
+          name="numberOfFloors"
+          control={control}
+          render={({ field: { value, ...field } }) => (
+            <InputField
+              label="Nombre de niveaux"
+              id="numberOfFloors"
+              type="number"
+              {...field}
+              value={value ? String(value) : ''}
+              placeholder="1"
+            />
+          )}
         />
-        <InputField
-          label="Année de construction"
-          id="constructionYear"
-          type="number"
-          min={1800}
-          max={new Date().getFullYear() + 2}
-          {...register('constructionYear', { valueAsNumber: true })}
-          placeholder="2005"
-          error={errors.constructionYear?.message}
-        />
+        <div>
+          <Controller
+            name="constructionYear"
+            control={control}
+            render={({ field: { value, ...field } }) => (
+              <InputField
+                label="Année de construction"
+                id="constructionYear"
+                type="number"
+                {...field}
+                value={value ? String(value) : ''}
+                placeholder="2005"
+                error={!!errors.constructionYear?.message}
+              />
+            )}
+          />
+          {errors.constructionYear?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.constructionYear.message}</p>}
+        </div>
       </div>
 
       {/* État général */}

@@ -643,7 +643,7 @@ function BadgePreview() {
       <div>
         <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-2">@real-estate/ui ‹Badge›</p>
         <div className="flex flex-wrap gap-2">
-          {(['default','secondary','info','success','warning','destructive','outline'] as const).map(v => (
+          {(['default','success','information','warning'] as const).map(v => (
             <Badge key={v} variant={v}>{v}</Badge>
           ))}
         </div>

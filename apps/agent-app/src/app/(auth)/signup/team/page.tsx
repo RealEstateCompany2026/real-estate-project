@@ -51,7 +51,7 @@ export default function TeamInvitationPage() {
           type="email"
           value={email}
           onChange={setEmail}
-          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMember())}
+          
           placeholder="collegue@agence.com"
         />
 

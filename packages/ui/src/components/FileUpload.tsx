@@ -214,7 +214,7 @@ export function FileUpload({
 
               <Button
                 variant="ghost"
-                size="small"
+                size="sm"
                 onClick={handleRemove}
                 disabled={disabled}
               >

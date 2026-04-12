@@ -90,35 +90,63 @@ export function StepPropertyKey() {
 
       {/* Surface, Pièces, Prix */}
       <div className="grid grid-cols-3 gap-4">
-        <InputField
-          label="Surface (m²)"
-          id="livingAreaSqm"
-          type="number"
-          step="0.1"
-          {...register('livingAreaSqm', { valueAsNumber: true })}
-          placeholder="75"
-          error={errors.livingAreaSqm?.message}
-          required
-        />
-        <InputField
-          label="Pièces"
-          id="numberOfRooms"
-          type="number"
-          {...register('numberOfRooms', { valueAsNumber: true })}
-          placeholder="3"
-          error={errors.numberOfRooms?.message}
-          required
-        />
-        <InputField
-          label="Prix souhaité"
-          id="desiredSellingPrice"
-          type="number"
-          {...register('desiredSellingPrice', { valueAsNumber: true })}
-          placeholder="350000"
-          error={errors.desiredSellingPrice?.message}
-          suffix="€"
-          required
-        />
+        <div>
+          <Controller
+            name="livingAreaSqm"
+            control={control}
+            render={({ field: { value, ...field } }) => (
+              <InputField
+                label="Surface (m²)"
+                id="livingAreaSqm"
+                type="number"
+                {...field}
+                value={value ? String(value) : ''}
+                placeholder="75"
+                error={!!errors.livingAreaSqm?.message}
+                required
+              />
+            )}
+          />
+          {errors.livingAreaSqm?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.livingAreaSqm.message}</p>}
+        </div>
+        <div>
+          <Controller
+            name="numberOfRooms"
+            control={control}
+            render={({ field: { value, ...field } }) => (
+              <InputField
+                label="Pièces"
+                id="numberOfRooms"
+                type="number"
+                {...field}
+                value={value ? String(value) : ''}
+                placeholder="3"
+                error={!!errors.numberOfRooms?.message}
+                required
+              />
+            )}
+          />
+          {errors.numberOfRooms?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.numberOfRooms.message}</p>}
+        </div>
+        <div>
+          <Controller
+            name="desiredSellingPrice"
+            control={control}
+            render={({ field: { value, ...field } }) => (
+              <InputField
+                label="Prix souhaité"
+                id="desiredSellingPrice"
+                type="number"
+                {...field}
+                value={value ? String(value) : ''}
+                placeholder="350000"
+                error={!!errors.desiredSellingPrice?.message}
+                required
+              />
+            )}
+          />
+          {errors.desiredSellingPrice?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.desiredSellingPrice.message}</p>}
+        </div>
       </div>
 
       {/* Propriétaire (Client) */}
@@ -145,12 +173,13 @@ export function StepPropertyKey() {
         ) : (
           <div className="space-y-2">
             <InputField
+              label=""
               id="client-search"
               type="text"
               value={clientSearch}
-              onChange={(e) => setClientSearch(e.target.value)}
+              onChange={setClientSearch}
               placeholder="Rechercher un client existant..."
-              icon={<Search className="w-4 h-4" />}
+              leftIcon={Search}
             />
 
             {/* Résultats recherche client */}

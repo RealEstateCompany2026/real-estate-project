@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X, UserPlus } from 'lucide-react';
 import { clientQuickCreateSchema, type ClientQuickCreateData } from '@/lib/validations/client';
@@ -36,12 +36,12 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
   const [error, setError] = useState<string | null>(null);
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     watch,
     setValue,
     reset,
+    control,
   } = useForm<ClientQuickCreateData>({
     resolver: zodResolver(clientQuickCreateSchema),
     defaultValues: {
@@ -125,24 +125,42 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Prénom & Nom */}
           <div className="grid grid-cols-2 gap-3">
-            <InputField
-              label="Prénom"
-              id="qc-firstName"
-              type="text"
-              {...register('firstName')}
-              placeholder="Prénom"
-              error={errors.firstName?.message}
-              required
-            />
-            <InputField
-              label="Nom"
-              id="qc-lastName"
-              type="text"
-              {...register('lastName')}
-              placeholder="Nom"
-              error={errors.lastName?.message}
-              required
-            />
+            <div>
+              <Controller
+                name="firstName"
+                control={control}
+                render={({ field }) => (
+                  <InputField
+                    label="Prénom"
+                    id="qc-firstName"
+                    type="text"
+                    {...field}
+                    placeholder="Prénom"
+                    error={!!errors.firstName?.message}
+                    required
+                  />
+                )}
+              />
+              {errors.firstName?.message && <p className="text-xs text-content-error mt-0.5">{errors.firstName.message}</p>}
+            </div>
+            <div>
+              <Controller
+                name="lastName"
+                control={control}
+                render={({ field }) => (
+                  <InputField
+                    label="Nom"
+                    id="qc-lastName"
+                    type="text"
+                    {...field}
+                    placeholder="Nom"
+                    error={!!errors.lastName?.message}
+                    required
+                  />
+                )}
+              />
+              {errors.lastName?.message && <p className="text-xs text-content-error mt-0.5">{errors.lastName.message}</p>}
+            </div>
           </div>
 
           {/* Type */}
@@ -170,23 +188,38 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
           </div>
 
           {/* Email */}
-          <InputField
-            label="Email"
-            id="qc-email"
-            type="email"
-            {...register('primaryEmail')}
-            placeholder="email@exemple.com"
-            error={errors.primaryEmail?.message}
-            required
-          />
+          <div>
+            <Controller
+              name="primaryEmail"
+              control={control}
+              render={({ field }) => (
+                <InputField
+                  label="Email"
+                  id="qc-email"
+                  type="email"
+                  {...field}
+                  placeholder="email@exemple.com"
+                  error={!!errors.primaryEmail?.message}
+                  required
+                />
+              )}
+            />
+            {errors.primaryEmail?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.primaryEmail.message}</p>}
+          </div>
 
           {/* Téléphone */}
-          <InputField
-            label="Téléphone"
-            id="qc-phone"
-            type="tel"
-            {...register('mobilePhone')}
-            placeholder="06 12 34 56 78"
+          <Controller
+            name="mobilePhone"
+            control={control}
+            render={({ field }) => (
+              <InputField
+                label="Téléphone"
+                id="qc-phone"
+                type="tel"
+                {...field}
+                placeholder="06 12 34 56 78"
+              />
+            )}
           />
 
           {/* Error */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
 import { InputField } from '@real-estate/ui/input-field';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
@@ -13,23 +13,24 @@ import { DuplicateAlert } from '@/components/ui/DuplicateAlert';
  * Déclenche la détection de doublons sur email/téléphone.
  */
 export function StepContact() {
-  const { register, formState: { errors }, setValue, watch } = useFormContext<ClientCreateData>();
+  const { register, formState: { errors }, setValue, watch, control } = useFormContext<ClientCreateData>();
   const { matches, checkDuplicates, dismiss } = useDuplicateCheck();
 
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  function handleEmailBlur(e: React.FocusEvent<HTMLInputElement>) {
-    const email = e.target.value;
-    if (email) {
-      checkDuplicates({ email, firstName, lastName });
+  const primaryEmail = watch('primaryEmail');
+  const mobilePhone = watch('mobilePhone');
+
+  function handleEmailBlur() {
+    if (primaryEmail) {
+      checkDuplicates({ email: primaryEmail, firstName, lastName });
     }
   }
 
-  function handlePhoneBlur(e: React.FocusEvent<HTMLInputElement>) {
-    const phone = e.target.value;
-    if (phone) {
-      checkDuplicates({ phone, firstName, lastName });
+  function handlePhoneBlur() {
+    if (mobilePhone) {
+      checkDuplicates({ phone: mobilePhone, firstName, lastName });
     }
   }
 
@@ -39,36 +40,63 @@ export function StepContact() {
       <DuplicateAlert matches={matches} onDismiss={dismiss} />
 
       {/* Email principal */}
-      <InputField
-        label="Email"
-        id="primaryEmail"
-        type="email"
-        {...register('primaryEmail')}
-        onBlur={handleEmailBlur}
-        placeholder="email@exemple.com"
-        error={errors.primaryEmail?.message}
-        required
+      <Controller
+        name="primaryEmail"
+        control={control}
+        render={({ field }) => (
+          <>
+            <InputField
+              label="Email"
+              id="primaryEmail"
+              type="email"
+              {...field}
+              onBlur={() => { field.onBlur(); handleEmailBlur(); }}
+              placeholder="email@exemple.com"
+              error={!!errors.primaryEmail?.message}
+              required
+            />
+            {errors.primaryEmail?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.primaryEmail.message}</p>}
+          </>
+        )}
       />
 
       {/* Email secondaire */}
-      <InputField
-        label="Email secondaire"
-        id="secondaryEmail"
-        type="email"
-        {...register('secondaryEmail')}
-        placeholder="email-secondaire@exemple.com"
-        error={errors.secondaryEmail?.message}
+      <Controller
+        name="secondaryEmail"
+        control={control}
+        render={({ field }) => (
+          <>
+            <InputField
+              label="Email secondaire"
+              id="secondaryEmail"
+              type="email"
+              {...field}
+              placeholder="email-secondaire@exemple.com"
+              error={!!errors.secondaryEmail?.message}
+            />
+            {errors.secondaryEmail?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.secondaryEmail.message}</p>}
+          </>
+        )}
       />
 
       {/* Téléphone */}
-      <InputField
-        label="Téléphone mobile"
-        id="mobilePhone"
-        type="tel"
-        {...register('mobilePhone')}
-        onBlur={handlePhoneBlur}
-        placeholder="06 12 34 56 78"
-        error={errors.mobilePhone?.message}
+      <Controller
+        name="mobilePhone"
+        control={control}
+        render={({ field }) => (
+          <>
+            <InputField
+              label="Téléphone mobile"
+              id="mobilePhone"
+              type="tel"
+              {...field}
+              onBlur={() => { field.onBlur(); handlePhoneBlur(); }}
+              placeholder="06 12 34 56 78"
+              error={!!errors.mobilePhone?.message}
+            />
+            {errors.mobilePhone?.message && <p className="text-xs text-semantic-destructive mt-0.5">{errors.mobilePhone.message}</p>}
+          </>
+        )}
       />
 
       {/* Adresse */}
