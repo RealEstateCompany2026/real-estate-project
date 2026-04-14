@@ -16,6 +16,7 @@ import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
 import { ListBien } from '@real-estate/ui/list-bien';
+import { ListCarnet } from '@real-estate/ui/list-carnet';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
 import { Sheet } from '@real-estate/ui/sheet';
@@ -901,7 +902,21 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
               Carnet
             </h3>
-            <Badge variant="default">0</Badge>
+            <Badge variant="default">{properties.filter(p => p.hasCarnet).length}</Badge>
+          </div>
+          <div className="flex flex-col gap-[16px]">
+            {properties.map((p) => (
+              <ListCarnet
+                key={`carnet-${p.id}`}
+                city={p.city}
+                propertyType={p.propertyType}
+                surface={p.surface}
+                dpeGrade={p.dpeGrade}
+                ownerName={`${client.lastName ?? ''}, ${client.firstName ?? ''}`.trim()}
+                status={p.hasCarnet ? 'active' : 'dormant'}
+                aiSuggestions={0}
+              />
+            ))}
           </div>
         </section>
 
