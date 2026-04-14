@@ -45,6 +45,7 @@ interface ActivityLog {
   time: string;
   author: string;
   category: string;
+  status: string | null;
   description: string;
   badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled';
 }
@@ -52,6 +53,7 @@ interface ActivityLog {
 interface EventRow {
   id: string;
   type: string | null;
+  status: string | null;
   title: string | null;
   description: string | null;
   eventDate: string;
@@ -164,6 +166,7 @@ function mockActivities(): ActivityLog[] {
       time: '12:56',
       author: 'Le client',
       category: 'QUALIFICATION',
+      status: null,
       description: 'Le client a fait le des place d\'dentist coutume.',
       badgeVariant: 'success',
     },
@@ -173,6 +176,7 @@ function mockActivities(): ActivityLog[] {
       time: '09:30',
       author: 'Système',
       category: 'ENGAGEMENT',
+      status: null,
       description: 'Un message a été envoyé au client pour lui confirmer un primo-a conversation de la transaction.',
       badgeVariant: 'information',
     },
@@ -182,6 +186,7 @@ function mockActivities(): ActivityLog[] {
       time: '14:15',
       author: 'Titre le registre',
       category: 'QUALIFICATION',
+      status: null,
       description: 'Le client a été scruté à trouver une pièce d\'identité valide.',
       badgeVariant: 'success',
     },
@@ -191,6 +196,7 @@ function mockActivities(): ActivityLog[] {
       time: '16:42',
       author: 'Mail',
       category: 'CONVERSION',
+      status: null,
       description: "L'offre de montant de vente forfaits a été envoyée au client.",
       badgeVariant: 'warning',
     },
@@ -226,6 +232,24 @@ function getActivityBadgeVariant(category: string): 'default' | 'success' | 'war
     case 'CONVERSION':    return 'warning';
     case 'REACTIVATION':  return 'information';
     default:              return 'default';
+  }
+}
+
+/** Mappe un EventStatus DB vers un BadgeVariant DS */
+function eventStatusToBadgeVariant(status: string | null): 'default' | 'success' | 'warning' | 'information' | 'error' | 'disabled' {
+  switch (status) {
+    case 'PROGRAMME':
+    case 'CONFIRME':
+      return 'information';
+    case 'TERMINE':
+      return 'success';
+    case 'ANNULE':
+    case 'NO_SHOW':
+      return 'error';
+    case 'REPORTE':
+      return 'warning';
+    default:
+      return 'default';
   }
 }
 
@@ -362,7 +386,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       // Fetch events for activity log
       const { data: eventsData, error: eventsError } = await supabase
         .from('Event')
-        .select('id, type, title, description, eventDate, agentId, createdAt, User:agentId(name)')
+        .select('id, type, status, title, description, eventDate, agentId, createdAt, User:agentId(name)')
         .eq('clientId', clientId)
         .order('eventDate', { ascending: false })
         .limit(4);
@@ -378,6 +402,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
         author: ev.User?.[0]?.name ?? 'Système',
         category: eventTypeToCategory(ev.type),
+        status: ev.status,
         description: ev.description ?? ev.title ?? '',
       }));
 
@@ -472,18 +497,20 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   return (
     <div className="relative">
       {/* ═══════════════════════════════════════════════════════
-          Bloc 1a — AppBarFicheClient
+          Bloc 1a — AppBarFicheClient (sticky)
           ═══════════════════════════════════════════════════════ */}
-      <AppBarFicheClient
-        clientName={clientName}
-        tags={tags}
-        qualification={kpis.qualification}
-        engagement={kpis.engagement}
-        conversion={kpis.conversion}
-        reactivation={kpis.reactivation}
-        aiSuggestions={aiSuggestions}
-        onBack={() => router.push('/clients')}
-      />
+      <div className="sticky top-0 z-30 bg-surface-page">
+        <AppBarFicheClient
+          clientName={clientName}
+          tags={tags}
+          qualification={kpis.qualification}
+          engagement={kpis.engagement}
+          conversion={kpis.conversion}
+          reactivation={kpis.reactivation}
+          aiSuggestions={aiSuggestions}
+          onBack={() => router.push('/clients')}
+        />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════
           Bloc 1b — GraphCourbe
@@ -499,9 +526,11 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       />
 
       {/* ═══════════════════════════════════════════════════════
-          Bloc 1c — AppBarClientAncres (navigation par ancres)
+          Bloc 1c — AppBarClientAncres (navigation par ancres, sticky)
           ═══════════════════════════════════════════════════════ */}
-      <AppBarClientAncres onItemClick={handleAnchorClick} />
+      <div className="sticky top-[100px] z-20 bg-surface-page">
+        <AppBarClientAncres onItemClick={handleAnchorClick} />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════
           Sections (Blocs 2-8 — à implémenter)
@@ -644,7 +673,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 author={activity.author}
                 category={activity.category}
                 description={activity.description}
-                badgeVariant={getActivityBadgeVariant(activity.category)}
+                badgeVariant={eventStatusToBadgeVariant(activity.status)}
                 className="w-full"
               />
             ))}
