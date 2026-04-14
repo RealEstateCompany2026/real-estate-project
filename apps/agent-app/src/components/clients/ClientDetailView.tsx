@@ -537,7 +537,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           ═══════════════════════════════════════════════════════ */}
       <div className="flex flex-col">
         {/* Bloc 2 — Profil */}
-        <section ref={setSectionRef('profil')} id="profil" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('profil')} id="profil" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           {/* Header : titre + badge count + bouton Éditer */}
           <div className="flex items-center justify-between mb-[50px]">
             <div className="flex items-center gap-[4px]">
@@ -612,7 +612,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         </section>
 
         {/* Bloc 3 — Activités */}
-        <section ref={setSectionRef('activites')} id="activites" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('activites')} id="activites" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           {/* Header : titre + badge + chips filtre + bouton Voir tout */}
           <div className="flex items-center justify-between mb-[50px]">
             <div className="flex items-center gap-[12px]">
@@ -681,7 +681,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         </section>
 
         {/* Bloc 4 — Affaires */}
-        <section ref={setSectionRef('affaires')} id="affaires" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('affaires')} id="affaires" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           <div className="flex items-center gap-[4px] mb-[50px]">
             <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
               Affaires
@@ -691,7 +691,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         </section>
 
         {/* Bloc 5 — Biens */}
-        <section ref={setSectionRef('biens')} id="biens" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('biens')} id="biens" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           <div className="flex items-center gap-[4px] mb-[50px]">
             <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
               Biens
@@ -717,7 +717,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         </section>
 
         {/* Bloc 6 — Carnets */}
-        <section ref={setSectionRef('carnet')} id="carnet" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('carnet')} id="carnet" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           <div className="flex items-center gap-[4px] mb-[50px]">
             <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
               Carnet
@@ -727,7 +727,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         </section>
 
         {/* Bloc 7 — Documents */}
-        <section ref={setSectionRef('documents')} id="documents" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('documents')} id="documents" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           <div className="flex items-center justify-between mb-[50px]">
             <div className="flex items-center gap-[4px]">
               <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
@@ -749,7 +749,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         </section>
 
         {/* Bloc 8 — Messages */}
-        <section ref={setSectionRef('messages')} id="messages" className="py-[50px] border-t border-edge-default">
+        <section ref={setSectionRef('messages')} id="messages" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           <div className="flex items-center justify-between mb-[50px]">
             <div className="flex items-center gap-[4px]">
               <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
