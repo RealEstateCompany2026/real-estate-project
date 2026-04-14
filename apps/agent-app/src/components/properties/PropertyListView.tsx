@@ -1,153 +1,119 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Building2, Download, Upload } from 'lucide-react';
+import { Filter, Plus, X } from 'lucide-react';
+
+// ── DS Components (from packages/ui) ──
+import { AppBarCategory } from '@real-estate/ui/app-bar-category';
+import { GraphCourbe } from '@real-estate/ui/graph-courbe';
+import { ListBien } from '@real-estate/ui/list-bien';
+import { CardBien } from '@real-estate/ui/card-bien';
+import { Sheet } from '@real-estate/ui/sheet';
+import { ButtonSort } from '@real-estate/ui/button-sort';
+import { ButtonPagination } from '@real-estate/ui/button-pagination';
+import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
+import { Chip } from '@real-estate/ui/chip';
 import { Button } from '@real-estate/ui/button';
+import { SheetBienDetails } from '@real-estate/ui/sheet-bien-details';
+
+// ── App-level ──
 import { createClient } from '@/lib/supabase/client';
-import { DataTable, StatusBadge, EmptyState } from '@/components/ui';
-import type { Column } from '@/components/ui/DataTable';
-import type { PropertyListItem, PropertyStatus, DpeClass } from '@/types/property';
-import {
-  PROPERTY_TYPE_LABELS,
-  PROPERTY_STATUS_LABELS,
-  PROPERTY_STATUS_COLORS,
-  DPE_COLORS,
-} from '@/types/property';
-import { formatPrice, formatSurface, formatRelativeDate } from '@/lib/utils/format';
+import type { PropertyStatus, DpeClass } from '@/types/property';
+import { PROPERTY_TYPE_LABELS } from '@/types/property';
+import { formatPrice } from '@/lib/utils/format';
 
 // ---------------------------------------------------------------------------
-// Filter chips
+// Types
 // ---------------------------------------------------------------------------
 
-const STATUS_FILTERS: { label: string; value: PropertyStatus | 'ALL' }[] = [
-  { label: 'Tous', value: 'ALL' },
-  { label: 'À vendre', value: 'A_VENDRE' },
-  { label: 'À louer', value: 'A_LOUER' },
-  { label: 'Vendus', value: 'VENDU' },
-  { label: 'Loués', value: 'LOUE' },
-  { label: 'Brouillons', value: 'OFF_MARKET' },
-];
+interface PropertyRow {
+  id: string;
+  type: string;
+  status: PropertyStatus;
+  address: string;
+  addressCity: string | null;
+  livingAreaSqm: number | null;
+  numberOfRooms: number | null;
+  desiredSellingPrice: number | null;
+  estimatedMarketValue: number | null;
+  dpeEnergyClass: DpeClass | null;
+  completionScore: number | null;
+  hasMaintenanceLog: boolean | null;
+  operationTypes: string[] | null;
+  internalRef: string | null;
+  createdAt: string;
+}
 
-// ---------------------------------------------------------------------------
-// DPE mini-badge
-// ---------------------------------------------------------------------------
+interface PropertyDisplayItem {
+  id: string;
+  city: string;
+  propertyType: string;
+  surface: string;
+  dpeGrade?: DpeClass;
+  operationType: string;
+  price: string;
+  hasCarnet: boolean;
+  status: string;
+  imageUrl?: string;
+}
 
-function DpeBadge({ dpe }: { dpe: DpeClass | null }) {
-  if (!dpe) return <span className="text-content-disabled">—</span>;
-  return (
-    <span
-      className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold text-white"
-      style={{ backgroundColor: DPE_COLORS[dpe] }}
-    >
-      {dpe}
-    </span>
-  );
+interface PropertyWithKpis extends PropertyDisplayItem {
+  kpis: PropertyKpis;
+  aiSuggestions: number;
+}
+
+interface PropertyKpis {
+  qualification: number;
+  entretien: number;
+  conversion: number;
 }
 
 // ---------------------------------------------------------------------------
-// Columns
+// Helpers
 // ---------------------------------------------------------------------------
 
-const columns: Column<PropertyListItem>[] = [
-  {
-    key: 'address',
-    label: 'Bien',
-    sortable: true,
-    className: 'min-w-[240px]',
-    render: (row) => (
-      <div className="min-w-0">
-        <p className="font-medium text-content-headings truncate">
-          {row.internalRef && (
-            <span className="text-xs text-content-subtle mr-1.5">{row.internalRef}</span>
-          )}
-          {PROPERTY_TYPE_LABELS[row.type]}
-        </p>
-        <p className="text-xs text-content-subtle truncate">{row.address}</p>
-      </div>
-    ),
-  },
-  {
-    key: 'status',
-    label: 'Statut',
-    render: (row) => (
-      <StatusBadge
-        label={PROPERTY_STATUS_LABELS[row.status]}
-        color={PROPERTY_STATUS_COLORS[row.status]}
-        variant="outlined"
-        size="sm"
-      />
-    ),
-  },
-  {
-    key: 'desiredSellingPrice',
-    label: 'Prix',
-    sortable: true,
-    className: 'w-32',
-    render: (row) => (
-      <span className="font-medium text-content-strong">
-        {formatPrice(row.desiredSellingPrice)}
-      </span>
-    ),
-  },
-  {
-    key: 'livingAreaSqm',
-    label: 'Surface',
-    sortable: true,
-    className: 'w-24',
-    render: (row) => (
-      <span className="text-content-body">{formatSurface(row.livingAreaSqm)}</span>
-    ),
-  },
-  {
-    key: 'numberOfRooms',
-    label: 'Pièces',
-    sortable: true,
-    className: 'w-20',
-    render: (row) => (
-      <span className="text-content-body">
-        {row.numberOfRooms != null ? `${row.numberOfRooms} p.` : '—'}
-      </span>
-    ),
-  },
-  {
-    key: 'dpeEnergyClass',
-    label: 'DPE',
-    className: 'w-16',
-    render: (row) => <DpeBadge dpe={row.dpeEnergyClass} />,
-  },
-  {
-    key: 'completionScore',
-    label: 'Complétude',
-    sortable: true,
-    className: 'w-28',
-    render: (row) => {
-      const score = row.completionScore ?? 0;
-      const color =
-        score >= 75 ? 'var(--green-500)' : score >= 50 ? 'var(--orange-400)' : score >= 25 ? 'var(--orange-500)' : 'var(--red-500)';
-      return (
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-surface-neutral-action-hover rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${score}%`, backgroundColor: color }}
-            />
-          </div>
-          <span className="text-xs font-medium" style={{ color }}>{score}%</span>
-        </div>
-      );
-    },
-  },
-  {
-    key: 'createdAt',
-    label: 'Ajouté',
-    sortable: true,
-    className: 'w-32',
-    render: (row) => (
-      <span className="text-content-subtle text-xs">{formatRelativeDate(row.createdAt)}</span>
-    ),
-  },
+/** Generate mock KPIs (replace with real RPC call later) */
+function mockKpis(): PropertyKpis {
+  return {
+    qualification: Math.floor(Math.random() * 60) + 20,
+    entretien: Math.floor(Math.random() * 60) + 20,
+    conversion: Math.floor(Math.random() * 40) + 10,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Filter chips config
+// ---------------------------------------------------------------------------
+
+const CATEGORY_FILTERS = [
+  { label: 'tous', value: 'ALL' as const },
+  { label: 'off market', value: 'OFF_MARKET' as const },
+  { label: 'à vendre', value: 'A_VENDRE' as const },
+  { label: 'à louer', value: 'A_LOUER' as const },
+  { label: 'sous gestion', value: 'SOUS_GESTION' as const },
 ];
+
+// ---------------------------------------------------------------------------
+// Graph data (mock — replace with real analytics)
+// ---------------------------------------------------------------------------
+
+const GRAPH_DATA = [
+  { label: '10 avr', value: 18 },
+  { label: '17 avr', value: 30 },
+  { label: '24 avr', value: 25 },
+  { label: '01 mai', value: 35 },
+  { label: '08 mai', value: 32 },
+  { label: '15 mai', value: 28 },
+  { label: '22 mai', value: 22 },
+  { label: '22 mai', value: 38 },
+];
+
+// ---------------------------------------------------------------------------
+// Page size
+// ---------------------------------------------------------------------------
+
+const PAGE_SIZE = 100;
 
 // ---------------------------------------------------------------------------
 // Component
@@ -155,100 +121,288 @@ const columns: Column<PropertyListItem>[] = [
 
 export function PropertyListView() {
   const router = useRouter();
-  const [properties, setProperties] = useState<PropertyListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<PropertyStatus | 'ALL'>('ALL');
 
+  // ── Data state ──
+  const [properties, setProperties] = useState<PropertyWithKpis[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ── UI state ──
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
+
+  // ── Sheet state ──
+  const [selectedProperty, setSelectedProperty] = useState<PropertyWithKpis | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // ── Fetch properties ──
   useEffect(() => {
     async function load() {
       const supabase = createClient();
       const { data } = await supabase
         .from('Property')
-        .select('id, type, status, address, addressCity, livingAreaSqm, numberOfRooms, desiredSellingPrice, dpeEnergyClass, completionScore, internalRef, createdAt')
+        .select(
+          'id, type, status, address, addressCity, livingAreaSqm, numberOfRooms, desiredSellingPrice, estimatedMarketValue, dpeEnergyClass, completionScore, hasMaintenanceLog, operationTypes, internalRef, createdAt'
+        )
         .order('createdAt', { ascending: false });
-      setProperties((data ?? []) as unknown as PropertyListItem[]);
+
+      const enriched: PropertyWithKpis[] = ((data ?? []) as unknown as PropertyRow[]).map((p) => {
+        const operationType = p.operationTypes?.[0] ?? 'VENTE';
+        const displayItem: PropertyDisplayItem = {
+          id: p.id,
+          city: p.addressCity ?? '—',
+          propertyType: PROPERTY_TYPE_LABELS[p.type as keyof typeof PROPERTY_TYPE_LABELS] ?? p.type,
+          surface: p.livingAreaSqm ? `${p.livingAreaSqm}m²` : '—',
+          dpeGrade: p.dpeEnergyClass ?? undefined,
+          operationType,
+          price: formatPrice(p.desiredSellingPrice ?? p.estimatedMarketValue),
+          hasCarnet: p.hasMaintenanceLog ?? false,
+          status: p.status,
+        };
+
+        return {
+          ...displayItem,
+          kpis: mockKpis(),
+          aiSuggestions: Math.floor(Math.random() * 5),
+        };
+      });
+
+      setProperties(enriched);
       setIsLoading(false);
     }
     load();
   }, []);
 
-  const filtered =
-    statusFilter === 'ALL'
-      ? properties
-      : properties.filter((p) => p.status === statusFilter);
+  // ── Filtering ──
+  const filtered = properties.filter((p) => {
+    if (categoryFilter !== 'ALL') {
+      if (categoryFilter === 'SOUS_GESTION') {
+        // TODO: filter by operationTypes includes 'GESTION'
+        return true;
+      } else if (categoryFilter === 'OFF_MARKET') {
+        return p.status === 'OFF_MARKET';
+      } else {
+        return p.status === categoryFilter;
+      }
+    }
+    return true;
+  });
+
+  // ── Pagination ──
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  // ── Handlers ──
+  const handlePropertyClick = useCallback((property: PropertyWithKpis) => {
+    setSelectedProperty(property);
+    setSheetOpen(true);
+  }, []);
+
+  const handleRemoveFilter = useCallback((filter: string) => {
+    setActiveFilters((prev) => prev.filter((f) => f !== filter));
+  }, []);
+
+  // ── Loading skeleton ──
+  if (isLoading) {
+    return (
+      <div className="space-y-3 p-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-[120px] bg-surface-neutral-action-hover rounded-2xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-h5 text-content-headings">Biens</h1>
-          <p className="text-sm text-content-subtle mt-0.5">
-            {properties.length} bien{properties.length > 1 ? 's' : ''} au total
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4" />
-            Importer
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4" />
-            Exporter
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => router.push('/properties/new')}
+    <>
+      {/* ═══════════════════════════════════════════════════════
+          1. AppBarCategory — "Biens" + dropdown + add + search
+          ═══════════════════════════════════════════════════════ */}
+      <AppBarCategory
+        title="Biens"
+        filterLabel={CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'tous'}
+        filterItems={CATEGORY_FILTERS.map((f) => ({
+          label: f.label,
+          onClick: () => {
+            setCategoryFilter(f.value);
+            setPage(0);
+          },
+        }))}
+        onAdd={() => router.push('/properties/new')}
+        onSearch={() => {
+          // TODO: open search overlay
+        }}
+      />
+
+      {/* ═══════════════════════════════════════════════════════
+          2. GraphCourbe — Analytics curve
+          ═══════════════════════════════════════════════════════ */}
+      <GraphCourbe
+        title="Label"
+        data={GRAPH_DATA}
+        selectedIndex={5}
+        selectedDate="22 fév 2026"
+        selectedLabel="28 réactions positives"
+        trendPercentage="7%"
+        trendDirection="down"
+      />
+
+      {/* ═══════════════════════════════════════════════════════
+          3. Filter bar — filter icon + chips + view mode toggle
+          ═══════════════════════════════════════════════════════ */}
+      <div className="flex items-center justify-between px-0 py-[10px]">
+        <div className="flex items-center gap-[8px]">
+          {/* Filter icon */}
+          <button
+            type="button"
+            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
+            aria-label="Filtrer"
           >
-            <Plus className="w-4 h-4" />
-            Nouveau bien
-          </Button>
+            <Filter size={20} style={{ color: 'var(--icon-neutral-default)' }} />
+          </button>
+
+          {/* Active filter chips */}
+          {activeFilters.map((filter) => (
+            <Chip key={filter} size="medium">
+              {filter}
+              <button
+                onClick={() => handleRemoveFilter(filter)}
+                className="ml-1"
+                aria-label={`Supprimer le filtre ${filter}`}
+              >
+                <X size={14} style={{ color: 'var(--icon-neutral-default)' }} />
+              </button>
+            </Chip>
+          ))}
+
+          {/* Add filter button */}
+          <button
+            type="button"
+            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
+            aria-label="Ajouter un filtre"
+          >
+            <Plus size={20} style={{ color: 'var(--icon-neutral-default)' }} />
+          </button>
         </div>
+
+        {/* View mode toggle */}
+        <ViewModeDropdown
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
       </div>
 
-      {/* DataTable */}
-      <DataTable
-        columns={columns}
-        data={filtered}
-        isLoading={isLoading}
-        searchableFields={['address', 'addressCity', 'internalRef', 'type']}
-        searchPlaceholder="Rechercher un bien…"
-        onRowClick={(row) => router.push(`/properties/${row.id}`)}
-        pageSize={25}
-        filters={
-          <div className="flex items-center gap-1.5">
-            {STATUS_FILTERS.map((f) => (
+      {/* ═══════════════════════════════════════════════════════
+          4. Property list / grid
+          ═══════════════════════════════════════════════════════ */}
+      {viewMode === 'list' ? (
+        /* ── MODE LIST : ListBien rows ── */
+        <div className="flex flex-col gap-[17px]">
+          {paginated.map((property) => (
+            <ListBien
+              key={property.id}
+              imageUrl={property.imageUrl}
+              operationType={property.operationType}
+              price={property.price}
+              hasCarnet={property.hasCarnet}
+              city={property.city}
+              propertyType={property.propertyType}
+              surface={property.surface}
+              dpeGrade={property.dpeGrade}
+              kpis={property.kpis}
+              aiSuggestions={property.aiSuggestions}
+              onClick={() => handlePropertyClick(property)}
+            />
+          ))}
+        </div>
+      ) : (
+        /* ── MODE GRID : CardBien cards ── */
+        <div className="grid grid-cols-3 gap-[17px]">
+          {paginated.map((property) => (
+            <CardBien
+              key={property.id}
+              imageUrl={property.imageUrl}
+              operationType={property.operationType}
+              price={property.price}
+              hasCarnet={property.hasCarnet}
+              city={property.city}
+              propertyType={property.propertyType}
+              surface={property.surface}
+              dpeGrade={property.dpeGrade}
+              kpis={property.kpis}
+              aiSuggestions={property.aiSuggestions}
+              onClick={() => handlePropertyClick(property)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
+          5. Pagination bar — ButtonSort + ButtonPagination
+          ═══════════════════════════════════════════════════════ */}
+      <div className="flex items-center justify-end gap-[12px] py-[20px]">
+        <ButtonSort
+          label=""
+          count={filtered.length}
+          sortDirection="none"
+        />
+        <ButtonPagination
+          onPrevious={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          canGoPrevious={page > 0}
+          canGoNext={page < totalPages - 1}
+        />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          6. Sheet — Property detail (opens on click)
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={sheetOpen}
+        onClose={() => {
+          setSheetOpen(false);
+          setSelectedProperty(null);
+        }}
+        title={selectedProperty ? `${selectedProperty.propertyType} . ${selectedProperty.surface}` : ''}
+        width="narrow"
+        footer={
+          selectedProperty ? (
+            <div className="flex gap-[12px] p-[20px] border-t border-edge-default">
               <Button
-                key={f.value}
-                variant={statusFilter === f.value ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter(f.value)}
-                className="rounded-full"
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setSheetOpen(false);
+                  router.push(`/properties/${selectedProperty.id}`);
+                }}
               >
-                {f.label}
+                Voir la fiche
               </Button>
-            ))}
-          </div>
-        }
-        emptyState={
-          <EmptyState
-            icon={<Building2 className="w-6 h-6" />}
-            title="Aucun bien"
-            description="Ajoutez votre premier bien immobilier."
-            action={
               <Button
                 variant="primary"
-                size="sm"
-                onClick={() => router.push('/properties/new')}
+                className="flex-1"
               >
-                <Plus className="w-4 h-4" />
-                Nouveau bien
+                Voir les actions
               </Button>
-            }
-          />
+            </div>
+          ) : undefined
         }
-      />
-    </div>
+      >
+        {selectedProperty && (
+          <SheetBienDetails
+            bienType={selectedProperty.propertyType}
+            surface={selectedProperty.surface}
+            type={selectedProperty.operationType}
+            price={selectedProperty.price}
+            location={selectedProperty.city}
+            dpe={selectedProperty.dpeGrade}
+            qualification={selectedProperty.kpis.qualification}
+            entretien={selectedProperty.kpis.entretien}
+            conversion={selectedProperty.kpis.conversion}
+          />
+        )}
+      </Sheet>
+    </>
   );
 }
