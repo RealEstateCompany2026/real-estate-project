@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -15,6 +15,7 @@ import { Button } from '@real-estate/ui/button';
 import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
+import { ListBien } from '@real-estate/ui/list-bien';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -57,12 +58,54 @@ interface EventRow {
   User: { name: string | null }[] | null;
 }
 
+interface DealRow {
+  id: string;
+}
+
+interface PropertyRow {
+  id: string;
+  addressCity: string | null;
+  type: string | null;
+  livingAreaSqm: number | null;
+  dpeEnergyClass: string | null;
+  operationTypes: string[] | null;
+  hasMaintenanceLog: boolean | null;
+  desiredSellingPrice: number | null;
+  estimatedMarketValue: number | null;
+}
+
+interface DocumentRow {
+  id: string;
+  title: string | null;
+  fileName: string | null;
+  type: string | null;
+}
+
+interface PropertyItem {
+  id: string;
+  city: string;
+  propertyType: string;
+  surface: string;
+  dpeGrade?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  operationType: string;
+  price: string;
+  hasCarnet: boolean;
+}
+
+interface DocumentItem {
+  id: string;
+  label: string;
+}
+
 interface ClientDetailData {
   client: Client;
   kpis: ClientKpis;
   aiSuggestions: number;
   graphData: GraphDataPoint[];
   activities: ActivityLog[];
+  dealsCount: number;
+  properties: PropertyItem[];
+  documents: DocumentItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -175,6 +218,47 @@ function statusToTags(status: ClientStatus[]): string[] {
   return status.map((s) => map[s] ?? s);
 }
 
+/** Formate un prix en euros (sans décimales) */
+function formatPriceEuro(value: number | null | undefined): string {
+  if (value == null) return '—';
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+}
+
+/** Mappe PropertyType enum → label court affiché */
+function propertyTypeLabel(t: string | null): string {
+  switch (t) {
+    case 'STUDIO': return 'Studio';
+    case 'T1': return 'T1';
+    case 'T2': return 'T2';
+    case 'T3': return 'T3';
+    case 'T4': return 'T4';
+    case 'APPARTEMENT': return 'Appartement';
+    case 'MAISON': return 'Maison';
+    case 'MAISON_DE_VILLE': return 'Maison de ville';
+    case 'LOFT': return 'Loft';
+    case 'TERRAIN': return 'Terrain';
+    case 'IMMEUBLE': return 'Immeuble';
+    default: return 'Bien';
+  }
+}
+
+/** Premier OperationType de l'array, pour affichage sticker */
+function firstOperationType(arr: string[] | null): string {
+  if (!arr || arr.length === 0) return 'VENTE';
+  return arr[0];
+}
+
+/** DPE valide ou undefined */
+function dpeGradeOrUndef(v: string | null): 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | undefined {
+  if (v && ['A','B','C','D','E','F','G'].includes(v)) return v as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  return undefined;
+}
+
+/** Label court pour un Document (title si dispo, sinon fileName, sinon type) */
+function documentLabel(d: DocumentRow): string {
+  return d.title ?? d.fileName ?? d.type ?? 'Document';
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -245,12 +329,43 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         description: ev.description ?? ev.title ?? '',
       }));
 
+      // Fetch deals, properties, documents in parallel
+      const [dealsRes, propertiesRes, documentsRes] = await Promise.all([
+        supabase.from('Deal').select('id').eq('clientId', clientId),
+        supabase
+          .from('Property')
+          .select('id, addressCity, type, livingAreaSqm, dpeEnergyClass, operationTypes, hasMaintenanceLog, desiredSellingPrice, estimatedMarketValue')
+          .or(`ownerId.eq.${clientId},clientId.eq.${clientId}`),
+        supabase.from('Document').select('id, title, fileName, type').eq('clientId', clientId),
+      ]);
+
+      const dealsCount = (dealsRes.data ?? []).length;
+
+      const properties: PropertyItem[] = ((propertiesRes.data ?? []) as PropertyRow[]).map((p) => ({
+        id: p.id,
+        city: p.addressCity ?? '—',
+        propertyType: propertyTypeLabel(p.type),
+        surface: p.livingAreaSqm != null ? `${p.livingAreaSqm}m²` : '—',
+        dpeGrade: dpeGradeOrUndef(p.dpeEnergyClass),
+        operationType: firstOperationType(p.operationTypes),
+        price: formatPriceEuro(p.desiredSellingPrice ?? p.estimatedMarketValue),
+        hasCarnet: Boolean(p.hasMaintenanceLog),
+      }));
+
+      const documents: DocumentItem[] = ((documentsRes.data ?? []) as DocumentRow[]).map((d) => ({
+        id: d.id,
+        label: documentLabel(d),
+      }));
+
       setData({
         client: clientData as Client,
         kpis: mockKpis(),
         aiSuggestions: Math.floor(Math.random() * 15) + 1,
         graphData: mockGraphData(),
         activities,
+        dealsCount,
+        properties,
+        documents,
       });
       setIsLoading(false);
     }
@@ -278,7 +393,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
-  const { client, kpis, aiSuggestions, graphData, activities } = data;
+  const { client, kpis, aiSuggestions, graphData, activities, dealsCount, properties, documents } = data;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -469,22 +584,70 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
         {/* Bloc 4 — Affaires */}
         <section ref={setSectionRef('affaires')} id="affaires" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Affaires */}
+          <div className="flex items-center gap-[4px] mb-[50px]">
+            <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+              Affaires
+            </h3>
+            <Badge variant="default">{dealsCount}</Badge>
+          </div>
         </section>
 
         {/* Bloc 5 — Biens */}
         <section ref={setSectionRef('biens')} id="biens" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Biens */}
+          <div className="flex items-center gap-[4px] mb-[50px]">
+            <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+              Biens
+            </h3>
+            <Badge variant="default">{properties.length}</Badge>
+          </div>
+          <div className="flex flex-col gap-[16px]">
+            {properties.map((p) => (
+              <ListBien
+                key={p.id}
+                operationType={p.operationType}
+                price={p.price}
+                hasCarnet={p.hasCarnet}
+                city={p.city}
+                propertyType={p.propertyType}
+                surface={p.surface}
+                dpeGrade={p.dpeGrade}
+                kpis={{ qualification: 0, entretien: 0, conversion: 0 }}
+                aiSuggestions={0}
+              />
+            ))}
+          </div>
         </section>
 
         {/* Bloc 6 — Carnets */}
         <section ref={setSectionRef('carnet')} id="carnet" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Carnets */}
+          <div className="flex items-center gap-[4px] mb-[50px]">
+            <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+              Carnet
+            </h3>
+            <Badge variant="default">0</Badge>
+          </div>
         </section>
 
         {/* Bloc 7 — Documents */}
         <section ref={setSectionRef('documents')} id="documents" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Documents */}
+          <div className="flex items-center justify-between mb-[50px]">
+            <div className="flex items-center gap-[4px]">
+              <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+                Documents
+              </h3>
+              <Badge variant="default">{documents.length}</Badge>
+            </div>
+            <Button variant="default" onClick={() => {}}>
+              <Upload size={16} /> Ajouter
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-[12px]">
+            {documents.map((d) => (
+              <Button key={d.id} variant="outline" onClick={() => {}}>
+                <FileText size={16} /> {d.label}
+              </Button>
+            ))}
+          </div>
         </section>
 
         {/* Bloc 8 — Messages */}
