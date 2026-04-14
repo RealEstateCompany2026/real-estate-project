@@ -54,6 +54,7 @@ interface EventRow {
   eventDate: string;
   agentId: string | null;
   createdAt: string;
+  User: { name: string | null }[] | null;
 }
 
 interface ClientDetailData {
@@ -225,7 +226,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       // Fetch events for activity log
       const { data: eventsData, error: eventsError } = await supabase
         .from('Event')
-        .select('id, type, title, description, eventDate, agentId, createdAt')
+        .select('id, type, title, description, eventDate, agentId, createdAt, User:agentId(name)')
         .eq('clientId', clientId)
         .order('eventDate', { ascending: false })
         .limit(4);
@@ -239,7 +240,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         id: ev.id,
         date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
         time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
-        author: ev.agentId ?? 'Système',
+        author: ev.User?.[0]?.name ?? 'Système',
         category: eventTypeToCategory(ev.type),
         description: ev.description ?? ev.title ?? '',
       }));
