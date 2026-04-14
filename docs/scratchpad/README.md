@@ -1,0 +1,1 @@
+# Scratchpad — Logs agents\n\nCe dossier contient les plans, rapports et reviews produits par les sous-agents.\n\n## Structure\n\n- `dev-plan-(date).md` — Plan de travail du dev-agent\n- `dev-report-(date).md` — Rapport de livraison du dev-agent\n- `review-report-(date).md` — Rapport de review du reviewer-agent\n- `ops-report-(date).md` — Rapport de déploiement du ops-agent

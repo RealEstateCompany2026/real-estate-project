@@ -18,6 +18,7 @@ import { Chip } from '@real-estate/ui/chip';
 import { ListBien } from '@real-estate/ui/list-bien';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
+import { Sheet } from '@real-estate/ui/sheet';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -126,6 +127,7 @@ interface ClientDetailData {
   aiSuggestions: number;
   graphData: GraphDataPoint[];
   activities: ActivityLog[];
+  allActivities: ActivityLog[];
   dealsCount: number;
   properties: PropertyItem[];
   documents: DocumentItem[];
@@ -364,6 +366,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [data, setData] = useState<ClientDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION'>('all');
+  const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -389,14 +392,14 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         .select('id, type, status, title, description, eventDate, agentId, createdAt, User:agentId(name)')
         .eq('clientId', clientId)
         .order('eventDate', { ascending: false })
-        .limit(4);
+        .limit(100);
 
       if (eventsError) {
         console.error('[ClientDetailView] Event query failed:', eventsError);
       }
 
-      // Map events to ActivityLog
-      const activities: ActivityLog[] = (eventsData ?? []).map((ev: EventRow) => ({
+      // Map events to ActivityLog (complete list)
+      const allActivities: ActivityLog[] = (eventsData ?? []).map((ev: EventRow) => ({
         id: ev.id,
         date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
         time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
@@ -405,6 +408,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         status: ev.status,
         description: ev.description ?? ev.title ?? '',
       }));
+      const activities: ActivityLog[] = allActivities.slice(0, 4);
 
       // Fetch deals, properties, documents, messages in parallel
       const [dealsRes, propertiesRes, documentsRes, messagesRes] = await Promise.all([
@@ -456,6 +460,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         aiSuggestions: Math.floor(Math.random() * 15) + 1,
         graphData: mockGraphData(),
         activities,
+        allActivities,
         dealsCount,
         properties,
         documents,
@@ -487,7 +492,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
-  const { client, kpis, aiSuggestions, graphData, activities, dealsCount, properties, documents, messages } = data;
+  const { client, kpis, aiSuggestions, graphData, activities, allActivities, dealsCount, properties, documents, messages } = data;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -657,7 +662,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </div>
             <Button
               variant="default"
-              onClick={() => sectionRefs.current['evenements']?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => setIsActivitySheetOpen(true)}
             >
               Voir tout <ArrowRight size={16} />
             </Button>
@@ -795,6 +800,31 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       <div className="fixed bottom-8 right-8 z-50">
         <IconButtonMega icon={<Sparkles size={24} />} variant="primary" />
       </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet — Voir tout Activités (liste exhaustive)
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={isActivitySheetOpen}
+        onClose={() => setIsActivitySheetOpen(false)}
+        title="Activités"
+        width="narrow"
+      >
+        <div className="flex flex-col px-[20px] py-[20px]">
+          {allActivities.map((activity) => (
+            <CardLog
+              key={activity.id}
+              date={activity.date}
+              time={activity.time}
+              author={activity.author}
+              category={activity.category}
+              description={activity.description}
+              badgeVariant={eventStatusToBadgeVariant(activity.status)}
+              className="w-full"
+            />
+          ))}
+        </div>
+      </Sheet>
     </div>
   );
 }
