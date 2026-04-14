@@ -19,6 +19,8 @@ import { ListBien } from '@real-estate/ui/list-bien';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
 import { Sheet } from '@real-estate/ui/sheet';
+import { InputField } from '@real-estate/ui/input-field';
+import { SelectField } from '@real-estate/ui/select-field';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -369,6 +371,26 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION'>('all');
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [isMessageSheetOpen, setIsMessageSheetOpen] = useState(false);
+  const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [profileForm, setProfileForm] = useState({
+    gender: '',
+    lastName: '',
+    firstName: '',
+    dateOfBirth: '',
+    placeOfBirth: '',
+    nationality: '',
+    maritalStatus: '',
+    address: '',
+    mobilePhone: '',
+    primaryEmail: '',
+    secondaryEmail: '',
+    preferredChannel: '',
+    jobTitle: '',
+    employer: '',
+    incomeBracket: '',
+  });
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -473,7 +495,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       setIsLoading(false);
     }
     load();
-  }, [clientId, router]);
+  }, [clientId, router, refreshKey]);
 
   // ── Anchor navigation ──
   const handleAnchorClick = useCallback((sectionId: string) => {
@@ -486,6 +508,71 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const setSectionRef = useCallback((id: string) => (el: HTMLElement | null) => {
     sectionRefs.current[id] = el;
   }, []);
+
+  const updateProfileField = useCallback((field: string, value: string) => {
+    setProfileForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleOpenProfileSheet = useCallback(() => {
+    if (!data) return;
+    const c = data.client;
+    setProfileForm({
+      gender: c.gender ?? '',
+      lastName: c.lastName ?? '',
+      firstName: c.firstName ?? '',
+      dateOfBirth: c.dateOfBirth ? new Date(c.dateOfBirth).toISOString().split('T')[0] : '',
+      placeOfBirth: c.placeOfBirth ?? '',
+      nationality: c.nationality ?? '',
+      maritalStatus: c.maritalStatus ?? '',
+      address: c.address ?? '',
+      mobilePhone: c.mobilePhone ?? '',
+      primaryEmail: c.primaryEmail ?? '',
+      secondaryEmail: c.secondaryEmail ?? '',
+      preferredChannel: c.preferredChannel ?? '',
+      jobTitle: c.jobTitle ?? '',
+      employer: c.employer ?? '',
+      incomeBracket: c.incomeBracket ?? '',
+    });
+    setIsProfileSheetOpen(true);
+  }, [data]);
+
+  const handleSaveProfile = useCallback(async () => {
+    if (!data) return;
+    setIsSavingProfile(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('Client')
+        .update({
+          gender: profileForm.gender || null,
+          lastName: profileForm.lastName || null,
+          firstName: profileForm.firstName || null,
+          dateOfBirth: profileForm.dateOfBirth || null,
+          placeOfBirth: profileForm.placeOfBirth || null,
+          nationality: profileForm.nationality || null,
+          maritalStatus: profileForm.maritalStatus || null,
+          address: profileForm.address || null,
+          mobilePhone: profileForm.mobilePhone || null,
+          primaryEmail: profileForm.primaryEmail || null,
+          secondaryEmail: profileForm.secondaryEmail || null,
+          preferredChannel: profileForm.preferredChannel || null,
+          jobTitle: profileForm.jobTitle || null,
+          employer: profileForm.employer || null,
+          incomeBracket: profileForm.incomeBracket || null,
+        })
+        .eq('id', data.client.id);
+
+      if (error) {
+        console.error('[ClientDetailView] Profile update failed:', error);
+        return;
+      }
+
+      setIsProfileSheetOpen(false);
+      setRefreshKey((k) => k + 1);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  }, [data, profileForm]);
 
   // ── Loading ──
   if (isLoading || !data) {
@@ -557,7 +644,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </div>
             <Button
               variant="ghost"
-              onClick={() => router.push(`/clients/${client.id}/edit`)}
+              onClick={handleOpenProfileSheet}
             >
               <Pencil size={16} />
               Éditer
@@ -863,6 +950,85 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               </MessageSent>
             )
           )}
+        </div>
+      </Sheet>
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet — Éditer le profil
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={isProfileSheetOpen}
+        onClose={() => setIsProfileSheetOpen(false)}
+        title="Éditer le profil"
+        width="narrow"
+        footer={
+          <div className="px-[20px] py-[16px] border-t border-edge-default">
+            <Button
+              variant="primary"
+              onClick={handleSaveProfile}
+              disabled={isSavingProfile}
+              className="w-full"
+            >
+              {isSavingProfile ? 'Enregistrement…' : 'Enregistrer'}
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-[32px] px-[20px] py-[20px]">
+          {/* Section Identité */}
+          <div className="flex flex-col gap-[16px]">
+            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
+              Informations d&apos;identité
+            </p>
+            <SelectField
+              label="Genre"
+              value={profileForm.gender}
+              onChange={(v) => updateProfileField('gender', v)}
+              options={[
+                { value: 'HOMME', label: 'M.' },
+                { value: 'FEMME', label: 'Mme' },
+                { value: 'AUTRE', label: 'Autre' },
+              ]}
+            />
+            <InputField label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
+            <InputField label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
+            <InputField label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" />
+            <InputField label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
+            <InputField label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
+            <InputField label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" />
+          </div>
+
+          {/* Section Contact */}
+          <div className="flex flex-col gap-[16px]">
+            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
+              Informations de contact
+            </p>
+            <InputField label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" />
+            <InputField label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
+            <InputField label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+            <InputField label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+            <SelectField
+              label="Canal préféré"
+              value={profileForm.preferredChannel}
+              onChange={(v) => updateProfileField('preferredChannel', v)}
+              options={[
+                { value: 'EMAIL', label: 'Email' },
+                { value: 'PHONE', label: 'Téléphone' },
+                { value: 'SMS', label: 'SMS' },
+                { value: 'WHATSAPP', label: 'WhatsApp' },
+              ]}
+            />
+          </div>
+
+          {/* Section Professionnel */}
+          <div className="flex flex-col gap-[16px]">
+            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
+              Informations professionnelles
+            </p>
+            <InputField label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
+            <InputField label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
+            <InputField label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
+          </div>
         </div>
       </Sheet>
     </div>
