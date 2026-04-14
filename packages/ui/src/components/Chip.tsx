@@ -55,7 +55,7 @@ export function Chip({
       ? variant === "filled"
         ? "bg-surface-information text-content-branded-action border border-edge-branded-default"
         : "border border-edge-branded-default text-content-branded-action"
-      : "border border-edge-default text-content-caption hover:border-edge-branded-default"
+      : "text-content-caption hover:text-content-branded-action"
     : "";
   const cursorClass = isClickable ? "cursor-pointer" : "";
 
