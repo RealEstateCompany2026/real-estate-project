@@ -443,7 +443,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </div>
             <Button
               variant="default"
-              onClick={() => sectionRefs.current['evenements']?.scrollIntoView({ behavior: 'smooth' })} {/* TODO: section 'evenements' à créer */}
+              onClick={() => sectionRefs.current['evenements']?.scrollIntoView({ behavior: 'smooth' })}
             >
               Voir tout <ArrowRight size={16} />
             </Button>
