@@ -16,6 +16,8 @@ import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
 import { ListBien } from '@real-estate/ui/list-bien';
+import { MessageReceived } from '@real-estate/ui/message-received';
+import { MessageSent } from '@real-estate/ui/message-sent';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -97,6 +99,25 @@ interface DocumentItem {
   label: string;
 }
 
+interface MessageRow {
+  id: string;
+  senderType: 'AGENT' | 'CLIENT' | 'IA' | null;
+  body: string;
+  messageDate: string;
+  status: 'BROUILLON' | 'ENVOYE' | 'DELIVRE' | 'LU' | 'ECHOUE' | null;
+  attachmentsUrls: string[] | null;
+}
+
+interface MessageItem {
+  id: string;
+  direction: 'received' | 'sent';
+  body: string;
+  date: string;
+  time: string;
+  status: 'none' | 'success' | 'fail';
+  attachments: { label: string }[];
+}
+
 interface ClientDetailData {
   client: Client;
   kpis: ClientKpis;
@@ -106,6 +127,7 @@ interface ClientDetailData {
   dealsCount: number;
   properties: PropertyItem[];
   documents: DocumentItem[];
+  messages: MessageItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -259,6 +281,36 @@ function documentLabel(d: DocumentRow): string {
   return d.title ?? d.fileName ?? d.type ?? 'Document';
 }
 
+/** Mappe un senderType DB vers la direction d'affichage */
+function senderToDirection(sender: string | null): 'received' | 'sent' {
+  return sender === 'CLIENT' ? 'received' : 'sent';
+}
+
+/** Mappe un MessageStatus DB vers la prop MessageStatus du DS */
+function dbStatusToDsStatus(status: string | null): 'none' | 'success' | 'fail' {
+  switch (status) {
+    case 'ENVOYE':
+    case 'DELIVRE':
+    case 'LU':
+      return 'success';
+    case 'ECHOUE':
+      return 'fail';
+    case 'BROUILLON':
+    default:
+      return 'none';
+  }
+}
+
+/** Extrait le nom de fichier d'une URL d'attachement */
+function attachmentLabel(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.pathname.split('/').pop() || 'Pièce jointe';
+  } catch {
+    return url.split('/').pop() || 'Pièce jointe';
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -329,14 +381,20 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         description: ev.description ?? ev.title ?? '',
       }));
 
-      // Fetch deals, properties, documents in parallel
-      const [dealsRes, propertiesRes, documentsRes] = await Promise.all([
+      // Fetch deals, properties, documents, messages in parallel
+      const [dealsRes, propertiesRes, documentsRes, messagesRes] = await Promise.all([
         supabase.from('Deal').select('id').eq('clientId', clientId),
         supabase
           .from('Property')
           .select('id, addressCity, type, livingAreaSqm, dpeEnergyClass, operationTypes, hasMaintenanceLog, desiredSellingPrice, estimatedMarketValue')
           .or(`ownerId.eq.${clientId},clientId.eq.${clientId}`),
         supabase.from('Document').select('id, title, fileName, type').eq('clientId', clientId),
+        supabase
+          .from('Message')
+          .select('id, senderType, body, messageDate, status, attachmentsUrls')
+          .eq('clientId', clientId)
+          .order('messageDate', { ascending: false })
+          .limit(4),
       ]);
 
       const dealsCount = (dealsRes.data ?? []).length;
@@ -357,6 +415,16 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         label: documentLabel(d),
       }));
 
+      const messages: MessageItem[] = ((messagesRes.data ?? []) as MessageRow[]).map((m) => ({
+        id: m.id,
+        direction: senderToDirection(m.senderType),
+        body: m.body,
+        date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(m.messageDate)),
+        time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(m.messageDate)),
+        status: dbStatusToDsStatus(m.status),
+        attachments: (m.attachmentsUrls ?? []).map((url) => ({ label: attachmentLabel(url) })),
+      }));
+
       setData({
         client: clientData as Client,
         kpis: mockKpis(),
@@ -366,6 +434,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         dealsCount,
         properties,
         documents,
+        messages,
       });
       setIsLoading(false);
     }
@@ -393,7 +462,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
-  const { client, kpis, aiSuggestions, graphData, activities, dealsCount, properties, documents } = data;
+  const { client, kpis, aiSuggestions, graphData, activities, dealsCount, properties, documents, messages } = data;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -652,7 +721,42 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
         {/* Bloc 8 — Messages */}
         <section ref={setSectionRef('messages')} id="messages" className="py-[50px] border-t border-edge-default">
-          {/* TODO: Section Messages */}
+          <div className="flex items-center justify-between mb-[50px]">
+            <div className="flex items-center gap-[4px]">
+              <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+                Messages
+              </h3>
+              <Badge variant="default">{messages.length}</Badge>
+            </div>
+            <Button variant="default" onClick={() => {}}>
+              Voir tout <ArrowRight size={16} />
+            </Button>
+          </div>
+          <div className="flex flex-col gap-[24px]">
+            {messages.map((m) =>
+              m.direction === 'received' ? (
+                <MessageReceived
+                  key={m.id}
+                  date={m.date}
+                  time={m.time}
+                  status={m.status}
+                  attachments={m.attachments}
+                >
+                  {m.body}
+                </MessageReceived>
+              ) : (
+                <MessageSent
+                  key={m.id}
+                  date={m.date}
+                  time={m.time}
+                  status={m.status}
+                  attachments={m.attachments}
+                >
+                  {m.body}
+                </MessageSent>
+              )
+            )}
+          </div>
         </section>
       </div>
 
