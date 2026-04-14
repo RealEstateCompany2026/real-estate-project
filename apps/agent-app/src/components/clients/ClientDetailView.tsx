@@ -21,6 +21,7 @@ import { MessageSent } from '@real-estate/ui/message-sent';
 import { Sheet } from '@real-estate/ui/sheet';
 import { InputField } from '@real-estate/ui/input-field';
 import { SelectField } from '@real-estate/ui/select-field';
+import { FileUpload } from '@real-estate/ui/file-upload';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -340,6 +341,20 @@ function attachmentLabel(url: string): string {
   }
 }
 
+/** Déduit le FileFormat DB depuis l'extension du fichier */
+function fileExtensionToFormat(fileName: string): 'PDF' | 'JPG' | 'PNG' | 'DOCX' | 'XLSX' | 'AUTRE' {
+  const ext = fileName.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'pdf': return 'PDF';
+    case 'jpg':
+    case 'jpeg': return 'JPG';
+    case 'png': return 'PNG';
+    case 'docx': return 'DOCX';
+    case 'xlsx': return 'XLSX';
+    default: return 'AUTRE';
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -391,6 +406,10 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     employer: '',
     incomeBracket: '',
   });
+  const [isDocUploadSheetOpen, setIsDocUploadSheetOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -573,6 +592,70 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       setIsSavingProfile(false);
     }
   }, [data, profileForm]);
+
+  const handleUploadDocument = useCallback(async () => {
+    if (!data || !uploadFile) return;
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const supabase = createClient();
+
+      // 1. Upload vers Supabase Storage
+      const filePath = `${data.client.id}/${Date.now()}-${uploadFile.name}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('client-documents')
+        .upload(filePath, uploadFile, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadErr) {
+        console.error('[ClientDetailView] Storage upload failed:', uploadErr);
+        setUploadError("Échec de l'upload. Veuillez réessayer.");
+        return;
+      }
+
+      // 2. Récupérer une signed URL (1h)
+      const { data: signedUrlData, error: signedUrlErr } = await supabase.storage
+        .from('client-documents')
+        .createSignedUrl(filePath, 3600);
+
+      if (signedUrlErr || !signedUrlData?.signedUrl) {
+        console.error('[ClientDetailView] Signed URL failed:', signedUrlErr);
+        setUploadError('Upload réussi mais impossible de générer le lien.');
+        return;
+      }
+
+      // 3. INSERT Document
+      const { error: insertErr } = await supabase.from('Document').insert({
+        clientId: data.client.id,
+        organizationId: data.client.organizationId,
+        title: uploadFile.name.replace(/\.[^/.]+$/, ''),
+        fileName: uploadFile.name,
+        fileUrl: signedUrlData.signedUrl,
+        fileSizeKb: Math.round(uploadFile.size / 1024),
+        fileFormat: fileExtensionToFormat(uploadFile.name),
+        type: 'AUTRE',
+        isPrivate: true,
+        documentStatus: 'RECU',
+      });
+
+      if (insertErr) {
+        console.error('[ClientDetailView] Document insert failed:', insertErr);
+        setUploadError('Fichier uploadé mais enregistrement échoué.');
+        return;
+      }
+
+      // 4. Succès — fermer la sheet, reset, recharger
+      setIsDocUploadSheetOpen(false);
+      setUploadFile(null);
+      setUploadError(null);
+      setRefreshKey((k) => k + 1);
+    } finally {
+      setIsUploading(false);
+    }
+  }, [data, uploadFile]);
 
   // ── Loading ──
   if (isLoading || !data) {
@@ -831,7 +914,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               </h3>
               <Badge variant="default">{documents.length}</Badge>
             </div>
-            <Button variant="default" onClick={() => {}}>
+            <Button variant="default" onClick={() => { setUploadFile(null); setUploadError(null); setIsDocUploadSheetOpen(true); }}>
               <Upload size={16} /> Ajouter
             </Button>
           </div>
@@ -1029,6 +1112,42 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             <InputField label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
             <InputField label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
           </div>
+        </div>
+      </Sheet>
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet — Ajouter un document
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={isDocUploadSheetOpen}
+        onClose={() => { setIsDocUploadSheetOpen(false); setUploadFile(null); setUploadError(null); }}
+        title="Ajouter un document"
+        width="narrow"
+        footer={
+          <div className="px-[20px] py-[16px] border-t border-edge-default">
+            <Button
+              variant="primary"
+              onClick={handleUploadDocument}
+              disabled={isUploading || !uploadFile}
+              className="w-full"
+            >
+              {isUploading ? 'Upload en cours…' : 'Enregistrer'}
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-[20px] px-[20px] py-[20px]">
+          <p className="text-[14px] leading-[20px] text-content-caption">
+            Formats acceptés : PDF, JPG, PNG, DOCX, XLSX — Taille max : 10 Mo
+          </p>
+          <FileUpload
+            accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx"
+            maxSize={10 * 1024 * 1024}
+            onFileSelect={(file) => { setUploadFile(file); setUploadError(null); }}
+            onFileRemove={() => setUploadFile(null)}
+            selectedFile={uploadFile}
+            error={uploadError ?? undefined}
+          />
         </div>
       </Sheet>
     </div>
