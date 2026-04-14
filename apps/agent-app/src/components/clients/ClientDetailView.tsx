@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -93,6 +93,7 @@ function mockGraphData(): GraphDataPoint[] {
 function mockActivities(): ActivityLog[] {
   return [
     {
+      id: 'mock-1',
       date: '12 fév. 2026',
       time: '12:56',
       author: 'Le client',
@@ -101,6 +102,7 @@ function mockActivities(): ActivityLog[] {
       badgeVariant: 'success',
     },
     {
+      id: 'mock-2',
       date: '10 fév. 2026',
       time: '09:30',
       author: 'Système',
@@ -109,6 +111,7 @@ function mockActivities(): ActivityLog[] {
       badgeVariant: 'information',
     },
     {
+      id: 'mock-3',
       date: '07 fév. 2026',
       time: '14:15',
       author: 'Titre le registre',
@@ -117,6 +120,7 @@ function mockActivities(): ActivityLog[] {
       badgeVariant: 'success',
     },
     {
+      id: 'mock-4',
       date: '03 fév. 2026',
       time: '16:42',
       author: 'Mail',
@@ -125,6 +129,38 @@ function mockActivities(): ActivityLog[] {
       badgeVariant: 'warning',
     },
   ];
+}
+
+/** Mappe un EventType DB vers une catégorie funnel pour l'affichage */
+function eventTypeToCategory(eventType: string | null): 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION' {
+  switch (eventType) {
+    case 'RDV_COMMERCIAL':
+      return 'QUALIFICATION';
+    case 'VISITE':
+    case 'TACHE':
+    case 'ANNIVERSAIRE':
+    case 'AUTRE':
+      return 'ENGAGEMENT';
+    case 'SIGNATURE_PROMESSE':
+    case 'SIGNATURE_NOTAIRE':
+    case 'SIGNATURE_BAIL':
+      return 'CONVERSION';
+    case 'RELANCE':
+      return 'REACTIVATION';
+    default:
+      return 'ENGAGEMENT';
+  }
+}
+
+/** Mappe une catégorie funnel vers un BadgeVariant DS */
+function getActivityBadgeVariant(category: string): 'default' | 'success' | 'warning' | 'information' | 'error' | 'disabled' {
+  switch (category) {
+    case 'QUALIFICATION': return 'success';
+    case 'ENGAGEMENT':    return 'default';
+    case 'CONVERSION':    return 'warning';
+    case 'REACTIVATION':  return 'information';
+    default:              return 'default';
+  }
 }
 
 function statusToTags(status: ClientStatus[]): string[] {
@@ -166,6 +202,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   // ── Data ──
   const [data, setData] = useState<ClientDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION'>('all');
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -203,7 +240,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
         time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
         author: ev.agentId ?? 'Système',
-        category: ev.type ?? 'ENGAGEMENT',
+        category: eventTypeToCategory(ev.type),
         description: ev.description ?? ev.title ?? '',
       }));
 
@@ -241,6 +278,9 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   }
 
   const { client, kpis, aiSuggestions, graphData, activities } = data;
+  const filteredActivities = activeFilter === 'all'
+    ? activities
+    : activities.filter((a) => a.category === activeFilter);
   const clientName = `${client.lastName?.toUpperCase()}, ${client.firstName}`;
   const tags = statusToTags(client.status ?? []);
 
@@ -366,21 +406,52 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
                   Activités
                 </h3>
-                <Badge variant="default">{activities.length}</Badge>
+                <Badge variant="default">{filteredActivities.length}</Badge>
               </div>
-              <Chip selected onClick={() => {}} label="Tout" />
-              <Chip onClick={() => {}} label="Qualification" />
-              <Chip onClick={() => {}} label="Engagement" />
-              <Chip onClick={() => {}} label="Conversion" />
+              <Chip
+                label="Tout"
+                icon={<CheckCheck size={16} />}
+                selected={activeFilter === 'all'}
+                size="medium"
+                fontWeight="semibold"
+                onClick={() => setActiveFilter('all')}
+              />
+              <Chip
+                label="Qualification"
+                icon={<Database size={16} />}
+                selected={activeFilter === 'QUALIFICATION'}
+                size="medium"
+                fontWeight="semibold"
+                onClick={() => setActiveFilter('QUALIFICATION')}
+              />
+              <Chip
+                label="Engagement"
+                icon={<MessageCirclePlus size={16} />}
+                selected={activeFilter === 'ENGAGEMENT'}
+                size="medium"
+                fontWeight="semibold"
+                onClick={() => setActiveFilter('ENGAGEMENT')}
+              />
+              <Chip
+                label="Conversion"
+                icon={<ScrollText size={16} />}
+                selected={activeFilter === 'CONVERSION'}
+                size="medium"
+                fontWeight="semibold"
+                onClick={() => setActiveFilter('CONVERSION')}
+              />
             </div>
-            <Button variant="ghost" onClick={() => {}}>
-              Voir tout &gt;
+            <Button
+              variant="default"
+              onClick={() => sectionRefs.current['evenements']?.scrollIntoView({ behavior: 'smooth' })} {/* TODO: section 'evenements' à créer */}
+            >
+              Voir tout <ArrowRight size={16} />
             </Button>
           </div>
 
           {/* Liste des activités */}
           <div className="flex flex-col">
-            {activities.map((activity) => (
+            {filteredActivities.map((activity) => (
               <CardLog
                 key={activity.id}
                 date={activity.date}
@@ -388,7 +459,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 author={activity.author}
                 category={activity.category}
                 description={activity.description}
-                badgeVariant={activity.badgeVariant}
+                badgeVariant={getActivityBadgeVariant(activity.category)}
                 className="w-full"
               />
             ))}
