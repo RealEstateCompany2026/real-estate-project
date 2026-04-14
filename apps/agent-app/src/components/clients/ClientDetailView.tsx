@@ -37,12 +37,23 @@ interface GraphDataPoint {
 }
 
 interface ActivityLog {
+  id: string;
   date: string;
   time: string;
   author: string;
   category: string;
   description: string;
   badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled';
+}
+
+interface EventRow {
+  id: string;
+  type: string | null;
+  title: string | null;
+  description: string | null;
+  eventDate: string;
+  agentId: string | null;
+  createdAt: string;
 }
 
 interface ClientDetailData {
@@ -174,12 +185,34 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         return;
       }
 
+      // Fetch events for activity log
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('Event')
+        .select('id, type, title, description, eventDate, agentId, createdAt')
+        .eq('clientId', clientId)
+        .order('eventDate', { ascending: false })
+        .limit(4);
+
+      if (eventsError) {
+        console.error('[ClientDetailView] Event query failed:', eventsError);
+      }
+
+      // Map events to ActivityLog
+      const activities: ActivityLog[] = (eventsData ?? []).map((ev: EventRow) => ({
+        id: ev.id,
+        date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
+        time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
+        author: ev.agentId ?? 'Système',
+        category: ev.type ?? 'ENGAGEMENT',
+        description: ev.description ?? ev.title ?? '',
+      }));
+
       setData({
         client: clientData as Client,
         kpis: mockKpis(),
         aiSuggestions: Math.floor(Math.random() * 15) + 1,
         graphData: mockGraphData(),
-        activities: mockActivities(),
+        activities,
       });
       setIsLoading(false);
     }
@@ -347,9 +380,9 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
           {/* Liste des activités */}
           <div className="flex flex-col">
-            {activities.map((activity, index) => (
+            {activities.map((activity) => (
               <CardLog
-                key={index}
+                key={activity.id}
                 date={activity.date}
                 time={activity.time}
                 author={activity.author}
