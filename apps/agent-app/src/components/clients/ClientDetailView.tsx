@@ -132,6 +132,7 @@ interface ClientDetailData {
   properties: PropertyItem[];
   documents: DocumentItem[];
   messages: MessageItem[];
+  allMessages: MessageItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -367,6 +368,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION'>('all');
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
+  const [isMessageSheetOpen, setIsMessageSheetOpen] = useState(false);
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -423,7 +425,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           .select('id, senderType, body, messageDate, status, attachmentsUrls')
           .eq('clientId', clientId)
           .order('messageDate', { ascending: false })
-          .limit(4),
+          .limit(100),
       ]);
 
       const dealsCount = (dealsRes.data ?? []).length;
@@ -444,7 +446,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         label: documentLabel(d),
       }));
 
-      const messages: MessageItem[] = ((messagesRes.data ?? []) as MessageRow[]).map((m) => ({
+      const allMessages: MessageItem[] = ((messagesRes.data ?? []) as MessageRow[]).map((m) => ({
         id: m.id,
         direction: senderToDirection(m.senderType),
         body: m.body,
@@ -453,6 +455,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         status: dbStatusToDsStatus(m.status),
         attachments: (m.attachmentsUrls ?? []).map((url) => ({ label: attachmentLabel(url) })),
       }));
+      const messages: MessageItem[] = allMessages.slice(0, 4);
 
       setData({
         client: clientData as Client,
@@ -465,6 +468,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         properties,
         documents,
         messages,
+        allMessages,
       });
       setIsLoading(false);
     }
@@ -492,7 +496,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
-  const { client, kpis, aiSuggestions, graphData, activities, allActivities, dealsCount, properties, documents, messages } = data;
+  const { client, kpis, aiSuggestions, graphData, activities, allActivities, dealsCount, properties, documents, messages, allMessages } = data;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -762,7 +766,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               </h3>
               <Badge variant="default">{messages.length}</Badge>
             </div>
-            <Button variant="default" onClick={() => {}}>
+            <Button variant="default" onClick={() => setIsMessageSheetOpen(true)}>
               Voir tout <ArrowRight size={16} />
             </Button>
           </div>
@@ -823,6 +827,42 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               className="w-full"
             />
           ))}
+        </div>
+      </Sheet>
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet — Voir tout Messages (historique complet)
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={isMessageSheetOpen}
+        onClose={() => setIsMessageSheetOpen(false)}
+        title="Messages"
+        width="wide"
+      >
+        <div className="flex flex-col gap-[24px] px-[40px] py-[20px]">
+          {allMessages.map((m) =>
+            m.direction === 'received' ? (
+              <MessageReceived
+                key={m.id}
+                date={m.date}
+                time={m.time}
+                status={m.status}
+                attachments={m.attachments}
+              >
+                {m.body}
+              </MessageReceived>
+            ) : (
+              <MessageSent
+                key={m.id}
+                date={m.date}
+                time={m.time}
+                status={m.status}
+                attachments={m.attachments}
+              >
+                {m.body}
+              </MessageSent>
+            )
+          )}
         </div>
       </Sheet>
     </div>
