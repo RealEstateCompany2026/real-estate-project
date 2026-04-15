@@ -9,6 +9,7 @@ import { AppBarFicheBien } from '@real-estate/ui/app-bar-fiche-bien';
 import { Gallery } from '@real-estate/ui/gallery';
 import { AppBarAnnonce } from '@real-estate/ui/app-bar-annonce';
 import { AppBarBienAncres } from '@real-estate/ui/app-bar-bien-ancres';
+import { GraphCourbe } from '@real-estate/ui/graph-courbe';
 import { ListAnnonce } from '@real-estate/ui/list-annonce';
 import { ListCarnet } from '@real-estate/ui/list-carnet';
 import { IconButtonMega } from '@real-estate/ui/icon-button-mega';
@@ -252,6 +253,21 @@ function ProfileField({ label, value }: { label: string; value: string | null | 
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Mock Data
+// ---------------------------------------------------------------------------
+
+const GRAPH_DATA = [
+  { label: '10 avr', value: 18 },
+  { label: '17 avr', value: 30 },
+  { label: '24 avr', value: 25 },
+  { label: '01 mai', value: 35 },
+  { label: '08 mai', value: 32 },
+  { label: '15 mai', value: 28 },
+  { label: '22 mai', value: 22 },
+  { label: '29 mai', value: 38 },
+];
 
 // ---------------------------------------------------------------------------
 // Component
@@ -579,7 +595,27 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       </div>
 
       {/* ═══════════════════════════════════════════════════════
-          Bloc 1b — Gallery
+          Bloc 1b — GraphCourbe (NOUVEAU)
+          ═══════════════════════════════════════════════════════ */}
+      <GraphCourbe
+        title="Activité"
+        data={GRAPH_DATA}
+        selectedIndex={5}
+        selectedDate="22 fév 2026"
+        selectedLabel="28 réactions positives"
+        trendPercentage="7%"
+        trendDirection="down"
+      />
+
+      {/* ═══════════════════════════════════════════════════════
+          Bloc 1c — AppBarBienAncres (sticky — REMONTÉ)
+          ═══════════════════════════════════════════════════════ */}
+      <div className="sticky top-[100px] z-20 bg-surface-page">
+        <AppBarBienAncres onItemClick={handleAnchorClick} />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          Bloc 1d — Gallery
           ═══════════════════════════════════════════════════════ */}
       <Gallery
         images={photos.slice(0, 3).map(p => ({ url: p.storagePath, alt: p.fileName }))}
@@ -587,7 +623,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       />
 
       {/* ═══════════════════════════════════════════════════════
-          Bloc 1c — AppBarAnnonce
+          Bloc 1e — AppBarAnnonce (DÉPLACÉ)
           ═══════════════════════════════════════════════════════ */}
       <AppBarAnnonce
         type={PROPERTY_TYPE_LABELS[property.type]}
@@ -599,13 +635,6 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           ? `${formatPrice(Math.round((property.desiredSellingPrice ?? property.estimatedMarketValue ?? 0) / property.livingAreaSqm))} /m²`
           : '—'}
       />
-
-      {/* ═══════════════════════════════════════════════════════
-          Bloc 1d — AppBarBienAncres (sticky)
-          ═══════════════════════════════════════════════════════ */}
-      <div className="sticky top-[100px] z-20 bg-surface-page">
-        <AppBarBienAncres onItemClick={handleAnchorClick} />
-      </div>
 
       {/* ═══════════════════════════════════════════════════════
           Sections (Blocs 2-9)
