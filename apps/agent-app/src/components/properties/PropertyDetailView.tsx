@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, Download, Send, X } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, Download, Send, X, Copy, Globe } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheBien } from '@real-estate/ui/app-bar-fiche-bien';
@@ -27,6 +27,7 @@ import { InputField } from '@real-estate/ui/input-field';
 import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
 import { ListClient } from '@real-estate/ui/list-client';
+import { Switch } from '@real-estate/ui/switch';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -89,9 +90,15 @@ interface DealRow {
 interface ListingRow {
   id: string;
   status: string | null;
-  editionStatus?: string | null;
-  revisionStatus?: string | null;
-  publicationStatus?: string | null;
+  title: string | null;
+  description: string | null;
+  descriptionSource: string | null;
+  alurCompliant: boolean | null;
+  slug: string | null;
+  publishedAt: string | null;
+  contactFormEnabled: boolean | null;
+  viewCount: number | null;
+  leadCount: number | null;
 }
 
 interface DocumentRow {
@@ -275,6 +282,24 @@ function attachmentLabel(url: string): string {
   }
 }
 
+/** Mappe un ListingWorkflowStatus vers les 3 badges de workflow */
+function listingStatusToWorkflow(status: string | null): { edition: 'disabled' | 'warning' | 'success'; revision: 'disabled' | 'warning' | 'success'; publication: 'disabled' | 'warning' | 'success' } {
+  switch (status) {
+    case 'DRAFT':
+      return { edition: 'warning', revision: 'disabled', publication: 'disabled' };
+    case 'REVIEW':
+      return { edition: 'success', revision: 'warning', publication: 'disabled' };
+    case 'PUBLISHED':
+      return { edition: 'success', revision: 'success', publication: 'success' };
+    case 'PAUSED':
+      return { edition: 'success', revision: 'success', publication: 'warning' };
+    case 'ARCHIVED':
+      return { edition: 'disabled', revision: 'disabled', publication: 'disabled' };
+    default:
+      return { edition: 'disabled', revision: 'disabled', publication: 'disabled' };
+  }
+}
+
 /** Déduit le FileFormat DB depuis l'extension du fichier */
 function fileExtensionToFormat(fileName: string): 'PDF' | 'JPG' | 'PNG' | 'DOCX' | 'XLSX' | 'AUTRE' {
   const ext = fileName.split('.').pop()?.toLowerCase();
@@ -387,6 +412,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [gallerySheetOpen, setGallerySheetOpen] = useState(false);
+  const [annonceSheetListing, setAnnonceSheetListing] = useState<ListingRow | null>(null);
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -418,7 +444,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           .order('eventDate', { ascending: false })
           .limit(100),
         supabase.from('Deal').select('id').eq('propertyId', propertyId),
-        supabase.from('Listing').select('id, status').eq('propertyId', propertyId),
+        supabase.from('Listing').select('id, status, title, description, descriptionSource, alurCompliant, slug, publishedAt, contactFormEnabled, viewCount, leadCount').eq('propertyId', propertyId),
         supabase.from('Document').select('id, title, fileName, type').eq('propertyId', propertyId),
         supabase
           .from('Message')
@@ -748,7 +774,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
     );
   }
 
-  const { property, photos, kpis, aiSuggestions, activities, allActivities, dealsCount, listings, documents, messages, allMessages, ownerName } = data;
+  const { property, photos, kpis, aiSuggestions, activities, allActivities, dealsCount, listings, documents, messages, allMessages, ownerName, coOwnership, matchingBuyers } = data;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -1175,17 +1201,280 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 surface={property.livingAreaSqm ? `${property.livingAreaSqm}m²` : '—'}
                 dpeGrade={property.dpeEnergyClass ?? undefined}
                 ownerName={ownerName}
-                workflow={{
-                  edition: 'disabled' as const,
-                  revision: 'disabled' as const,
-                  publication: 'disabled' as const,
-                }}
+                workflow={listingStatusToWorkflow(l.status)}
                 aiSuggestions={0}
-                onView={() => { /* TODO: Sheet wide annonce */ }}
+                onView={() => setAnnonceSheetListing(l)}
               />
             ))}
           </div>
         </section>
+
+        {/* Sheet Annonce Wide */}
+        <Sheet
+          isOpen={annonceSheetListing !== null}
+          onClose={() => setAnnonceSheetListing(null)}
+          width="wide"
+          customHeader={
+            <div className="px-[40px] pt-[51px] pb-[20px]">
+              {/* Row 1 : Titre + badges workflow + Switch publier + Close */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-[16px]">
+                  <h4
+                    className="text-[28px] font-bold leading-[34px] tracking-[0.28px]"
+                    style={{ color: 'var(--text-headings)' }}
+                  >
+                    Annonce
+                  </h4>
+                  {annonceSheetListing && (
+                    <>
+                      <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).edition}>ÉDITION</Badge>
+                      <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).revision}>RÉVISION</Badge>
+                      <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).publication}>PUBLICATION</Badge>
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center gap-[16px]">
+                  {/* Switch Publier */}
+                  <div className="flex items-center gap-[8px]">
+                    <span
+                      className="text-[14px] font-semibold leading-[20px]"
+                      style={{ color: 'var(--text-caption)' }}
+                    >
+                      Publier
+                    </span>
+                    <Switch
+                      checked={annonceSheetListing?.status === 'PUBLISHED'}
+                      onChange={() => { /* TODO: toggle publication status */ }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setAnnonceSheetListing(null)}
+                    className="p-[12px] rounded-[16px]"
+                    style={{ color: 'var(--text-caption)' }}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Row 2 : AppBarAnnonce — infos du bien */}
+              <AppBarAnnonce
+                type={PROPERTY_TYPE_LABELS[property.type]}
+                surface={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : '—'}
+                annee={property.constructionYear ? String(property.constructionYear) : '—'}
+                ville={property.addressCity ?? '—'}
+                prix={formatPrice(property.desiredSellingPrice ?? property.estimatedMarketValue)}
+                prixM2={
+                  property.livingAreaSqm && (property.desiredSellingPrice || property.estimatedMarketValue)
+                    ? `${formatPrice(Math.round(Number(property.desiredSellingPrice || property.estimatedMarketValue) / Number(property.livingAreaSqm)))} /m²`
+                    : '—'
+                }
+              />
+            </div>
+          }
+          footer={
+            <div
+              className="sticky bottom-0 flex justify-end px-[40px] py-[16px] pb-[100px]"
+              style={{ backgroundColor: 'var(--surface-neutral-default)' }}
+            >
+              <Button
+                variant="outline"
+                onClick={() => { /* TODO: partager annonce */ }}
+              >
+                Partager l&apos;annonce
+                <Send size={16} />
+              </Button>
+            </div>
+          }
+        >
+          <div className="px-[40px] py-[20px] flex flex-col gap-[40px]">
+
+            {/* Section 1 — Diaporama */}
+            <section>
+              <Diaporama
+                images={photos.map(p => ({ id: p.id, url: p.storagePath, alt: p.fileName }))}
+                mainImageMaxHeight={400}
+              />
+            </section>
+
+            {/* Section 2 — URL de l'annonce */}
+            <section>
+              <h5
+                className="text-[20px] font-bold leading-[24px] tracking-[0.2px] mb-[16px]"
+                style={{ color: 'var(--text-headings)' }}
+              >
+                URL de l&apos;annonce
+              </h5>
+              <div
+                className="flex items-center justify-between px-[16px] py-[12px] rounded-[12px] border"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  backgroundColor: 'var(--surface-neutral-action)',
+                }}
+              >
+                <div className="flex items-center gap-[8px]">
+                  <Globe size={16} style={{ color: 'var(--icon-neutral-default)' }} />
+                  <span
+                    className="text-[14px] leading-[20px]"
+                    style={{ color: 'var(--text-body)' }}
+                  >
+                    realagent.fr/annonce/{annonceSheetListing?.slug ?? annonceSheetListing?.id ?? ''}
+                  </span>
+                </div>
+                <button
+                  className="p-[8px] rounded-[8px] transition-colors"
+                  style={{ color: 'var(--text-neutral-action)' }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `realagent.fr/annonce/${annonceSheetListing?.slug ?? annonceSheetListing?.id ?? ''}`
+                    );
+                  }}
+                  aria-label="Copier l'URL"
+                >
+                  <Copy size={16} />
+                </button>
+              </div>
+            </section>
+
+            {/* Section 3 — Description */}
+            <section>
+              <div className="flex items-center justify-between mb-[16px]">
+                <h5
+                  className="text-[20px] font-bold leading-[24px] tracking-[0.2px]"
+                  style={{ color: 'var(--text-headings)' }}
+                >
+                  Description
+                </h5>
+                {annonceSheetListing?.descriptionSource && (
+                  <Badge variant={
+                    annonceSheetListing.descriptionSource === 'AI_GENERATED' ? 'information'
+                    : annonceSheetListing.descriptionSource === 'AI_EDITED' ? 'warning'
+                    : 'default'
+                  }>
+                    {annonceSheetListing.descriptionSource === 'AI_GENERATED' ? 'IA'
+                     : annonceSheetListing.descriptionSource === 'AI_EDITED' ? 'IA éditée'
+                     : 'Manuelle'}
+                  </Badge>
+                )}
+              </div>
+              <p
+                className="text-[14px] leading-[22px]"
+                style={{ color: 'var(--text-body)' }}
+              >
+                {annonceSheetListing?.description ?? 'Aucune description'}
+              </p>
+            </section>
+
+            {/* Section 4 — Caractéristiques */}
+            <section>
+              <h5
+                className="text-[20px] font-bold leading-[24px] tracking-[0.2px] mb-[16px]"
+                style={{ color: 'var(--text-headings)' }}
+              >
+                Caractéristiques
+              </h5>
+              <div className="grid grid-cols-2 gap-x-[40px] gap-y-[4px]">
+                <ProfileField label="Type" value={PROPERTY_TYPE_LABELS[property.type]} />
+                <ProfileField label="État" value={property.condition ? PROPERTY_CONDITION_LABELS[property.condition] : null} />
+                <ProfileField label="Surface" value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
+                <ProfileField label="Terrain" value={property.landAreaSqm ? `${property.landAreaSqm} m²` : null} />
+                <ProfileField label="Pièces" value={property.numberOfRooms ? String(property.numberOfRooms) : null} />
+                <ProfileField label="Chambres" value={property.bedroomCount ? String(property.bedroomCount) : null} />
+                <ProfileField label="SDB" value={property.bathroomCount ? String(property.bathroomCount) : null} />
+                <ProfileField label="WC" value={property.toiletCount ? String(property.toiletCount) : null} />
+                <ProfileField label="Cuisine" value={property.kitchenType ? KITCHEN_TYPE_LABELS[property.kitchenType] : null} />
+                <ProfileField label="Parking" value={property.parkingType ? PARKING_TYPE_LABELS[property.parkingType] : null} />
+                <ProfileField label="Étage" value={property.floorLevel ? `${property.floorLevel}/${property.numberOfFloors ?? '?'}` : null} />
+                <ProfileField label="Exposition" value={property.mainExposure ?? null} />
+                <ProfileField label="Ascenseur" value={property.hasElevator != null ? (property.hasElevator ? 'Oui' : 'Non') : null} />
+                <ProfileField label="Piscine" value={property.hasPool != null ? (property.hasPool ? 'Oui' : 'Non') : null} />
+                <ProfileField label="Terrasse" value={property.terraceAreaSqm ? `${property.terraceAreaSqm} m²` : null} />
+                <ProfileField label="Balcon" value={property.balconyAreaSqm ? `${property.balconyAreaSqm} m²` : null} />
+                <ProfileField label="Jardin" value={property.gardenAreaSqm ? `${property.gardenAreaSqm} m²` : null} />
+                <ProfileField label="Cave" value={property.basementAreaSqm ? `${property.basementAreaSqm} m²` : null} />
+              </div>
+            </section>
+
+            {/* Section 5 — Énergie */}
+            <section>
+              <h5
+                className="text-[20px] font-bold leading-[24px] tracking-[0.2px] mb-[16px]"
+                style={{ color: 'var(--text-headings)' }}
+              >
+                Énergie
+              </h5>
+              <div className="grid grid-cols-2 gap-x-[40px] gap-y-[4px]">
+                <ProfileField label="DPE énergie" value={property.dpeEnergyClass ?? null} />
+                <ProfileField label="DPE GES" value={property.dpeGasEmissionClass ?? null} />
+                <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+                <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
+                <ProfileField label="Conso kWh" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
+                <ProfileField label="Émission CO₂" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
+              </div>
+            </section>
+
+            {/* Section 6 — Copropriété */}
+            {coOwnership && (
+              <section>
+                <h5
+                  className="text-[20px] font-bold leading-[24px] tracking-[0.2px] mb-[16px]"
+                  style={{ color: 'var(--text-headings)' }}
+                >
+                  Copropriété
+                </h5>
+                <div className="grid grid-cols-2 gap-x-[40px] gap-y-[4px]">
+                  <ProfileField label="Type" value={coOwnership.type} />
+                  <ProfileField label="Nb lots" value={coOwnership.numberOfLots ? String(coOwnership.numberOfLots) : null} />
+                  <ProfileField label="N° lot" value={coOwnership.lotNumber} />
+                  <ProfileField label="Syndic" value={coOwnership.syndicName} />
+                  <ProfileField label="Charges/mois" value={coOwnership.monthlyCharges ? `${coOwnership.monthlyCharges} €` : null} />
+                  <ProfileField label="Frais annuels" value={coOwnership.estimatedAnnualFees ? `${coOwnership.estimatedAnnualFees} €` : null} />
+                  <ProfileField label="Travaux prévus" value={coOwnership.plannedWorkAmount ? `${coOwnership.plannedWorkAmount} €` : null} />
+                  <ProfileField label="Procédures" value={
+                    coOwnership.hasCurrentLegalProcedures ? 'En cours'
+                    : coOwnership.hasPlannedLegalProcedures ? 'Prévues'
+                    : 'Aucune'
+                  } />
+                </div>
+              </section>
+            )}
+
+            {/* Section 7 — Statistiques (si publiée) */}
+            {annonceSheetListing?.status === 'PUBLISHED' && (
+              <section>
+                <h5
+                  className="text-[20px] font-bold leading-[24px] tracking-[0.2px] mb-[16px]"
+                  style={{ color: 'var(--text-headings)' }}
+                >
+                  Statistiques
+                </h5>
+                <div className="flex gap-[24px]">
+                  <div className="flex flex-col items-center gap-[4px] px-[20px] py-[12px] rounded-[12px]"
+                    style={{ backgroundColor: 'var(--surface-neutral-action)' }}
+                  >
+                    <span className="text-[24px] font-bold" style={{ color: 'var(--text-headings)' }}>
+                      {annonceSheetListing.viewCount ?? 0}
+                    </span>
+                    <span className="text-[12px]" style={{ color: 'var(--text-caption)' }}>
+                      Vues
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center gap-[4px] px-[20px] py-[12px] rounded-[12px]"
+                    style={{ backgroundColor: 'var(--surface-neutral-action)' }}
+                  >
+                    <span className="text-[24px] font-bold" style={{ color: 'var(--text-headings)' }}>
+                      {annonceSheetListing.leadCount ?? 0}
+                    </span>
+                    <span className="text-[12px]" style={{ color: 'var(--text-caption)' }}>
+                      Contacts
+                    </span>
+                  </div>
+                </div>
+              </section>
+            )}
+
+          </div>
+        </Sheet>
 
         {/* Bloc 6 — Carnet */}
         <section ref={setSectionRef('carnet')} id="carnet" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
