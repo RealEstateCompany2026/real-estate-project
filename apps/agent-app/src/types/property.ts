@@ -24,6 +24,8 @@ export type ParkingType = 'BOX_FERME' | 'PARKING_EXTERIEUR' | 'GARAGE' | 'AUCUN'
 
 export type KitchenType = 'SEPAREE' | 'OUVERTE' | 'AMERICAINE' | 'KITCHENETTE';
 
+export type HotWaterSystem = 'CUMULUS_ELECTRIQUE' | 'CHAUDIERE_GAZ' | 'SOLAIRE' | 'THERMODYNAMIQUE';
+
 export type OperationType = 'VENTE' | 'LOCATION' | 'VIAGER' | 'CESSION';
 
 // Catégories (mapping front uniquement — pas en BDD)
@@ -64,6 +66,10 @@ export interface Property {
   terraceAreaSqm: number | null;
   balconyAreaSqm: number | null;
   gardenAreaSqm: number | null;
+  mainRoomAreaSqm: number | null;
+  kitchenAreaSqm: number | null;
+  basementAreaSqm: number | null;
+  atticAreaSqm: number | null;
 
   // Pièces
   numberOfRooms: number | null;
@@ -71,6 +77,10 @@ export interface Property {
   bathroomCount: number | null;
   showerRoomCount: number | null;
   toiletCount: number | null;
+  bedroom1AreaSqm: number | null;
+  bedroom2AreaSqm: number | null;
+  bedroom3AreaSqm: number | null;
+  bedroom4AreaSqm: number | null;
 
   // Construction
   floorLevel: number | null;
@@ -79,6 +89,7 @@ export interface Property {
 
   // Équipements
   heatingType: HeatingType | null;
+  hotWaterSystem: HotWaterSystem | null;
   mainExposure: Exposure | null;    // Legacy single — conservé pour rétrocompatibilité
   exposures: Exposure[];             // Source de vérité — multi-exposition
   kitchenType: KitchenType | null;
@@ -94,6 +105,8 @@ export interface Property {
   dpeGasEmissionClass: DpeClass | null;
   dpeEnergyKwh: number | null;
   dpeGasGco2: number | null;
+  dpeValidityDate: string | null;
+  dpeComplianceDeadline: string | null;
 
   // Prix
   estimatedMarketValue: number | null;
@@ -239,4 +252,34 @@ export const CATEGORY_LABELS: Record<PropertyCategory, string> = {
   TERRAIN: 'Terrain',
   COMMERCIAL: 'Commercial',
   AUTRE: 'Autre',
+};
+
+export const HEATING_TYPE_LABELS: Record<HeatingType, string> = {
+  INDIVIDUEL_GAZ: 'Individuel gaz',
+  INDIVIDUEL_ELECTRIQUE: 'Individuel électrique',
+  COLLECTIF_GAZ: 'Collectif gaz',
+  PAC: 'Pompe à chaleur',
+  FUEL: 'Fuel',
+  BOIS: 'Bois',
+};
+
+export const HOT_WATER_SYSTEM_LABELS: Record<HotWaterSystem, string> = {
+  CUMULUS_ELECTRIQUE: 'Cumulus électrique',
+  CHAUDIERE_GAZ: 'Chaudière gaz',
+  SOLAIRE: 'Solaire',
+  THERMODYNAMIQUE: 'Thermodynamique',
+};
+
+export const KITCHEN_TYPE_LABELS: Record<KitchenType, string> = {
+  SEPAREE: 'Séparée',
+  OUVERTE: 'Ouverte',
+  AMERICAINE: 'Américaine',
+  KITCHENETTE: 'Kitchenette',
+};
+
+export const PARKING_TYPE_LABELS: Record<ParkingType, string> = {
+  BOX_FERME: 'Box fermé',
+  PARKING_EXTERIEUR: 'Parking extérieur',
+  GARAGE: 'Garage',
+  AUCUN: 'Aucun',
 };

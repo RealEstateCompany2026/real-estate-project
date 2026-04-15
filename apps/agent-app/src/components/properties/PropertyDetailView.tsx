@@ -28,11 +28,26 @@ import { FileUpload } from '@real-estate/ui/file-upload';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
-import type { Property, PropertyMedia, OperationType } from '@/types/property';
+import type { Property, PropertyMedia, OperationType, DpeClass } from '@/types/property';
 import {
   PROPERTY_TYPE_LABELS, PROPERTY_CONDITION_LABELS, OPERATION_TYPE_LABELS,
+  HEATING_TYPE_LABELS, HOT_WATER_SYSTEM_LABELS, KITCHEN_TYPE_LABELS, PARKING_TYPE_LABELS,
 } from '@/types/property';
 import { formatPrice } from '@/lib/utils/format';
+
+// ---------------------------------------------------------------------------
+// Constants — Labels pour enums DPE
+// ---------------------------------------------------------------------------
+
+const DPE_CLASS_LABELS: Record<DpeClass, string> = {
+  A: 'A',
+  B: 'B',
+  C: 'C',
+  D: 'D',
+  E: 'E',
+  F: 'F',
+  G: 'G',
+};
 
 // ---------------------------------------------------------------------------
 // Types — alignées sur ClientDetailView
@@ -113,6 +128,23 @@ interface ClientRow {
   lastName: string | null;
 }
 
+interface CoOwnershipDetailsRow {
+  id: string;
+  propertyId: string;
+  type: string | null;
+  numberOfLots: number | null;
+  lotNumber: string | null;
+  syndicName: string | null;
+  syndicContact: string | null;
+  lastAgmDate: string | null;
+  estimatedAnnualFees: number | null;
+  monthlyCharges: number | null;
+  plannedWorkAmount: number | null;
+  hasCurrentLegalProcedures: boolean | null;
+  hasPlannedLegalProcedures: boolean | null;
+  legalProcedureDetails: string | null;
+}
+
 interface PropertyDetailData {
   property: Property;
   photos: PropertyMedia[];
@@ -126,6 +158,7 @@ interface PropertyDetailData {
   messages: MessageItem[];
   allMessages: MessageItem[];
   ownerName: string;
+  coOwnership: CoOwnershipDetailsRow | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -305,6 +338,30 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
     parkingType: '',
     dpeEnergyClass: '',
     dpeGasEmissionClass: '',
+    mainRoomAreaSqm: '',
+    kitchenAreaSqm: '',
+    bedroom1AreaSqm: '',
+    bedroom2AreaSqm: '',
+    bedroom3AreaSqm: '',
+    bedroom4AreaSqm: '',
+    showerRoomCount: '',
+    toiletCount: '',
+    balconyAreaSqm: '',
+    gardenAreaSqm: '',
+    basementAreaSqm: '',
+    atticAreaSqm: '',
+    parkingSpotCount: '',
+    hotWaterSystem: '',
+    hasElevator: '',
+    hasIntercom: '',
+    hasHomeAutomation: '',
+    hasPool: '',
+    dpeEnergyKwh: '',
+    dpeGasGco2: '',
+    dpeValidityDate: '',
+    dpeComplianceDeadline: '',
+    floorLevel: '',
+    numberOfFloors: '',
   });
   const [isDocUploadSheetOpen, setIsDocUploadSheetOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -369,6 +426,19 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         }
       }
 
+      // Fetch CoOwnershipDetails if coOwnershipId exists
+      let coOwnershipData: CoOwnershipDetailsRow | null = null;
+      if ((prop as Property).coOwnershipId) {
+        const { data: coData } = await supabase
+          .from('CoOwnershipDetails')
+          .select('*')
+          .eq('id', (prop as Property).coOwnershipId)
+          .single();
+        if (coData) {
+          coOwnershipData = coData as CoOwnershipDetailsRow;
+        }
+      }
+
       // Map events to ActivityLog
       const allActivities: ActivityLog[] = (eventsData ?? []).map((ev: EventRow) => ({
         id: ev.id,
@@ -417,6 +487,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         messages,
         allMessages,
         ownerName,
+        coOwnership: coOwnershipData,
       });
       setIsLoading(false);
     }
@@ -457,6 +528,30 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       parkingType: p.parkingType ?? '',
       dpeEnergyClass: p.dpeEnergyClass ?? '',
       dpeGasEmissionClass: p.dpeGasEmissionClass ?? '',
+      mainRoomAreaSqm: p.mainRoomAreaSqm?.toString() ?? '',
+      kitchenAreaSqm: p.kitchenAreaSqm?.toString() ?? '',
+      bedroom1AreaSqm: p.bedroom1AreaSqm?.toString() ?? '',
+      bedroom2AreaSqm: p.bedroom2AreaSqm?.toString() ?? '',
+      bedroom3AreaSqm: p.bedroom3AreaSqm?.toString() ?? '',
+      bedroom4AreaSqm: p.bedroom4AreaSqm?.toString() ?? '',
+      showerRoomCount: p.showerRoomCount?.toString() ?? '',
+      toiletCount: p.toiletCount?.toString() ?? '',
+      balconyAreaSqm: p.balconyAreaSqm?.toString() ?? '',
+      gardenAreaSqm: p.gardenAreaSqm?.toString() ?? '',
+      basementAreaSqm: p.basementAreaSqm?.toString() ?? '',
+      atticAreaSqm: p.atticAreaSqm?.toString() ?? '',
+      parkingSpotCount: p.parkingSpotCount?.toString() ?? '',
+      hotWaterSystem: p.hotWaterSystem ?? '',
+      hasElevator: p.hasElevator ? 'true' : 'false',
+      hasIntercom: p.hasIntercom ? 'true' : 'false',
+      hasHomeAutomation: p.hasHomeAutomation ? 'true' : 'false',
+      hasPool: p.hasPool ? 'true' : 'false',
+      dpeEnergyKwh: p.dpeEnergyKwh?.toString() ?? '',
+      dpeGasGco2: p.dpeGasGco2?.toString() ?? '',
+      dpeValidityDate: p.dpeValidityDate ?? '',
+      dpeComplianceDeadline: p.dpeComplianceDeadline ?? '',
+      floorLevel: p.floorLevel?.toString() ?? '',
+      numberOfFloors: p.numberOfFloors?.toString() ?? '',
     });
     setIsCharacteristicsSheetOpen(true);
   }, [data]);
@@ -483,6 +578,30 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           parkingType: characteristicsForm.parkingType || null,
           dpeEnergyClass: characteristicsForm.dpeEnergyClass || null,
           dpeGasEmissionClass: characteristicsForm.dpeGasEmissionClass || null,
+          mainRoomAreaSqm: characteristicsForm.mainRoomAreaSqm ? parseFloat(characteristicsForm.mainRoomAreaSqm) : null,
+          kitchenAreaSqm: characteristicsForm.kitchenAreaSqm ? parseFloat(characteristicsForm.kitchenAreaSqm) : null,
+          bedroom1AreaSqm: characteristicsForm.bedroom1AreaSqm ? parseFloat(characteristicsForm.bedroom1AreaSqm) : null,
+          bedroom2AreaSqm: characteristicsForm.bedroom2AreaSqm ? parseFloat(characteristicsForm.bedroom2AreaSqm) : null,
+          bedroom3AreaSqm: characteristicsForm.bedroom3AreaSqm ? parseFloat(characteristicsForm.bedroom3AreaSqm) : null,
+          bedroom4AreaSqm: characteristicsForm.bedroom4AreaSqm ? parseFloat(characteristicsForm.bedroom4AreaSqm) : null,
+          showerRoomCount: characteristicsForm.showerRoomCount ? parseInt(characteristicsForm.showerRoomCount) : null,
+          toiletCount: characteristicsForm.toiletCount ? parseInt(characteristicsForm.toiletCount) : null,
+          balconyAreaSqm: characteristicsForm.balconyAreaSqm ? parseFloat(characteristicsForm.balconyAreaSqm) : null,
+          gardenAreaSqm: characteristicsForm.gardenAreaSqm ? parseFloat(characteristicsForm.gardenAreaSqm) : null,
+          basementAreaSqm: characteristicsForm.basementAreaSqm ? parseFloat(characteristicsForm.basementAreaSqm) : null,
+          atticAreaSqm: characteristicsForm.atticAreaSqm ? parseFloat(characteristicsForm.atticAreaSqm) : null,
+          parkingSpotCount: characteristicsForm.parkingSpotCount ? parseInt(characteristicsForm.parkingSpotCount) : null,
+          hotWaterSystem: characteristicsForm.hotWaterSystem || null,
+          hasElevator: characteristicsForm.hasElevator === 'true',
+          hasIntercom: characteristicsForm.hasIntercom === 'true',
+          hasHomeAutomation: characteristicsForm.hasHomeAutomation === 'true',
+          hasPool: characteristicsForm.hasPool === 'true',
+          dpeEnergyKwh: characteristicsForm.dpeEnergyKwh ? parseFloat(characteristicsForm.dpeEnergyKwh) : null,
+          dpeGasGco2: characteristicsForm.dpeGasGco2 ? parseFloat(characteristicsForm.dpeGasGco2) : null,
+          dpeValidityDate: characteristicsForm.dpeValidityDate || null,
+          dpeComplianceDeadline: characteristicsForm.dpeComplianceDeadline || null,
+          floorLevel: characteristicsForm.floorLevel ? parseInt(characteristicsForm.floorLevel) : null,
+          numberOfFloors: characteristicsForm.numberOfFloors ? parseInt(characteristicsForm.numberOfFloors) : null,
         })
         .eq('id', data.property.id);
 
@@ -654,52 +773,41 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             </Button>
           </div>
 
-          {/* Grille 3 colonnes — champs principaux */}
+          {/* Grille 3 colonnes — Localisation / Type / Diagnostics */}
           <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px] mb-[50px]">
-            {/* En-têtes colonnes */}
+            {/* Headers */}
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
-              Général
+              Localisation
             </p>
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
-              Surfaces
+              Type
             </p>
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
-              Énergie
+              Diagnostics
             </p>
 
-            {/* Row 1 */}
-            <ProfileField label="Type" value={PROPERTY_TYPE_LABELS[property.type]} />
-            <ProfileField label="Surface hab." value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
-            <ProfileField label="DPE énergie" value={property.dpeEnergyClass} />
+            {/* Localisation col */}
+            <ProfileField label="Adresse" value={property.address} />
+            <ProfileField label="Date de construction" value={property.constructionYear?.toString()} />
+            <ProfileField label="DPE" value={property.dpeEnergyClass && property.dpeEnergyKwh ? `${property.dpeEnergyClass} (${property.dpeEnergyKwh} kWh/m²/an)` : null} />
 
-            {/* Row 2 */}
-            <ProfileField label="État" value={property.condition ? PROPERTY_CONDITION_LABELS[property.condition] : null} />
-            <ProfileField label="Terrain" value={property.landAreaSqm ? `${property.landAreaSqm} m²` : null} />
-            <ProfileField label="DPE GES" value={property.dpeGasEmissionClass} />
+            <ProfileField label="Étage" value={property.floorLevel ? `${property.floorLevel}ème / ${property.numberOfFloors ?? '?'} étages` : null} />
+            <ProfileField label="Type de bien" value={PROPERTY_TYPE_LABELS[property.type]} />
+            <ProfileField label="GES" value={property.dpeGasEmissionClass && property.dpeGasGco2 ? `${property.dpeGasEmissionClass} (${property.dpeGasGco2} gCO₂/m²/an)` : null} />
 
-            {/* Row 3 */}
-            <ProfileField label="Pièces" value={property.numberOfRooms?.toString()} />
-            <ProfileField label="Terrasse" value={property.terraceAreaSqm ? `${property.terraceAreaSqm} m²` : null} />
-            <ProfileField label="Énergie kWh" value={property.dpeEnergyKwh?.toString()} />
+            <ProfileField label="Nombre d'étages" value={property.numberOfFloors ? `${property.numberOfFloors} étages` : null} />
+            <ProfileField label="Surface habitable" value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
+            <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
 
-            {/* Row 4 */}
-            <ProfileField label="Chambres" value={property.bedroomCount?.toString()} />
-            <ProfileField label="Balcon" value={property.balconyAreaSqm ? `${property.balconyAreaSqm} m²` : null} />
-            <ProfileField label="GES gCO₂" value={property.dpeGasGco2?.toString()} />
-
-            {/* Row 5 */}
-            <ProfileField label="SDB" value={property.bathroomCount?.toString()} />
-            <ProfileField label="Jardin" value={property.gardenAreaSqm ? `${property.gardenAreaSqm} m²` : null} />
-            <ProfileField label="Chauffage" value={property.heatingType} />
-
-            {/* Row 6 */}
-            <ProfileField label="Étage" value={property.floorLevel?.toString()} />
             <div />
-            <ProfileField label="Exposition" value={property.exposures?.join(', ') ?? property.mainExposure} />
+            <ProfileField label="Surface extérieure" value={(() => {
+              const ext = (property.terraceAreaSqm ?? 0) + (property.balconyAreaSqm ?? 0) + (property.gardenAreaSqm ?? 0);
+              return ext > 0 ? `${ext} m²` : null;
+            })()} />
+            <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
 
-            {/* Row 7 */}
-            <ProfileField label="Année" value={property.constructionYear?.toString()} />
             <div />
+            <ProfileField label="Nombre de pièces" value={property.numberOfRooms?.toString()} />
             <div />
           </div>
 
@@ -712,33 +820,143 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           </Button>
 
           {showMoreCharacteristics && (
-            <div className="mt-[30px] grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
-              {/* Sous-sections: Cuisine, Équipements, Stationnement, Annexes */}
-              <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
-                Cuisine & équipements
-              </p>
-              <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
-                Stationnement
-              </p>
-              <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
-                Équipements divers
-              </p>
+            <div className="mt-[30px] flex flex-col gap-[50px]">
+              {/* B.1 — Caractéristiques par pièce */}
+              <div>
+                <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Caractéristiques par pièce
+                </p>
+                <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
+                  <ProfileField label="Pièce à vivre" value={property.mainRoomAreaSqm ? `${property.mainRoomAreaSqm} m²` : null} />
+                  <ProfileField label="Chambre 1" value={property.bedroom1AreaSqm ? `${property.bedroom1AreaSqm} m²` : null} />
+                  <ProfileField label="SDB" value={property.bathroomCount?.toString()} />
 
-              <ProfileField label="Cuisine" value={property.kitchenType} />
-              <ProfileField label="Parking" value={property.parkingType} />
-              <ProfileField label="Ascenseur" value={property.hasElevator ? 'Oui' : 'Non'} />
+                  <ProfileField label="Cuisine" value={property.kitchenAreaSqm ? `${property.kitchenAreaSqm} m²` : null} />
+                  {property.bedroomCount !== null && property.bedroomCount >= 2 ? (
+                    <ProfileField label="Chambre 2" value={property.bedroom2AreaSqm ? `${property.bedroom2AreaSqm} m²` : null} />
+                  ) : <div />}
+                  <ProfileField label="Douches" value={property.showerRoomCount?.toString()} />
 
-              <ProfileField label="WC" value={property.toiletCount?.toString()} />
-              <ProfileField label="Places" value={property.parkingSpotCount?.toString()} />
-              <ProfileField label="Interphone" value={property.hasIntercom ? 'Oui' : 'Non'} />
+                  <ProfileField label="Type cuisine" value={property.kitchenType ? KITCHEN_TYPE_LABELS[property.kitchenType] : null} />
+                  {property.bedroomCount !== null && property.bedroomCount >= 3 ? (
+                    <ProfileField label="Chambre 3" value={property.bedroom3AreaSqm ? `${property.bedroom3AreaSqm} m²` : null} />
+                  ) : <div />}
+                  <ProfileField label="WC" value={property.toiletCount?.toString()} />
 
-              <ProfileField label="Douches" value={property.showerRoomCount?.toString()} />
-              <div />
-              <ProfileField label="Piscine" value={property.hasPool ? 'Oui' : 'Non'} />
+                  <div />
+                  {property.bedroomCount !== null && property.bedroomCount >= 4 ? (
+                    <ProfileField label="Chambre 4" value={property.bedroom4AreaSqm ? `${property.bedroom4AreaSqm} m²` : null} />
+                  ) : <div />}
+                  <div />
+                </div>
+              </div>
 
-              <div />
-              <div />
-              <ProfileField label="Domotique" value={property.hasHomeAutomation ? 'Oui' : 'Non'} />
+              {/* B.2 — Équipements */}
+              <div>
+                <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Équipements
+                </p>
+                <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
+                  <ProfileField label="Domotique" value={property.hasHomeAutomation !== null ? (property.hasHomeAutomation ? 'Oui' : 'Non') : null} />
+                  <ProfileField label="Interphone" value={property.hasIntercom !== null ? (property.hasIntercom ? 'Oui' : 'Non') : null} />
+                  <ProfileField label="Piscine" value={property.hasPool !== null ? (property.hasPool ? 'Oui' : 'Non') : null} />
+                </div>
+              </div>
+
+              {/* B.3 — Énergie */}
+              <div>
+                <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Énergie
+                </p>
+                <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
+                  <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+                  <ProfileField label="DPE" value={property.dpeEnergyClass} />
+                  <ProfileField label="Validité DPE" value={property.dpeValidityDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeValidityDate)) : null} />
+
+                  <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
+                  <ProfileField label="GES" value={property.dpeGasEmissionClass} />
+                  <ProfileField label="Conformité" value={property.dpeComplianceDeadline ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeComplianceDeadline)) : null} />
+
+                  <div />
+                  <ProfileField label="Énergie" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
+                  <div />
+
+                  <div />
+                  <ProfileField label="GES" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
+                  <div />
+                </div>
+              </div>
+
+              {/* B.4 — Stationnement */}
+              <div>
+                <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Stationnement
+                </p>
+                <div className="grid grid-cols-2 gap-x-[60px] gap-y-[8px]">
+                  <ProfileField label="Type" value={property.parkingType ? PARKING_TYPE_LABELS[property.parkingType] : null} />
+                  <ProfileField label="Quantité" value={property.parkingSpotCount ? `${property.parkingSpotCount} place(s)` : null} />
+                </div>
+              </div>
+
+              {/* B.5 — Annexes (afficher seulement les non-null) */}
+              {(property.basementAreaSqm || property.atticAreaSqm || property.terraceAreaSqm || property.balconyAreaSqm || property.gardenAreaSqm || property.landAreaSqm) && (
+                <div>
+                  <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                    Annexes
+                  </p>
+                  <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
+                    {property.basementAreaSqm && <ProfileField label="Cave" value={`${property.basementAreaSqm} m²`} />}
+                    {property.atticAreaSqm && <ProfileField label="Grenier" value={`${property.atticAreaSqm} m²`} />}
+                    {property.terraceAreaSqm && <ProfileField label="Terrasse" value={`${property.terraceAreaSqm} m²`} />}
+                    {property.balconyAreaSqm && <ProfileField label="Balcon" value={`${property.balconyAreaSqm} m²`} />}
+                    {property.gardenAreaSqm && <ProfileField label="Jardin" value={`${property.gardenAreaSqm} m²`} />}
+                    {property.landAreaSqm && <ProfileField label="Terrain" value={`${property.landAreaSqm} m²`} />}
+                  </div>
+                </div>
+              )}
+
+              {/* B.6 — Parties Communes */}
+              <div>
+                <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Parties Communes
+                </p>
+                <div className="grid grid-cols-2 gap-x-[60px] gap-y-[8px]">
+                  <ProfileField label="Ascenseur" value={property.hasElevator !== null ? (property.hasElevator ? 'Oui' : 'Non') : null} />
+                  <ProfileField label="Exposition" value={property.exposures?.length ? property.exposures.join(', ') : property.mainExposure} />
+                </div>
+              </div>
+
+              {/* B.7 — Copropriété (conditionnel) */}
+              {data.coOwnership && (
+                <div>
+                  <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                    Copropriété
+                  </p>
+                  <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
+                    <ProfileField label="Type" value={data.coOwnership.type} />
+                    <ProfileField label="Nombre de lots" value={data.coOwnership.numberOfLots?.toString()} />
+                    <ProfileField label="Charges annuelles" value={data.coOwnership.estimatedAnnualFees ? `${data.coOwnership.estimatedAnnualFees} €` : null} />
+
+                    <ProfileField label="Numéro de lot" value={data.coOwnership.lotNumber} />
+                    <ProfileField label="Syndic" value={data.coOwnership.syndicName} />
+                    <ProfileField label="Charges mensuelles" value={data.coOwnership.monthlyCharges ? `${data.coOwnership.monthlyCharges} €/mois` : null} />
+
+                    <ProfileField label="Dernière AG" value={data.coOwnership.lastAgmDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(data.coOwnership.lastAgmDate)) : null} />
+                    <ProfileField label="Travaux votés" value={data.coOwnership.plannedWorkAmount ? `${data.coOwnership.plannedWorkAmount} €` : null} />
+                    <div />
+
+                    <ProfileField label="Procédures en cours" value={data.coOwnership.hasCurrentLegalProcedures !== null ? (data.coOwnership.hasCurrentLegalProcedures ? 'Oui' : 'Non') : null} />
+                    <ProfileField label="Procédures votées" value={data.coOwnership.hasPlannedLegalProcedures !== null ? (data.coOwnership.hasPlannedLegalProcedures ? 'Oui' : 'Non') : null} />
+                    <div />
+
+                    {data.coOwnership.legalProcedureDetails && (
+                      <div className="col-span-3">
+                        <ProfileField label="Détails" value={data.coOwnership.legalProcedureDetails} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1038,76 +1256,57 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         }
       >
         <div className="flex flex-col gap-[32px] px-[20px] py-[20px]">
-          {/* Section Général */}
+          {/* Localisation */}
           <div className="flex flex-col gap-[16px]">
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Général
+              Localisation
+            </p>
+            <InputField
+              label="Étage"
+              value={characteristicsForm.floorLevel}
+              onChange={(v) => updateCharacteristicsField('floorLevel', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Nombre d'étages"
+              value={characteristicsForm.numberOfFloors}
+              onChange={(v) => updateCharacteristicsField('numberOfFloors', v)}
+              type="number"
+              placeholder="0"
+            />
+          </div>
+
+          {/* Type */}
+          <div className="flex flex-col gap-[16px]">
+            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
+              Type
             </p>
             <SelectField
               label="Type"
               value={characteristicsForm.type}
               onChange={(v) => updateCharacteristicsField('type', v)}
-              options={[
-                { value: 'STUDIO', label: 'Studio' },
-                { value: 'T1', label: 'T1' },
-                { value: 'T2', label: 'T2' },
-                { value: 'T3', label: 'T3' },
-                { value: 'T4', label: 'T4' },
-                { value: 'APPARTEMENT', label: 'Appartement' },
-                { value: 'MAISON', label: 'Maison' },
-                { value: 'MAISON_DE_VILLE', label: 'Maison de ville' },
-                { value: 'LOFT', label: 'Loft' },
-                { value: 'TERRAIN', label: 'Terrain' },
-                { value: 'IMMEUBLE', label: 'Immeuble' },
-              ]}
+              options={Object.entries(PROPERTY_TYPE_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
             />
             <SelectField
               label="Condition"
               value={characteristicsForm.condition}
               onChange={(v) => updateCharacteristicsField('condition', v)}
-              options={[
-                { value: 'NEUF', label: 'Neuf' },
-                { value: 'RENOVE', label: 'Rénové' },
-                { value: 'BON_ETAT', label: 'Bon état' },
-                { value: 'A_RENOVER', label: 'À rénover' },
-                { value: 'ANCIEN', label: 'Ancien' },
-              ]}
-            />
-          </div>
-
-          {/* Section Pièces */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Pièces
-            </p>
-            <InputField
-              label="Nombre de pièces"
-              value={characteristicsForm.numberOfRooms}
-              onChange={(v) => updateCharacteristicsField('numberOfRooms', v)}
-              type="number"
-              placeholder="0"
+              options={Object.entries(PROPERTY_CONDITION_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
             />
             <InputField
-              label="Chambres"
-              value={characteristicsForm.bedroomCount}
-              onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
+              label="Année de construction"
+              value={characteristicsForm.constructionYear}
+              onChange={(v) => updateCharacteristicsField('constructionYear', v)}
               type="number"
-              placeholder="0"
+              placeholder="2000"
             />
-            <InputField
-              label="Salles de bain"
-              value={characteristicsForm.bathroomCount}
-              onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
-              type="number"
-              placeholder="0"
-            />
-          </div>
-
-          {/* Section Surfaces */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Surfaces
-            </p>
             <InputField
               label="Surface habitable (m²)"
               value={characteristicsForm.livingAreaSqm}
@@ -1123,29 +1322,143 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
               placeholder="0"
             />
             <InputField
+              label="Nombre de pièces"
+              value={characteristicsForm.numberOfRooms}
+              onChange={(v) => updateCharacteristicsField('numberOfRooms', v)}
+              type="number"
+              placeholder="0"
+            />
+          </div>
+
+          {/* Pièces */}
+          <div className="flex flex-col gap-[16px]">
+            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
+              Pièces
+            </p>
+            <InputField
+              label="Pièce à vivre (m²)"
+              value={characteristicsForm.mainRoomAreaSqm}
+              onChange={(v) => updateCharacteristicsField('mainRoomAreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Cuisine (m²)"
+              value={characteristicsForm.kitchenAreaSqm}
+              onChange={(v) => updateCharacteristicsField('kitchenAreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <SelectField
+              label="Type de cuisine"
+              value={characteristicsForm.kitchenType}
+              onChange={(v) => updateCharacteristicsField('kitchenType', v)}
+              options={Object.entries(KITCHEN_TYPE_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
+            />
+            <InputField
+              label="Chambres"
+              value={characteristicsForm.bedroomCount}
+              onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Chambre 1 (m²)"
+              value={characteristicsForm.bedroom1AreaSqm}
+              onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Chambre 2 (m²)"
+              value={characteristicsForm.bedroom2AreaSqm}
+              onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Chambre 3 (m²)"
+              value={characteristicsForm.bedroom3AreaSqm}
+              onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Chambre 4 (m²)"
+              value={characteristicsForm.bedroom4AreaSqm}
+              onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Salles de bain"
+              value={characteristicsForm.bathroomCount}
+              onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Douches"
+              value={characteristicsForm.showerRoomCount}
+              onChange={(v) => updateCharacteristicsField('showerRoomCount', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="WC"
+              value={characteristicsForm.toiletCount}
+              onChange={(v) => updateCharacteristicsField('toiletCount', v)}
+              type="number"
+              placeholder="0"
+            />
+          </div>
+
+          {/* Surfaces annexes */}
+          <div className="flex flex-col gap-[16px]">
+            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
+              Surfaces annexes
+            </p>
+            <InputField
               label="Terrasse (m²)"
               value={characteristicsForm.terraceAreaSqm}
               onChange={(v) => updateCharacteristicsField('terraceAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-          </div>
-
-          {/* Section Construction */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Construction
-            </p>
             <InputField
-              label="Année de construction"
-              value={characteristicsForm.constructionYear}
-              onChange={(v) => updateCharacteristicsField('constructionYear', v)}
+              label="Balcon (m²)"
+              value={characteristicsForm.balconyAreaSqm}
+              onChange={(v) => updateCharacteristicsField('balconyAreaSqm', v)}
               type="number"
-              placeholder="2000"
+              placeholder="0"
+            />
+            <InputField
+              label="Jardin (m²)"
+              value={characteristicsForm.gardenAreaSqm}
+              onChange={(v) => updateCharacteristicsField('gardenAreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Cave (m²)"
+              value={characteristicsForm.basementAreaSqm}
+              onChange={(v) => updateCharacteristicsField('basementAreaSqm', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Grenier (m²)"
+              value={characteristicsForm.atticAreaSqm}
+              onChange={(v) => updateCharacteristicsField('atticAreaSqm', v)}
+              type="number"
+              placeholder="0"
             />
           </div>
 
-          {/* Section Équipements */}
+          {/* Équipements */}
           <div className="flex flex-col gap-[16px]">
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               Équipements
@@ -1154,40 +1467,75 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
               label="Type de chauffage"
               value={characteristicsForm.heatingType}
               onChange={(v) => updateCharacteristicsField('heatingType', v)}
-              options={[
-                { value: 'INDIVIDUEL_GAZ', label: 'Individuel gaz' },
-                { value: 'INDIVIDUEL_ELECTRIQUE', label: 'Individuel électrique' },
-                { value: 'COLLECTIF_GAZ', label: 'Collectif gaz' },
-                { value: 'PAC', label: 'PAC' },
-                { value: 'FUEL', label: 'Fuel' },
-                { value: 'BOIS', label: 'Bois' },
-              ]}
+              options={Object.entries(HEATING_TYPE_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
             />
             <SelectField
-              label="Type de cuisine"
-              value={characteristicsForm.kitchenType}
-              onChange={(v) => updateCharacteristicsField('kitchenType', v)}
-              options={[
-                { value: 'SEPAREE', label: 'Séparée' },
-                { value: 'OUVERTE', label: 'Ouverte' },
-                { value: 'AMERICAINE', label: 'Américaine' },
-                { value: 'KITCHENETTE', label: 'Kitchenette' },
-              ]}
+              label="Eau chaude"
+              value={characteristicsForm.hotWaterSystem}
+              onChange={(v) => updateCharacteristicsField('hotWaterSystem', v)}
+              options={Object.entries(HOT_WATER_SYSTEM_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
             />
             <SelectField
               label="Type de parking"
               value={characteristicsForm.parkingType}
               onChange={(v) => updateCharacteristicsField('parkingType', v)}
+              options={Object.entries(PARKING_TYPE_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
+            />
+            <InputField
+              label="Places de parking"
+              value={characteristicsForm.parkingSpotCount}
+              onChange={(v) => updateCharacteristicsField('parkingSpotCount', v)}
+              type="number"
+              placeholder="0"
+            />
+            <SelectField
+              label="Ascenseur"
+              value={characteristicsForm.hasElevator}
+              onChange={(v) => updateCharacteristicsField('hasElevator', v)}
               options={[
-                { value: 'BOX_FERME', label: 'Box fermé' },
-                { value: 'PARKING_EXTERIEUR', label: 'Parking extérieur' },
-                { value: 'GARAGE', label: 'Garage' },
-                { value: 'AUCUN', label: 'Aucun' },
+                { value: 'true', label: 'Oui' },
+                { value: 'false', label: 'Non' },
+              ]}
+            />
+            <SelectField
+              label="Interphone"
+              value={characteristicsForm.hasIntercom}
+              onChange={(v) => updateCharacteristicsField('hasIntercom', v)}
+              options={[
+                { value: 'true', label: 'Oui' },
+                { value: 'false', label: 'Non' },
+              ]}
+            />
+            <SelectField
+              label="Domotique"
+              value={characteristicsForm.hasHomeAutomation}
+              onChange={(v) => updateCharacteristicsField('hasHomeAutomation', v)}
+              options={[
+                { value: 'true', label: 'Oui' },
+                { value: 'false', label: 'Non' },
+              ]}
+            />
+            <SelectField
+              label="Piscine"
+              value={characteristicsForm.hasPool}
+              onChange={(v) => updateCharacteristicsField('hasPool', v)}
+              options={[
+                { value: 'true', label: 'Oui' },
+                { value: 'false', label: 'Non' },
               ]}
             />
           </div>
 
-          {/* Section DPE */}
+          {/* DPE */}
           <div className="flex flex-col gap-[16px]">
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               DPE
@@ -1196,29 +1544,47 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
               label="Classe énergétique"
               value={characteristicsForm.dpeEnergyClass}
               onChange={(v) => updateCharacteristicsField('dpeEnergyClass', v)}
-              options={[
-                { value: 'A', label: 'A' },
-                { value: 'B', label: 'B' },
-                { value: 'C', label: 'C' },
-                { value: 'D', label: 'D' },
-                { value: 'E', label: 'E' },
-                { value: 'F', label: 'F' },
-                { value: 'G', label: 'G' },
-              ]}
+              options={Object.entries(DPE_CLASS_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
+            />
+            <InputField
+              label="Énergie (kWh/m²/an)"
+              value={characteristicsForm.dpeEnergyKwh}
+              onChange={(v) => updateCharacteristicsField('dpeEnergyKwh', v)}
+              type="number"
+              placeholder="0"
             />
             <SelectField
               label="Classe GES"
               value={characteristicsForm.dpeGasEmissionClass}
               onChange={(v) => updateCharacteristicsField('dpeGasEmissionClass', v)}
-              options={[
-                { value: 'A', label: 'A' },
-                { value: 'B', label: 'B' },
-                { value: 'C', label: 'C' },
-                { value: 'D', label: 'D' },
-                { value: 'E', label: 'E' },
-                { value: 'F', label: 'F' },
-                { value: 'G', label: 'G' },
-              ]}
+              options={Object.entries(DPE_CLASS_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              }))}
+            />
+            <InputField
+              label="GES (gCO₂/m²/an)"
+              value={characteristicsForm.dpeGasGco2}
+              onChange={(v) => updateCharacteristicsField('dpeGasGco2', v)}
+              type="number"
+              placeholder="0"
+            />
+            <InputField
+              label="Validité DPE (YYYY-MM-DD)"
+              value={characteristicsForm.dpeValidityDate}
+              onChange={(v) => updateCharacteristicsField('dpeValidityDate', v)}
+              type="text"
+              placeholder="2025-12-31"
+            />
+            <InputField
+              label="Conformité (YYYY-MM-DD)"
+              value={characteristicsForm.dpeComplianceDeadline}
+              onChange={(v) => updateCharacteristicsField('dpeComplianceDeadline', v)}
+              type="text"
+              placeholder="2025-12-31"
             />
           </div>
         </div>
