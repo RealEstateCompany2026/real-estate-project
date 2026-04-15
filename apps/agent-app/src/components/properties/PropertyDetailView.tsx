@@ -171,34 +171,35 @@ function mockKpis(): PropertyKpis {
   };
 }
 
-/** Mappe un EventType DB vers une catégorie funnel */
-function eventTypeToCategory(eventType: string | null): 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION' {
+/** Mappe un EventType DB vers une catégorie KPI Bien */
+function eventTypeToBienCategory(eventType: string | null): 'QUALIFICATION' | 'ENTRETIEN' | 'CONVERSION' {
   switch (eventType) {
+    // Qualification = actions de complétude données du bien
     case 'RDV_COMMERCIAL':
-      return 'QUALIFICATION';
-    case 'VISITE':
     case 'TACHE':
+      return 'QUALIFICATION';
+    // Entretien = suivi maintenance, visites, relances, divers
+    case 'VISITE':
+    case 'RELANCE':
     case 'ANNIVERSAIRE':
     case 'AUTRE':
-      return 'ENGAGEMENT';
+      return 'ENTRETIEN';
+    // Conversion = signatures et progression transaction
     case 'SIGNATURE_PROMESSE':
     case 'SIGNATURE_NOTAIRE':
     case 'SIGNATURE_BAIL':
       return 'CONVERSION';
-    case 'RELANCE':
-      return 'REACTIVATION';
     default:
-      return 'ENGAGEMENT';
+      return 'ENTRETIEN';
   }
 }
 
-/** Mappe une catégorie funnel vers un BadgeVariant DS */
+/** Mappe une catégorie KPI Bien vers un BadgeVariant DS */
 function getActivityBadgeVariant(category: string): 'default' | 'success' | 'warning' | 'information' | 'error' | 'disabled' {
   switch (category) {
     case 'QUALIFICATION': return 'success';
-    case 'ENGAGEMENT':    return 'default';
+    case 'ENTRETIEN':     return 'default';
     case 'CONVERSION':    return 'warning';
-    case 'REACTIVATION':  return 'information';
     default:              return 'default';
   }
 }
@@ -316,7 +317,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   // ── Data ──
   const [data, setData] = useState<PropertyDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENTRETIEN' | 'CONVERSION'>('all');
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [isMessageSheetOpen, setIsMessageSheetOpen] = useState(false);
   const [isCharacteristicsSheetOpen, setIsCharacteristicsSheetOpen] = useState(false);
@@ -445,7 +446,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
         time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
         author: ev.User?.[0]?.name ?? 'Système',
-        category: eventTypeToCategory(ev.type),
+        category: eventTypeToBienCategory(ev.type),
         status: ev.status,
         description: ev.description ?? ev.title ?? '',
       }));
@@ -994,12 +995,12 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onClick={() => setActiveFilter('QUALIFICATION')}
               />
               <Chip
-                label="Engagement"
+                label="Entretien"
                 icon={<MessageCirclePlus size={16} />}
-                selected={activeFilter === 'ENGAGEMENT'}
+                selected={activeFilter === 'ENTRETIEN'}
                 size="medium"
                 fontWeight="semibold"
-                onClick={() => setActiveFilter('ENGAGEMENT')}
+                onClick={() => setActiveFilter('ENTRETIEN')}
               />
               <Chip
                 label="Conversion"
