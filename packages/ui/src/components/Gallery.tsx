@@ -27,6 +27,8 @@ export interface GalleryProps {
   images: Array<{ url: string; alt?: string }>;
   /** Callback au clic sur "Galerie" */
   onGalleryClick?: () => void;
+  /** Callback quand l'utilisateur veut ajouter des photos (affiché dans l'empty state) */
+  onAddPhotos?: () => void;
   /** Label du bouton */
   galleryLabel?: string;
   /** Hauteur du strip */
@@ -37,6 +39,7 @@ export interface GalleryProps {
 export function Gallery({
   images,
   onGalleryClick,
+  onAddPhotos,
   galleryLabel = "Galerie",
   height = 277,
   className = "",
@@ -49,15 +52,34 @@ export function Gallery({
   if (images.length === 0) {
     return (
       <div
-        className={`relative w-full rounded-tl-[16px] rounded-bl-[16px] overflow-hidden
-          flex items-center justify-center ${className}`.trim()}
+        className={`relative w-full rounded-[16px] overflow-hidden
+          flex flex-col items-center justify-center gap-[12px] ${className}`.trim()}
         style={{
           height: `${height}px`,
           backgroundColor: "var(--surface-neutral-action)",
-          color: "var(--text-subtle)",
         }}
       >
         <ImageIcon size={40} style={{ color: "var(--text-disabled)" }} />
+        <p
+          className="text-[14px] leading-[20px] font-medium"
+          style={{ color: "var(--text-subtle)" }}
+        >
+          Aucune photo pour ce bien
+        </p>
+        {onAddPhotos && (
+          <button
+            onClick={onAddPhotos}
+            className="mt-[4px] px-[16px] py-[8px] rounded-[12px] border border-solid
+              text-[14px] font-semibold leading-[20px] transition-colors"
+            style={{
+              backgroundColor: "var(--surface-neutral-default)",
+              borderColor: "var(--border-default)",
+              color: "var(--text-neutral-action)",
+            }}
+          >
+            Ajouter des photos
+          </button>
+        )}
       </div>
     );
   }

@@ -795,6 +795,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       <Gallery
         images={photos.slice(0, 3).map(p => ({ url: p.storagePath, alt: p.fileName }))}
         onGalleryClick={() => { /* TODO: Sheet wide galerie complète */ }}
+        onAddPhotos={() => { /* TODO: Sheet upload photos */ }}
       />
 
       {/* ═══════════════════════════════════════════════════════
