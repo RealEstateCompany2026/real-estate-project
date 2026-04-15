@@ -91,9 +91,10 @@ export const Sheet: React.FC<SheetProps> = ({
     <>
       {/* Overlay (Backdrop) */}
       <div
-        className="fixed inset-0 z-40 transition-opacity duration-300 bg-black/40"
+        className="fixed inset-0 z-40 transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
       />
 
       {/* Sheet Container */}
