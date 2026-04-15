@@ -134,6 +134,7 @@ interface BuyerRow {
   firstName: string | null;
   lastName: string | null;
   searchCriteriaSummary: string | null;
+  status: string[] | null;
 }
 
 interface BuyerMatch {
@@ -462,8 +463,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         const property = prop as Property;
         const { data: buyersData } = await supabase
           .from('Client')
-          .select('id, firstName, lastName, searchCriteriaSummary')
-          .contains('status', ['ACQUEREUR'])
+          .select('id, firstName, lastName, searchCriteriaSummary, status')
           .not('searchCriteriaSummary', 'is', null)
           .limit(50);
 
@@ -473,7 +473,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           const propertyType = property.type ? (PROPERTY_TYPE_LABELS[property.type]?.toLowerCase() ?? '') : '';
           const propertyCity = property.addressCity?.toLowerCase() ?? '';
 
-          matchingBuyers = (buyersData as BuyerRow[])
+          // Filtrer d'abord les ACQUEREUR (status est un array)
+          const acquereurs = (buyersData as BuyerRow[]).filter((b) => {
+            const statuses = Array.isArray(b.status) ? b.status : [];
+            return statuses.includes('ACQUEREUR');
+          });
+
+          // Puis matcher par type/ville sur les acquéreurs uniquement
+          matchingBuyers = acquereurs
             .filter((b) => {
               const criteria = (b.searchCriteriaSummary ?? '').toLowerCase();
               // Match si les critères mentionnent le type OU la ville

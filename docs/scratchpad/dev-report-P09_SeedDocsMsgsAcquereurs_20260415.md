@@ -260,6 +260,68 @@ Route (app)
 
 ---
 
+---
+
+## Hotfix — Bug Acquéreurs Appétents Query
+
+**Issue**: `.contains('status', ['ACQUEREUR'])` in PostgREST doesn't work with PostgreSQL enum arrays — silently returns 0 results.
+
+**Root Cause**: PostgREST's `.contains()` filter expects exact matches against array columns. The Client.status column stores enum arrays, but the query syntax was incorrect.
+
+### Changes Made
+
+#### File: `apps/agent-app/src/components/properties/PropertyDetailView.tsx`
+
+1. **Updated BuyerRow interface** (line 132):
+```typescript
+interface BuyerRow {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  searchCriteriaSummary: string | null;
+  status: string[] | null;  // ← ADDED
+}
+```
+
+2. **Fixed fetch query** (line 463-467):
+**Before:**
+```typescript
+.select('id, firstName, lastName, searchCriteriaSummary')
+.contains('status', ['ACQUEREUR'])
+```
+
+**After:**
+```typescript
+.select('id, firstName, lastName, searchCriteriaSummary, status')
+// .contains() REMOVED
+```
+
+3. **Added client-side ACQUEREUR filter** (line 476-480):
+```typescript
+// Filter ACQUEREUR first (status is an array)
+const acquereurs = (buyersData as BuyerRow[]).filter((b) => {
+  const statuses = Array.isArray(b.status) ? b.status : [];
+  return statuses.includes('ACQUEREUR');
+});
+
+// Then match by type/city on buyers only
+matchingBuyers = acquereurs.filter((b) => { ... })
+```
+
+### Strategy
+- **Fetch all buyers** with `status` field included
+- **Filter ACQUEREUR in JavaScript** (safe, predictable)
+- **Then apply city/type matching** on filtered results
+
+### Build Result
+✅ **Build PASSED**
+```
+✓ Compiled successfully in 2.6s
+✓ TypeScript check: PASSED
+```
+
+---
+
 ## Summary
 
 | Volet | Task | Result |
@@ -268,6 +330,7 @@ Route (app)
 | 2 | Seed 495 Messages (5/property × 99) | ✅ PASSED |
 | 3 | Implement Acquéreurs section | ✅ PASSED |
 | 4 | Build verification | ✅ PASSED |
+| **Hotfix** | **Fix ACQUEREUR query bug** | **✅ PASSED** |
 
 ### Checklist
 - ✅ Documents seeded with correct types (DPE, MANDAT_VENTE, ACTE_PROPRIETE, COMPTE_RENDU)
