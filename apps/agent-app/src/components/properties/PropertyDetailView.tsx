@@ -25,6 +25,7 @@ import { Sheet } from '@real-estate/ui/sheet';
 import { InputField } from '@real-estate/ui/input-field';
 import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
+import { ListClient } from '@real-estate/ui/list-client';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -128,6 +129,20 @@ interface ClientRow {
   lastName: string | null;
 }
 
+interface BuyerRow {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  searchCriteriaSummary: string | null;
+}
+
+interface BuyerMatch {
+  id: string;
+  firstName: string;
+  lastName: string;
+  criteria: string;
+}
+
 interface CoOwnershipDetailsRow {
   id: string;
   propertyId: string;
@@ -159,6 +174,7 @@ interface PropertyDetailData {
   allMessages: MessageItem[];
   ownerName: string;
   coOwnership: CoOwnershipDetailsRow | null;
+  matchingBuyers: BuyerMatch[];
 }
 
 // ---------------------------------------------------------------------------
@@ -440,6 +456,42 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         }
       }
 
+      // Fetch acquéreurs appétents — clients ACQUEREUR avec critères de recherche
+      let matchingBuyers: BuyerMatch[] = [];
+      if (prop) {
+        const property = prop as Property;
+        const { data: buyersData } = await supabase
+          .from('Client')
+          .select('id, firstName, lastName, searchCriteriaSummary')
+          .contains('status', ['ACQUEREUR'])
+          .not('searchCriteriaSummary', 'is', null)
+          .limit(50);
+
+        if (buyersData) {
+          // Matching simplifié : filtrer les clients dont les critères mentionnent
+          // le type de bien ou la ville
+          const propertyType = property.type ? (PROPERTY_TYPE_LABELS[property.type]?.toLowerCase() ?? '') : '';
+          const propertyCity = property.addressCity?.toLowerCase() ?? '';
+
+          matchingBuyers = (buyersData as BuyerRow[])
+            .filter((b) => {
+              const criteria = (b.searchCriteriaSummary ?? '').toLowerCase();
+              // Match si les critères mentionnent le type OU la ville
+              return (
+                (propertyType && criteria.includes(propertyType)) ||
+                (propertyCity && criteria.includes(propertyCity))
+              );
+            })
+            .slice(0, 10)  // max 10 acquéreurs affichés
+            .map((b) => ({
+              id: b.id,
+              firstName: b.firstName ?? '',
+              lastName: b.lastName ?? '',
+              criteria: b.searchCriteriaSummary ?? '',
+            }));
+        }
+      }
+
       // Map events to ActivityLog
       const allActivities: ActivityLog[] = (eventsData ?? []).map((ev: EventRow) => ({
         id: ev.id,
@@ -489,6 +541,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         allMessages,
         ownerName,
         coOwnership: coOwnershipData,
+        matchingBuyers,
       });
       setIsLoading(false);
     }
@@ -1156,14 +1209,29 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           </div>
         </section>
 
-        {/* Bloc 9 — Acquéreurs Appétents (stand-by) */}
+        {/* Bloc 9 — Acquéreurs Appétents */}
         <section ref={setSectionRef('acquereurs')} id="acquereurs" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
           <div className="flex items-center gap-[4px] mb-[50px]">
             <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
               Acquéreurs appétents
             </h3>
-            <Badge variant="default">0</Badge>
+            <Badge variant="default">{data.matchingBuyers.length}</Badge>
           </div>
+          {data.matchingBuyers.length > 0 && (
+            <div className="flex flex-col gap-[8px]">
+              {data.matchingBuyers.map((buyer) => (
+                <ListClient
+                  key={buyer.id}
+                  firstName={buyer.firstName}
+                  lastName={buyer.lastName}
+                  badges={[{ label: 'ACQUÉREUR' }]}
+                  kpis={{ qualification: 0, engagement: 0, conversion: 0, reactivation: 0 }}
+                  aiSuggestions={0}
+                  onClick={() => router.push(`/clients/${buyer.id}`)}
+                />
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
