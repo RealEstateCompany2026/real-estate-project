@@ -464,32 +464,27 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         const { data: buyersData } = await supabase
           .from('Client')
           .select('id, firstName, lastName, searchCriteriaSummary, status')
-          .not('searchCriteriaSummary', 'is', null)
-          .limit(50);
+          .limit(200);
 
         if (buyersData) {
-          // Matching simplifié : filtrer les clients dont les critères mentionnent
-          // le type de bien ou la ville
           const propertyType = property.type ? (PROPERTY_TYPE_LABELS[property.type]?.toLowerCase() ?? '') : '';
           const propertyCity = property.addressCity?.toLowerCase() ?? '';
 
-          // Filtrer d'abord les ACQUEREUR (status est un array)
-          const acquereurs = (buyersData as BuyerRow[]).filter((b) => {
-            const statuses = Array.isArray(b.status) ? b.status : [];
-            return statuses.includes('ACQUEREUR');
-          });
-
-          // Puis matcher par type/ville sur les acquéreurs uniquement
-          matchingBuyers = acquereurs
+          matchingBuyers = (buyersData as BuyerRow[])
             .filter((b) => {
-              const criteria = (b.searchCriteriaSummary ?? '').toLowerCase();
-              // Match si les critères mentionnent le type OU la ville
+              // 1. Doit être ACQUEREUR
+              const statuses = Array.isArray(b.status) ? b.status : [];
+              if (!statuses.includes('ACQUEREUR')) return false;
+              // 2. Doit avoir des critères de recherche
+              if (!b.searchCriteriaSummary) return false;
+              // 3. Les critères doivent mentionner le type OU la ville du bien
+              const criteria = b.searchCriteriaSummary.toLowerCase();
               return (
                 (propertyType && criteria.includes(propertyType)) ||
                 (propertyCity && criteria.includes(propertyCity))
               );
             })
-            .slice(0, 10)  // max 10 acquéreurs affichés
+            .slice(0, 10)
             .map((b) => ({
               id: b.id,
               firstName: b.firstName ?? '',
