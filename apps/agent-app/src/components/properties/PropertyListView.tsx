@@ -147,6 +147,32 @@ export function PropertyListView() {
         )
         .order('createdAt', { ascending: false });
 
+      // Fetch cover photos for each property
+      const propertyIds = (data ?? []).map((p: any) => p.id);
+      const { data: coverPhotos } = await supabase
+        .from('PropertyMedia')
+        .select('propertyId, storagePath')
+        .in('propertyId', propertyIds)
+        .eq('mediaType', 'photo')
+        .eq('isCover', true);
+
+      // Fallback : si pas de isCover, prendre sortOrder = 1
+      const { data: firstPhotos } = await supabase
+        .from('PropertyMedia')
+        .select('propertyId, storagePath')
+        .in('propertyId', propertyIds)
+        .eq('mediaType', 'photo')
+        .eq('sortOrder', 1);
+
+      // Construire un map propertyId → imageUrl (cover en priorité, sinon première photo)
+      const coverMap = new Map<string, string>();
+      (firstPhotos ?? []).forEach((p: any) => {
+        if (!coverMap.has(p.propertyId)) coverMap.set(p.propertyId, p.storagePath);
+      });
+      (coverPhotos ?? []).forEach((p: any) => {
+        coverMap.set(p.propertyId, p.storagePath); // écrase avec la cover si disponible
+      });
+
       const enriched: PropertyWithKpis[] = ((data ?? []) as unknown as PropertyRow[]).map((p) => {
         const operationType = p.operationTypes?.[0] ?? 'VENTE';
         const displayItem: PropertyDisplayItem = {
@@ -159,6 +185,7 @@ export function PropertyListView() {
           price: formatPrice(p.desiredSellingPrice ?? p.estimatedMarketValue),
           hasCarnet: p.hasMaintenanceLog ?? false,
           status: p.status,
+          imageUrl: coverMap.get(p.id),
         };
 
         return {

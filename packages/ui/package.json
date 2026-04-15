@@ -29,6 +29,7 @@
         "./toast": "./src/components/Toast.tsx",
         "./snackbar": "./src/components/Snackbar.tsx",
         "./divider": "./src/components/Divider.tsx",
+        "./diaporama": "./src/components/Diaporama.tsx",
         "./horizontal-divider": "./src/components/HorizontalDivider.tsx",
         "./nav-rail": "./src/components/NavRail.tsx",
         "./nav-button": "./src/components/NavButton.tsx",

@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, Download, Send, X } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheBien } from '@real-estate/ui/app-bar-fiche-bien';
 import { Gallery } from '@real-estate/ui/gallery';
+import { Diaporama } from '@real-estate/ui/diaporama';
 import { AppBarAnnonce } from '@real-estate/ui/app-bar-annonce';
 import { AppBarBienAncres } from '@real-estate/ui/app-bar-bien-ancres';
 import { GraphCourbe } from '@real-estate/ui/graph-courbe';
@@ -385,6 +386,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [gallerySheetOpen, setGallerySheetOpen] = useState(false);
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -794,7 +796,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           ═══════════════════════════════════════════════════════ */}
       <Gallery
         images={photos.slice(0, 3).map(p => ({ url: p.storagePath, alt: p.fileName }))}
-        onGalleryClick={() => { /* TODO: Sheet wide galerie complète */ }}
+        onGalleryClick={() => setGallerySheetOpen(true)}
         onAddPhotos={() => { /* TODO: Sheet upload photos */ }}
       />
 
@@ -811,6 +813,69 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           ? `${formatPrice(Math.round((property.desiredSellingPrice ?? property.estimatedMarketValue ?? 0) / property.livingAreaSqm))} /m²`
           : '—'}
       />
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet Galerie Wide
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={gallerySheetOpen}
+        onClose={() => setGallerySheetOpen(false)}
+        width="wide"
+        customHeader={
+          <div className="flex items-center justify-between px-[40px] pt-[51px] pb-[20px]">
+            <div className="flex items-center gap-[16px]">
+              <h4
+                className="text-[28px] font-bold leading-[34px] tracking-[0.28px]"
+                style={{ color: 'var(--text-headings)' }}
+              >
+                Galerie ({photos.length})
+              </h4>
+              <button
+                className="flex items-center gap-[6px] text-[14px] font-semibold leading-[20px]"
+                style={{ color: 'var(--text-neutral-action)' }}
+                onClick={() => { /* TODO: import photo */ }}
+              >
+                Importer une photo
+                <Download size={16} />
+              </button>
+            </div>
+            <button
+              onClick={() => setGallerySheetOpen(false)}
+              className="p-[12px] rounded-[16px]"
+              style={{ color: 'var(--text-caption)' }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        }
+        footer={
+          <div className="sticky bottom-0 flex justify-end px-[40px] py-[16px]"
+            style={{ backgroundColor: 'var(--surface-neutral-default)' }}
+          >
+            <button
+              className="flex items-center gap-[8px] px-[16px] py-[10px] rounded-[12px] border border-solid
+                text-[14px] font-semibold leading-[20px]"
+              style={{
+                borderColor: 'var(--border-default)',
+                color: 'var(--text-neutral-action)',
+                backgroundColor: 'var(--surface-neutral-default)',
+              }}
+              onClick={() => { /* TODO: partager galerie */ }}
+            >
+              Partager la galerie
+              <Send size={16} />
+            </button>
+          </div>
+        }
+      >
+        <div className="px-[40px] py-[20px]">
+          <Diaporama
+            images={photos.map(p => ({ id: p.id, url: p.storagePath, alt: p.fileName }))}
+            onDelete={(image, index) => { /* TODO: supprimer photo */ }}
+            mainImageMaxHeight={500}
+          />
+        </div>
+      </Sheet>
 
       {/* ═══════════════════════════════════════════════════════
           Sections (Blocs 2-9)
