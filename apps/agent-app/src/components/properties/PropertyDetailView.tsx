@@ -823,22 +823,12 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         width="wide"
         customHeader={
           <div className="flex items-center justify-between px-[40px] pt-[51px] pb-[20px]">
-            <div className="flex items-center gap-[16px]">
-              <h4
-                className="text-[28px] font-bold leading-[34px] tracking-[0.28px]"
-                style={{ color: 'var(--text-headings)' }}
-              >
-                Galerie ({photos.length})
-              </h4>
-              <button
-                className="flex items-center gap-[6px] text-[14px] font-semibold leading-[20px]"
-                style={{ color: 'var(--text-neutral-action)' }}
-                onClick={() => { /* TODO: import photo */ }}
-              >
-                Importer une photo
-                <Download size={16} />
-              </button>
-            </div>
+            <h4
+              className="text-[28px] font-bold leading-[34px] tracking-[0.28px]"
+              style={{ color: 'var(--text-headings)' }}
+            >
+              Galerie ({photos.length})
+            </h4>
             <button
               onClick={() => setGallerySheetOpen(false)}
               className="p-[12px] rounded-[16px]"
@@ -849,22 +839,23 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           </div>
         }
         footer={
-          <div className="sticky bottom-0 flex justify-end px-[40px] py-[16px]"
+          <div className="sticky bottom-0 flex justify-end gap-[12px] px-[40px] pb-[100px] pt-[16px]"
             style={{ backgroundColor: 'var(--surface-neutral-default)' }}
           >
-            <button
-              className="flex items-center gap-[8px] px-[16px] py-[10px] rounded-[12px] border border-solid
-                text-[14px] font-semibold leading-[20px]"
-              style={{
-                borderColor: 'var(--border-default)',
-                color: 'var(--text-neutral-action)',
-                backgroundColor: 'var(--surface-neutral-default)',
-              }}
+            <Button
+              variant="outline"
+              onClick={() => { /* TODO: import photo */ }}
+            >
+              Importer une photo
+              <Download size={16} />
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => { /* TODO: partager galerie */ }}
             >
               Partager la galerie
               <Send size={16} />
-            </button>
+            </Button>
           </div>
         }
       >
