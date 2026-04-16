@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { IconButtonMega } from "../components/IconButtonMega";
-import { Home, Settings, Search } from "lucide-react";
+import { Home, Settings, Search, Star } from "lucide-react";
 
 const meta: Meta<typeof IconButtonMega> = {
   title: "Design System/Atoms/IconButtonMega",
@@ -9,6 +9,14 @@ const meta: Meta<typeof IconButtonMega> = {
 };
 export default meta;
 type Story = StoryObj<typeof IconButtonMega>;
+
+export const Default: Story = {
+  args: {
+    icon: <Settings size={24} />,
+    variant: "default",
+    onClick: () => console.log("Default button clicked"),
+  },
+};
 
 export const Primary: Story = {
   args: {
@@ -18,11 +26,11 @@ export const Primary: Story = {
   },
 };
 
-export const Secondary: Story = {
+export const Outline: Story = {
   args: {
-    icon: <Settings size={24} />,
-    variant: "secondary",
-    onClick: () => console.log("Secondary button clicked"),
+    icon: <Star size={24} />,
+    variant: "outline",
+    onClick: () => console.log("Outline button clicked"),
   },
 };
 
@@ -37,15 +45,7 @@ export const Ghost: Story = {
 export const Disabled: Story = {
   args: {
     icon: <Home size={24} />,
+    variant: "primary",
     disabled: true,
-  },
-};
-
-export const Outlined: Story = {
-  args: {
-    icon: <Home size={24} />,
-    variant: "secondary",
-    outlined: true,
-    onClick: () => console.log("Outlined button clicked"),
   },
 };

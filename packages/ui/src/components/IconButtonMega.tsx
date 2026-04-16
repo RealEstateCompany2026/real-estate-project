@@ -1,119 +1,65 @@
 "use client";
 
 import { ReactNode } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "../lib/utils";
 
 /**
- * IconButtonMega - Large icon-only button (70×70px)
+ * IconButtonMega - Large icon-only button (70x70px)
+ *
+ * Tokens aligned with Button DS (same variant names & semantic tokens).
+ * Only the dimensions / border-radius are specific to Mega.
  *
  * Structure:
- * - Size: 70×70px (fixed)
+ * - Size: 70x70px (fixed)
  * - Padding: 23px
  * - Border-radius: 28px
- * - Icon: 24×24px
- * - Focus Ring: 2px border at -4px offset (visible on :focus-visible)
+ * - Icon: 24x24px
  */
 
-export type IconButtonMegaVariant = "primary" | "secondary" | "ghost" | "disabled";
+const iconButtonMegaVariants = cva(
+  "inline-flex items-center justify-center rounded-[28px] w-[70px] h-[70px] p-[23px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ring-offset-surface-page disabled:pointer-events-none disabled:bg-surface-disabled disabled:text-content-disabled disabled:border-edge-disabled",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-surface-neutral-default text-content-body border border-edge-neutral-default hover:bg-surface-neutral-action-hover",
+        primary:
+          "bg-surface-branded-action text-content-branded-on-action border border-edge-branded-action hover:bg-surface-branded-action-hover",
+        outline:
+          "border border-edge-neutral-default bg-surface-neutral-default hover:bg-surface-neutral-default text-content-body hover:border-edge-neutral-action",
+        ghost:
+          "text-content-body hover:bg-surface-neutral-action",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
 
-export interface IconButtonMegaProps {
+export type IconButtonMegaVariant = "default" | "primary" | "outline" | "ghost";
+
+export interface IconButtonMegaProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children">,
+    VariantProps<typeof iconButtonMegaVariants> {
   icon: ReactNode;
-  variant?: IconButtonMegaVariant;
-  outlined?: boolean;
-  onClick?: () => void;
-  disabled?: boolean;
-  className?: string;
-  title?: string;
 }
 
 export function IconButtonMega({
   icon,
-  variant = "secondary",
-  outlined = false,
-  onClick,
-  disabled = false,
-  className = "",
-  title,
+  variant = "default",
+  className,
+  ...props
 }: IconButtonMegaProps) {
-  const finalVariant = disabled ? "disabled" : variant;
-
-  const getVariantStyles = () => {
-    switch (finalVariant) {
-      case "primary":
-        return {
-          background: "bg-[var(--surface-branded-default)]",
-          color: "text-white",
-          border: "border-[var(--surface-branded-default)]",
-          hoverBg: "hover:bg-[var(--surface-branded-action-hover)]",
-        };
-      case "secondary":
-        return {
-          background: "bg-surface-neutral-default",
-          color: "text-content-body",
-          border: outlined
-            ? "border-edge-neutral-default"
-            : "border-transparent",
-          hoverBg: "hover:bg-surface-neutral-action-hover",
-        };
-      case "ghost":
-        return {
-          background: "bg-transparent",
-          color: "text-content-body",
-          border: "border-transparent",
-          hoverBg: "hover:bg-surface-neutral-action-hover",
-        };
-      case "disabled":
-        return {
-          background: "bg-surface-neutral-action",
-          color: "text-content-subtle",
-          border: outlined
-            ? "border-edge-subtle"
-            : "border-transparent",
-          hoverBg: "hover:opacity-50",
-        };
-      default:
-        return {
-          background: "bg-surface-neutral-default",
-          color: "text-content-body",
-          border: "border-transparent",
-          hoverBg: "hover:bg-surface-neutral-action-hover",
-        };
-    }
-  };
-
-  const styles = getVariantStyles();
-
   return (
     <button
-      onClick={disabled ? undefined : onClick}
-      disabled={disabled}
-      title={title}
-      className={`
-        icon-button-mega-component
-        relative rounded-[28px] transition-all inline-flex
-        w-[70px] h-[70px] p-[23px]
-        border border-solid
-        ${styles.background}
-        ${styles.color}
-        ${styles.border}
-        ${disabled ? "cursor-not-allowed opacity-50" : `cursor-pointer ${styles.hoverBg} active:scale-[0.98]`}
-        ${className}
-      `.trim()}
+      className={cn(iconButtonMegaVariants({ variant }), className)}
+      {...props}
     >
-      {/* Content */}
-      <div className="flex flex-row items-center justify-center size-full relative">
-        <div className="relative shrink-0 w-[24px] h-[24px]">{icon}</div>
+      <div className="flex items-center justify-center size-full">
+        <div className="shrink-0 w-[24px] h-[24px]">{icon}</div>
       </div>
-
-      {/* Focus Ring */}
-      {!disabled && (
-        <div className="absolute inset-[-4px] rounded-[28px] pointer-events-none opacity-0 transition-opacity focus-visible:opacity-100">
-          <div
-            aria-hidden="true"
-            className="absolute border-2 border-solid inset-0 pointer-events-none rounded-[28px]"
-            style={{ borderColor: "var(--border-branded-default)" }}
-          />
-        </div>
-      )}
     </button>
   );
 }
