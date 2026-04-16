@@ -42,25 +42,22 @@ export function SendingIconButton({
     switch (status) {
       case "sent":
         return {
-          background: "bg-[var(--green-500)]",
-          borderColor: "var(--green-500)",
+          background: "bg-green-500",
+          border: "border-edge-success-default",
           icon: <Check className="w-[20px] h-[20px]" />,
-          iconColor: "var(--text-branded-on-action)",
         };
       case "sending":
         return {
-          background: "bg-[var(--surface-branded-action-hover)]",
-          borderColor: "var(--surface-branded-action-hover)",
+          background: "bg-surface-branded-action-hover",
+          border: "border-edge-branded-action",
           icon: <Send className="w-[20px] h-[20px]" />,
-          iconColor: "var(--text-branded-on-action)",
         };
       case "idle":
       default:
         return {
-          background: "bg-[var(--surface-branded-default)]",
-          borderColor: "var(--surface-branded-default)",
+          background: "bg-surface-branded-action",
+          border: "border-edge-branded-action",
           icon: <Send className="w-[20px] h-[20px]" />,
-          iconColor: "var(--text-branded-on-action)",
         };
     }
   };
@@ -74,20 +71,19 @@ export function SendingIconButton({
       title={title || (isSent ? "Envoyé" : isSending ? "Envoi en cours..." : "Envoyer")}
       className={`
         sending-icon-button-component
-        relative rounded-[16px] transition-all inline-flex
+        relative rounded-[16px] transition-colors inline-flex
         w-[46px] h-[46px] p-[12px]
         border border-solid
         ${styles.background}
-        ${isDisabled ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:opacity-90 active:scale-[0.98]"}
+        ${styles.border}
+        cursor-pointer hover:bg-surface-branded-action-hover
+        disabled:pointer-events-none disabled:bg-surface-disabled disabled:text-content-disabled disabled:border-edge-disabled
         ${className}
       `.trim()}
-      style={{
-        borderColor: styles.borderColor,
-      }}
     >
       {/* Content */}
       <div className="flex flex-row items-center justify-center size-full">
-        <div className="relative shrink-0 w-[20px] h-[20px] transition-all text-white">
+        <div className="relative shrink-0 w-[20px] h-[20px] transition-colors text-content-branded-on-action">
           {styles.icon}
         </div>
       </div>
