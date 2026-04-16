@@ -70,6 +70,7 @@
         "./message-sent": "./src/components/MessageSent.tsx",
         "./image-bien": "./src/components/ImageBien.tsx",
         "./icon-dpe": "./src/components/IconDpe.tsx",
+        "./icon-ges": "./src/components/IconGes.tsx",
         "./list-bien": "./src/components/ListBien.tsx",
         "./app-bar-fiche-bien": "./src/components/AppBarFicheBien.tsx",
         "./app-bar-bien-ancres": "./src/components/AppBarBienAncres.tsx",
