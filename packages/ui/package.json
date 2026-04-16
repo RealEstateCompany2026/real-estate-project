@@ -22,6 +22,7 @@
         "./chip": "./src/components/Chip.tsx",
         "./stepper": "./src/components/Stepper.tsx",
         "./switch": "./src/components/Switch.tsx",
+        "./switch-theme": "./src/components/SwitchTheme.tsx",
         "./checkbox": "./src/components/Checkbox.tsx",
         "./select-field": "./src/components/SelectField.tsx",
         "./spinner": "./src/components/Spinner.tsx",

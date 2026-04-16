@@ -15,6 +15,7 @@ import { NavButton } from "./NavButton";
 import { NavDivider } from "./NavDivider";
 import { NavAvatar } from "./NavAvatar";
 import { NavLogo } from "./NavLogo";
+import { SwitchTheme } from "./SwitchTheme";
 
 /**
  * NavRail - Navigation principale verticale
@@ -80,6 +81,14 @@ export interface NavRailProps {
    * Classe CSS supplémentaire
    */
   className?: string;
+  /**
+   * Mode sombre actif
+   */
+  isDark?: boolean;
+  /**
+   * Callback toggle theme
+   */
+  onThemeToggle?: () => void;  // Aligned with SwitchTheme.onChange: () => void
 }
 
 // Définition des sections de navigation
@@ -112,6 +121,8 @@ export function NavRail({
   onLogoClick,
   avatarSelected = false,
   className = "",
+  isDark = false,
+  onThemeToggle,
 }: NavRailProps) {
   return (
     <div
@@ -152,8 +163,13 @@ export function NavRail({
         ))}
       </div>
 
-      {/* Avatar utilisateur en bas */}
-      <NavAvatar src={avatarSrc} alt={avatarAlt} selected={avatarSelected} onClick={onAvatarClick} />
+      {/* Theme toggle + Avatar en bas */}
+      <div className="flex flex-col items-center gap-[16px]">
+        {onThemeToggle && (
+          <SwitchTheme isDark={isDark} onChange={onThemeToggle} />
+        )}
+        <NavAvatar src={avatarSrc} alt={avatarAlt} selected={avatarSelected} onClick={onAvatarClick} />
+      </div>
     </div>
   );
 }

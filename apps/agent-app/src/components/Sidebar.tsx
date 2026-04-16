@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { NavRail, type NavSection } from '@real-estate/ui/nav-rail';
+import { useTheme } from '@/components/ThemeProvider';
 
 /**
  * Sidebar — Refactored to use NavRail DS component.
@@ -10,6 +11,7 @@ import { NavRail, type NavSection } from '@real-estate/ui/nav-rail';
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   function mapPathToSection(path: string): NavSection | undefined {
     if (path === '/dashboard' || path === '/') return 'dashboard';
@@ -24,7 +26,9 @@ export function Sidebar() {
 
   return (
     <NavRail
-      activeSection={activeSection as NavSection}
+      activeSection={activeSection}
+      isDark={theme === 'dark'}
+      onThemeToggle={toggleTheme}
       onNavigate={(section) => {
         const routeMap: Record<NavSection, string> = {
           dashboard: '/dashboard',
