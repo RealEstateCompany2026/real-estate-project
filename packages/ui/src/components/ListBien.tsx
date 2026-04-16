@@ -5,7 +5,7 @@ import { Tag, MapPin, Home, Maximize2 } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
 import { KpiIndicator } from "./KpiIndicator";
 import { AiSuggestion } from "./AiSuggestion";
-import { DpeBadge, DpeGrade } from "./DpeBadge";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
  * ListBien - Ligne de liste bien immobilier
@@ -44,7 +44,7 @@ export interface ListBienProps {
   /** Surface (ex: "120m²") */
   surface: string;
   /** Note DPE (A-G) */
-  dpeGrade?: DpeGrade;
+  dpeGrade?: DpeType;
   /** KPI pourcentages (0-100) */
   kpis: ListBienKpi;
   /** Nombre de suggestions IA */
@@ -149,7 +149,7 @@ export function ListBien({
             >
               {surface}
             </IconText>
-            {dpeGrade && <DpeBadge grade={dpeGrade} />}
+            {dpeGrade && <IconDpe type={dpeGrade} />}
           </div>
         </div>
       </div>

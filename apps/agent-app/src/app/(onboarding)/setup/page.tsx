@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import { Switch } from '@real-estate/ui/switch'
 import { FileUpload } from '@real-estate/ui/file-upload'
 import { Stepper } from '@real-estate/ui/stepper'
@@ -193,30 +193,30 @@ export default function OnboardingSetupPage() {
         </p>
         <div className="mt-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <TextField
+            <TextFieldOutlined
               placeholder="Prénom"
               value={profileData.firstName}
               onChange={(value) => setProfileData({ ...profileData, firstName: value })}
             />
-            <TextField
+            <TextFieldOutlined
               placeholder="Nom"
               value={profileData.lastName}
               onChange={(value) => setProfileData({ ...profileData, lastName: value })}
             />
           </div>
-          <TextField
+          <TextFieldOutlined
             type="email"
             placeholder="Email professionnel"
             value={profileData.email}
             onChange={(value) => setProfileData({ ...profileData, email: value })}
           />
-          <TextField
+          <TextFieldOutlined
             type="tel"
             placeholder="+33 6 00 00 00 00"
             value={profileData.mobilePhone}
             onChange={(value) => setProfileData({ ...profileData, mobilePhone: value })}
           />
-          <TextField
+          <TextFieldOutlined
             placeholder="CPI XXXX XXXX XXXX"
             value={profileData.rsacNumber}
             onChange={(value) => setProfileData({ ...profileData, rsacNumber: value })}
@@ -239,31 +239,31 @@ export default function OnboardingSetupPage() {
           Renseignez les coordonnées de votre agence.
         </p>
         <div className="mt-6 space-y-4">
-          <TextField
+          <TextFieldOutlined
             placeholder="Nom de l'agence"
             value={orgData.name}
             onChange={(value) => setOrgData({ ...orgData, name: value })}
           />
           <div className="grid grid-cols-2 gap-4">
-            <TextField
+            <TextFieldOutlined
               type="email"
               placeholder="Email agence"
               value={orgData.email}
               onChange={(value) => setOrgData({ ...orgData, email: value })}
             />
-            <TextField
+            <TextFieldOutlined
               type="tel"
               placeholder="Téléphone"
               value={orgData.phone}
               onChange={(value) => setOrgData({ ...orgData, phone: value })}
             />
           </div>
-          <TextField
+          <TextFieldOutlined
             placeholder="Adresse"
             value={orgData.address}
             onChange={(value) => setOrgData({ ...orgData, address: value })}
           />
-          <TextField
+          <TextFieldOutlined
             placeholder="14 chiffres"
             value={orgData.siret}
             onChange={(value) => setOrgData({ ...orgData, siret: value.replace(/\D/g, '').slice(0, 14) })}

@@ -20,7 +20,7 @@ import { ListCarnet } from '@real-estate/ui/list-carnet';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
 import { Sheet } from '@real-estate/ui/sheet';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
 
@@ -1115,12 +1115,12 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 { value: 'AUTRE', label: 'Autre' },
               ]}
             />
-            <InputField label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
-            <InputField label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
-            <InputField label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" />
-            <InputField label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
-            <InputField label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
-            <InputField label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" />
+            <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
+            <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
+            <InputFieldOutlined label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" />
+            <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
+            <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
+            <InputFieldOutlined label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" />
           </div>
 
           {/* Section Contact */}
@@ -1128,10 +1128,10 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               Informations de contact
             </p>
-            <InputField label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" />
-            <InputField label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
-            <InputField label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
-            <InputField label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+            <InputFieldOutlined label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" />
+            <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
+            <InputFieldOutlined label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+            <InputFieldOutlined label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
             <SelectField
               label="Canal préféré"
               value={profileForm.preferredChannel}
@@ -1150,9 +1150,9 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               Informations professionnelles
             </p>
-            <InputField label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
-            <InputField label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
-            <InputField label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
+            <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
+            <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
+            <InputFieldOutlined label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
           </div>
         </div>
       </Sheet>

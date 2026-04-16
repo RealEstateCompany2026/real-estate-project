@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { propertyCreateSchema, type PropertyCreateData } from '@/lib/validations/property';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@real-estate/ui/button';
-import { Divider } from '@real-estate/ui/divider';
+import { HorizontalDivider } from '@real-estate/ui/horizontal-divider';
 import { useToast } from '@/components/ui/Toast';
 import { ClientFormStepper } from '@/components/clients/ClientFormStepper';
 
@@ -144,7 +144,7 @@ export function PropertyFormWizard() {
           {currentStep === 5 && <StepPropertyReview />}
         </div>
 
-        <Divider className="my-8" />
+        <HorizontalDivider className="my-8" />
         <div className="flex items-center justify-between">
           <Button
             variant="secondary"

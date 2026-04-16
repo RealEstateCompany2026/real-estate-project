@@ -4,7 +4,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
 import { CLIENT_SOURCE_LABELS } from '@/types/client';
 import type { ClientSource } from '@/types/client';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { TagsInput } from '@/components/ui/TagsInput';
 
 const SOURCE_OPTIONS: { value: ClientSource; label: string }[] = [

@@ -5,7 +5,7 @@ import { Tag, MapPin, Home, Maximize2 } from "lucide-react";
 import { Badge } from "./Badge";
 import { KpiIndicator } from "./KpiIndicator";
 import { AiSuggestion } from "./AiSuggestion";
-import { DpeBadge, DpeGrade } from "./DpeBadge";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
  * CardBien - Carte bien immobilier
@@ -43,7 +43,7 @@ export interface CardBienProps {
   /** Surface (ex: "120m²") */
   surface: string;
   /** Note DPE (A-G) */
-  dpeGrade?: DpeGrade;
+  dpeGrade?: DpeType;
   /** KPI pourcentages (0-100) */
   kpis: CardBienKpi;
   /** Nombre de suggestions IA */
@@ -150,7 +150,7 @@ export function CardBien({
           >
             {surface}
           </IconText>
-          {dpeGrade && <DpeBadge grade={dpeGrade} />}
+          {dpeGrade && <IconDpe type={dpeGrade} />}
         </div>
       </div>
 

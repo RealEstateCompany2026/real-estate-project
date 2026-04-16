@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { clientCreateSchema, type ClientCreateData } from '@/lib/validations/client';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@real-estate/ui/button';
-import { Divider } from '@real-estate/ui/divider';
+import { HorizontalDivider } from '@real-estate/ui/horizontal-divider';
 import { useToast } from '@/components/ui/Toast';
 
 import { StepIdentity } from './steps/StepIdentity';
@@ -134,7 +134,7 @@ export function ClientFormWizard() {
         </div>
 
         {/* Navigation */}
-        <Divider className="my-8" />
+        <HorizontalDivider className="my-8" />
         <div className="flex items-center justify-between">
           <Button
             variant="secondary"

@@ -4,7 +4,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
 import { CLIENT_STATUS_LABELS } from '@/types/client';
 import type { ClientGender, ClientStatus } from '@/types/client';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { Chip } from '@real-estate/ui/chip';
 
 const GENDER_OPTIONS: { value: ClientGender; label: string }[] = [
@@ -71,7 +71,7 @@ export function StepIdentity() {
             name="firstName"
             control={control}
             render={({ field }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Prénom"
                 id="firstName"
                 type="text"
@@ -89,7 +89,7 @@ export function StepIdentity() {
             name="lastName"
             control={control}
             render={({ field }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Nom"
                 id="lastName"
                 type="text"

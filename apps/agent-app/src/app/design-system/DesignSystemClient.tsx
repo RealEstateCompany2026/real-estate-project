@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@real-estate/ui/button'
 import { Badge } from '@real-estate/ui/badge'
-import { Input } from '@real-estate/ui/input'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import {
   Sun, Moon, Check, X, Plus, Search, ChevronDown, TrendingUp,
   Home, Users, MapPin, Briefcase, FileText, Zap, Database, Calendar,
@@ -494,7 +494,7 @@ function InputPreview() {
       {/* UI library */}
       <div className="pt-3 border-t border-[#ecedee]">
         <p className="text-xs font-bold text-[#a1a4aa] uppercase tracking-widest mb-2">@real-estate/ui ‹Input›</p>
-        <Input placeholder="Placeholder..." />
+        <TextFieldOutlined placeholder="Placeholder..." />
       </div>
     </div>
   )

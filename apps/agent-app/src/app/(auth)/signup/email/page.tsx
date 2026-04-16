@@ -8,7 +8,7 @@ import { LogoBadge } from '@/components/auth'
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator'
 import { signupSchema } from '@/lib/validations/auth'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function SignupEmailPage() {
@@ -58,7 +58,7 @@ export default function SignupEmailPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="w-full mt-8 space-y-5">
-        <TextField
+        <TextFieldOutlined
           type="email"
           value={email}
           onChange={setEmail}
@@ -67,7 +67,7 @@ export default function SignupEmailPage() {
           autoComplete="email"
         />
 
-        <TextField
+        <TextFieldOutlined
           type="password"
           value={password}
           onChange={setPassword}
@@ -75,7 +75,7 @@ export default function SignupEmailPage() {
           autoComplete="new-password"
         />
 
-        <TextField
+        <TextFieldOutlined
           type="password"
           value={confirmPassword}
           onChange={setConfirmPassword}

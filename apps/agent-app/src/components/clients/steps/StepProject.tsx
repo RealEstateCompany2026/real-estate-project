@@ -2,7 +2,7 @@
 
 import { useFormContext } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 
 /**
  * Étape 3 — Résumé du projet (CLI-05).

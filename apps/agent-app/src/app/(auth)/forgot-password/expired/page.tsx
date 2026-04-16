@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoBadge, InfoCard } from '@/components/auth'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 
 export default function LinkExpiredPage() {
   const [email, setEmail] = useState('')
@@ -40,7 +40,7 @@ export default function LinkExpiredPage() {
 
         {!sent ? (
           <>
-            <TextField
+            <TextFieldOutlined
               type="email"
               value={email}
               onChange={setEmail}

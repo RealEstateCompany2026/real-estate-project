@@ -2,7 +2,7 @@
 
 import { useFormContext, Controller } from 'react-hook-form';
 import type { ClientCreateData } from '@/lib/validations/client';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { useDuplicateCheck } from '@/hooks/useDuplicateCheck';
 import { DuplicateAlert } from '@/components/ui/DuplicateAlert';
@@ -45,7 +45,7 @@ export function StepContact() {
         control={control}
         render={({ field }) => (
           <>
-            <InputField
+            <InputFieldOutlined
               label="Email"
               id="primaryEmail"
               type="email"
@@ -66,7 +66,7 @@ export function StepContact() {
         control={control}
         render={({ field }) => (
           <>
-            <InputField
+            <InputFieldOutlined
               label="Email secondaire"
               id="secondaryEmail"
               type="email"
@@ -85,7 +85,7 @@ export function StepContact() {
         control={control}
         render={({ field }) => (
           <>
-            <InputField
+            <InputFieldOutlined
               label="Téléphone mobile"
               id="mobilePhone"
               type="tel"

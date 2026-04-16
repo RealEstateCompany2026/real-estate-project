@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoBadge } from '@/components/auth'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function ForgotPasswordPage() {
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="w-full mt-8 space-y-6">
-        <TextField
+        <TextFieldOutlined
           type="email"
           value={email}
           onChange={setEmail}

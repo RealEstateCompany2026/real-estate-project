@@ -7,7 +7,7 @@ import { LogoBadge, InfoCard } from '@/components/auth'
 import { useCountdown } from '@/hooks/useCountdown'
 import { Suspense } from 'react'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 
 function ConfirmationContent() {
   const searchParams = useSearchParams()
@@ -34,7 +34,7 @@ function ConfirmationContent() {
       </p>
 
       <div className="w-full mt-8 space-y-6">
-        <TextField
+        <TextFieldOutlined
           type="email"
           value={email}
           disabled

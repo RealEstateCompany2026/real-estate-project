@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoBadge } from '@/components/auth'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function LoginPage() {
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
         {/* Email/password form */}
         <form onSubmit={handleEmailLogin} className="space-y-5">
-          <TextField
+          <TextFieldOutlined
             type="email"
             value={email}
             onChange={setEmail}
@@ -104,7 +104,7 @@ export default function LoginPage() {
             autoComplete="email"
           />
 
-          <TextField
+          <TextFieldOutlined
             type="password"
             value={password}
             onChange={setPassword}

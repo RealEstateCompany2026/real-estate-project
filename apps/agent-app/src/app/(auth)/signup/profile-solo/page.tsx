@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { StepperDots } from '@/components/auth'
 import { profileSoloSchema } from '@/lib/validations/auth'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function ProfileSoloPage() {
@@ -87,13 +87,13 @@ export default function ProfileSoloPage() {
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div className="grid grid-cols-2 gap-4">
-          <TextField
+          <TextFieldOutlined
             type="text"
             value={firstName}
             onChange={setFirstName}
             required
           />
-          <TextField
+          <TextFieldOutlined
             type="text"
             value={lastName}
             onChange={setLastName}
@@ -101,7 +101,7 @@ export default function ProfileSoloPage() {
           />
         </div>
 
-        <TextField
+        <TextFieldOutlined
           type="tel"
           value={mobilePhone}
           onChange={setMobilePhone}
@@ -110,7 +110,7 @@ export default function ProfileSoloPage() {
         />
 
         <div>
-          <TextField
+          <TextFieldOutlined
             type="text"
             value={rsacNumber}
             onChange={setRsacNumber}

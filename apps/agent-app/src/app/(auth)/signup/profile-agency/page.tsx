@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { StepperDots } from '@/components/auth'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 import { InlineMessage } from '@real-estate/ui/inline-message'
 
 export default function ProfileAgencyPage() {
@@ -112,20 +112,20 @@ export default function ProfileAgencyPage() {
           </h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <TextField
+              <TextFieldOutlined
                 type="text"
                 value={firstName}
                 onChange={setFirstName}
                 required
               />
-              <TextField
+              <TextFieldOutlined
                 type="text"
                 value={lastName}
                 onChange={setLastName}
                 required
               />
             </div>
-            <TextField
+            <TextFieldOutlined
               type="tel"
               value={mobilePhone}
               onChange={setMobilePhone}
@@ -142,13 +142,13 @@ export default function ProfileAgencyPage() {
           </h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <TextField
+              <TextFieldOutlined
                 type="text"
                 value={agencyName}
                 onChange={setAgencyName}
                 required
               />
-              <TextField
+              <TextFieldOutlined
                 type="text"
                 value={siret}
                 onChange={(val) => setSiret(val.replace(/\D/g, '').slice(0, 14))}
@@ -156,20 +156,20 @@ export default function ProfileAgencyPage() {
                 required
               />
             </div>
-            <TextField
+            <TextFieldOutlined
               type="text"
               value={address}
               onChange={setAddress}
               required
             />
             <div className="grid grid-cols-2 gap-4">
-              <TextField
+              <TextFieldOutlined
                 type="text"
                 value={city}
                 onChange={setCity}
                 required
               />
-              <TextField
+              <TextFieldOutlined
                 type="text"
                 value={postalCode}
                 onChange={(val) => setPostalCode(val.replace(/\D/g, '').slice(0, 5))}

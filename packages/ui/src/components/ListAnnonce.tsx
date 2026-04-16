@@ -5,7 +5,7 @@ import { MapPin, Home, Maximize2, UserCircle, ArrowRight } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
 import { Button } from "./Button";
 import { AiSuggestion } from "./AiSuggestion";
-import { DpeBadge, DpeGrade } from "./DpeBadge";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
  * ListAnnonce - Ligne de liste annonce immobilière
@@ -37,7 +37,7 @@ export interface ListAnnonceProps {
   /** Surface (ex: "120m²") */
   surface: string;
   /** Note DPE (A-G) */
-  dpeGrade?: DpeGrade;
+  dpeGrade?: DpeType;
   /** Nom du propriétaire */
   ownerName: string;
   /** Statuts des 3 étapes du workflow */
@@ -104,7 +104,7 @@ export function ListAnnonce({
         <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
           {surface}
         </IconText>
-        {dpeGrade && <DpeBadge grade={dpeGrade} />}
+        {dpeGrade && <IconDpe type={dpeGrade} />}
         <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
           {ownerName}
         </IconText>

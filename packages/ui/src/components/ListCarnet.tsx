@@ -4,7 +4,7 @@ import React from "react";
 import { MapPin, Home, Maximize2, UserCircle, Calendar } from "lucide-react";
 import { Badge } from "./Badge";
 import { AiSuggestion } from "./AiSuggestion";
-import { DpeBadge, DpeGrade } from "./DpeBadge";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
  * ListCarnet - Ligne de liste carnet d'entretien
@@ -36,7 +36,7 @@ export interface ListCarnetProps {
   /** Surface (ex: "120m²") */
   surface: string;
   /** Note DPE (A-G) */
-  dpeGrade?: DpeGrade;
+  dpeGrade?: DpeType;
   /** Nom du propriétaire (ex: "RASTAPOPULOS, Roberto") */
   ownerName: string;
   /** Statut du carnet */
@@ -104,7 +104,7 @@ export function ListCarnet({
         <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
           {surface}
         </IconText>
-        {dpeGrade && <DpeBadge grade={dpeGrade} />}
+        {dpeGrade && <IconDpe type={dpeGrade} />}
         <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
           {ownerName}
         </IconText>

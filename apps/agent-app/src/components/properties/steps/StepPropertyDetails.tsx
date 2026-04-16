@@ -4,7 +4,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import type { PropertyCreateData } from '@/lib/validations/property';
 import { PROPERTY_CONDITION_LABELS } from '@/types/property';
 import type { PropertyCondition } from '@/types/property';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { Chip } from '@real-estate/ui/chip';
 
 const CONDITION_OPTIONS: { value: PropertyCondition; label: string }[] = [
@@ -34,7 +34,7 @@ export function StepPropertyDetails() {
           name="floorLevel"
           control={control}
           render={({ field: { value, ...field } }) => (
-            <InputField
+            <InputFieldOutlined
               label="Étage"
               id="floorLevel"
               type="number"
@@ -48,7 +48,7 @@ export function StepPropertyDetails() {
           name="numberOfFloors"
           control={control}
           render={({ field: { value, ...field } }) => (
-            <InputField
+            <InputFieldOutlined
               label="Nombre de niveaux"
               id="numberOfFloors"
               type="number"
@@ -63,7 +63,7 @@ export function StepPropertyDetails() {
             name="constructionYear"
             control={control}
             render={({ field: { value, ...field } }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Année de construction"
                 id="constructionYear"
                 type="number"

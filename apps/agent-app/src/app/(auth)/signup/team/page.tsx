@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { StepperDots, InfoCard } from '@/components/auth'
 import { X } from 'lucide-react'
 import { Button } from '@real-estate/ui/button'
-import { TextField } from '@real-estate/ui/text-field'
+import { TextFieldOutlined } from '@real-estate/ui/text-field-outlined'
 
 export default function TeamInvitationPage() {
   const [email, setEmail] = useState('')
@@ -47,7 +47,7 @@ export default function TeamInvitationPage() {
       </p>
 
       <div className="mt-8 space-y-4">
-        <TextField
+        <TextFieldOutlined
           type="email"
           value={email}
           onChange={setEmail}

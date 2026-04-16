@@ -9,7 +9,7 @@ import { CLIENT_STATUS_LABELS } from '@/types/client';
 import type { ClientStatus } from '@/types/client';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@real-estate/ui/button';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { Chip } from '@real-estate/ui/chip';
 
 interface ClientQuickCreateProps {
@@ -130,7 +130,7 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
                 name="firstName"
                 control={control}
                 render={({ field }) => (
-                  <InputField
+                  <InputFieldOutlined
                     label="Prénom"
                     id="qc-firstName"
                     type="text"
@@ -148,7 +148,7 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
                 name="lastName"
                 control={control}
                 render={({ field }) => (
-                  <InputField
+                  <InputFieldOutlined
                     label="Nom"
                     id="qc-lastName"
                     type="text"
@@ -193,7 +193,7 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
               name="primaryEmail"
               control={control}
               render={({ field }) => (
-                <InputField
+                <InputFieldOutlined
                   label="Email"
                   id="qc-email"
                   type="email"
@@ -212,7 +212,7 @@ export function ClientQuickCreate({ isOpen, onClose, onCreated, defaultStatus = 
             name="mobilePhone"
             control={control}
             render={({ field }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Téléphone"
                 id="qc-phone"
                 type="tel"

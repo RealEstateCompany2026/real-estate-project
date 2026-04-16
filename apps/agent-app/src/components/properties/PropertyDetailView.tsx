@@ -23,7 +23,7 @@ import { Chip } from '@real-estate/ui/chip';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
 import { Sheet } from '@real-estate/ui/sheet';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
 import { ListClient } from '@real-estate/ui/list-client';
@@ -1678,14 +1678,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               Localisation
             </p>
-            <InputField
+            <InputFieldOutlined
               label="Étage"
               value={characteristicsForm.floorLevel}
               onChange={(v) => updateCharacteristicsField('floorLevel', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Nombre d'étages"
               value={characteristicsForm.numberOfFloors}
               onChange={(v) => updateCharacteristicsField('numberOfFloors', v)}
@@ -1717,28 +1717,28 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 label,
               }))}
             />
-            <InputField
+            <InputFieldOutlined
               label="Année de construction"
               value={characteristicsForm.constructionYear}
               onChange={(v) => updateCharacteristicsField('constructionYear', v)}
               type="number"
               placeholder="2000"
             />
-            <InputField
+            <InputFieldOutlined
               label="Surface habitable (m²)"
               value={characteristicsForm.livingAreaSqm}
               onChange={(v) => updateCharacteristicsField('livingAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Terrain (m²)"
               value={characteristicsForm.landAreaSqm}
               onChange={(v) => updateCharacteristicsField('landAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Nombre de pièces"
               value={characteristicsForm.numberOfRooms}
               onChange={(v) => updateCharacteristicsField('numberOfRooms', v)}
@@ -1752,14 +1752,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               Pièces
             </p>
-            <InputField
+            <InputFieldOutlined
               label="Pièce à vivre (m²)"
               value={characteristicsForm.mainRoomAreaSqm}
               onChange={(v) => updateCharacteristicsField('mainRoomAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Cuisine (m²)"
               value={characteristicsForm.kitchenAreaSqm}
               onChange={(v) => updateCharacteristicsField('kitchenAreaSqm', v)}
@@ -1775,56 +1775,56 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 label,
               }))}
             />
-            <InputField
+            <InputFieldOutlined
               label="Chambres"
               value={characteristicsForm.bedroomCount}
               onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Chambre 1 (m²)"
               value={characteristicsForm.bedroom1AreaSqm}
               onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Chambre 2 (m²)"
               value={characteristicsForm.bedroom2AreaSqm}
               onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Chambre 3 (m²)"
               value={characteristicsForm.bedroom3AreaSqm}
               onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Chambre 4 (m²)"
               value={characteristicsForm.bedroom4AreaSqm}
               onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Salles de bain"
               value={characteristicsForm.bathroomCount}
               onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Douches"
               value={characteristicsForm.showerRoomCount}
               onChange={(v) => updateCharacteristicsField('showerRoomCount', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="WC"
               value={characteristicsForm.toiletCount}
               onChange={(v) => updateCharacteristicsField('toiletCount', v)}
@@ -1838,35 +1838,35 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
               Surfaces annexes
             </p>
-            <InputField
+            <InputFieldOutlined
               label="Terrasse (m²)"
               value={characteristicsForm.terraceAreaSqm}
               onChange={(v) => updateCharacteristicsField('terraceAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Balcon (m²)"
               value={characteristicsForm.balconyAreaSqm}
               onChange={(v) => updateCharacteristicsField('balconyAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Jardin (m²)"
               value={characteristicsForm.gardenAreaSqm}
               onChange={(v) => updateCharacteristicsField('gardenAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Cave (m²)"
               value={characteristicsForm.basementAreaSqm}
               onChange={(v) => updateCharacteristicsField('basementAreaSqm', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Grenier (m²)"
               value={characteristicsForm.atticAreaSqm}
               onChange={(v) => updateCharacteristicsField('atticAreaSqm', v)}
@@ -1907,7 +1907,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 label,
               }))}
             />
-            <InputField
+            <InputFieldOutlined
               label="Places de parking"
               value={characteristicsForm.parkingSpotCount}
               onChange={(v) => updateCharacteristicsField('parkingSpotCount', v)}
@@ -1966,7 +1966,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 label,
               }))}
             />
-            <InputField
+            <InputFieldOutlined
               label="Énergie (kWh/m²/an)"
               value={characteristicsForm.dpeEnergyKwh}
               onChange={(v) => updateCharacteristicsField('dpeEnergyKwh', v)}
@@ -1982,21 +1982,21 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 label,
               }))}
             />
-            <InputField
+            <InputFieldOutlined
               label="GES (gCO₂/m²/an)"
               value={characteristicsForm.dpeGasGco2}
               onChange={(v) => updateCharacteristicsField('dpeGasGco2', v)}
               type="number"
               placeholder="0"
             />
-            <InputField
+            <InputFieldOutlined
               label="Validité DPE (YYYY-MM-DD)"
               value={characteristicsForm.dpeValidityDate}
               onChange={(v) => updateCharacteristicsField('dpeValidityDate', v)}
               type="text"
               placeholder="2025-12-31"
             />
-            <InputField
+            <InputFieldOutlined
               label="Conformité (YYYY-MM-DD)"
               value={characteristicsForm.dpeComplianceDeadline}
               onChange={(v) => updateCharacteristicsField('dpeComplianceDeadline', v)}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { PropertyCreateData } from '@/lib/validations/property';
-import { InputField } from '@real-estate/ui/input-field';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { Button } from '@real-estate/ui/button';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { ClientQuickCreate } from '@/components/clients/ClientQuickCreate';
@@ -95,7 +95,7 @@ export function StepPropertyKey() {
             name="livingAreaSqm"
             control={control}
             render={({ field: { value, ...field } }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Surface (m²)"
                 id="livingAreaSqm"
                 type="number"
@@ -114,7 +114,7 @@ export function StepPropertyKey() {
             name="numberOfRooms"
             control={control}
             render={({ field: { value, ...field } }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Pièces"
                 id="numberOfRooms"
                 type="number"
@@ -133,7 +133,7 @@ export function StepPropertyKey() {
             name="desiredSellingPrice"
             control={control}
             render={({ field: { value, ...field } }) => (
-              <InputField
+              <InputFieldOutlined
                 label="Prix souhaité"
                 id="desiredSellingPrice"
                 type="number"
@@ -172,7 +172,7 @@ export function StepPropertyKey() {
           </div>
         ) : (
           <div className="space-y-2">
-            <InputField
+            <InputFieldOutlined
               label=""
               id="client-search"
               type="text"
