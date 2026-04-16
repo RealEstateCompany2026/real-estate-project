@@ -40,6 +40,22 @@ export const CardsMode: Story = {
   },
 };
 
+export const Disabled: Story = {
+  render: () => {
+    const [viewMode, setViewMode] = useState<ViewMode>("list");
+    return (
+      <div style={{ padding: "20px" }}>
+        <ViewModeDropdown
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          disabled
+        />
+        <p style={{ marginTop: "16px" }}>Mode: {viewMode} (disabled)</p>
+      </div>
+    );
+  },
+};
+
 export const Interactive: Story = {
   render: () => {
     const [viewMode, setViewMode] = useState<ViewMode>("list");
