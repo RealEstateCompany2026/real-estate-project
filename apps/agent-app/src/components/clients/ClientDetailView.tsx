@@ -99,6 +99,7 @@ interface PropertyItem {
   operationType: string;
   price: string;
   hasCarnet: boolean;
+  imageUrl?: string;
 }
 
 interface DocumentItem {
@@ -472,6 +473,30 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
       const dealsCount = (dealsRes.data ?? []).length;
 
+      // Fetch cover photos pour les biens du client
+      const propertyIds = ((propertiesRes.data ?? []) as PropertyRow[]).map((p) => p.id);
+      let coverMap = new Map<string, string>();
+      if (propertyIds.length > 0) {
+        const { data: coverPhotos } = await supabase
+          .from('PropertyMedia')
+          .select('propertyId, storagePath')
+          .in('propertyId', propertyIds)
+          .eq('mediaType', 'photo')
+          .eq('isCover', true);
+        const { data: firstPhotos } = await supabase
+          .from('PropertyMedia')
+          .select('propertyId, storagePath')
+          .in('propertyId', propertyIds)
+          .eq('mediaType', 'photo')
+          .eq('sortOrder', 1);
+        (firstPhotos ?? []).forEach((p: any) => {
+          if (!coverMap.has(p.propertyId)) coverMap.set(p.propertyId, p.storagePath);
+        });
+        (coverPhotos ?? []).forEach((p: any) => {
+          coverMap.set(p.propertyId, p.storagePath);
+        });
+      }
+
       const properties: PropertyItem[] = ((propertiesRes.data ?? []) as PropertyRow[]).map((p) => ({
         id: p.id,
         city: p.addressCity ?? '—',
@@ -481,6 +506,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         operationType: firstOperationType(p.operationTypes),
         price: formatPriceEuro(p.desiredSellingPrice ?? p.estimatedMarketValue),
         hasCarnet: Boolean(p.hasMaintenanceLog),
+        imageUrl: coverMap.get(p.id),
       }));
 
       const documents: DocumentItem[] = ((documentsRes.data ?? []) as DocumentRow[]).map((d) => ({
@@ -882,6 +908,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             {properties.map((p) => (
               <ListBien
                 key={p.id}
+                imageUrl={p.imageUrl}
                 operationType={p.operationType}
                 price={p.price}
                 hasCarnet={p.hasCarnet}
