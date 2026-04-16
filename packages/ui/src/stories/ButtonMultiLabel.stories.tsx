@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { ButtonMultiLabel } from "../components/ButtonMultiLabel";
 
@@ -9,41 +9,33 @@ const meta: Meta<typeof ButtonMultiLabel> = {
 export default meta;
 type Story = StoryObj<typeof ButtonMultiLabel>;
 
-export const Default: Story = {
+export const TwoSections: Story = {
   args: {
-    options: ["Option 1", "Option 2", "Option 3"],
-    value: "Option 1",
-    onChange: () => {},
+    sections: [
+      { label: "Précédent", onClick: () => console.log("Précédent") },
+      { label: "Suivant", onClick: () => console.log("Suivant") },
+    ],
   },
-  render: (args) => {
-    const [value, setValue] = React.useState(args.value);
-    return (
-      <ButtonMultiLabel
-        {...args}
-        value={value}
-        onChange={setValue}
-      />
-    );
+};
+
+export const FourSectionsWithDisabled: Story = {
+  args: {
+    sections: [
+      { label: "Tous", onClick: () => console.log("Tous") },
+      { label: "Actifs", onClick: () => console.log("Actifs") },
+      { label: "Archivés", onClick: () => console.log("Archivés"), disabled: true },
+      { label: "Brouillons", onClick: () => console.log("Brouillons") },
+    ],
   },
 };
 
 export const FullWidth: Story = {
   args: {
-    options: ["Small", "Medium", "Large"],
-    value: "Medium",
-    onChange: () => {},
+    sections: [
+      { label: "Liste", onClick: () => console.log("Liste") },
+      { label: "Carte", onClick: () => console.log("Carte") },
+      { label: "Tableau", onClick: () => console.log("Tableau") },
+    ],
     fullWidth: true,
-  },
-  render: (args) => {
-    const [value, setValue] = React.useState(args.value);
-    return (
-      <div className="w-full">
-        <ButtonMultiLabel
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
-      </div>
-    );
   },
 };

@@ -1,86 +1,88 @@
 "use client";
 
+import * as React from "react";
+import { cn } from "../lib/utils";
+
 /**
- * ButtonMultiLabel (Segmented Control)
+ * ButtonMultiLabel — Multi-section action button
  *
- * Structure:
- * - Border-radius: 20px (external corners)
- * - Padding: 6px per button
- * - Font: Roboto 16px/20px
- * - Selected: Bold, background neutral-100
- * - Unselected: SemiBold, background white
+ * Visually resembles a Button `outline` from the DS, but split into
+ * 2-5 independent clickable sections. Each section has its own hover,
+ * click handler, and disabled state.
+ *
+ * Tokens (from Button outline variant):
+ * - Border: border-edge-neutral-default, hover → border-edge-neutral-action
+ * - Background: bg-surface-neutral-default (unchanged on hover)
+ * - Text: text-content-body
+ * - Font: Roboto SemiBold 16px/20px tracking 0.16px
+ * - Padding: p-3
+ * - Border-radius: rounded-lg (16px) on outer corners
  */
 
+export interface ButtonMultiLabelSection {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}
+
 export interface ButtonMultiLabelProps {
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
+  sections: ButtonMultiLabelSection[];
   className?: string;
   fullWidth?: boolean;
 }
 
 export function ButtonMultiLabel({
-  options,
-  value,
-  onChange,
-  className = "",
+  sections,
+  className,
   fullWidth = false,
 }: ButtonMultiLabelProps) {
-  const selectedIndex = options.indexOf(value);
-
-  const getButtonStyles = (index: number, isSelected: boolean) => {
-    const isFirst = index === 0;
-    const isLast = index === options.length - 1;
-
-    return {
-      background: isSelected
-        ? "bg-surface-neutral-action-hover"
-        : "bg-surface-neutral-default",
-      textColor: isSelected
-        ? "text-content-headings"
-        : "text-content-body",
-      fontWeight: isSelected ? "font-bold" : "font-semibold",
-      borderRadius: isFirst
-        ? "rounded-l-[16px]"
-        : isLast
-          ? "rounded-r-[16px]"
-          : "rounded-none",
-    };
-  };
-
   return (
     <div
-      className={`button-multi-label-component inline-flex ${fullWidth ? "w-full" : ""} ${className}`}
+      className={cn(
+        "inline-flex",
+        fullWidth && "w-full",
+        className,
+      )}
       role="group"
-      aria-label="Segmented control"
+      aria-label="Multi-action button"
     >
-      {options.map((option, index) => {
-        const isSelected = index === selectedIndex;
-        const styles = getButtonStyles(index, isSelected);
+      {sections.map((section, index) => {
+        const isFirst = index === 0;
+        const isLast = index === sections.length - 1;
 
         return (
           <button
-            key={option}
-            onClick={() => onChange(option)}
-            className={`
-              relative flex items-center justify-center p-[6px]
-              transition-all border border-solid border-edge-subtle
-              ${styles.borderRadius}
-              ${fullWidth ? "flex-1" : ""}
-              ${isSelected ? "cursor-default" : "cursor-pointer hover:opacity-80"}
-              ${styles.textColor}
-              ${styles.fontWeight}
-              text-[16px] leading-[20px] tracking-[0.16px]
-              min-w-[80px]
-            `}
-            style={{
-              background: styles.background.split(" ")[1],
-            }}
-            aria-pressed={isSelected}
+            key={`${section.label}-${index}`}
+            type="button"
+            onClick={section.onClick}
+            disabled={section.disabled}
+            className={cn(
+              // Base styles (matching Button outline variant)
+              "inline-flex items-center justify-center gap-2",
+              "p-3 text-base font-semibold tracking-[0.16px]",
+              "transition-colors",
+              "border border-edge-neutral-default",
+              "bg-surface-neutral-default text-content-body",
+              // Hover (only border changes, like outline variant)
+              "hover:border-edge-neutral-action",
+              // Focus
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ring-offset-surface-page",
+              // Disabled
+              "disabled:pointer-events-none disabled:bg-surface-disabled disabled:text-content-disabled disabled:border-edge-disabled",
+              // Border-radius: only on outer edges
+              isFirst && "rounded-l-lg",
+              isLast && "rounded-r-lg",
+              // Collapse internal borders to avoid double-border
+              !isFirst && "-ml-px",
+              // Full width distribution
+              fullWidth && "flex-1",
+            )}
           >
-            <div className="flex items-center justify-center px-[10px] py-[8px] relative">
-              <p className="whitespace-nowrap">{option}</p>
-            </div>
+            {section.icon && (
+              <span className="shrink-0 [&>svg]:size-5">{section.icon}</span>
+            )}
+            <span className="whitespace-nowrap">{section.label}</span>
           </button>
         );
       })}
