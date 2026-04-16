@@ -11,7 +11,7 @@ import { Info } from "lucide-react";
  * - Letter-spacing: 0.14px
  * - Gap: 8px entre label et icône info
  * - Icône info: 20×20px (Lucide Info)
- * - Required: astérisque rouge
+ * - Required: astérisque neutral (même couleur que le label)
  */
 
 export interface LabelProps {
@@ -33,11 +33,11 @@ export function Label({
     <div className={className}>
       <div className="flex items-center gap-2 relative">
         {required && (
-          <span className="text-red-500 text-base absolute -left-2 top-1/2 -translate-y-1/2">*</span>
+          <span className="text-content-subtle text-base absolute -left-2 top-1/2 -translate-y-1/2">*</span>
         )}
         <label
           htmlFor={htmlFor}
-          className="text-sm font-semibold text-content-body tracking-wide whitespace-nowrap"
+          className="text-xs font-semibold uppercase text-content-body tracking-wide whitespace-nowrap"
         >
           {label}
         </label>
