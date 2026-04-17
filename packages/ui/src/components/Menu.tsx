@@ -13,6 +13,7 @@ import { MenuItem, type MenuItemProps } from "./MenuItem";
  * - Border-radius: 16px
  * - Scrollbar optionnelle: 5px width, padding 8px
  * - Tokens pour colors light/dark automatiques
+ * - size: "default" | "small" — propagé à tous les MenuItems enfants
  *
  * Structure:
  * - Liste verticale de MenuItems
@@ -39,6 +40,11 @@ export interface MenuProps {
    */
   maxHeight?: number;
   /**
+   * Taille des items du menu
+   * @default "default"
+   */
+  size?: "default" | "small";
+  /**
    * Classe CSS personnalisée
    */
   className?: string;
@@ -49,6 +55,7 @@ export function Menu({
   showScrollbar = true,
   width = 347,
   maxHeight,
+  size = "default",
   className = "",
 }: MenuProps) {
   return (
@@ -68,7 +75,7 @@ export function Menu({
           }}
         >
           {items.map((item, index) => (
-            <MenuItem key={index} {...item} />
+            <MenuItem key={index} {...item} size={size} />
           ))}
         </div>
 

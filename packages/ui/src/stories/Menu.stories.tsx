@@ -119,3 +119,11 @@ export const LargeWidth: Story = {
     showScrollbar: true,
   },
 };
+
+export const SmallMenu: Story = {
+  args: {
+    items: basicItems,
+    showScrollbar: true,
+    size: "small",
+  },
+};

@@ -11,6 +11,7 @@ const meta: Meta<typeof MenuItem> = {
     selected: { control: "boolean" },
     disabled: { control: "boolean" },
     destructive: { control: "boolean" },
+    size: { control: "select", options: ["default", "small"] },
   },
 };
 
@@ -107,4 +108,31 @@ export const AllVariants: Story = {
       <MenuItem label="Disabled" disabled={true} />
     </div>
   ),
+};
+
+// --- Small variants ---
+
+export const SmallDefault: Story = {
+  args: {
+    label: "Edit Profile",
+    size: "small",
+  },
+};
+
+export const SmallSelected: Story = {
+  args: {
+    label: "Active Item",
+    leftIcon: Settings,
+    selected: true,
+    size: "small",
+  },
+};
+
+export const SmallWithIcons: Story = {
+  args: {
+    label: "Edit Item",
+    leftIcon: Edit,
+    rightIcon: Check,
+    size: "small",
+  },
 };
