@@ -57,14 +57,14 @@ export interface CardBienProps {
 /** Divider horizontal pleine largeur */
 function HorizontalDivider() {
   return (
-    <div className="divider w-full h-px bg-[var(--border-divider)] transition-colors" />
+    <div className="divider w-full h-px bg-[var(--border-divider)] dark:group-hover:bg-[var(--neutral-600)] transition-colors" />
   );
 }
 
 /** Divider vertical 84px */
 function VerticalDivider() {
   return (
-    <div className="divider h-[84px] w-px bg-[var(--border-divider)] shrink-0 transition-colors" />
+    <div className="divider h-[84px] w-px bg-[var(--border-divider)] dark:group-hover:bg-[var(--neutral-600)] shrink-0 transition-colors" />
   );
 }
 

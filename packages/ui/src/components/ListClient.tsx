@@ -56,7 +56,7 @@ export interface ListClientProps {
  */
 function VerticalDivider() {
   return (
-    <div className="divider h-[84px] w-px bg-[var(--border-divider)] shrink-0 transition-colors" />
+    <div className="divider h-[84px] w-px bg-[var(--border-divider)] dark:group-hover:bg-[var(--neutral-600)] shrink-0 transition-colors" />
   );
 }
 
