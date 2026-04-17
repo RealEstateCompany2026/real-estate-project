@@ -73,16 +73,14 @@ export function MessageSent({
             <ArrowRightCircle
               size={20}
               strokeWidth={1.5}
-              style={{ color: "var(--text-caption)" }}
-              className="shrink-0"
+              className="shrink-0 text-content-caption"
             />
           )}
 
           {/* Timestamp */}
           {isChat ? (
             <span
-              className="text-[12px] leading-tight tracking-tighter"
-              style={{ color: "var(--text-caption)" }}
+              className="text-[12px] leading-tight tracking-tighter text-content-caption"
             >
               {time.replace("à ", "")}
             </span>
@@ -102,8 +100,7 @@ export function MessageSent({
           {/* Text content */}
           <div className="px-[10px] py-[8px] w-full">
             <div
-              className="text-[16px] font-normal leading-[22px] tracking-[0.16px]"
-              style={{ color: "var(--text-body)" }}
+              className="text-[16px] font-normal leading-[22px] tracking-[0.16px] text-content-body"
             >
               {children}
             </div>
@@ -114,18 +111,14 @@ export function MessageSent({
             <button
               key={index}
               onClick={attachment.onClick}
-              className="flex items-center gap-[8px] p-[12px] rounded-[16px]"
-              style={{
-                backgroundColor: "var(--surface-neutral-default)",
-              }}
+              className="flex items-center gap-[8px] p-[12px] rounded-[16px] bg-surface-neutral-default"
             >
               <Paperclip
                 size={20}
-                style={{ color: "var(--text-neutral-action)" }}
+                className="text-content-neutral-action"
               />
               <span
-                className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
-                style={{ color: "var(--text-neutral-action)" }}
+                className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap text-content-neutral-action"
               >
                 {attachment.label}
               </span>

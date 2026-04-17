@@ -43,13 +43,7 @@ export function MessageBubble({
   if (variant === "chat") {
     return (
       <div
-        className={`w-full rounded-[12px] px-[12px] py-[8px] shadow-sm ${className}`.trim()}
-        style={{
-          backgroundColor:
-            align === "right"
-              ? "var(--surface-branded-subtle)"
-              : "var(--surface-neutral-action)",
-        }}
+        className={`w-full rounded-[12px] px-[12px] py-[8px] shadow-sm ${align === "right" ? "bg-surface-branded-subtle" : "bg-surface-neutral-action"} ${className}`.trim()}
       >
         <div
           className={`flex flex-col gap-[10px] w-full ${
@@ -65,11 +59,7 @@ export function MessageBubble({
   /* Standard Figma style */
   return (
     <div
-      className={`w-full rounded-[16px] p-[10px] border border-solid ${className}`.trim()}
-      style={{
-        backgroundColor: "var(--surface-neutral-action)",
-        borderColor: "var(--surface-neutral-action)",
-      }}
+      className={`w-full rounded-[16px] p-[10px] border border-solid bg-surface-neutral-action border-surface-neutral-action ${className}`.trim()}
     >
       <div
         className={`flex flex-col gap-[10px] w-full ${

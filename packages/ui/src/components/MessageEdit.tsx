@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Paperclip, Send, Plus, X } from "lucide-react";
+import { Button } from "./Button";
 
 /**
  * MessageEdit - Éditeur de message
@@ -70,7 +71,7 @@ export function MessageEdit({
         <div className="flex items-start gap-2 p-2 rounded-3xl bg-surface-neutral-default">
           <button
             onClick={handleAttachment}
-            className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:opacity-70 transition-opacity mt-1"
+            className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:bg-surface-neutral-action-hover transition-colors mt-1"
           >
             <Paperclip className="size-5 text-icon-neutral-default" />
           </button>
@@ -82,15 +83,14 @@ export function MessageEdit({
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
               rows={2}
-              className="w-full bg-transparent border-none outline-none resize-none text-sm leading-5"
-              style={{ color: "var(--text-body)" }}
+              className="w-full bg-transparent border-none outline-none resize-none text-sm leading-5 text-content-body"
             />
           </div>
 
           {isEditing && (
             <button
               onClick={onCancel}
-              className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:opacity-70 transition-opacity mt-1"
+              className="relative shrink-0 size-10 rounded-full flex items-center justify-center hover:bg-surface-neutral-action-hover transition-colors mt-1"
             >
               <X className="size-5 text-icon-neutral-default" />
             </button>
@@ -99,20 +99,10 @@ export function MessageEdit({
           <button
             onClick={handleSend}
             disabled={!content.trim() && attachments.length === 0}
-            className="relative shrink-0 size-10 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 mt-1"
-            style={{
-              backgroundColor: content.trim()
-                ? "var(--surface-branded-default)"
-                : "transparent",
-            }}
+            className={`relative shrink-0 size-10 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 disabled:pointer-events-none mt-1 ${content.trim() ? "bg-surface-branded-default" : "bg-transparent"}`}
           >
             <Send
-              className="size-5"
-              style={{
-                color: content.trim()
-                  ? "var(--text-branded-on-action)"
-                  : "var(--icon-neutral-default)",
-              }}
+              className={`size-5 ${content.trim() ? "text-content-branded-on-action" : "text-icon-neutral-default"}`}
             />
           </button>
         </div>
@@ -130,8 +120,7 @@ export function MessageEdit({
         {/* Title: H6 Bold Desktop */}
         <div className="p-[10px]">
           <h2
-            className="text-[20px] font-bold leading-[24px] tracking-[0.2px]"
-            style={{ color: "var(--text-headings)" }}
+            className="text-[20px] font-bold leading-[24px] tracking-[0.2px] text-content-headings"
           >
             {isEditing ? "Modifier le message" : "Votre message"}
           </h2>
@@ -142,7 +131,7 @@ export function MessageEdit({
           {/* Editor organism box */}
           <div
             className="flex flex-col gap-[8px] items-start p-[20px] rounded-[16px] w-full
-              border border-solid border-edge-subtle bg-[var(--surface-neutral-default)]"
+              border border-solid border-edge-subtle bg-surface-neutral-default"
           >
             {/* Text area: Body md Regular */}
             <div className="w-full px-[10px] py-[8px]">
@@ -152,70 +141,35 @@ export function MessageEdit({
                 placeholder={placeholder}
                 rows={5}
                 className="w-full bg-transparent border-none outline-none resize-none
-                  text-[16px] font-normal leading-[20px] tracking-[0.16px]"
-                style={{ color: "var(--text-body)" }}
+                  text-[16px] font-normal leading-[20px] tracking-[0.16px] text-content-body"
               />
             </div>
 
-            {/* Outlined "Pièce jointe" button (always visible) */}
-            <button
-              onClick={handleAttachment}
-              className="flex items-center gap-[8px] p-[12px] rounded-[16px]
-                border border-solid bg-[var(--surface-neutral-default)]"
-              style={{ borderColor: "var(--border-neutral-action)" }}
-            >
-              <Paperclip
-                size={20}
-                style={{ color: "var(--text-neutral-action)" }}
-              />
-              <span
-                className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
-                style={{ color: "var(--text-neutral-action)" }}
-              >
-                Pièce jointe
-              </span>
-            </button>
+            {/* Outlined "Pièce jointe" button */}
+            <Button variant="outline" size="default" onClick={handleAttachment}>
+              <Paperclip size={20} />
+              Pièce jointe
+            </Button>
           </div>
 
           {/* "Ajouter une pièce jointe +" link */}
-          <button
-            onClick={handleAttachment}
-            className="flex items-center gap-[8px] p-[12px] rounded-[16px]
-              hover:opacity-70 transition-opacity"
-          >
-            <span
-              className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
-              style={{ color: "var(--text-neutral-action)" }}
-            >
-              Ajouter une pièce jointe
-            </span>
-            <Plus
-              size={20}
-              style={{ color: "var(--text-neutral-action)" }}
-            />
-          </button>
+          <Button variant="ghost" size="default" onClick={handleAttachment}>
+            Ajouter une pièce jointe
+            <Plus size={20} />
+          </Button>
         </div>
       </div>
 
       {/* Send button (centered via items-center on parent) */}
-      <button
+      <Button
+        variant="primary"
+        size="default"
         onClick={handleSend}
         disabled={!content.trim() && attachments.length === 0}
-        className="flex items-center gap-[8px] p-[12px] rounded-[16px]
-          border border-solid bg-surface-branded-default border-edge-branded-action
-          disabled:opacity-50 hover:opacity-90 transition-opacity"
       >
-        <span
-          className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
-          style={{ color: "var(--text-branded-on-action)" }}
-        >
-          {isEditing ? "Enregistrer" : "Envoyer le message"}
-        </span>
-        <Send
-          size={20}
-          style={{ color: "var(--text-branded-on-action)" }}
-        />
-      </button>
+        {isEditing ? "Enregistrer" : "Envoyer le message"}
+        <Send size={20} />
+      </Button>
     </div>
   );
 }
