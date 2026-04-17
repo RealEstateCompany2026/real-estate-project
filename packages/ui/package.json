@@ -76,7 +76,8 @@
         "./card-bien": "./src/components/CardBien.tsx",
         "./gallery": "./src/components/Gallery.tsx",
         "./list-annonce": "./src/components/ListAnnonce.tsx",
-        "./app-bar-annonce": "./src/components/AppBarAnnonce.tsx"
+        "./app-bar-annonce": "./src/components/AppBarAnnonce.tsx",
+        "./list-import": "./src/components/ListImport.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
