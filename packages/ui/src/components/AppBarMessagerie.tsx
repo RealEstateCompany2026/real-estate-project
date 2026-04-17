@@ -1,7 +1,10 @@
 "use client";
 
 import React from "react";
-import { UserCircle, MessageCircleCheck, CalendarCheck, X } from "lucide-react";
+import { UserCircle, CalendarCheck, X } from "lucide-react";
+import { MessageStatusDot } from "./MessageStatusDot";
+import type { MessageStatus as DsMessageStatus } from "./MessageStatusDot";
+import { KpiIndicator } from "./KpiIndicator";
 
 /**
  * AppBarMessagerie - Barre d'en-tête de la page messagerie client
@@ -15,19 +18,18 @@ import { UserCircle, MessageCircleCheck, CalendarCheck, X } from "lucide-react";
  * Composition :
  *   1. Titre "Messages" — H4 Bold
  *   2. Nom du contact [client_id] (profile-circle icon)
- *   3. Scoring engagement [engagement_score] (message-circle-check icon + %)
- *      + dot couleur (success/warning/error selon le score)
- *   4. 5 derniers statuts de messages [last_5_statuses] (NONE/REÇU/LU)
+ *   3. Scoring engagement [engagement_score] (KpiIndicator kpi="eng" variant="straight")
+ *   4. 5 derniers statuts de messages [last_5_statuses] (MessageStatusDot)
  *   5. Date dernier message [last_message_date] (calendar-check icon + durée)
  *   6. Bouton fermer (✕)
  */
 
-export type MessageStatus = "none" | "received" | "read";
+export type AppBarMessageStatus = "none" | "received" | "read";
 
-const STATUS_COLORS: Record<MessageStatus, string> = {
-  none: "var(--border-disabled)",
-  received: "var(--border-default)",
-  read: "var(--success-500)",
+const STATUS_MAP: Record<AppBarMessageStatus, DsMessageStatus> = {
+  none: "none",
+  received: "fail",
+  read: "success",
 };
 
 export interface AppBarMessagerieProps {
@@ -36,22 +38,13 @@ export interface AppBarMessagerieProps {
   /** Score d'engagement (0-100) */
   engagementScore: number;
   /** Statuts des 5 derniers messages */
-  lastMessageStatuses: [MessageStatus, MessageStatus, MessageStatus, MessageStatus, MessageStatus];
+  lastMessageStatuses: [AppBarMessageStatus, AppBarMessageStatus, AppBarMessageStatus, AppBarMessageStatus, AppBarMessageStatus];
   /** Durée depuis le dernier message (ex: "280 j", "3 h", "12 min") */
   lastMessageAge: string;
   /** Callback fermer */
   onClose?: () => void;
   /** Classes CSS additionnelles */
   className?: string;
-}
-
-/**
- * Score engagement color dot
- */
-function getScoreColor(score: number): string {
-  if (score >= 60) return "var(--success-500)";
-  if (score >= 30) return "var(--warning-500)";
-  return "var(--error-500)";
 }
 
 /**
@@ -84,9 +77,6 @@ export function AppBarMessagerie({
   onClose,
   className = "",
 }: AppBarMessagerieProps) {
-  const iconColor = "var(--icon-neutral-default)";
-  const scoreColor = getScoreColor(engagementScore);
-
   return (
     <div
       className={`bg-surface-neutral-default h-[100px] flex items-center justify-between px-[20px] py-[27px] ${className}`.trim()}
@@ -100,40 +90,24 @@ export function AppBarMessagerie({
 
         {/* 2. Nom du contact */}
         <IconText
-          icon={<UserCircle size={20} style={{ color: iconColor }} />}
+          icon={<UserCircle size={20} className="text-icon-neutral-default" />}
         >
           {contactName}
         </IconText>
 
-        {/* 3. Engagement score + dot */}
-        <div className="flex gap-[10px] items-center shrink-0">
-          <IconText
-            icon={
-              <MessageCircleCheck size={20} style={{ color: iconColor }} />
-            }
-          >
-            {engagementScore}%
-          </IconText>
-          <div
-            className="size-[14px] rounded-lg"
-            style={{ backgroundColor: scoreColor }}
-          />
-        </div>
+        {/* 3. Engagement score + dot (DS KpiIndicator) */}
+        <KpiIndicator kpi="eng" value={`${engagementScore}%`} percentage={engagementScore} variant="straight" />
 
-        {/* 4. 5 derniers statuts de messages */}
+        {/* 4. 5 derniers statuts de messages (DS MessageStatusDot) */}
         <div className="flex gap-[8px] items-center py-px shrink-0">
           {lastMessageStatuses.map((status, i) => (
-            <div
-              key={i}
-              className="size-[18px] rounded-lg"
-              style={{ backgroundColor: STATUS_COLORS[status] }}
-            />
+            <MessageStatusDot key={i} status={STATUS_MAP[status]} />
           ))}
         </div>
 
         {/* 5. Date dernier message */}
         <div className="flex gap-[8px] items-center shrink-0">
-          <CalendarCheck size={20} style={{ color: iconColor }} />
+          <CalendarCheck size={20} className="text-icon-neutral-default" />
           <span className="text-base font-normal font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
             {lastMessageAge}
           </span>
