@@ -34,9 +34,6 @@ const GES_COLORS: Record<GesType, string> = {
   G: "#6d0f91",
 };
 
-// Classes foncées nécessitant un texte blanc pour la lisibilité
-const DARK_CLASSES: Set<GesType> = new Set<GesType>(["E", "F", "G"]);
-
 const SIZE_MAP = {
   small: { width: 20, height: 20, fontSize: 14 },
   medium: { width: 40, height: 40, fontSize: 20 },
@@ -53,10 +50,6 @@ export function IconGes({
   const gesClass = classe || type || "A";
   const backgroundColor = GES_COLORS[gesClass];
   const dimensions = SIZE_MAP[size];
-  const textColorClass = DARK_CLASSES.has(gesClass)
-    ? "text-white"
-    : "text-gray-800";
-
   return (
     <div
       className={`
@@ -76,7 +69,7 @@ export function IconGes({
       }}
     >
       <p
-        className={`text-center whitespace-nowrap font-bold ${textColorClass}`}
+        className="text-center whitespace-nowrap font-bold text-content-branded-on-action"
         style={{
           fontSize: `${dimensions.fontSize}px`,
           lineHeight: `${dimensions.height}px`,
