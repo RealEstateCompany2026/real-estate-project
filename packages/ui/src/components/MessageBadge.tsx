@@ -25,13 +25,11 @@ export function MessageBadge({ label, className = "" }: MessageBadgeProps) {
   return (
     <div
       className={`inline-flex items-center h-[20px] px-[8px] py-[4px]
-        rounded-[16px] border border-solid shrink-0
+        rounded-[16px] border border-solid shrink-0 border-edge-neutral-default
         ${className}`.trim()}
-      style={{ borderColor: "var(--border-neutral-default)" }}
     >
       <span
-        className="text-[12px] font-bold leading-[14px] tracking-[0.12px] whitespace-nowrap text-center"
-        style={{ color: "var(--text-caption)" }}
+        className="text-[12px] font-bold leading-[14px] tracking-[0.12px] whitespace-nowrap text-center text-content-caption"
       >
         {label}
       </span>

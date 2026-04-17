@@ -7,8 +7,8 @@
  *
  * Variants:
  *   none    → bg surface-neutral-default, border border-disabled
- *   success → bg green-500, border green-200
- *   fail    → bg neutral-200, border neutral-400
+ *   success → bg surface-success, border border-success
+ *   fail    → bg surface-neutral-action, border border-subtle
  *
  * Tokens Layer 3, dark mode auto via .dark class.
  */
@@ -20,34 +20,19 @@ export interface MessageStatusDotProps {
   className?: string;
 }
 
+const statusClasses: Record<MessageStatus, string> = {
+  none: "bg-surface-neutral-default border-edge-disabled",
+  success: "bg-surface-success border-edge-success",
+  fail: "bg-surface-neutral-action border-edge-subtle",
+};
+
 export function MessageStatusDot({
   status = "none",
   className = "",
 }: MessageStatusDotProps) {
-  const styles: Record<MessageStatus, { bg: string; border: string }> = {
-    none: {
-      bg: "var(--surface-neutral-default)",
-      border: "var(--border-disabled)",
-    },
-    success: {
-      bg: "var(--green-500)",
-      border: "var(--green-200)",
-    },
-    fail: {
-      bg: "var(--neutral-200)",
-      border: "var(--neutral-400)",
-    },
-  };
-
-  const s = styles[status];
-
   return (
     <div
-      className={`rounded-[8px] size-[18px] border border-solid shrink-0 ${className}`.trim()}
-      style={{
-        backgroundColor: s.bg,
-        borderColor: s.border,
-      }}
+      className={`rounded-[8px] size-[18px] border border-solid shrink-0 ${statusClasses[status]} ${className}`.trim()}
     />
   );
 }

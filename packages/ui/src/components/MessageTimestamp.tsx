@@ -29,16 +29,14 @@ export function MessageTimestamp({
     <div className={`flex items-center shrink-0 ${className}`.trim()}>
       <div className="flex items-center px-[10px] py-[8px]">
         <span
-          className="text-[14px] font-normal leading-[16px] tracking-[0.14px] whitespace-nowrap"
-          style={{ color: "var(--text-caption)" }}
+          className="text-[14px] font-normal leading-[16px] tracking-[0.14px] whitespace-nowrap text-content-caption"
         >
           {date}
         </span>
       </div>
       <div className="flex items-center px-[10px] py-[8px]">
         <span
-          className="text-[14px] font-normal leading-[16px] tracking-[0.14px] whitespace-nowrap"
-          style={{ color: "var(--text-caption)" }}
+          className="text-[14px] font-normal leading-[16px] tracking-[0.14px] whitespace-nowrap text-content-caption"
         >
           {time}
         </span>
