@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Lightbulb } from "lucide-react";
+import { IconButton } from "./Button";
 
 /**
  * AiSuggestionBanner - Banner de suggestion contextuelle IA
@@ -24,6 +25,7 @@ export interface AiSuggestionBannerProps {
   suggestion: string;
   actionLabel?: string;
   onAction?: () => void;
+  variant?: "default" | "compact";
   className?: string;
 }
 
@@ -31,6 +33,7 @@ export function AiSuggestionBanner({
   suggestion,
   actionLabel = "Programmer",
   onAction,
+  variant = "default",
   className = "",
 }: AiSuggestionBannerProps) {
   return (
@@ -46,31 +49,33 @@ export function AiSuggestionBanner({
 
       {/* Suggestion text */}
       <p
-        className="flex-1 min-w-0 text-[16px] font-semibold leading-[20px] tracking-[0.16px] px-[10px] py-[8px]"
-        style={{ color: "var(--text-body)" }}
+        className="flex-1 min-w-0 text-[16px] font-semibold leading-[20px] tracking-[0.16px] px-[10px] py-[8px] text-content-body"
       >
         {suggestion}
       </p>
 
       {/* Action button */}
-      <button
-        type="button"
-        onClick={onAction}
-        className="shrink-0 flex items-center gap-[8px] p-[12px] rounded-[16px] border border-solid
-          bg-surface-branded-default border-edge-branded-action
-          hover:opacity-90 transition-opacity"
-      >
-        <span
-          className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap"
-          style={{ color: "var(--text-branded-on-action)" }}
+      {variant === "compact" ? (
+        <IconButton variant="primary" onClick={onAction} icon={<ArrowRight size={20} />} />
+      ) : (
+        <button
+          type="button"
+          onClick={onAction}
+          className="shrink-0 flex items-center gap-[8px] p-[12px] rounded-[16px] border border-solid
+            bg-surface-branded-default border-edge-branded-action
+            hover:opacity-90 transition-opacity"
         >
-          {actionLabel}
-        </span>
-        <ArrowRight
-          size={20}
-          style={{ color: "var(--text-branded-on-action)" }}
-        />
-      </button>
+          <span
+            className="text-[16px] font-semibold leading-[20px] tracking-[0.16px] whitespace-nowrap text-content-branded-on-action"
+          >
+            {actionLabel}
+          </span>
+          <ArrowRight
+            size={20}
+            className="text-content-branded-on-action"
+          />
+        </button>
+      )}
     </div>
   );
 }

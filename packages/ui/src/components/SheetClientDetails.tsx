@@ -64,12 +64,16 @@ export function SheetClientDetails({
       {/* Section 2 — Suggestions IA */}
       {suggestions && suggestions.length > 0 && (
         <div className="flex flex-col gap-3">
+          <h6 className="text-[16px] font-bold leading-[20px] tracking-[0.16px] text-content-headings">
+            Suggestions d'actions
+          </h6>
           {suggestions.slice(0, 2).map((suggestion, idx) => (
             <AiSuggestionBanner
               key={idx}
               suggestion={suggestion.text}
               actionLabel={suggestion.actionLabel}
               onAction={suggestion.onAction}
+              variant="compact"
             />
           ))}
         </div>
@@ -77,7 +81,10 @@ export function SheetClientDetails({
 
       {/* Section 3 — Activités récentes */}
       {recentLogs && recentLogs.length > 0 && (
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col gap-3">
+          <h6 className="text-[16px] font-bold leading-[20px] tracking-[0.16px] text-content-headings">
+            Activités
+          </h6>
           {recentLogs.slice(0, 3).map((log, idx) => (
             <CardLog
               key={idx}

@@ -19,7 +19,7 @@ import { IconDpe, DpeType } from "./IconDpe";
 import { KpiIndicator } from "./KpiIndicator";
 import { AiSuggestionBanner } from "./AiSuggestionBanner";
 import { CardLog } from "./CardLog";
-import { MapPin, Tag, Home, Square } from "lucide-react";
+import { Tag } from "lucide-react";
 
 export interface SheetBienDetailsProps {
   // Infos bien
@@ -76,55 +76,23 @@ export function SheetBienDetails({
         className="w-full h-[115px] rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
       />
 
-      {/* Position 2: Infos bien (badges, chips, DPE) */}
-      <div className="flex flex-col gap-6">
-        {/* Ligne 1: Badge type + Chip prix + Badge CARNET */}
-        <div className="flex gap-2 items-center">
-          <Badge variant="default">
-            {type}
-          </Badge>
+      {/* Position 2: Infos bien (badge type + chip prix + badge carnet) */}
+      <div className="flex gap-2 items-center">
+        <Badge variant="default">
+          {type}
+        </Badge>
 
-          <Chip
-            size="medium"
-            icon={<Tag size={20} className="text-icon-neutral-default" />}
-            iconPosition="left"
-          >
-            {price}
-          </Chip>
+        <Chip
+          size="medium"
+          icon={<Tag size={20} className="text-icon-neutral-default" />}
+          iconPosition="left"
+        >
+          {price}
+        </Chip>
 
-          <Badge variant="success">
-            CARNET
-          </Badge>
-        </div>
-
-        {/* Ligne 2: Chip localisation + Chip type + Chip surface + Icon DPE */}
-        <div className="flex gap-2 items-center">
-          <Chip
-            size="medium"
-            icon={<MapPin size={20} className="text-icon-neutral-default" />}
-            iconPosition="left"
-          >
-            {location}
-          </Chip>
-
-          <Chip
-            size="medium"
-            icon={<Home size={20} className="text-icon-neutral-default" />}
-            iconPosition="left"
-          >
-            {bienType}
-          </Chip>
-
-          <Chip
-            size="medium"
-            icon={<Square size={20} className="text-icon-neutral-default" />}
-            iconPosition="left"
-          >
-            {surface}
-          </Chip>
-
-          <IconDpe type={dpe} size="small" />
-        </div>
+        <Badge variant="success">
+          CARNET
+        </Badge>
       </div>
 
       {/* Section 3 — KPIs inline */}
@@ -137,12 +105,16 @@ export function SheetBienDetails({
       {/* Section 4 — Suggestions IA */}
       {suggestions && suggestions.length > 0 && (
         <div className="flex flex-col gap-3">
+          <h6 className="text-[16px] font-bold leading-[20px] tracking-[0.16px] text-content-headings">
+            Suggestions d'actions
+          </h6>
           {suggestions.slice(0, 2).map((suggestion, idx) => (
             <AiSuggestionBanner
               key={idx}
               suggestion={suggestion.text}
               actionLabel={suggestion.actionLabel}
               onAction={suggestion.onAction}
+              variant="compact"
             />
           ))}
         </div>
@@ -150,7 +122,10 @@ export function SheetBienDetails({
 
       {/* Section 5 — Activités récentes */}
       {recentLogs && recentLogs.length > 0 && (
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col gap-3">
+          <h6 className="text-[16px] font-bold leading-[20px] tracking-[0.16px] text-content-headings">
+            Activités
+          </h6>
           {recentLogs.slice(0, 3).map((log, idx) => (
             <CardLog
               key={idx}
