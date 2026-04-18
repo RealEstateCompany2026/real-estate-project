@@ -23,6 +23,7 @@ import { Sheet } from '@real-estate/ui/sheet';
 import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
+import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -1099,61 +1100,88 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           </div>
         }
       >
-        <div className="flex flex-col gap-[32px] px-[20px] py-[20px]">
+        <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
           {/* Section Identité */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Informations d&apos;identité
-            </p>
-            <SelectField
-              label="Genre"
-              value={profileForm.gender}
-              onChange={(v) => updateProfileField('gender', v)}
-              options={[
-                { value: 'HOMME', label: 'M.' },
-                { value: 'FEMME', label: 'Mme' },
-                { value: 'AUTRE', label: 'Autre' },
-              ]}
-            />
-            <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
-            <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
-            <InputFieldOutlined label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" />
-            <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
-            <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
-            <InputFieldOutlined label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" />
-          </div>
+          <CollapsibleSection
+            title="Informations d'identité"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [profileForm.gender, profileForm.lastName, profileForm.firstName, profileForm.dateOfBirth, profileForm.placeOfBirth, profileForm.nationality, profileForm.maritalStatus];
+              const filled = fields.filter(f => f != null && f !== '').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <SelectField
+                label="Genre"
+                value={profileForm.gender}
+                onChange={(v) => updateProfileField('gender', v)}
+                options={[
+                  { value: 'HOMME', label: 'M.' },
+                  { value: 'FEMME', label: 'Mme' },
+                  { value: 'AUTRE', label: 'Autre' },
+                ]}
+              />
+              <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
+              <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
+              <InputFieldOutlined label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" />
+              <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
+              <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
+              <InputFieldOutlined label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" />
+            </div>
+          </CollapsibleSection>
 
           {/* Section Contact */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Informations de contact
-            </p>
-            <InputFieldOutlined label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" />
-            <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
-            <InputFieldOutlined label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
-            <InputFieldOutlined label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
-            <SelectField
-              label="Canal préféré"
-              value={profileForm.preferredChannel}
-              onChange={(v) => updateProfileField('preferredChannel', v)}
-              options={[
-                { value: 'EMAIL', label: 'Email' },
-                { value: 'PHONE', label: 'Téléphone' },
-                { value: 'SMS', label: 'SMS' },
-                { value: 'WHATSAPP', label: 'WhatsApp' },
-              ]}
-            />
-          </div>
+          <CollapsibleSection
+            title="Informations de contact"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [profileForm.address, profileForm.mobilePhone, profileForm.primaryEmail, profileForm.secondaryEmail, profileForm.preferredChannel];
+              const filled = fields.filter(f => f != null && f !== '').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <InputFieldOutlined label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" />
+              <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
+              <InputFieldOutlined label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+              <InputFieldOutlined label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+              <SelectField
+                label="Canal préféré"
+                value={profileForm.preferredChannel}
+                onChange={(v) => updateProfileField('preferredChannel', v)}
+                options={[
+                  { value: 'EMAIL', label: 'Email' },
+                  { value: 'PHONE', label: 'Téléphone' },
+                  { value: 'SMS', label: 'SMS' },
+                  { value: 'WHATSAPP', label: 'WhatsApp' },
+                ]}
+              />
+            </div>
+          </CollapsibleSection>
 
           {/* Section Professionnel */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Informations professionnelles
-            </p>
-            <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
-            <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
-            <InputFieldOutlined label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
-          </div>
+          <CollapsibleSection
+            title="Informations professionnelles"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [profileForm.jobTitle, profileForm.employer, profileForm.incomeBracket];
+              const filled = fields.filter(f => f != null && f !== '').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
+              <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
+              <InputFieldOutlined label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
+            </div>
+          </CollapsibleSection>
         </div>
       </Sheet>
 

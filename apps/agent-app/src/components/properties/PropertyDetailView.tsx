@@ -28,6 +28,7 @@ import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
 import { ListClient } from '@real-estate/ui/list-client';
 import { Switch } from '@real-estate/ui/switch';
+import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -1633,338 +1634,392 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           </div>
         }
       >
-        <div className="flex flex-col gap-[32px] px-[20px] py-[20px]">
+        <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
           {/* Localisation */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Localisation
-            </p>
-            <InputFieldOutlined
-              label="Étage"
-              value={characteristicsForm.floorLevel}
-              onChange={(v) => updateCharacteristicsField('floorLevel', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Nombre d'étages"
-              value={characteristicsForm.numberOfFloors}
-              onChange={(v) => updateCharacteristicsField('numberOfFloors', v)}
-              type="number"
-              placeholder="0"
-            />
-          </div>
+          <CollapsibleSection
+            title="Localisation"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [characteristicsForm.floorLevel, characteristicsForm.numberOfFloors];
+              const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <InputFieldOutlined
+                label="Étage"
+                value={characteristicsForm.floorLevel}
+                onChange={(v) => updateCharacteristicsField('floorLevel', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Nombre d'étages"
+                value={characteristicsForm.numberOfFloors}
+                onChange={(v) => updateCharacteristicsField('numberOfFloors', v)}
+                type="number"
+                placeholder="0"
+              />
+            </div>
+          </CollapsibleSection>
 
           {/* Type */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Type
-            </p>
-            <SelectField
-              label="Type"
-              value={characteristicsForm.type}
-              onChange={(v) => updateCharacteristicsField('type', v)}
-              options={Object.entries(PROPERTY_TYPE_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <SelectField
-              label="Condition"
-              value={characteristicsForm.condition}
-              onChange={(v) => updateCharacteristicsField('condition', v)}
-              options={Object.entries(PROPERTY_CONDITION_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <InputFieldOutlined
-              label="Année de construction"
-              value={characteristicsForm.constructionYear}
-              onChange={(v) => updateCharacteristicsField('constructionYear', v)}
-              type="number"
-              placeholder="2000"
-            />
-            <InputFieldOutlined
-              label="Surface habitable (m²)"
-              value={characteristicsForm.livingAreaSqm}
-              onChange={(v) => updateCharacteristicsField('livingAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Terrain (m²)"
-              value={characteristicsForm.landAreaSqm}
-              onChange={(v) => updateCharacteristicsField('landAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Nombre de pièces"
-              value={characteristicsForm.numberOfRooms}
-              onChange={(v) => updateCharacteristicsField('numberOfRooms', v)}
-              type="number"
-              placeholder="0"
-            />
-          </div>
+          <CollapsibleSection
+            title="Type"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [characteristicsForm.type, characteristicsForm.condition, characteristicsForm.constructionYear, characteristicsForm.livingAreaSqm, characteristicsForm.landAreaSqm, characteristicsForm.numberOfRooms];
+              const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <SelectField
+                label="Type"
+                value={characteristicsForm.type}
+                onChange={(v) => updateCharacteristicsField('type', v)}
+                options={Object.entries(PROPERTY_TYPE_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <SelectField
+                label="Condition"
+                value={characteristicsForm.condition}
+                onChange={(v) => updateCharacteristicsField('condition', v)}
+                options={Object.entries(PROPERTY_CONDITION_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <InputFieldOutlined
+                label="Année de construction"
+                value={characteristicsForm.constructionYear}
+                onChange={(v) => updateCharacteristicsField('constructionYear', v)}
+                type="number"
+                placeholder="2000"
+              />
+              <InputFieldOutlined
+                label="Surface habitable (m²)"
+                value={characteristicsForm.livingAreaSqm}
+                onChange={(v) => updateCharacteristicsField('livingAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Terrain (m²)"
+                value={characteristicsForm.landAreaSqm}
+                onChange={(v) => updateCharacteristicsField('landAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Nombre de pièces"
+                value={characteristicsForm.numberOfRooms}
+                onChange={(v) => updateCharacteristicsField('numberOfRooms', v)}
+                type="number"
+                placeholder="0"
+              />
+            </div>
+          </CollapsibleSection>
 
           {/* Pièces */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Pièces
-            </p>
-            <InputFieldOutlined
-              label="Pièce à vivre (m²)"
-              value={characteristicsForm.mainRoomAreaSqm}
-              onChange={(v) => updateCharacteristicsField('mainRoomAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Cuisine (m²)"
-              value={characteristicsForm.kitchenAreaSqm}
-              onChange={(v) => updateCharacteristicsField('kitchenAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <SelectField
-              label="Type de cuisine"
-              value={characteristicsForm.kitchenType}
-              onChange={(v) => updateCharacteristicsField('kitchenType', v)}
-              options={Object.entries(KITCHEN_TYPE_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <InputFieldOutlined
-              label="Chambres"
-              value={characteristicsForm.bedroomCount}
-              onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Chambre 1 (m²)"
-              value={characteristicsForm.bedroom1AreaSqm}
-              onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Chambre 2 (m²)"
-              value={characteristicsForm.bedroom2AreaSqm}
-              onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Chambre 3 (m²)"
-              value={characteristicsForm.bedroom3AreaSqm}
-              onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Chambre 4 (m²)"
-              value={characteristicsForm.bedroom4AreaSqm}
-              onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Salles de bain"
-              value={characteristicsForm.bathroomCount}
-              onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Douches"
-              value={characteristicsForm.showerRoomCount}
-              onChange={(v) => updateCharacteristicsField('showerRoomCount', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="WC"
-              value={characteristicsForm.toiletCount}
-              onChange={(v) => updateCharacteristicsField('toiletCount', v)}
-              type="number"
-              placeholder="0"
-            />
-          </div>
+          <CollapsibleSection
+            title="Pièces"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [characteristicsForm.mainRoomAreaSqm, characteristicsForm.kitchenAreaSqm, characteristicsForm.kitchenType, characteristicsForm.bedroomCount, characteristicsForm.bedroom1AreaSqm, characteristicsForm.bedroom2AreaSqm, characteristicsForm.bedroom3AreaSqm, characteristicsForm.bedroom4AreaSqm, characteristicsForm.bathroomCount, characteristicsForm.showerRoomCount, characteristicsForm.toiletCount];
+              const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <InputFieldOutlined
+                label="Pièce à vivre (m²)"
+                value={characteristicsForm.mainRoomAreaSqm}
+                onChange={(v) => updateCharacteristicsField('mainRoomAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Cuisine (m²)"
+                value={characteristicsForm.kitchenAreaSqm}
+                onChange={(v) => updateCharacteristicsField('kitchenAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <SelectField
+                label="Type de cuisine"
+                value={characteristicsForm.kitchenType}
+                onChange={(v) => updateCharacteristicsField('kitchenType', v)}
+                options={Object.entries(KITCHEN_TYPE_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <InputFieldOutlined
+                label="Chambres"
+                value={characteristicsForm.bedroomCount}
+                onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Chambre 1 (m²)"
+                value={characteristicsForm.bedroom1AreaSqm}
+                onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Chambre 2 (m²)"
+                value={characteristicsForm.bedroom2AreaSqm}
+                onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Chambre 3 (m²)"
+                value={characteristicsForm.bedroom3AreaSqm}
+                onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Chambre 4 (m²)"
+                value={characteristicsForm.bedroom4AreaSqm}
+                onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Salles de bain"
+                value={characteristicsForm.bathroomCount}
+                onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Douches"
+                value={characteristicsForm.showerRoomCount}
+                onChange={(v) => updateCharacteristicsField('showerRoomCount', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="WC"
+                value={characteristicsForm.toiletCount}
+                onChange={(v) => updateCharacteristicsField('toiletCount', v)}
+                type="number"
+                placeholder="0"
+              />
+            </div>
+          </CollapsibleSection>
 
           {/* Surfaces annexes */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Surfaces annexes
-            </p>
-            <InputFieldOutlined
-              label="Terrasse (m²)"
-              value={characteristicsForm.terraceAreaSqm}
-              onChange={(v) => updateCharacteristicsField('terraceAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Balcon (m²)"
-              value={characteristicsForm.balconyAreaSqm}
-              onChange={(v) => updateCharacteristicsField('balconyAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Jardin (m²)"
-              value={characteristicsForm.gardenAreaSqm}
-              onChange={(v) => updateCharacteristicsField('gardenAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Cave (m²)"
-              value={characteristicsForm.basementAreaSqm}
-              onChange={(v) => updateCharacteristicsField('basementAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Grenier (m²)"
-              value={characteristicsForm.atticAreaSqm}
-              onChange={(v) => updateCharacteristicsField('atticAreaSqm', v)}
-              type="number"
-              placeholder="0"
-            />
-          </div>
+          <CollapsibleSection
+            title="Surfaces annexes"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [characteristicsForm.terraceAreaSqm, characteristicsForm.balconyAreaSqm, characteristicsForm.gardenAreaSqm, characteristicsForm.basementAreaSqm, characteristicsForm.atticAreaSqm];
+              const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <InputFieldOutlined
+                label="Terrasse (m²)"
+                value={characteristicsForm.terraceAreaSqm}
+                onChange={(v) => updateCharacteristicsField('terraceAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Balcon (m²)"
+                value={characteristicsForm.balconyAreaSqm}
+                onChange={(v) => updateCharacteristicsField('balconyAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Jardin (m²)"
+                value={characteristicsForm.gardenAreaSqm}
+                onChange={(v) => updateCharacteristicsField('gardenAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Cave (m²)"
+                value={characteristicsForm.basementAreaSqm}
+                onChange={(v) => updateCharacteristicsField('basementAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Grenier (m²)"
+                value={characteristicsForm.atticAreaSqm}
+                onChange={(v) => updateCharacteristicsField('atticAreaSqm', v)}
+                type="number"
+                placeholder="0"
+              />
+            </div>
+          </CollapsibleSection>
 
           {/* Équipements */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              Équipements
-            </p>
-            <SelectField
-              label="Type de chauffage"
-              value={characteristicsForm.heatingType}
-              onChange={(v) => updateCharacteristicsField('heatingType', v)}
-              options={Object.entries(HEATING_TYPE_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <SelectField
-              label="Eau chaude"
-              value={characteristicsForm.hotWaterSystem}
-              onChange={(v) => updateCharacteristicsField('hotWaterSystem', v)}
-              options={Object.entries(HOT_WATER_SYSTEM_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <SelectField
-              label="Type de parking"
-              value={characteristicsForm.parkingType}
-              onChange={(v) => updateCharacteristicsField('parkingType', v)}
-              options={Object.entries(PARKING_TYPE_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <InputFieldOutlined
-              label="Places de parking"
-              value={characteristicsForm.parkingSpotCount}
-              onChange={(v) => updateCharacteristicsField('parkingSpotCount', v)}
-              type="number"
-              placeholder="0"
-            />
-            <SelectField
-              label="Ascenseur"
-              value={characteristicsForm.hasElevator}
-              onChange={(v) => updateCharacteristicsField('hasElevator', v)}
-              options={[
-                { value: 'true', label: 'Oui' },
-                { value: 'false', label: 'Non' },
-              ]}
-            />
-            <SelectField
-              label="Interphone"
-              value={characteristicsForm.hasIntercom}
-              onChange={(v) => updateCharacteristicsField('hasIntercom', v)}
-              options={[
-                { value: 'true', label: 'Oui' },
-                { value: 'false', label: 'Non' },
-              ]}
-            />
-            <SelectField
-              label="Domotique"
-              value={characteristicsForm.hasHomeAutomation}
-              onChange={(v) => updateCharacteristicsField('hasHomeAutomation', v)}
-              options={[
-                { value: 'true', label: 'Oui' },
-                { value: 'false', label: 'Non' },
-              ]}
-            />
-            <SelectField
-              label="Piscine"
-              value={characteristicsForm.hasPool}
-              onChange={(v) => updateCharacteristicsField('hasPool', v)}
-              options={[
-                { value: 'true', label: 'Oui' },
-                { value: 'false', label: 'Non' },
-              ]}
-            />
-          </div>
+          <CollapsibleSection
+            title="Équipements"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [characteristicsForm.heatingType, characteristicsForm.hotWaterSystem, characteristicsForm.parkingType, characteristicsForm.parkingSpotCount, characteristicsForm.hasElevator, characteristicsForm.hasIntercom, characteristicsForm.hasHomeAutomation, characteristicsForm.hasPool];
+              const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <SelectField
+                label="Type de chauffage"
+                value={characteristicsForm.heatingType}
+                onChange={(v) => updateCharacteristicsField('heatingType', v)}
+                options={Object.entries(HEATING_TYPE_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <SelectField
+                label="Eau chaude"
+                value={characteristicsForm.hotWaterSystem}
+                onChange={(v) => updateCharacteristicsField('hotWaterSystem', v)}
+                options={Object.entries(HOT_WATER_SYSTEM_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <SelectField
+                label="Type de parking"
+                value={characteristicsForm.parkingType}
+                onChange={(v) => updateCharacteristicsField('parkingType', v)}
+                options={Object.entries(PARKING_TYPE_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <InputFieldOutlined
+                label="Places de parking"
+                value={characteristicsForm.parkingSpotCount}
+                onChange={(v) => updateCharacteristicsField('parkingSpotCount', v)}
+                type="number"
+                placeholder="0"
+              />
+              <SelectField
+                label="Ascenseur"
+                value={characteristicsForm.hasElevator}
+                onChange={(v) => updateCharacteristicsField('hasElevator', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+              <SelectField
+                label="Interphone"
+                value={characteristicsForm.hasIntercom}
+                onChange={(v) => updateCharacteristicsField('hasIntercom', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+              <SelectField
+                label="Domotique"
+                value={characteristicsForm.hasHomeAutomation}
+                onChange={(v) => updateCharacteristicsField('hasHomeAutomation', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+              <SelectField
+                label="Piscine"
+                value={characteristicsForm.hasPool}
+                onChange={(v) => updateCharacteristicsField('hasPool', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+            </div>
+          </CollapsibleSection>
 
           {/* DPE */}
-          <div className="flex flex-col gap-[16px]">
-            <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings">
-              DPE
-            </p>
-            <SelectField
-              label="Classe énergétique"
-              value={characteristicsForm.dpeEnergyClass}
-              onChange={(v) => updateCharacteristicsField('dpeEnergyClass', v)}
-              options={Object.entries(DPE_CLASS_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <InputFieldOutlined
-              label="Énergie (kWh/m²/an)"
-              value={characteristicsForm.dpeEnergyKwh}
-              onChange={(v) => updateCharacteristicsField('dpeEnergyKwh', v)}
-              type="number"
-              placeholder="0"
-            />
-            <SelectField
-              label="Classe GES"
-              value={characteristicsForm.dpeGasEmissionClass}
-              onChange={(v) => updateCharacteristicsField('dpeGasEmissionClass', v)}
-              options={Object.entries(DPE_CLASS_LABELS).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-            />
-            <InputFieldOutlined
-              label="GES (gCO₂/m²/an)"
-              value={characteristicsForm.dpeGasGco2}
-              onChange={(v) => updateCharacteristicsField('dpeGasGco2', v)}
-              type="number"
-              placeholder="0"
-            />
-            <InputFieldOutlined
-              label="Validité DPE (YYYY-MM-DD)"
-              value={characteristicsForm.dpeValidityDate}
-              onChange={(v) => updateCharacteristicsField('dpeValidityDate', v)}
-              type="text"
-              placeholder="2025-12-31"
-            />
-            <InputFieldOutlined
-              label="Conformité (YYYY-MM-DD)"
-              value={characteristicsForm.dpeComplianceDeadline}
-              onChange={(v) => updateCharacteristicsField('dpeComplianceDeadline', v)}
-              type="text"
-              placeholder="2025-12-31"
-            />
-          </div>
+          <CollapsibleSection
+            title="DPE"
+            defaultExpanded={false}
+            badge={(() => {
+              const fields = [characteristicsForm.dpeEnergyClass, characteristicsForm.dpeEnergyKwh, characteristicsForm.dpeGasEmissionClass, characteristicsForm.dpeGasGco2, characteristicsForm.dpeValidityDate, characteristicsForm.dpeComplianceDeadline];
+              const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
+              const pct = Math.round((filled / fields.length) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <SelectField
+                label="Classe énergétique"
+                value={characteristicsForm.dpeEnergyClass}
+                onChange={(v) => updateCharacteristicsField('dpeEnergyClass', v)}
+                options={Object.entries(DPE_CLASS_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <InputFieldOutlined
+                label="Énergie (kWh/m²/an)"
+                value={characteristicsForm.dpeEnergyKwh}
+                onChange={(v) => updateCharacteristicsField('dpeEnergyKwh', v)}
+                type="number"
+                placeholder="0"
+              />
+              <SelectField
+                label="Classe GES"
+                value={characteristicsForm.dpeGasEmissionClass}
+                onChange={(v) => updateCharacteristicsField('dpeGasEmissionClass', v)}
+                options={Object.entries(DPE_CLASS_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+              />
+              <InputFieldOutlined
+                label="GES (gCO2/m2/an)"
+                value={characteristicsForm.dpeGasGco2}
+                onChange={(v) => updateCharacteristicsField('dpeGasGco2', v)}
+                type="number"
+                placeholder="0"
+              />
+              <InputFieldOutlined
+                label="Validité DPE (YYYY-MM-DD)"
+                value={characteristicsForm.dpeValidityDate}
+                onChange={(v) => updateCharacteristicsField('dpeValidityDate', v)}
+                type="text"
+                placeholder="2025-12-31"
+              />
+              <InputFieldOutlined
+                label="Conformité (YYYY-MM-DD)"
+                value={characteristicsForm.dpeComplianceDeadline}
+                onChange={(v) => updateCharacteristicsField('dpeComplianceDeadline', v)}
+                type="text"
+                placeholder="2025-12-31"
+              />
+            </div>
+          </CollapsibleSection>
         </div>
       </Sheet>
 

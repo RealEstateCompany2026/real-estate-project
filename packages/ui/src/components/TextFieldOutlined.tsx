@@ -135,7 +135,7 @@ export function TextFieldOutlined({
     <div
       className={`
         text-field-outlined-component
-        flex items-center gap-[8px]
+        w-full flex items-center gap-[8px]
         h-[56px] px-[12px] py-[18px]
         border border-solid rounded-[8px]
         transition-all

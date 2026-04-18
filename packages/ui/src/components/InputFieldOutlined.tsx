@@ -72,7 +72,7 @@ export function InputFieldOutlined({
   const fieldId = id || `input-outlined-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
-    <div className={`flex flex-col gap-[12px] items-start ${className}`.trim()}>
+    <div className={`flex flex-col gap-[12px] w-full ${className}`.trim()}>
       {/* Label */}
       <Label
         label={label}

@@ -83,7 +83,11 @@
         "./filter-range": "./src/components/FilterRange.tsx",
         "./filter-location": "./src/components/FilterLocation.tsx",
         "./filter-date-range": "./src/components/FilterDateRange.tsx",
-        "./filter-enum": "./src/components/FilterEnum.tsx"
+        "./filter-enum": "./src/components/FilterEnum.tsx",
+        "./collapsible-section": {
+            "import": "./src/components/CollapsibleSection.tsx",
+            "types": "./src/components/CollapsibleSection.tsx"
+        }
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
