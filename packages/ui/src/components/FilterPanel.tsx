@@ -68,22 +68,22 @@ function formatFilterLabel(
       const v = value as RangeValue;
       const unit = criterion.config?.unit ?? "";
       if (v.min != null && v.max != null)
-        return `${criterion.label}: ${v.min}–${v.max} ${unit}`.trim();
-      if (v.min != null) return `${criterion.label}: >= ${v.min} ${unit}`.trim();
-      if (v.max != null) return `${criterion.label}: <= ${v.max} ${unit}`.trim();
+        return `${v.min}–${v.max} ${unit}`.trim();
+      if (v.min != null) return `>= ${v.min} ${unit}`.trim();
+      if (v.max != null) return `<= ${v.max} ${unit}`.trim();
       return criterion.label;
     }
     case "location": {
       const locations = value as string[];
       if (locations.length === 0) return criterion.label;
-      if (locations.length <= 2) return `${criterion.label}: ${locations.join(", ")}`;
-      return `${criterion.label}: ${locations[0]}, ${locations[1]} +${locations.length - 2}`;
+      if (locations.length <= 2) return locations.join(", ");
+      return `${locations[0]}, ${locations[1]} +${locations.length - 2}`;
     }
     case "date": {
       const v = value as DateValue;
-      if (v.from && v.to) return `${criterion.label}: ${v.from} → ${v.to}`;
-      if (v.from) return `${criterion.label}: depuis ${v.from}`;
-      if (v.to) return `${criterion.label}: jusqu'au ${v.to}`;
+      if (v.from && v.to) return `${v.from} → ${v.to}`;
+      if (v.from) return `depuis ${v.from}`;
+      if (v.to) return `jusqu'au ${v.to}`;
       return criterion.label;
     }
     case "enum": {
@@ -92,8 +92,8 @@ function formatFilterLabel(
       const labels = vals
         .map((v) => opts.find((o) => o.value === v)?.label ?? v)
         .slice(0, 2);
-      if (vals.length > 2) return `${criterion.label}: ${labels.join(", ")} +${vals.length - 2}`;
-      if (vals.length > 0) return `${criterion.label}: ${labels.join(", ")}`;
+      if (vals.length > 2) return `${labels.join(", ")} +${vals.length - 2}`;
+      if (vals.length > 0) return labels.join(", ");
       return criterion.label;
     }
     default:

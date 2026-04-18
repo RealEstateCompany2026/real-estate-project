@@ -60,7 +60,7 @@ interface ClientWithKpis extends ClientListItem {
   suggestions: Array<{ text: string; actionLabel: string }>;
   recentActivities: Array<{ date: string; time: string; author: string; category: string; description: string; badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled' }>;
   // Raw data for advanced filtering
-  addressCity: string | null;
+  address: string | null;
   dateOfBirth: string | null;
 }
 
@@ -204,16 +204,16 @@ export function ClientListView() {
       const supabase = createClient();
       const { data } = await supabase
         .from('Client')
-        .select('id, firstName, lastName, status, primaryEmail, mobilePhone, agentId, completionScore, isActive, createdAt, addressCity, dateOfBirth')
+        .select('id, firstName, lastName, status, primaryEmail, mobilePhone, agentId, completionScore, isActive, createdAt, address, dateOfBirth')
         .eq('isActive', true)
         .order('createdAt', { ascending: false });
 
-      const rawRows = (data ?? []) as unknown as (ClientListItem & { addressCity?: string | null; dateOfBirth?: string | null })[];
+      const rawRows = (data ?? []) as unknown as (ClientListItem & { address?: string | null; dateOfBirth?: string | null })[];
       const enriched: ClientWithKpis[] = rawRows.map((c) => {
         const kpis = mockKpis();
         return {
           ...c,
-          addressCity: c.addressCity ?? null,
+          address: c.address ?? null,
           dateOfBirth: c.dateOfBirth ?? null,
           kpis,
           kpiDetails: mockKpiDetails(kpis),
@@ -247,8 +247,8 @@ export function ClientListView() {
         case "01.01": { // Secteur géographique
           const cities = af.value as string[];
           if (cities.length > 0) {
-            const clientCity = (c.addressCity ?? '').toLowerCase();
-            if (!cities.some(city => clientCity.includes(city.toLowerCase()))) return false;
+            const clientAddress = (c.address ?? '').toLowerCase();
+            if (!cities.some(city => clientAddress.includes(city.toLowerCase()))) return false;
           }
           break;
         }
