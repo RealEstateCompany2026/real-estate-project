@@ -77,7 +77,12 @@
         "./gallery": "./src/components/Gallery.tsx",
         "./list-annonce": "./src/components/ListAnnonce.tsx",
         "./app-bar-annonce": "./src/components/AppBarAnnonce.tsx",
-        "./list-import": "./src/components/ListImport.tsx"
+        "./list-import": "./src/components/ListImport.tsx",
+        "./filter-panel": "./src/components/FilterPanel.tsx",
+        "./filter-range": "./src/components/FilterRange.tsx",
+        "./filter-location": "./src/components/FilterLocation.tsx",
+        "./filter-date-range": "./src/components/FilterDateRange.tsx",
+        "./filter-enum": "./src/components/FilterEnum.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
