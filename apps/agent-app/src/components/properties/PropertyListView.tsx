@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Filter, Plus, X } from 'lucide-react';
+import { Filter, Plus, Square, Calendar, Tag, MapPin } from 'lucide-react';
 
 // ── DS Components (from packages/ui) ──
 import { AppBarCategory } from '@real-estate/ui/app-bar-category';
@@ -18,6 +18,8 @@ import { IconDpe } from '@real-estate/ui/icon-dpe';
 import { Button } from '@real-estate/ui/button';
 import { IconButton } from '@real-estate/ui/button';
 import { SheetBienDetails } from '@real-estate/ui/sheet-bien-details';
+import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
+import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
 import { MessageCircle, Phone } from 'lucide-react';
 
 // ── App-level ──
@@ -121,6 +123,17 @@ const GRAPH_DATA = [
 const PAGE_SIZE = 100;
 
 // ---------------------------------------------------------------------------
+// Filter criteria definitions
+// ---------------------------------------------------------------------------
+
+const PROPERTY_FILTER_CRITERIA: FilterCriterionDef[] = [
+  { id: "02.01", label: "Surface", icon: <Square size={16} />, type: "range", config: { unit: "m\u00B2", min: 0, max: 1000, step: 5 } },
+  { id: "02.02", label: "Localisation", icon: <MapPin size={16} />, type: "location", config: { placeholder: "Rechercher une ville..." } },
+  { id: "02.03", label: "Prix", icon: <Tag size={16} />, type: "range", config: { unit: "\u20AC", min: 0, max: 5000000, step: 10000 } },
+  { id: "02.04", label: "Date de construction", icon: <Calendar size={16} />, type: "range", config: { unit: "", min: 1800, max: 2026, step: 1 } },
+];
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -134,7 +147,8 @@ export function PropertyListView() {
   // ── UI state ──
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [page, setPage] = useState(0);
 
   // ── Sheet state ──
@@ -216,14 +230,42 @@ export function PropertyListView() {
 
   // ── Filtering ──
   const filtered = properties.filter((p) => {
+    // Category macro filter
     if (categoryFilter !== 'ALL') {
       if (categoryFilter === 'SOUS_GESTION') {
         // TODO: filter by operationTypes includes 'GESTION'
         return true;
       } else if (categoryFilter === 'OFF_MARKET') {
-        return p.status === 'OFF_MARKET';
+        if (p.status !== 'OFF_MARKET') return false;
       } else {
-        return p.status === categoryFilter;
+        if (p.status !== categoryFilter) return false;
+      }
+    }
+
+    // Advanced filters
+    for (const af of activeFilters) {
+      switch (af.criterionId) {
+        case "02.01": { // Surface
+          const range = af.value as { min?: number; max?: number };
+          const surface = parseFloat(p.surface);
+          if (range.min !== undefined && surface < range.min) return false;
+          if (range.max !== undefined && surface > range.max) return false;
+          break;
+        }
+        case "02.02": { // Localisation
+          const cities = af.value as string[];
+          if (cities.length > 0 && !cities.some(city => p.city.toLowerCase().includes(city.toLowerCase()))) return false;
+          break;
+        }
+        case "02.03": { // Prix
+          const range = af.value as { min?: number; max?: number };
+          const price = parseFloat(p.price.replace(/[^0-9]/g, ''));
+          if (range.min !== undefined && price < range.min) return false;
+          if (range.max !== undefined && price > range.max) return false;
+          break;
+        }
+        case "02.04": // Date construction — pas de donnée dans le fetch actuel, skip V1
+          break;
       }
     }
     return true;
@@ -239,8 +281,9 @@ export function PropertyListView() {
     setSheetOpen(true);
   }, []);
 
-  const handleRemoveFilter = useCallback((filter: string) => {
-    setActiveFilters((prev) => prev.filter((f) => f !== filter));
+  const handleRemoveFilter = useCallback((criterionId: string) => {
+    setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
+    setPage(0);
   }, []);
 
   // ── Loading skeleton ──
@@ -289,41 +332,32 @@ export function PropertyListView() {
       />
 
       {/* ═══════════════════════════════════════════════════════
-          3. Filter bar — filter icon + chips + view mode toggle
+          3. Filter bar — filter icon + badges + view mode toggle
           ═══════════════════════════════════════════════════════ */}
       <div className="flex items-center justify-between px-0 py-[10px]">
-        <div className="flex items-center gap-[8px]">
+        <div className="flex items-center gap-[8px] flex-wrap">
           {/* Filter icon */}
-          <button
-            type="button"
-            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
-            aria-label="Filtrer"
-          >
-            <Filter size={20} style={{ color: 'var(--icon-neutral-default)' }} />
-          </button>
+          <IconButton
+            variant="ghost"
+            icon={<Filter size={20} />}
+            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+          />
 
-          {/* Active filter chips */}
+          {/* Active filter badges */}
           {activeFilters.map((filter) => (
-            <Chip key={filter} size="medium">
-              {filter}
-              <button
-                onClick={() => handleRemoveFilter(filter)}
-                className="ml-1"
-                aria-label={`Supprimer le filtre ${filter}`}
-              >
-                <X size={14} style={{ color: 'var(--icon-neutral-default)' }} />
-              </button>
-            </Chip>
+            <BadgeCriteria
+              key={filter.criterionId}
+              label={filter.label}
+              onRemove={() => handleRemoveFilter(filter.criterionId)}
+            />
           ))}
 
           {/* Add filter button */}
-          <button
-            type="button"
-            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
-            aria-label="Ajouter un filtre"
-          >
-            <Plus size={20} style={{ color: 'var(--icon-neutral-default)' }} />
-          </button>
+          <IconButton
+            variant="ghost"
+            icon={<Plus size={20} />}
+            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+          />
         </div>
 
         {/* View mode toggle */}
@@ -332,6 +366,26 @@ export function PropertyListView() {
           onViewModeChange={setViewMode}
         />
       </div>
+
+      {/* FilterPanel — ancré sous la barre */}
+      {filterPanelOpen && (
+        <FilterPanel
+          criteria={PROPERTY_FILTER_CRITERIA}
+          activeFilters={activeFilters}
+          onApplyFilter={(filter) => {
+            setActiveFilters((prev) => {
+              const without = prev.filter((f) => f.criterionId !== filter.criterionId);
+              return [...without, filter];
+            });
+            setFilterPanelOpen(false);
+            setPage(0);
+          }}
+          onRemoveFilter={(criterionId) => {
+            setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
+          }}
+          onClose={() => setFilterPanelOpen(false)}
+        />
+      )}
 
       {/* ═══════════════════════════════════════════════════════
           4. Property list / grid

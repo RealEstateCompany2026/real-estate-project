@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Filter, Plus, X } from 'lucide-react';
+import { Filter, Plus, MapPin, User, Calendar, Home, FileText, BookOpen } from 'lucide-react';
 
 // ── DS Components (from packages/ui) ──
 import { AppBarCategory } from '@real-estate/ui/app-bar-category';
@@ -13,10 +13,11 @@ import { Sheet } from '@real-estate/ui/sheet';
 import { ButtonSort } from '@real-estate/ui/button-sort';
 import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
-import { Chip } from '@real-estate/ui/chip';
 import { Button } from '@real-estate/ui/button';
 import { IconButton } from '@real-estate/ui/button';
 import { SheetClientDetails } from '@real-estate/ui/sheet-client-details';
+import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
+import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
 import { MessageCircle, Phone } from 'lucide-react';
 
 // ── App-level ──
@@ -151,6 +152,28 @@ const GRAPH_DATA = [
 const PAGE_SIZE = 25;
 
 // ---------------------------------------------------------------------------
+// Filter criteria definitions
+// ---------------------------------------------------------------------------
+
+const CLIENT_FILTER_CRITERIA: FilterCriterionDef[] = [
+  { id: "01.01", label: "Secteur géographique", icon: <MapPin size={16} />, type: "location", config: { placeholder: "Rechercher une ville..." } },
+  { id: "01.02", label: "Âge", icon: <User size={16} />, type: "range", config: { unit: "ans", min: 18, max: 100 } },
+  { id: "01.03", label: "Dernière transaction", icon: <Calendar size={16} />, type: "date" },
+  { id: "01.04", label: "Quantité de biens", icon: <Home size={16} />, type: "range", config: { unit: "biens", min: 0, max: 50 } },
+  { id: "01.05", label: "Mandat en cours", icon: <FileText size={16} />, type: "enum", config: { options: [
+    { value: "VENTE", label: "Vente" },
+    { value: "GESTION", label: "Gestion" },
+    { value: "RECHERCHE_ACQUISITION", label: "Recherche acquisition" },
+    { value: "RECHERCHE_LOCATION", label: "Recherche location" },
+  ]}},
+  { id: "01.06", label: "Mandat terminé depuis", icon: <FileText size={16} />, type: "date" },
+  { id: "01.07", label: "Carnet", icon: <BookOpen size={16} />, type: "enum", config: { options: [
+    { value: "ACTIF", label: "Actif" },
+    { value: "INACTIF", label: "Inactif" },
+  ]}},
+];
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -164,7 +187,8 @@ export function ClientListView() {
   // ── UI state ──
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [page, setPage] = useState(0);
 
   // ── Sheet state ──
@@ -208,8 +232,28 @@ export function ClientListView() {
 
   // ── Filtering ──
   const filtered = clients.filter((c) => {
+    // Category macro filter
     if (categoryFilter !== 'ALL' && !c.status.includes(categoryFilter as ClientStatus)) return false;
-    // Additional active filters could be applied here
+
+    // Advanced filters
+    for (const af of activeFilters) {
+      switch (af.criterionId) {
+        case "01.01": // Secteur géographique — pas de donnée city sur le client actuellement, skip en V1
+          break;
+        case "01.02": // Âge — pas de dateOfBirth dans le fetch actuel, skip en V1
+          break;
+        case "01.03": // Dernière transaction — nécessite jointure, skip en V1
+          break;
+        case "01.04": // Quantité de biens — nécessite jointure, skip en V1
+          break;
+        case "01.05": // Mandat en cours — nécessite jointure, skip en V1
+          break;
+        case "01.06": // Mandat terminé depuis — nécessite jointure, skip en V1
+          break;
+        case "01.07": // Carnet — nécessite donnée pas encore fetchée, skip en V1
+          break;
+      }
+    }
     return true;
   });
 
@@ -223,8 +267,9 @@ export function ClientListView() {
     setSheetOpen(true);
   }, []);
 
-  const handleRemoveFilter = useCallback((filter: string) => {
-    setActiveFilters((prev) => prev.filter((f) => f !== filter));
+  const handleRemoveFilter = useCallback((criterionId: string) => {
+    setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
+    setPage(0);
   }, []);
 
   // ── Loading skeleton ──
@@ -273,41 +318,32 @@ export function ClientListView() {
       />
 
       {/* ═══════════════════════════════════════════════════════
-          3. Filter bar — filter icon + chips + view mode toggle
+          3. Filter bar — filter icon + badges + view mode toggle
           ═══════════════════════════════════════════════════════ */}
       <div className="flex items-center justify-between px-0 py-[10px]">
-        <div className="flex items-center gap-[8px]">
+        <div className="flex items-center gap-[8px] flex-wrap">
           {/* Filter icon */}
-          <button
-            type="button"
-            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
-            aria-label="Filtrer"
-          >
-            <Filter size={20} style={{ color: 'var(--icon-neutral-default)' }} />
-          </button>
+          <IconButton
+            variant="ghost"
+            icon={<Filter size={20} />}
+            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+          />
 
-          {/* Active filter chips */}
+          {/* Active filter badges */}
           {activeFilters.map((filter) => (
-            <Chip key={filter} size="medium">
-              {filter}
-              <button
-                onClick={() => handleRemoveFilter(filter)}
-                className="ml-1"
-                aria-label={`Supprimer le filtre ${filter}`}
-              >
-                <X size={14} style={{ color: 'var(--icon-neutral-default)' }} />
-              </button>
-            </Chip>
+            <BadgeCriteria
+              key={filter.criterionId}
+              label={filter.label}
+              onRemove={() => handleRemoveFilter(filter.criterionId)}
+            />
           ))}
 
           {/* Add filter button */}
-          <button
-            type="button"
-            className="p-[12px] rounded-2xl hover:bg-surface-neutral-action transition-colors"
-            aria-label="Ajouter un filtre"
-          >
-            <Plus size={20} style={{ color: 'var(--icon-neutral-default)' }} />
-          </button>
+          <IconButton
+            variant="ghost"
+            icon={<Plus size={20} />}
+            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+          />
         </div>
 
         {/* View mode toggle */}
@@ -316,6 +352,26 @@ export function ClientListView() {
           onViewModeChange={setViewMode}
         />
       </div>
+
+      {/* FilterPanel — ancré sous la barre */}
+      {filterPanelOpen && (
+        <FilterPanel
+          criteria={CLIENT_FILTER_CRITERIA}
+          activeFilters={activeFilters}
+          onApplyFilter={(filter) => {
+            setActiveFilters((prev) => {
+              const without = prev.filter((f) => f.criterionId !== filter.criterionId);
+              return [...without, filter];
+            });
+            setFilterPanelOpen(false);
+            setPage(0);
+          }}
+          onRemoveFilter={(criterionId) => {
+            setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
+          }}
+          onClose={() => setFilterPanelOpen(false)}
+        />
+      )}
 
       {/* ═══════════════════════════════════════════════════════
           4. Client list / grid
