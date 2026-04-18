@@ -59,6 +59,9 @@ interface ClientWithKpis extends ClientListItem {
   // Nouvelles données pour Sheet
   suggestions: Array<{ text: string; actionLabel: string }>;
   recentActivities: Array<{ date: string; time: string; author: string; category: string; description: string; badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled' }>;
+  // Raw data for advanced filtering
+  addressCity: string | null;
+  dateOfBirth: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -201,14 +204,17 @@ export function ClientListView() {
       const supabase = createClient();
       const { data } = await supabase
         .from('Client')
-        .select('id, firstName, lastName, status, primaryEmail, mobilePhone, agentId, completionScore, isActive, createdAt')
+        .select('id, firstName, lastName, status, primaryEmail, mobilePhone, agentId, completionScore, isActive, createdAt, addressCity, dateOfBirth')
         .eq('isActive', true)
         .order('createdAt', { ascending: false });
 
-      const enriched: ClientWithKpis[] = ((data ?? []) as unknown as ClientListItem[]).map((c) => {
+      const rawRows = (data ?? []) as unknown as (ClientListItem & { addressCity?: string | null; dateOfBirth?: string | null })[];
+      const enriched: ClientWithKpis[] = rawRows.map((c) => {
         const kpis = mockKpis();
         return {
           ...c,
+          addressCity: c.addressCity ?? null,
+          dateOfBirth: c.dateOfBirth ?? null,
           kpis,
           kpiDetails: mockKpiDetails(kpis),
           aiSuggestions: Math.floor(Math.random() * 20),
@@ -238,10 +244,24 @@ export function ClientListView() {
     // Advanced filters
     for (const af of activeFilters) {
       switch (af.criterionId) {
-        case "01.01": // Secteur géographique — pas de donnée city sur le client actuellement, skip en V1
+        case "01.01": { // Secteur géographique
+          const cities = af.value as string[];
+          if (cities.length > 0) {
+            const clientCity = (c.addressCity ?? '').toLowerCase();
+            if (!cities.some(city => clientCity.includes(city.toLowerCase()))) return false;
+          }
           break;
-        case "01.02": // Âge — pas de dateOfBirth dans le fetch actuel, skip en V1
+        }
+        case "01.02": { // Âge
+          const range = af.value as { min?: number; max?: number };
+          const dob = c.dateOfBirth;
+          if (dob) {
+            const age = Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+            if (range.min !== undefined && age < range.min) return false;
+            if (range.max !== undefined && age > range.max) return false;
+          }
           break;
+        }
         case "01.03": // Dernière transaction — nécessite jointure, skip en V1
           break;
         case "01.04": // Quantité de biens — nécessite jointure, skip en V1

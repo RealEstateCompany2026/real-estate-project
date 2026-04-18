@@ -132,20 +132,13 @@ export function FilterPanel({
 
   const selectedCriterion = criteria.find((c) => c.id === selectedId) ?? null;
 
-  // Reset value when criterion changes
-  useEffect(() => {
-    if (selectedCriterion) {
-      // If already active, load existing value
-      const existing = activeFilters.find(
-        (f) => f.criterionId === selectedCriterion.id
-      );
-      setCurrentValue(
-        existing ? existing.value : getDefaultValue(selectedCriterion.type)
-      );
-    } else {
-      setCurrentValue(null);
-    }
-  }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Synchronous criterion selection — sets both selectedId and currentValue
+  // in the same handler to avoid a render with stale null value (crash fix).
+  const handleSelectCriterion = useCallback((criterion: FilterCriterionDef) => {
+    setSelectedId(criterion.id);
+    const existing = activeFilters.find(f => f.criterionId === criterion.id);
+    setCurrentValue(existing ? existing.value : getDefaultValue(criterion.type));
+  }, [activeFilters]);
 
   // Click outside → close
   useEffect(() => {
@@ -267,9 +260,9 @@ export function FilterPanel({
       )}
 
       {/* Main 2-column layout */}
-      <div className="flex min-h-[320px]">
-        {/* Left column — criteria list */}
-        <div className="w-[240px] border-r border-edge-divider overflow-y-auto">
+      <div className="flex">
+        {/* Left column — criteria list (max-h for scroll when many criteria) */}
+        <div className="w-[240px] border-r border-edge-divider overflow-y-auto max-h-[400px]">
           <div className="flex flex-col py-2">
             {criteria.map((criterion) => {
               const active = isActive(criterion.id);
@@ -284,7 +277,7 @@ export function FilterPanel({
                       ? "bg-surface-neutral-action"
                       : "hover:bg-surface-neutral-action-hover"
                   }`}
-                  onClick={() => setSelectedId(criterion.id)}
+                  onClick={() => handleSelectCriterion(criterion)}
                 >
                   {/* Icon */}
                   {criterion.icon && (

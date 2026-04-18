@@ -68,6 +68,10 @@ interface PropertyWithKpis extends PropertyDisplayItem {
   aiSuggestions: number;
   suggestions: Array<{ text: string; actionLabel: string }>;
   recentActivities: Array<{ date: string; time: string; author: string; category: string; description: string; badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled' }>;
+  // Raw numeric data for robust filtering (avoids parsing formatted strings)
+  rawLivingAreaSqm: number | null;
+  rawDesiredSellingPrice: number | null;
+  rawAddressCity: string | null;
 }
 
 interface PropertyKpis {
@@ -209,6 +213,9 @@ export function PropertyListView() {
 
         return {
           ...displayItem,
+          rawLivingAreaSqm: p.livingAreaSqm,
+          rawDesiredSellingPrice: p.desiredSellingPrice ?? p.estimatedMarketValue,
+          rawAddressCity: p.addressCity,
           kpis: mockKpis(),
           aiSuggestions: Math.floor(Math.random() * 5),
           suggestions: [
@@ -245,21 +252,24 @@ export function PropertyListView() {
     // Advanced filters
     for (const af of activeFilters) {
       switch (af.criterionId) {
-        case "02.01": { // Surface
+        case "02.01": { // Surface — use raw numeric field
           const range = af.value as { min?: number; max?: number };
-          const surface = parseFloat(p.surface);
+          const surface = p.rawLivingAreaSqm;
+          if (surface == null) break;
           if (range.min !== undefined && surface < range.min) return false;
           if (range.max !== undefined && surface > range.max) return false;
           break;
         }
-        case "02.02": { // Localisation
+        case "02.02": { // Localisation — use raw addressCity
           const cities = af.value as string[];
-          if (cities.length > 0 && !cities.some(city => p.city.toLowerCase().includes(city.toLowerCase()))) return false;
+          const city = (p.rawAddressCity ?? p.city).toLowerCase();
+          if (cities.length > 0 && !cities.some(c => city.includes(c.toLowerCase()))) return false;
           break;
         }
-        case "02.03": { // Prix
+        case "02.03": { // Prix — use raw numeric field (avoids parsing formatted string)
           const range = af.value as { min?: number; max?: number };
-          const price = parseFloat(p.price.replace(/[^0-9]/g, ''));
+          const price = p.rawDesiredSellingPrice;
+          if (price == null) break;
           if (range.min !== undefined && price < range.min) return false;
           if (range.max !== undefined && price > range.max) return false;
           break;
