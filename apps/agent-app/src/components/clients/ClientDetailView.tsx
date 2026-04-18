@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, AlertCircle } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -701,6 +701,16 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const clientName = `${client.lastName?.toUpperCase()}, ${client.firstName}`;
   const tags = statusToTags(client.status ?? []);
 
+  /** Props pour champs vides : placeholder "À compléter" + icône warning */
+  const emptyProps = (value: string | null | undefined) => {
+    if (value != null && value !== '') return {};
+    return {
+      placeholder: 'À compléter',
+      rightIcon: AlertCircle,
+      rightIconClassName: 'text-icon-warning',
+    };
+  };
+
   return (
     <div className="relative">
       {/* ═══════════════════════════════════════════════════════
@@ -1124,12 +1134,12 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                   { value: 'AUTRE', label: 'Autre' },
                 ]}
               />
-              <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
-              <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
-              <InputFieldOutlined label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" />
-              <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
-              <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
-              <InputFieldOutlined label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" />
+              <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" {...emptyProps(profileForm.lastName)} />
+              <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" {...emptyProps(profileForm.firstName)} />
+              <InputFieldOutlined label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" {...emptyProps(profileForm.dateOfBirth)} />
+              <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" {...emptyProps(profileForm.placeOfBirth)} />
+              <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" {...emptyProps(profileForm.nationality)} />
+              <InputFieldOutlined label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" {...emptyProps(profileForm.maritalStatus)} />
             </div>
           </CollapsibleSection>
 
@@ -1146,10 +1156,10 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             })()}
           >
             <div className="flex flex-col gap-[16px]">
-              <InputFieldOutlined label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" />
-              <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
-              <InputFieldOutlined label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
-              <InputFieldOutlined label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+              <InputFieldOutlined label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" {...emptyProps(profileForm.address)} />
+              <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" {...emptyProps(profileForm.mobilePhone)} />
+              <InputFieldOutlined label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" {...emptyProps(profileForm.primaryEmail)} />
+              <InputFieldOutlined label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" {...emptyProps(profileForm.secondaryEmail)} />
               <SelectField
                 label="Canal préféré"
                 value={profileForm.preferredChannel}
@@ -1177,9 +1187,9 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             })()}
           >
             <div className="flex flex-col gap-[16px]">
-              <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
-              <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
-              <InputFieldOutlined label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" />
+              <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" {...emptyProps(profileForm.jobTitle)} />
+              <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" {...emptyProps(profileForm.employer)} />
+              <InputFieldOutlined label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" {...emptyProps(profileForm.incomeBracket)} />
             </div>
           </CollapsibleSection>
         </div>

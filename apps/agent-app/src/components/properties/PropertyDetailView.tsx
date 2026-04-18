@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, Download, Send, X, Copy, Globe } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, Download, Send, X, Copy, Globe, AlertCircle } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheBien } from '@real-estate/ui/app-bar-fiche-bien';
@@ -779,6 +779,16 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
+
+  /** Props pour champs vides : placeholder "À compléter" + icône warning */
+  const emptyProps = (value: string | null | undefined) => {
+    if (value != null && value !== '' && value !== '0') return {};
+    return {
+      placeholder: 'À compléter',
+      rightIcon: AlertCircle,
+      rightIconClassName: 'text-icon-warning',
+    };
+  };
 
   return (
     <div className="relative">
@@ -1654,6 +1664,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('floorLevel', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.floorLevel)}
               />
               <InputFieldOutlined
                 label="Nombre d'étages"
@@ -1661,6 +1672,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('numberOfFloors', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.numberOfFloors)}
               />
             </div>
           </CollapsibleSection>
@@ -1702,6 +1714,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('constructionYear', v)}
                 type="number"
                 placeholder="2000"
+                {...emptyProps(characteristicsForm.constructionYear)}
               />
               <InputFieldOutlined
                 label="Surface habitable (m²)"
@@ -1709,6 +1722,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('livingAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.livingAreaSqm)}
               />
               <InputFieldOutlined
                 label="Terrain (m²)"
@@ -1716,6 +1730,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('landAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.landAreaSqm)}
               />
               <InputFieldOutlined
                 label="Nombre de pièces"
@@ -1723,6 +1738,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('numberOfRooms', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.numberOfRooms)}
               />
             </div>
           </CollapsibleSection>
@@ -1746,6 +1762,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('mainRoomAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.mainRoomAreaSqm)}
               />
               <InputFieldOutlined
                 label="Cuisine (m²)"
@@ -1753,6 +1770,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('kitchenAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.kitchenAreaSqm)}
               />
               <SelectField
                 label="Type de cuisine"
@@ -1769,6 +1787,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.bedroomCount)}
               />
               <InputFieldOutlined
                 label="Chambre 1 (m²)"
@@ -1776,6 +1795,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.bedroom1AreaSqm)}
               />
               <InputFieldOutlined
                 label="Chambre 2 (m²)"
@@ -1783,6 +1803,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.bedroom2AreaSqm)}
               />
               <InputFieldOutlined
                 label="Chambre 3 (m²)"
@@ -1790,6 +1811,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.bedroom3AreaSqm)}
               />
               <InputFieldOutlined
                 label="Chambre 4 (m²)"
@@ -1797,6 +1819,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.bedroom4AreaSqm)}
               />
               <InputFieldOutlined
                 label="Salles de bain"
@@ -1804,6 +1827,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.bathroomCount)}
               />
               <InputFieldOutlined
                 label="Douches"
@@ -1811,6 +1835,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('showerRoomCount', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.showerRoomCount)}
               />
               <InputFieldOutlined
                 label="WC"
@@ -1818,6 +1843,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('toiletCount', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.toiletCount)}
               />
             </div>
           </CollapsibleSection>
@@ -1841,6 +1867,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('terraceAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.terraceAreaSqm)}
               />
               <InputFieldOutlined
                 label="Balcon (m²)"
@@ -1848,6 +1875,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('balconyAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.balconyAreaSqm)}
               />
               <InputFieldOutlined
                 label="Jardin (m²)"
@@ -1855,6 +1883,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('gardenAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.gardenAreaSqm)}
               />
               <InputFieldOutlined
                 label="Cave (m²)"
@@ -1862,6 +1891,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('basementAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.basementAreaSqm)}
               />
               <InputFieldOutlined
                 label="Grenier (m²)"
@@ -1869,6 +1899,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('atticAreaSqm', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.atticAreaSqm)}
               />
             </div>
           </CollapsibleSection>
@@ -1919,6 +1950,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('parkingSpotCount', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.parkingSpotCount)}
               />
               <SelectField
                 label="Ascenseur"
@@ -1987,6 +2019,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('dpeEnergyKwh', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.dpeEnergyKwh)}
               />
               <SelectField
                 label="Classe GES"
@@ -2003,6 +2036,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('dpeGasGco2', v)}
                 type="number"
                 placeholder="0"
+                {...emptyProps(characteristicsForm.dpeGasGco2)}
               />
               <InputFieldOutlined
                 label="Validité DPE (YYYY-MM-DD)"
@@ -2010,6 +2044,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('dpeValidityDate', v)}
                 type="text"
                 placeholder="2025-12-31"
+                {...emptyProps(characteristicsForm.dpeValidityDate)}
               />
               <InputFieldOutlined
                 label="Conformité (YYYY-MM-DD)"
@@ -2017,6 +2052,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 onChange={(v) => updateCharacteristicsField('dpeComplianceDeadline', v)}
                 type="text"
                 placeholder="2025-12-31"
+                {...emptyProps(characteristicsForm.dpeComplianceDeadline)}
               />
             </div>
           </CollapsibleSection>

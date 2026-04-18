@@ -54,6 +54,10 @@ export interface TextFieldOutlinedProps {
    */
   rightIcon?: LucideIcon;
   /**
+   * Classes CSS additionnelles pour l'icône droite
+   */
+  rightIconClassName?: string;
+  /**
    * État erreur (border rouge)
    */
   error?: boolean;
@@ -103,6 +107,7 @@ export function TextFieldOutlined({
   type = "text",
   leftIcon: LeftIcon,
   rightIcon: RightIcon,
+  rightIconClassName = "",
   error = false,
   disabled = false,
   name,
@@ -183,7 +188,7 @@ export function TextFieldOutlined({
 
       {/* Right Icon */}
       {RightIcon && (
-        <div className="shrink-0 w-[20px] h-[20px] flex items-center justify-center text-content-caption">
+        <div className={`shrink-0 w-[20px] h-[20px] flex items-center justify-center ${rightIconClassName || 'text-content-caption'}`}>
           <RightIcon size={20} />
         </div>
       )}
