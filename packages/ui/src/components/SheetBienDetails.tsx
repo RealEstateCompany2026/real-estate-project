@@ -4,8 +4,8 @@
  * SheetBienDetails - Panneau de décision rapide bien immobilier
  *
  * Structure:
- * - Position 1: Map placeholder
- * - Position 2: Infos bien (badges, chips, DPE)
+ * - Position 1: Infos bien (badges, chips, DPE)
+ * - Position 2: Map placeholder
  * - Section 3: KPIs inline (qual, ent, conv) variant="straight"
  * - Section 4: Suggestions IA (2 AiSuggestionBanner max)
  * - Section 5: Activités récentes (2-3 CardLog)
@@ -71,12 +71,7 @@ export function SheetBienDetails({
 }: SheetBienDetailsProps) {
   return (
     <div className={`flex flex-col gap-5 px-5 py-5 ${className}`.trim()}>
-      {/* Position 1: Map */}
-      <div
-        className="w-full h-[115px] rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
-      />
-
-      {/* Position 2: Infos bien (badge type + chip prix + badge carnet) */}
+      {/* Position 1: Infos bien (badge type + chip prix + badge carnet) */}
       <div className="flex gap-2 items-center">
         <Badge variant="default">
           {type}
@@ -94,6 +89,11 @@ export function SheetBienDetails({
           CARNET
         </Badge>
       </div>
+
+      {/* Position 2: Map */}
+      <div
+        className="w-full h-[115px] rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
+      />
 
       {/* Section 3 — KPIs inline */}
       <div className="flex items-center justify-between gap-4">

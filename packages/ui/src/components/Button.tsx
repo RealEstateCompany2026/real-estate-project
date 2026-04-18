@@ -22,7 +22,7 @@ const buttonVariants = cva(
                 default:
                     "bg-surface-neutral-default text-content-body border border-edge-neutral-default hover:bg-surface-neutral-action-hover",
                 primary:
-                    "bg-surface-branded-action text-content-branded-on-action border border-edge-branded-action hover:bg-surface-branded-action-hover",
+                    "bg-surface-branded-action text-content-branded-on-action border border-[var(--surface-branded-action)] hover:bg-surface-branded-action-hover hover:border-[var(--surface-branded-action-hover)]",
                 outline:
                     "border border-edge-neutral-default bg-surface-neutral-default hover:bg-surface-neutral-default text-content-body hover:border-edge-neutral-action",
                 ghost:

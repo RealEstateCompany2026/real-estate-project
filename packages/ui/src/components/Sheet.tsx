@@ -100,7 +100,7 @@ export const Sheet: React.FC<SheetProps> = ({
     <>
       {/* Overlay (Backdrop) */}
       <div
-        className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
+        className="fixed inset-0 z-40 bg-[rgba(0,0,0,0.5)] transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
       />
