@@ -7,33 +7,103 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── Enums ─────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ENUMS (97)
+// ══════════════════════════════════════════════════════════════════════════════
 
-enum ClientStatus {
-  PROPRIETAIRE
-  ACQUEREUR
-  BAILLEUR
-  LOCATAIRE
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  TRIAL
+  DEACTIVATED
+}
+
+enum ActionResult {
+  NO_RESPONSE
+  INTERESTED
+  RDV_PRIS
+  MANDAT_SIGNE
+  REFUS
+}
+
+enum ActionStatus {
+  PLANNED
+  EXECUTED
+  CANCELLED
+}
+
+enum AgentClientLinkSource {
+  AGENT_INVITATION
+  CLIENT_REQUEST
+  MANDATE
+}
+
+enum AgentClientLinkStatus {
+  PENDING_INVITATION
+  ACTIVE
+  ENDED
+}
+
+enum AgentSpecialty {
+  TRANSACTION
+  GESTION
+  LOCATION
+  COMMERCE
+  NEUF
+  VIAGER
+  LUXE
+  AUTRE
+}
+
+enum AnalyzedBy {
+  AGENT
+  IA
+  AUTOMATIQUE
+}
+
+enum AuthType {
+  OAUTH2
+  API_KEY
+  BASIC
+}
+
+enum BailType {
+  NU
+  MEUBLE
+  COMMERCIAL
+  PROFESSIONNEL
+  MIXTE
+}
+
+enum BounceType {
+  HARD
+  SOFT
+}
+
+enum CampaignFrequency {
+  MONTHLY
+  QUARTERLY
+  BIANNUAL
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum CampaignType {
+  CARNET_ENTRETIEN
+  NEWSLETTER
+  PROSPECTION
 }
 
 enum ClientGender {
   HOMME
   FEMME
   AUTRE
-}
-
-enum MaritalStatus {
-  SINGLE
-  MARRIED
-  DIVORCED
-  WIDOWED
-  OTHER
-}
-
-enum PreferredChannel {
-  EMAIL
-  SMS
-  IN_APP
 }
 
 enum ClientSource {
@@ -43,114 +113,37 @@ enum ClientSource {
   ANNONCE
 }
 
-enum PropertyType {
-  APPARTEMENT
-  MAISON
-  LOFT
-  STUDIO
-  TERRAIN
-  IMMEUBLE
-  OTHER
+enum ClientStatus {
+  PROPRIETAIRE
+  ACQUEREUR
+  BAILLEUR
+  LOCATAIRE
 }
 
-enum PropertyStatus {
-  OFF_MARKET
-  A_VENDRE
-  A_LOUER
-  LOUE
-  VENDU
-  EN_VIAGER
-  OTHER
+enum CoOwnershipType {
+  HORIZONTAL
+  VERTICAL
+  EN_VOLUME
 }
 
-enum PropertyCondition {
-  NEUF
-  RENOVE
-  BON_ETAT
-  A_RENOVER
-  ANCIEN
+enum ConnectorType {
+  SELOGER
+  LEBONCOIN
+  BIENICI
+  HEKTOR
+  APIMO
+  AC3
+  NETTY
+  GOOGLE_CALENDAR
+  OUTLOOK
+  YOUSIGN
+  DOCUSIGN
 }
 
-enum KitchenType {
-  SEPAREE
-  OUVERTE
-  AMERICAINE
-  KITCHENETTE
-}
-
-enum ParkingType {
-  BOX_FERME
-  PARKING_EXTERIEUR
-  GARAGE
-  AUCUN
-}
-
-enum HeatingType {
-  INDIVIDUEL_GAZ
-  INDIVIDUEL_ELECTRIQUE
-  COLLECTIF_GAZ
-  PAC
-  FUEL
-  BOIS
-}
-
-enum HotWaterSystem {
-  CUMULUS_ELECTRIQUE
-  CHAUDIERE_GAZ
-  SOLAIRE
-  THERMODYNAMIQUE
-}
-
-enum PoolType {
-  ENTERREE
-  SEMI_ENTERREE
-  HORS_SOL
-  AUCUNE
-}
-
-enum Exposure {
-  N
-  NE
-  E
-  SE
-  S
-  SO
-  O
-  NO
-}
-
-enum ViewType {
-  SUR_RUE
-  SUR_COUR
-  DEGAGEE
-  SUR_JARDIN
-  PANORAMIQUE
-}
-
-enum DpeClass {
-  A
-  B
-  C
-  D
-  E
-  F
-  G
-}
-
-enum ListingStatus {
-  NON_CREEE
-  EDITEE
-  EN_VALIDATION
-  PUBLIEE
-  ARCHIVEE
-}
-
-enum DealType {
-  VENTE
-  BAIL
-  ACQUISITION
-  LOCATION
-  GESTION
+enum ContentSource {
+  MANUAL
+  AI_GENERATED
+  AI_EDITED
 }
 
 enum DealStatus {
@@ -166,184 +159,27 @@ enum DealTrend {
   A_RISQUE
 }
 
-enum MandateStatus {
-  NON_CREE
-  EDITE
-  ENVOYE
-  SIGNE
-  RESILIE
+enum DealType {
+  VENTE
+  BAIL
+  ACQUISITION
+  LOCATION
+  GESTION
 }
 
-enum PurchaseOfferStatus {
-  AUCUNE
+enum DescriptionSource {
+  MANUAL
+  AI_GENERATED
+  AI_EDITED
+}
+
+enum DocumentStatus {
   EN_ATTENTE
-  ENVOYEE
-  ACCEPTEE
-  REFUSEE
-  CONTRE_OFFRE
-}
-
-enum NotarialDeedStatus {
-  EN_ATTENTE
-  RDV_FIXE
-  SIGNE
-  ANNULE
-}
-
-enum BailType {
-  NU
-  MEUBLE
-  COMMERCIAL
-  PROFESSIONNEL
-  MIXTE
-}
-
-enum CoOwnershipType {
-  HORIZONTAL
-  VERTICAL
-  EN_VOLUME
-}
-
-enum RegimeFiscal {
-  MICRO_FONCIER
-  REGIME_REEL
-  LMNP_MICRO_BIC
-  LMNP_REEL_BIC
-}
-
-enum TmiBracket {
-  TMI_0
-  TMI_11
-  TMI_30
-  TMI_41
-  TMI_45
-}
-
-enum LoanType {
-  TAUX_FIXE
-  TAUX_VARIABLE
-  TAUX_MIXTE
-  PRET_RELAIS
-  PAS
-  PTZ
-}
-
-enum LoanPurpose {
-  ACHAT_RESIDENCE_PRINCIPALE
-  ACHAT_INVESTISSEMENT_LOCATIF
-  RACHAT_DE_CREDIT
-  TRAVAUX
-}
-
-enum GuaranteeType {
-  CAUTION
-  HYPOTHEQUE
-  PPD
-}
-
-enum LoanStatus {
-  EN_COURS
-  SOLDE
-  EN_ATTENTE_DEBLOCAGE
-  EN_RENEGOCIATION
-}
-
-enum AnalyzedBy {
-  AGENT
-  IA
-  AUTOMATIQUE
-}
-
-enum OpportunityStatus {
-  DETECTEE
-  NOTIFIEE
-  EN_COURS
-  TRAITEE
-  NON_RETENUE
-}
-
-enum MessageSenderType {
-  AGENT
-  CLIENT
-  IA
-}
-
-enum MessageChannel {
-  EMAIL
-  SMS
-  IN_APP
-  WHATSAPP
-}
-
-enum MessageStatus {
-  BROUILLON
-  ENVOYE
-  DELIVRE
-  LU
-  ECHOUE
-}
-
-enum TriggerType {
-  INACTIVITY
-  DPE_ALERT
-  MARKET_OPPORTUNITY
-  CREDIT_RENEGOCIATION
-  BIRTHDAY
-  ANNIVERSARY
-  DATA_MISSING
-  DOCUMENT_EXPIRY
-  STAGNATION
-  MOMENTUM
-}
-
-enum TriggerCategory {
-  QUALIFICATION
-  CONVERSION
-  FIDELISATION
-  HYGIENE
-  PERFORMANCE
-}
-
-enum TriggerStatus {
-  ACTIF
-  TRAITE
-  IGNORE
+  RECU
+  VERIFIE
   EXPIRE
-}
-
-enum EventType {
-  RDV_COMMERCIAL
-  VISITE
-  SIGNATURE_PROMESSE
-  SIGNATURE_NOTAIRE
-  SIGNATURE_BAIL
-  RELANCE
-  TACHE
-  ANNIVERSAIRE
-  AUTRE
-}
-
-enum EventLocationType {
-  PRESENTIEL
-  VISIOCONFERENCE
-  TELEPHONE
-  AUTRE
-}
-
-enum EventStatus {
-  PROGRAMME
-  CONFIRME
-  TERMINE
-  ANNULE
-  REPORTE
-  NO_SHOW
-}
-
-enum ReportStatus {
-  NON_REDIGE
-  BROUILLON
-  VALIDE
-  ENVOYE_AU_CLIENT
+  REJETE
+  ARCHIVE
 }
 
 enum DocumentType {
@@ -366,6 +202,95 @@ enum DocumentType {
   AUTRE
 }
 
+enum DpeClass {
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+}
+
+enum DuplicateEntityType {
+  CLIENT
+  PROPERTY
+}
+
+enum DuplicateStatus {
+  DETECTED
+  MERGED
+  DISMISSED
+}
+
+enum EngagementSignalType {
+  EMAIL_OPENED
+  LINK_CLICKED
+  ESTIMATION_REQUESTED
+  SURVEY_ANSWERED
+  PAGE_VISITED
+  EMAIL_REPLIED
+  CALL_INBOUND
+  UNSUBSCRIBED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CONVERTED
+  UNSUBSCRIBED
+  MANUALLY_STOPPED
+}
+
+enum EsignStatus {
+  EN_ATTENTE
+  INITIE
+  EN_COURS
+  SIGNE
+  REFUSE
+  EXPIRE
+}
+
+enum EventLocationType {
+  PRESENTIEL
+  VISIOCONFERENCE
+  TELEPHONE
+  AUTRE
+}
+
+enum EventStatus {
+  PROGRAMME
+  CONFIRME
+  TERMINE
+  ANNULE
+  REPORTE
+  NO_SHOW
+}
+
+enum EventType {
+  RDV_COMMERCIAL
+  VISITE
+  SIGNATURE_PROMESSE
+  SIGNATURE_NOTAIRE
+  SIGNATURE_BAIL
+  RELANCE
+  TACHE
+  ANNIVERSAIRE
+  AUTRE
+}
+
+enum Exposure {
+  N
+  NE
+  E
+  SE
+  S
+  SO
+  O
+  NO
+}
+
 enum FileFormat {
   PDF
   JPG
@@ -375,62 +300,667 @@ enum FileFormat {
   AUTRE
 }
 
-enum DocumentStatus {
-  EN_ATTENTE
-  RECU
-  VERIFIE
-  EXPIRE
+enum GuaranteeType {
+  CAUTION
+  HYPOTHEQUE
+  PPD
+}
+
+enum HeatingType {
+  INDIVIDUEL_GAZ
+  INDIVIDUEL_ELECTRIQUE
+  COLLECTIF_GAZ
+  PAC
+  FUEL
+  BOIS
+}
+
+enum HotWaterSystem {
+  CUMULUS_ELECTRIQUE
+  CHAUDIERE_GAZ
+  SOLAIRE
+  THERMODYNAMIQUE
+}
+
+enum IdentifiedProject {
+  VENTE
+  ACHAT
+  LOCATION
+  GESTION
+  ESTIMATION
+  INCONNU
+}
+
+enum ImportEntityType {
+  CLIENTS
+  PROPERTIES
+  DEALS
+}
+
+enum ImportFileFormat {
+  CSV
+  XLSX
+}
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum IntegrationStatus {
+  DISCONNECTED
+  CONNECTED
+  SYNCING
+  ERROR
+  PAUSED
+}
+
+enum KitchenType {
+  SEPAREE
+  OUVERTE
+  AMERICAINE
+  KITCHENETTE
+}
+
+enum LeadSource {
+  PAGE_PUBLIQUE
+  PORTAIL
+  CAMPAGNE
+  REFERRAL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum ListingStatus {
+  NON_CREEE
+  EDITEE
+  EN_VALIDATION
+  PUBLIEE
+  ARCHIVEE
+}
+
+enum ListingWorkflowStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  PAUSED
+  ARCHIVED
+}
+
+enum LoanPurpose {
+  ACHAT_RESIDENCE_PRINCIPALE
+  ACHAT_INVESTISSEMENT_LOCATIF
+  RACHAT_DE_CREDIT
+  TRAVAUX
+}
+
+enum LoanStatus {
+  EN_COURS
+  SOLDE
+  EN_ATTENTE_DEBLOCAGE
+  EN_RENEGOCIATION
+}
+
+enum LoanType {
+  TAUX_FIXE
+  TAUX_VARIABLE
+  TAUX_MIXTE
+  PRET_RELAIS
+  PAS
+  PTZ
+}
+
+enum MandateSignalStatus {
+  NOUVEAU
+  EN_COURS
+  CONTACTE
+  MANDAT_SIGNE
   REJETE
-  ARCHIVE
 }
 
-// ── Models ────────────────────────────────────────────────────────────────────
-
-model Organization {
-  id   String @id @default(cuid())
-  name String
-
-  users      User[]
-  clients    Client[]
-  properties Property[]
-  deals      Deal[]
-  messages   Message[]
-  triggers   Trigger[]
-  events     Event[]
-  documents  Document[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum MandateSignalType {
+  PROPRIETAIRE_SANS_MANDAT
+  MANDAT_ECHU
+  FORTE_DEMANDE
+  ESTIMATION_SANS_CONVERSION
+  EVENEMENT_VIE
+  GESTION_RENOUVELER
 }
+
+enum MandateStatus {
+  NON_CREE
+  EDITE
+  ENVOYE
+  SIGNE
+  RESILIE
+}
+
+enum MappingEntityType {
+  CLIENT
+  PROPERTY
+  DEAL
+  EVENT
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  OTHER
+}
+
+enum MaxEmailFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  BIANNUAL
+}
+
+enum MessageChannel {
+  EMAIL
+  SMS
+  IN_APP
+  WHATSAPP
+}
+
+enum MessageSenderType {
+  AGENT
+  CLIENT
+  IA
+}
+
+enum MessageStatus {
+  BROUILLON
+  ENVOYE
+  DELIVRE
+  LU
+  ECHOUE
+}
+
+enum NetworkType {
+  ORPI
+  CENTURY21
+  LAFORET
+  GUY_HOQUET
+  ERA
+  SOLVIMO
+  CAPIFRANCE
+  IAD
+  SAFTI
+  INDEPENDANT
+  AUTRE
+}
+
+enum NotarialDeedStatus {
+  EN_ATTENTE
+  RDV_FIXE
+  SIGNE
+  ANNULE
+}
+
+enum NotificationEntityType {
+  CLIENT
+  PROPERTY
+  DEAL
+  EVENT
+  SIGNAL
+  CAMPAIGN
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  ACTION_REQUIRED
+}
+
+enum OnboardingStep {
+  WELCOME
+  PROFILE
+  AGENCY
+  IMPORT
+  DONE
+}
+
+enum OperationType {
+  VENTE
+  LOCATION
+  VIAGER
+  CESSION
+}
+
+enum OpportunityStatus {
+  DETECTEE
+  NOTIFIEE
+  EN_COURS
+  TRAITEE
+  NON_RETENUE
+}
+
+enum OrgRole {
+  ADMIN
+  MANAGER
+  AGENT
+}
+
+enum ParkingType {
+  BOX_FERME
+  PARKING_EXTERIEUR
+  GARAGE
+  AUCUN
+}
+
+enum PipelineStage {
+  PROSPECT
+  QUALIFICATION
+  ESTIMATION
+  MANDAT
+  COMMERCIALISATION
+  OFFRE
+  COMPROMIS
+  ACTE
+}
+
+enum PlaybookTargetProfile {
+  PROPRIETAIRE
+  ACQUEREUR
+  LOCATAIRE
+  ALL
+}
+
+enum PlaybookTargetSegment {
+  CHAUD
+  TIEDE
+  FROID
+  DORMANT
+  INCONNU
+  ALL
+}
+
+enum PoolType {
+  ENTERREE
+  SEMI_ENTERREE
+  HORS_SOL
+  AUCUNE
+}
+
+enum PortalName {
+  SELOGER
+  LEBONCOIN
+  BIENICI
+  LOGIC_IMMO
+  PAP
+  GREEN_ACRES
+}
+
+enum PreferredChannel {
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum PropertyCondition {
+  NEUF
+  RENOVE
+  BON_ETAT
+  A_RENOVER
+  ANCIEN
+}
+
+enum PropertyStatus {
+  OFF_MARKET
+  A_VENDRE
+  A_LOUER
+  LOUER
+  VENDU
+  OTHER
+  LOUE
+  EN_VIAGER
+}
+
+enum PropertyType {
+  STUDIO
+  T1
+  T2
+  T3
+  T4
+  MAISON_DE_VILLE
+  OTHER
+  APPARTEMENT
+  MAISON
+  LOFT
+  TERRAIN
+  IMMEUBLE
+}
+
+enum PublicationStatus {
+  PENDING
+  PUBLISHED
+  UPDATED
+  PAUSED
+  REMOVED
+  ERROR
+}
+
+enum PurchaseOfferStatus {
+  AUCUNE
+  EN_ATTENTE
+  ENVOYEE
+  ACCEPTEE
+  REFUSEE
+  CONTRE_OFFRE
+}
+
+enum RegimeFiscal {
+  MICRO_FONCIER
+  REGIME_REEL
+  LMNP_MICRO_BIC
+  LMNP_REEL_BIC
+}
+
+enum ReportStatus {
+  NON_REDIGE
+  BROUILLON
+  VALIDE
+  ENVOYE_AU_CLIENT
+}
+
+enum SegmentTransitionTrigger {
+  ENGAGEMENT_SIGNAL
+  PLAYBOOK_STEP
+  MANUAL_INTERACTION
+  DECAY
+  IMPORT
+  RECALC_NIGHTLY
+}
+
+enum SegmentType {
+  CHAUD
+  TIEDE
+  FROID
+  DORMANT
+  INCONNU
+}
+
+enum SendStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  BOUNCED
+  FAILED
+}
+
+enum SignalActionType {
+  EMAIL
+  APPEL
+  SMS
+  VISITE
+  COURRIER
+  RELANCE
+}
+
+enum SignalSource {
+  AUTOMATIQUE
+  AGENT
+  IA
+  CRM
+  PORTAIL
+}
+
+enum SubjectLineVariant {
+  A
+  B
+}
+
+enum SubscriptionPlan {
+  TRIAL
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+enum SyncAction {
+  CREATE
+  UPDATE
+  DELETE
+  SKIP
+  CONFLICT
+}
+
+enum SyncDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum SyncEntityType {
+  CLIENT
+  PROPERTY
+  DEAL
+  EVENT
+  DOCUMENT
+}
+
+enum SyncMode {
+  REALTIME
+  PERIODIC
+  MANUAL
+}
+
+enum SyncStatus {
+  SUCCESS
+  ERROR
+  CONFLICT_RESOLVED
+  SKIPPED
+}
+
+enum TmiBracket {
+  TMI_0
+  TMI_11
+  TMI_30
+  TMI_41
+  TMI_45
+}
+
+enum TransformRule {
+  NONE
+  UPPERCASE
+  LOWERCASE
+  DATE_FORMAT
+  CONCAT
+  SPLIT
+  CUSTOM
+}
+
+enum TriggerCategory {
+  QUALIFICATION
+  CONVERSION
+  FIDELISATION
+  HYGIENE
+  PERFORMANCE
+}
+
+enum TriggerStatus {
+  ACTIF
+  TRAITE
+  IGNORE
+  EXPIRE
+}
+
+enum TriggerType {
+  INACTIVITY
+  DPE_ALERT
+  MARKET_OPPORTUNITY
+  CREDIT_RENEGOCIATION
+  BIRTHDAY
+  ANNIVERSARY
+  DATA_MISSING
+  DOCUMENT_EXPIRY
+  STAGNATION
+  MOMENTUM
+}
+
+enum ViewType {
+  SUR_RUE
+  SUR_COUR
+  DEGAGEE
+  SUR_JARDIN
+  PANORAMIQUE
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MODELS (46)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Core ──────────────────────────────────────────────────────────────────────
 
 model User {
-  id          String  @id @default(cuid())
-  supabase_id String? @unique @db.Uuid
+  id          String  @id
   email       String  @unique
   name        String?
-  role        String  @default("AGENT") // "AGENT" | "MANAGER" | "ADMIN"
+  role        String  @default("AGENT")
+  supabase_id String? @db.Uuid
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
 
-  clientProfile      Client?
-  properties         Property[]      @relation("OwnerProperties")
+  // Reverse relations
+  agents             Agent[]
+  clientProfile      Client?           @relation("ClientUser")
+  ownedProperties    Property[]        @relation("OwnerProperties")
   assignedProperties PropertyAgent[]
-  managedClients     Client[]        @relation("AgentClients")
-  managedDeals       Deal[]          @relation("AgentDeals")
-  managedTriggers    Trigger[]       @relation("AgentTriggers")
-  sentMessages       Message[]       @relation("AgentMessages")
-  managedEvents      Event[]         @relation("AgentEvents")
-  uploadedDocuments  Document[]      @relation("UploadedDocuments")
+  managedClients     Client[]          @relation("AgentClients")
+  managedDeals       Deal[]            @relation("AgentDeals")
+  managedTriggers    Trigger[]         @relation("AgentTriggers")
+  sentMessages       Message[]         @relation("AgentMessages")
+  managedEvents      Event[]           @relation("AgentEvents")
+  uploadedDocuments  Document[]        @relation("UploadedDocuments")
+  createdMilestones  DealMilestoneEvent[]
+  propertyShareLinks PropertyShareLink[] @relation("ShareLinkCreator")
+  propertyMedia      PropertyMedia[]     @relation("MediaUploader")
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
+model Organization {
+  id   String @id @default(uuid())
+  name String
+
+  siret           String?
+  address         String?
+  phone           String?
+  email           String?
+  logoUrl         String?
+  network         NetworkType?
+  carteTNumber    String?
+  carteGNumber    String?
+  rcpInsuranceRef String?
+  rcpExpiryDate   DateTime?    @db.Date
+  maxAgents       Int?         @default(5)
+  invitationCode  String?
+
+  // Reverse relations
+  users              User[]
+  agents             Agent[]
+  clients            Client[]
+  properties         Property[]
+  deals              Deal[]
+  messages           Message[]
+  triggers           Trigger[]
+  events             Event[]
+  documents          Document[]
+  listings           Listing[]
+  campaigns          Campaign[]
+  notifications      Notification[]
+  subscriptions      Subscription[]
+  agentClientLinks   AgentClientLink[]
+  importJobs         ImportJob[]
+  integrations       Integration[]
+  auditScores        AuditScore[]
+  propertyShareLinks PropertyShareLink[]
+  propertyMedia      PropertyMedia[]
+  leads              Lead[]
+  playbooks          Playbook[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Agent {
+  id             String  @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id])
+
+  language               String?        @default("fr")
+  firstName              String
+  lastName               String
+  email                  String
+  mobilePhone            String?
+  avatarUrl              String?
+  specialty              AgentSpecialty?
+  rsacNumber             String?
+  orgRole                OrgRole        @default(AGENT)
+  accountStatus          AccountStatus  @default(TRIAL)
+  trialEndsAt            DateTime?
+  notificationPreferences Json?         @default("{}")
+  timezone               String?        @default("Europe/Paris")
+  lastLoginAt            DateTime?
+  onboardingCompleted    Boolean        @default(false)
+  onboardingStep         OnboardingStep? @default(WELCOME)
+
+  // Reverse relations
+  propertyAgents         Property[]              @relation("PropertyAgent")
+  agentClientLinks       AgentClientLink[]
+  clientEngagementSignals ClientEngagementSignal[]
+  clientSegments         ClientSegment[]
+  mandateSignalsOwned    MandateSignal[]          @relation("MandateSignalAgent")
+  mandateSignalsAssigned MandateSignal[]          @relation("MandateSignalAssignee")
+  signalActions          SignalAction[]
+  segmentTransitions     SegmentTransition[]
+  campaigns              Campaign[]
+  campaignSends          CampaignSend[]
+  playbooks              Playbook[]
+  playbookEnrollments    PlaybookEnrollment[]
+  listings               Listing[]
+  notifications          Notification[]
+  subscriptions          Subscription[]
+  leads                  Lead[]
+  portalPublications     PortalPublication[]
+  auditScores            AuditScore[]
+  duplicatePairs         DuplicatePair[]
+  emailPreferences       EmailPreference[]
+  importJobs             ImportJob[]
+  integrations           Integration[]
+  syncLogs               SyncLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// ── Client ────────────────────────────────────────────────────────────────────
+
 model Client {
-  id     String  @id @default(cuid())
+  id     String  @id
   userId String? @unique
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation("ClientUser", fields: [userId], references: [id])
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -475,13 +1005,13 @@ model Client {
   cniExpiryDate      DateTime?
   passportExpiryDate DateTime?
 
-  // Propriétaire / Bailleur
+  // Proprietaire / Bailleur
   totalOwnedProperties     Int?
   propertiesForSaleCount   Int?
   titleDeedUrl             String?
   propertiesUnderMgmtCount Int?
 
-  // Acquéreur / Locataire
+  // Acquereur / Locataire
   paySlipUrl            String?
   taxStatementUrl       String?
   loanOfferUrl          String?
@@ -489,25 +1019,46 @@ model Client {
   searchCriteriaSummary String?
 
   // Misc
-  notes  String?
-  source ClientSource?
+  notes              String?
+  source             ClientSource?
+  language           String?  @default("fr")
+  emailConsent       Boolean? @default(false)
+  emailConsentSource String?
+  emailConsentDate   DateTime?
+  lifecycleStage     String?  @default("lead")
+  tags               Json?    @default("[]")
+  isPotentialDuplicate Boolean? @default(false)
+  completionScore    Int?     @default(0)
 
-  properties    Property[]              @relation("ClientProperties")
-  deals         Deal[]
-  financing     ClientFinancing[]
-  loanAnalyses  LoanAnalysis[]
-  fiscalDetails PropertyFiscalDetails[]
-  messages      Message[]
-  triggers      Trigger[]
-  events        Event[]
-  documents     Document[]
+  // Reverse relations
+  properties              Property[]              @relation("ClientProperties")
+  deals                   Deal[]
+  financing               ClientFinancing[]
+  loanAnalyses            LoanAnalysis[]
+  fiscalDetails           PropertyFiscalDetails[]
+  messages                Message[]
+  triggers                Trigger[]
+  events                  Event[]
+  documents               Document[]
+  agentClientLinks        AgentClientLink[]
+  clientPastTransactions  ClientPastTransaction[]
+  clientSegments          ClientSegment[]
+  clientEngagementSignals ClientEngagementSignal[]
+  mandateSignals          MandateSignal[]
+  campaignSends           CampaignSend[]
+  playbookEnrollments     PlaybookEnrollment[]
+  leads                   Lead[]
+  emailPreferences        EmailPreference[]
+  segmentTransitions      SegmentTransition[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// ── Property ──────────────────────────────────────────────────────────────────
+
 model Property {
-  id String @id @default(cuid())
+  id String @id
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -516,6 +1067,16 @@ model Property {
   owner    User?   @relation("OwnerProperties", fields: [ownerId], references: [id])
   clientId String?
   client   Client? @relation("ClientProperties", fields: [clientId], references: [id])
+  agentId  String?
+  agent    Agent?  @relation("PropertyAgent", fields: [agentId], references: [id])
+
+  coOwnershipId String?
+  coOwnership   CoOwnershipDetails? @relation("PropertyCoOwnership", fields: [coOwnershipId], references: [id])
+
+  listingId String?
+  listing   Listing? @relation("PropertyListingRef", fields: [listingId], references: [id])
+
+  referencePropertyId String?
 
   // Type & statut
   type      PropertyType      @default(OTHER)
@@ -524,6 +1085,11 @@ model Property {
 
   // Localisation
   address          String
+  addressStreet    String?
+  addressZipCode   String?
+  addressCity      String?
+  addressLat       Float?
+  addressLng       Float?
   neighborhoodName String?
 
   // Structure
@@ -535,27 +1101,27 @@ model Property {
   hasHomeAutomation Boolean?
 
   // Surfaces
-  livingAreaSqm   Decimal? @db.Decimal(10, 2)
-  landAreaSqm     Decimal? @db.Decimal(10, 2)
+  livingAreaSqm   Float?
+  landAreaSqm     Float?
   numberOfRooms   Int?
-  mainRoomAreaSqm Decimal? @db.Decimal(10, 2)
+  mainRoomAreaSqm Float?
   bedroomCount    Int?
-  bedroom1AreaSqm Decimal? @db.Decimal(10, 2)
-  bedroom2AreaSqm Decimal? @db.Decimal(10, 2)
-  bedroom3AreaSqm Decimal? @db.Decimal(10, 2)
-  bedroom4AreaSqm Decimal? @db.Decimal(10, 2)
-  kitchenAreaSqm  Decimal? @db.Decimal(10, 2)
+  bedroom1AreaSqm Float?
+  bedroom2AreaSqm Float?
+  bedroom3AreaSqm Float?
+  bedroom4AreaSqm Float?
+  kitchenAreaSqm  Float?
   kitchenType     KitchenType?
   bathroomCount   Int?
   showerRoomCount Int?
   toiletCount     Int?
-  terraceAreaSqm  Decimal? @db.Decimal(10, 2)
-  balconyAreaSqm  Decimal? @db.Decimal(10, 2)
-  gardenAreaSqm   Decimal? @db.Decimal(10, 2)
-  basementAreaSqm Decimal? @db.Decimal(10, 2)
-  atticAreaSqm    Decimal? @db.Decimal(10, 2)
+  terraceAreaSqm  Float?
+  balconyAreaSqm  Float?
+  gardenAreaSqm   Float?
+  basementAreaSqm Float?
+  atticAreaSqm    Float?
 
-  // Équipements
+  // Equipements
   parkingType      ParkingType?
   parkingSpotCount Int?
   heatingType      HeatingType?
@@ -566,19 +1132,20 @@ model Property {
   // Exposition & vue
   mainExposure Exposure?
   mainViewType ViewType?
+  exposures    Exposure[]
 
   // DPE
   dpeEnergyClass        DpeClass?
   dpeGasEmissionClass   DpeClass?
-  dpeEnergyKwh          Decimal?  @db.Decimal(10, 2)
-  dpeGasGco2            Decimal?  @db.Decimal(10, 2)
+  dpeEnergyKwh          Float?
+  dpeGasGco2            Float?
   dpeValidityDate       DateTime?
   dpeComplianceDeadline DateTime?
 
   // Valeur & annonce
-  estimatedMarketValue       Decimal?      @db.Decimal(15, 2)
-  estimatedMarketValuePerSqm Decimal?      @db.Decimal(10, 2)
-  desiredSellingPrice        Decimal?      @db.Decimal(15, 2)
+  estimatedMarketValue       Float?
+  estimatedMarketValuePerSqm Float?
+  desiredSellingPrice        Float?
   listingStatus              ListingStatus?
   listingPublicationDate     DateTime?
 
@@ -587,31 +1154,50 @@ model Property {
   maintenanceLogCreationDate DateTime?
   lastMaintenanceDate        DateTime?
 
-  // Proximité
+  // Proximite
   proximityToShops     Boolean?
   proximityToSchools   Boolean?
   proximityToDaycares  Boolean?
   proximityToTransport Boolean?
   proximityToHighways  Boolean?
 
-  assignedAgents  PropertyAgent[]
-  maintenanceLogs MaintenanceLog[]
-  coOwnership     CoOwnershipDetails?
-  fiscalDetails   PropertyFiscalDetails[]
-  deals           Deal[]
-  financing       ClientFinancing[]
-  saleAnalyses    SaleAnalysis[]
-  messages        Message[]
-  triggers        Trigger[]
-  events          Event[]
-  documents       Document[]
+  // Completion
+  completionScore         Int?   @default(0)
+  completionMissingFields Json?
+
+  // Misc
+  internalRef    String?
+  notes          String?
+  tags           Json?           @default("[]")
+  operationTypes OperationType[]
+
+  // Reverse relations
+  assignedAgents                  PropertyAgent[]
+  maintenanceLogs                 MaintenanceLog[]
+  coOwnershipDetails              CoOwnershipDetails[]           @relation("CoOwnershipProperty")
+  fiscalDetails                   PropertyFiscalDetails[]
+  deals                           Deal[]
+  financing                       ClientFinancing[]
+  saleAnalyses                    SaleAnalysis[]
+  messages                        Message[]
+  triggers                        Trigger[]
+  events                          Event[]
+  documents                       Document[]
+  mandateSignals                  MandateSignal[]
+  clientPastTransactions          ClientPastTransaction[]
+  opportunityTriggers             OpportunityTrigger[]
+  propertyDiagnosticQuestionnaires PropertyDiagnosticQuestionnaire[]
+  propertyFeatures                PropertyFeature[]
+  propertyShareLinks              PropertyShareLink[]
+  propertyMedia                   PropertyMedia[]
+  listings                        Listing[]                      @relation("ListingProperty")
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
 model PropertyAgent {
-  id         String   @id @default(cuid())
+  id         String   @id
   propertyId String
   agentId    String
   property   Property @relation(fields: [propertyId], references: [id])
@@ -626,9 +1212,9 @@ model PropertyAgent {
 }
 
 model CoOwnershipDetails {
-  id         String   @id @default(cuid())
-  propertyId String   @unique
-  property   Property @relation(fields: [propertyId], references: [id])
+  id         String   @id @default(uuid())
+  propertyId String
+  property   Property @relation("CoOwnershipProperty", fields: [propertyId], references: [id])
 
   type                      CoOwnershipType?
   numberOfLots              Int?
@@ -636,19 +1222,22 @@ model CoOwnershipDetails {
   syndicName                String?
   syndicContact             String?
   lastAgmDate               DateTime?
-  estimatedAnnualFees       Decimal? @db.Decimal(10, 2)
-  monthlyCharges            Decimal? @db.Decimal(10, 2)
-  plannedWorkAmount         Decimal? @db.Decimal(10, 2)
+  estimatedAnnualFees       Float?
+  monthlyCharges            Float?
+  plannedWorkAmount         Float?
   hasCurrentLegalProcedures Boolean?
   hasPlannedLegalProcedures Boolean?
   legalProcedureDetails     String?
 
+  // Reverse relation for Property.coOwnershipId
+  linkedProperties Property[] @relation("PropertyCoOwnership")
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
 model PropertyFiscalDetails {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   propertyId String
   property   Property @relation(fields: [propertyId], references: [id])
   clientId   String?
@@ -659,36 +1248,99 @@ model PropertyFiscalDetails {
   regimeFiscal        RegimeFiscal?
   tmiBracket          TmiBracket?
 
-  estimatedNotaryFees       Decimal? @db.Decimal(10, 2)
-  estimatedPropertyTax      Decimal? @db.Decimal(10, 2)
-  estimatedOccupancyTax     Decimal? @db.Decimal(10, 2)
-  estimatedVacantHousingTax Decimal? @db.Decimal(10, 2)
-  estimatedGarbageTax       Decimal? @db.Decimal(10, 2)
-  cadastralRentalValue      Decimal? @db.Decimal(10, 2)
-  estimatedManagementCost   Decimal? @db.Decimal(10, 2)
-  estimatedDeductibleFees   Decimal? @db.Decimal(10, 2)
-  estimatedCapitalGainsTax  Decimal? @db.Decimal(10, 2)
+  estimatedNotaryFees       Float?
+  estimatedPropertyTax      Float?
+  estimatedOccupancyTax     Float?
+  estimatedVacantHousingTax Float?
+  estimatedGarbageTax       Float?
+  cadastralRentalValue      Float?
+  estimatedManagementCost   Float?
+  estimatedDeductibleFees   Float?
+  estimatedCapitalGainsTax  Float?
 
   lmnpEligible                 Boolean?
-  lmnpFiscalSimulation         Decimal? @db.Decimal(10, 2)
+  lmnpFiscalSimulation         Float?
   pinelEligible                Boolean?
-  pinelFiscalSimulation        Decimal? @db.Decimal(10, 2)
+  pinelFiscalSimulation        Float?
   denormandieEligible          Boolean?
-  denormandieFiscalSimulation  Decimal? @db.Decimal(10, 2)
+  denormandieFiscalSimulation  Float?
   censiBouvardEligible         Boolean?
-  censiBouvardFiscalSimulation Decimal? @db.Decimal(10, 2)
+  censiBouvardFiscalSimulation Float?
   malrauxEligible              Boolean?
-  malrauxFiscalSimulation      Decimal? @db.Decimal(10, 2)
+  malrauxFiscalSimulation      Float?
   girardinEligible             Boolean?
-  girardinFiscalSimulation     Decimal? @db.Decimal(10, 2)
+  girardinFiscalSimulation     Float?
   ifiEligible                  Boolean?
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
+model PropertyDiagnosticQuestionnaire {
+  id             String   @id @default(uuid())
+  propertyId     String
+  property       Property @relation(fields: [propertyId], references: [id])
+  topic          String
+  completedAt    DateTime @default(now())
+  score          Int?
+  recommendation String?
+  answeredBy     String?
+  answersJson    Json?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+model PropertyFeature {
+  id           String   @id @default(uuid())
+  propertyId   String
+  property     Property @relation(fields: [propertyId], references: [id])
+  featureKey   String
+  featureValue String?
+
+  createdAt DateTime? @default(now())
+}
+
+model PropertyShareLink {
+  id             String   @id @default(uuid())
+  propertyId     String
+  property       Property @relation(fields: [propertyId], references: [id])
+  createdBy      String?
+  creator        User?    @relation("ShareLinkCreator", fields: [createdBy], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  expiresAt      DateTime?
+  passwordHash   String?
+  viewCount      Int?     @default(0)
+  isActive       Boolean? @default(true)
+
+  createdAt DateTime? @default(now())
+}
+
+model PropertyMedia {
+  id             String   @id @default(uuid())
+  propertyId     String
+  property       Property @relation(fields: [propertyId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  mediaType      String
+  storagePath    String
+  fileName       String
+  fileSizeBytes  Int?
+  mimeType       String?
+  sortOrder      Int?     @default(0)
+  isCover        Boolean? @default(false)
+  uploadedBy     String?
+  uploader       User?    @relation("MediaUploader", fields: [uploadedBy], references: [id])
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+// ── Deal ──────────────────────────────────────────────────────────────────────
+
 model Deal {
-  id String @id @default(cuid())
+  id String @id
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -699,6 +1351,15 @@ model Deal {
   property   Property? @relation(fields: [propertyId], references: [id])
   agentId    String?
   agent      User?     @relation("AgentDeals", fields: [agentId], references: [id])
+
+  listingId            String?
+  listing              Listing?          @relation(fields: [listingId], references: [id])
+  saleMandateId        String?
+  saleMandate          Document?         @relation("DealSaleMandate", fields: [saleMandateId], references: [id])
+  mgmtMandateId        String?
+  mgmtMandate          Document?         @relation("DealMgmtMandate", fields: [mgmtMandateId], references: [id])
+  acquisitionFinancingId String?
+  acquisitionFinancing ClientFinancing?  @relation("DealAcquisitionFinancing", fields: [acquisitionFinancingId], references: [id])
 
   type   DealType   @default(VENTE)
   status DealStatus @default(EN_COURS)
@@ -720,101 +1381,120 @@ model Deal {
   lastVisitDate       DateTime?
   purchaseOfferStatus PurchaseOfferStatus?
   purchaseOfferDate   DateTime?
-  purchaseOfferAmount Decimal?             @db.Decimal(15, 2)
+  purchaseOfferAmount Float?
   notarialDeedStatus  NotarialDeedStatus?
   notarialDeedDate    DateTime?
-  finalSalePrice      Decimal?             @db.Decimal(15, 2)
+  finalSalePrice      Float?
 
   // Acquisition
-  acquisitionMinBudget       Decimal? @db.Decimal(15, 2)
-  acquisitionMaxBudget       Decimal? @db.Decimal(15, 2)
+  acquisitionMinBudget       Float?
+  acquisitionMaxBudget       Float?
   acquisitionCriteriaSummary String?
   acquisitionFinancingExpiry DateTime?
 
   // Bail
   bailType          BailType?
-  bailMonthlyRent   Decimal?  @db.Decimal(10, 2)
-  bailCharges       Decimal?  @db.Decimal(10, 2)
-  bailDepositAmount Decimal?  @db.Decimal(10, 2)
+  bailMonthlyRent   Float?
+  bailCharges       Float?
+  bailDepositAmount Float?
   bailSignedDate    DateTime?
   bailStartDate     DateTime?
   bailEndDate       DateTime?
 
   // Location
-  locationMinBudget       Decimal? @db.Decimal(10, 2)
+  locationMinBudget       Float?
   locationCriteriaSummary String?
 
-  saleAnalyses SaleAnalysis[]
-  loanAnalyses LoanAnalysis[]
-  financing    ClientFinancing[]
-  triggers     Trigger[]
-  messages     Message[]
-  events       Event[]
-  documents    Document[]
+  // Pipeline
+  pipelineStage   PipelineStage? @default(PROSPECT)
+  stageChangedAt  DateTime?
+  conversionSource String?
+  currentMilestone String?
+
+  // Reverse relations
+  saleAnalyses        SaleAnalysis[]
+  loanAnalyses        LoanAnalysis[]
+  financing           ClientFinancing[]    @relation("FinancingDeal")
+  triggers            Trigger[]
+  messages            Message[]
+  events              Event[]
+  documents           Document[]           @relation("DealDocuments")
+  mandateSignals      MandateSignal[]
+  dealMilestoneEvents DealMilestoneEvent[]
+  playbookEnrollments PlaybookEnrollment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// ── Financial ─────────────────────────────────────────────────────────────────
+
 model ClientFinancing {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   clientId   String
   client     Client    @relation(fields: [clientId], references: [id])
   propertyId String?
   property   Property? @relation(fields: [propertyId], references: [id])
   dealId     String?
-  deal       Deal?     @relation(fields: [dealId], references: [id])
+  deal       Deal?     @relation("FinancingDeal", fields: [dealId], references: [id])
 
   lenderName          String?
   loanType            LoanType?
   loanPurpose         LoanPurpose?
-  loanAmount          Decimal?      @db.Decimal(15, 2)
-  downPaymentAmount   Decimal?      @db.Decimal(15, 2)
-  loanRateAnnual      Decimal?      @db.Decimal(6, 4)
-  insuranceRateAnnual Decimal?      @db.Decimal(6, 4)
+  loanAmount          Float?
+  downPaymentAmount   Float?
+  loanRateAnnual      Float?
+  insuranceRateAnnual Float?
   durationMonths      Int?
   startDate           DateTime?
   endDate             DateTime?
   guaranteeType       GuaranteeType?
   status              LoanStatus?
 
-  monthlyPayment              Decimal? @db.Decimal(10, 2)
-  monthlyPaymentWithInsurance Decimal? @db.Decimal(10, 2)
-  totalLoanCost               Decimal? @db.Decimal(15, 2)
-  remainingCapital            Decimal? @db.Decimal(15, 2)
+  monthlyPayment              Float?
+  monthlyPaymentWithInsurance Float?
+  totalLoanCost               Float?
+  remainingCapital            Float?
   remainingMonths             Int?
 
   bankAmortizationScheduleUrl    String?
   loanOfferUrl                   String?
-  totalCreditCostSimulation      Decimal? @db.Decimal(15, 2)
+  totalCreditCostSimulation      Float?
   amortizationScheduleSimulation String?
 
-  loanAnalyses LoanAnalysis[]
+  // Reverse relations
+  loanAnalyses       LoanAnalysis[]
+  dealsAsFinancing   Deal[]         @relation("DealAcquisitionFinancing")
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
 model SaleAnalysis {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   propertyId String
   property   Property @relation(fields: [propertyId], references: [id])
   dealId     String?
   deal       Deal?    @relation(fields: [dealId], references: [id])
 
+  estimatedValue Float?
+  targetPrice    Float?
+  finalPrice     Float?
+  notes          String @default("")
+
   analyzedBy   AnalyzedBy?
   analysisDate DateTime    @default(now())
 
-  estimatedMarketValue     Decimal? @db.Decimal(15, 2)
-  estimatedSellingPrice    Decimal? @db.Decimal(15, 2)
-  simulatedAddedValue      Decimal? @db.Decimal(15, 2)
-  estimatedAgencyFees      Decimal? @db.Decimal(10, 2)
-  estimatedNotaryFeesBuyer Decimal? @db.Decimal(10, 2)
-  netSellerGain            Decimal? @db.Decimal(15, 2)
-  estimatedCapitalGainsTax Decimal? @db.Decimal(10, 2)
+  estimatedMarketValue     Float?
+  estimatedSellingPrice    Float?
+  simulatedAddedValue      Float?
+  estimatedAgencyFees      Float?
+  estimatedNotaryFeesBuyer Float?
+  netSellerGain            Float?
+  estimatedCapitalGainsTax Float?
 
-  saleSuccessProbability   Decimal? @db.Decimal(5, 2)
+  saleSuccessProbability   Float?
   timeOnMarketEstimateDays Int?
   comparableSalesCount     Int?
 
@@ -822,41 +1502,19 @@ model SaleAnalysis {
   lastMomentumAlertDate DateTime?
   analysisDetails       String?
 
-  // Legacy fields kept for backward compatibility
-  estimatedValue Float?
-  targetPrice    Float?
-  finalPrice     Float?
-  notes          String @default("")
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model LoanAnalysis {
-  id       String          @id @default(cuid())
+  id       String  @id @default(uuid())
   clientId String
-  client   Client          @relation(fields: [clientId], references: [id])
+  client   Client  @relation(fields: [clientId], references: [id])
   dealId   String?
-  deal     Deal?           @relation(fields: [dealId], references: [id])
+  deal     Deal?   @relation(fields: [dealId], references: [id])
   loanId   String?
   loan     ClientFinancing? @relation(fields: [loanId], references: [id])
 
-  analysisDate DateTime   @default(now())
-  analyzedBy   AnalyzedBy?
-
-  marketRateAtAnalysis         Decimal? @db.Decimal(6, 4)
-  marketRateSource             String?
-  currentMonthlyPayment        Decimal? @db.Decimal(10, 2)
-  newRateEstimate              Decimal? @db.Decimal(6, 4)
-  newMonthlyPayment            Decimal? @db.Decimal(10, 2)
-  monthlySavings               Decimal? @db.Decimal(10, 2)
-  totalSavings                 Decimal? @db.Decimal(15, 2)
-  estimatedRateGain            Decimal? @db.Decimal(6, 4)
-  breakevenMonths              Int?
-  renegociationOpportunityDate DateTime?
-  opportunityStatus            OpportunityStatus?
-
-  // Legacy fields kept for backward compatibility
   maxLoanAmount  Float?
   interestRate   Float?
   durationMonths Int?
@@ -864,22 +1522,55 @@ model LoanAnalysis {
   bankName       String?
   status         String @default("PENDING")
 
+  analysisDate DateTime   @default(now())
+  analyzedBy   AnalyzedBy?
+
+  marketRateAtAnalysis         Float?
+  marketRateSource             String?
+  currentMonthlyPayment        Float?
+  newRateEstimate              Float?
+  newMonthlyPayment            Float?
+  monthlySavings               Float?
+  totalSavings                 Float?
+  estimatedRateGain            Float?
+  breakevenMonths              Int?
+  renegociationOpportunityDate DateTime?
+  opportunityStatus            OpportunityStatus?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model MaintenanceLog {
-  id          String   @id @default(cuid())
-  category    String
-  description String
-  amount      Float?
-  isPrivate   Boolean  @default(true)
-  propertyId  String
-  property    Property @relation(fields: [propertyId], references: [id])
+model ClientPastTransaction {
+  id         String   @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+
+  transactionType  String?
+  transactionDate  DateTime? @db.Date
+  amount           Float?
+  loanAmount       Float?
+  loanRate         Float?
+  loanDurationYears Int?
+  loanStartDate    DateTime? @db.Date
+  loanEndDate      DateTime? @db.Date
+  monthlyPayment   Float?
+  notaryFees       Float?
+  agencyFees       Float?
+  isFromOurAgency  Boolean?  @default(false)
+  notes            String?
+  source           String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
 }
 
+// ── Communication ─────────────────────────────────────────────────────────────
+
 model Message {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -894,7 +1585,7 @@ model Message {
   agent      User?     @relation("AgentMessages", fields: [agentId], references: [id])
 
   parentMessageId String?
-  parentMessage   Message?  @relation("MessageThread", fields: [parentMessageId], references: [id])
+  parent          Message?  @relation("MessageThread", fields: [parentMessageId], references: [id])
   replies         Message[] @relation("MessageThread")
 
   subject         String?
@@ -902,18 +1593,39 @@ model Message {
   senderType      MessageSenderType?
   channel         MessageChannel?
   aiGenerated     Boolean            @default(false)
-  attachmentsUrls String[]
+  attachmentsUrls String[]           @default([])
 
-  messageDate    DateTime      @default(now())
+  messageDate    DateTime       @default(now())
   status         MessageStatus?
   readAt         DateTime?
   deliveryStatus String?
+  templateId     String?
 
   createdAt DateTime @default(now())
 }
 
+model Notification {
+  id             String   @id @default(uuid())
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  type       NotificationType       @default(INFO)
+  title      String
+  message    String?
+  entityType NotificationEntityType?
+  entityId   String?
+  isRead     Boolean                @default(false)
+  readAt     DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+// ── Triggers & Signals ────────────────────────────────────────────────────────
+
 model Trigger {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -927,13 +1639,19 @@ model Trigger {
   agentId    String?
   agent      User?     @relation("AgentTriggers", fields: [agentId], references: [id])
 
-  automationCode String?
-  type           TriggerType?
-  category       TriggerCategory?
-  label          String?
-  description    String
-  score          Int?
-  status         TriggerStatus @default(ACTIF)
+  linkedPlaybookId String?
+  linkedPlaybook   Playbook? @relation(fields: [linkedPlaybookId], references: [id])
+
+  automationCode        String?
+  type                  TriggerType?
+  category              TriggerCategory?
+  label                 String?
+  description           String
+  score                 Int?
+  status                TriggerStatus    @default(ACTIF)
+  engagementScoreImpact Int?             @default(0)
+  signalSource          SignalSource?
+  engagementContext     Json?
 
   detectedAt  DateTime  @default(now())
   resolvedAt  DateTime?
@@ -943,8 +1661,66 @@ model Trigger {
   createdAt DateTime @default(now())
 }
 
+model MandateSignal {
+  id        String @id @default(uuid())
+  agentId   String
+  agent     Agent  @relation("MandateSignalAgent", fields: [agentId], references: [id])
+  clientId  String?
+  client    Client? @relation(fields: [clientId], references: [id])
+  propertyId String?
+  property  Property? @relation(fields: [propertyId], references: [id])
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id])
+
+  signalType       MandateSignalType
+  score            Int?               @default(0)
+  status           MandateSignalStatus @default(NOUVEAU)
+  contextData      Json?
+  assignedTo       String?
+  assignee         Agent?             @relation("MandateSignalAssignee", fields: [assignedTo], references: [id])
+  generatedContent Json?
+  contactedAt      DateTime?
+  convertedAt      DateTime?
+  expiresAt        DateTime?
+
+  // Reverse relations
+  signalActions SignalAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model SignalAction {
+  id            String   @id @default(uuid())
+  signalId      String
+  signal        MandateSignal @relation(fields: [signalId], references: [id])
+  agentId       String
+  agent         Agent    @relation(fields: [agentId], references: [id])
+
+  actionType    SignalActionType
+  content       String?
+  contentSource ContentSource?   @default(MANUAL)
+  status        ActionStatus     @default(PLANNED)
+  executedAt    DateTime?
+  result        ActionResult?
+  resultNotes   String?
+  nextActionPlannedAt DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+model OpportunityTrigger {
+  id          String   @id
+  type        String
+  description String
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+
 model Event {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -974,12 +1750,32 @@ model Event {
   reportStatus       ReportStatus?
   reportSentAt       DateTime?
 
+  isTask          Boolean   @default(false)
+  taskCompleted   Boolean?  @default(false)
+  taskCompletedAt DateTime?
+  recurrenceRule  String?
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
+model DealMilestoneEvent {
+  id        String   @id @default(uuid())
+  dealId    String
+  deal      Deal     @relation(fields: [dealId], references: [id])
+  milestone String
+  occurredAt DateTime @default(now())
+  createdBy String?
+  creator   User?    @relation(fields: [createdBy], references: [id])
+  metadata  Json?
+
+  createdAt DateTime? @default(now())
+}
+
+// ── Documents ─────────────────────────────────────────────────────────────────
+
 model Document {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -989,14 +1785,15 @@ model Document {
   propertyId   String?
   property     Property? @relation(fields: [propertyId], references: [id])
   dealId       String?
-  deal         Deal?     @relation(fields: [dealId], references: [id])
+  deal         Deal?     @relation("DealDocuments", fields: [dealId], references: [id])
   uploadedById String?
   uploadedBy   User?     @relation("UploadedDocuments", fields: [uploadedById], references: [id])
 
   type        DocumentType?
   title       String
   description String?
-  fileUrl     String
+  url         String
+  fileUrl     String?
   fileName    String?
   fileSizeKb  Int?
   fileFormat  FileFormat?
@@ -1009,6 +1806,468 @@ model Document {
   isPrivate         Boolean         @default(false)
   signedAt          DateTime?
 
+  templateId            String?
+  generatedFromTemplate Boolean @default(false)
+  esignExternalId       String?
+  esignStatus           EsignStatus?
+  isTemplate            Boolean @default(false)
+  templateVariables     Json?
+
+  // Reverse relations
+  dealsSaleMandate Deal[] @relation("DealSaleMandate")
+  dealsMgmtMandate Deal[] @relation("DealMgmtMandate")
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
+}
+
+model MaintenanceLog {
+  id          String   @id @default(uuid())
+  category    String
+  description String
+  amount      Float?
+  isPrivate   Boolean  @default(true)
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+}
+
+// ── Listing & Publication ─────────────────────────────────────────────────────
+
+model Listing {
+  id             String   @id @default(uuid())
+  propertyId     String
+  property       Property @relation("ListingProperty", fields: [propertyId], references: [id])
+  agentId        String?
+  agent          Agent?   @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  title              String?
+  description        String?
+  descriptionSource  DescriptionSource? @default(MANUAL)
+  status             ListingWorkflowStatus @default(DRAFT)
+  alurCompliant      Boolean?           @default(false)
+  alurChecklist      Json?
+  slug               String?
+  publishedAt        DateTime?
+  contactFormEnabled Boolean?           @default(true)
+  viewCount          Int?               @default(0)
+  leadCount          Int?               @default(0)
+
+  // Reverse relations
+  deals              Deal[]
+  leads              Lead[]
+  portalPublications PortalPublication[]
+  linkedProperties   Property[]         @relation("PropertyListingRef")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Lead {
+  id             String   @id @default(uuid())
+  listingId      String?
+  listing        Listing? @relation(fields: [listingId], references: [id])
+  agentId        String?
+  agent          Agent?   @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  name               String?
+  email              String?
+  phone              String?
+  message            String?
+  source             LeadSource?
+  score              Int?        @default(0)
+  status             LeadStatus  @default(NEW)
+  convertedToClientId String?
+  convertedToClient  Client?     @relation(fields: [convertedToClientId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model PortalPublication {
+  id             String   @id @default(uuid())
+  listingId      String
+  listing        Listing  @relation(fields: [listingId], references: [id])
+  integrationId  String?
+  integration    Integration? @relation(fields: [integrationId], references: [id])
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+
+  portalName         PortalName
+  externalListingId  String?
+  externalUrl        String?
+  status             PublicationStatus @default(PENDING)
+  publishedAt        DateTime?
+  lastSyncedAt       DateTime?
+  errorMessage       String?
+  stats              Json?             @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// ── Campaigns & Playbooks ─────────────────────────────────────────────────────
+
+model Campaign {
+  id             String   @id @default(uuid())
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  name            String
+  type            CampaignType
+  status          CampaignStatus    @default(DRAFT)
+  audienceFilters Json?
+  audienceCount   Int?              @default(0)
+  frequency       CampaignFrequency?
+  modules         Json?
+  templateId      String?
+  templateConfig  Json?
+  subjectLine     String?
+  subjectLineB    String?
+  scheduledAt     DateTime?
+  lastSentAt      DateTime?
+
+  // Reverse relations
+  campaignSends CampaignSend[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model CampaignSend {
+  id         String @id @default(uuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
+  agentId    String
+  agent      Agent    @relation(fields: [agentId], references: [id])
+
+  emailTo            String
+  subjectLineVariant SubjectLineVariant? @default(A)
+  status             SendStatus          @default(QUEUED)
+  sentAt             DateTime?
+  deliveredAt        DateTime?
+  openedAt           DateTime?
+  openCount          Int?                @default(0)
+  clickedAt          DateTime?
+  clickCount         Int?                @default(0)
+  clickedLinks       Json?
+  bounceType         BounceType?
+  bounceReason       String?
+  unsubscribedAt     DateTime?
+  contentSnapshot    Json?
+
+  createdAt DateTime @default(now())
+}
+
+model Playbook {
+  id             String   @id @default(uuid())
+  agentId        String?
+  agent          Agent?   @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  name          String
+  description   String?
+  targetSegment PlaybookTargetSegment?  @default(ALL)
+  targetProfile PlaybookTargetProfile?  @default(ALL)
+  isSystem      Boolean                @default(false)
+  isActive      Boolean                @default(true)
+  steps         Json                   @default("[]")
+  stats         Json?                  @default("{}")
+
+  // Reverse relations
+  enrollments PlaybookEnrollment[]
+  triggers    Trigger[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model PlaybookEnrollment {
+  id         String   @id @default(uuid())
+  playbookId String
+  playbook   Playbook @relation(fields: [playbookId], references: [id])
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
+  agentId    String
+  agent      Agent    @relation(fields: [agentId], references: [id])
+
+  currentStep      Int?             @default(0)
+  status           EnrollmentStatus @default(ACTIVE)
+  nextActionAt     DateTime?
+  enrolledAt       DateTime         @default(now())
+  completedAt      DateTime?
+  conversionDealId String?
+  conversionDeal   Deal?            @relation(fields: [conversionDealId], references: [id])
+  stepHistory      Json?            @default("[]")
+
+  createdAt DateTime @default(now())
+}
+
+// ── Segmentation & Engagement ─────────────────────────────────────────────────
+
+model ClientSegment {
+  id       String @id @default(uuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+  agentId  String
+  agent    Agent  @relation(fields: [agentId], references: [id])
+
+  temperatureScore   Int?         @default(0)
+  segment            SegmentType  @default(INCONNU)
+  previousSegment    SegmentType?
+  segmentChangedAt   DateTime?
+  lastInteractionAt  DateTime?
+  lastEngagementAt   DateTime?
+  engagementCount30d Int?         @default(0)
+  identifiedProject  IdentifiedProject? @default(INCONNU)
+  dataQualityScore   Int?         @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model ClientEngagementSignal {
+  id         String @id @default(uuid())
+  clientId   String
+  client     Client @relation(fields: [clientId], references: [id])
+  agentId    String
+  agent      Agent  @relation(fields: [agentId], references: [id])
+
+  signalType            EngagementSignalType
+  source                String?
+  scoreImpact           Int?     @default(0)
+  metadata              Json?
+  triggersMandateSignal  Boolean? @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+model SegmentTransition {
+  id       String @id @default(uuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+  agentId  String
+  agent    Agent  @relation(fields: [agentId], references: [id])
+
+  fromSegment        SegmentType?
+  toSegment          SegmentType
+  fromScore          Int?
+  toScore            Int?
+  triggerType        SegmentTransitionTrigger
+  triggerReferenceId String?
+
+  createdAt DateTime @default(now())
+}
+
+// ── Agent-Client Link ─────────────────────────────────────────────────────────
+
+model AgentClientLink {
+  id               String   @id @default(uuid())
+  ownerAccountId   String
+  agentId          String
+  agent            Agent    @relation(fields: [agentId], references: [id])
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id])
+  crmClientId      String?
+  crmClient        Client?  @relation(fields: [crmClientId], references: [id])
+
+  status               AgentClientLinkStatus @default(PENDING_INVITATION)
+  source               AgentClientLinkSource @default(AGENT_INVITATION)
+  startDate            DateTime?             @default(now())
+  endDate              DateTime?
+  isDataSharingConsented Boolean?             @default(false)
+  consentDate          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// ── Subscription ──────────────────────────────────────────────────────────────
+
+model Subscription {
+  id             String   @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  agentId        String?
+  agent          Agent?   @relation(fields: [agentId], references: [id])
+
+  plan                  SubscriptionPlan   @default(TRIAL)
+  status                SubscriptionStatus @default(TRIALING)
+  trialStartDate        DateTime?
+  trialEndDate          DateTime?
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  maxAgents             Int?               @default(1)
+  maxProperties         Int?               @default(50)
+  features              Json?              @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// ── Data Quality ──────────────────────────────────────────────────────────────
+
+model AuditScore {
+  id             String   @id @default(uuid())
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  globalScore       Int?      @default(0)
+  completenessScore Int?      @default(0)
+  consistencyScore  Int?      @default(0)
+  freshnessScore    Int?      @default(0)
+  duplicatesScore   Int?      @default(0)
+  calculatedAt      DateTime  @default(now())
+  details           Json?
+
+  createdAt DateTime @default(now())
+}
+
+model ScoringConfig {
+  id         String  @id @default(uuid())
+  metricKey  String
+  version    String  @default("2026-04-v1")
+  isActive   Boolean @default(true)
+  entityType String
+  formula    Json
+  weights    Json?
+  thresholds Json?
+  description String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+model DuplicatePair {
+  id             String   @id @default(uuid())
+  agentId        String
+  agent          Agent    @relation(fields: [agentId], references: [id])
+
+  entityType      DuplicateEntityType
+  entityAId       String
+  entityBId       String
+  confidenceScore Int?              @default(0)
+  matchingFields  Json?
+  status          DuplicateStatus   @default(DETECTED)
+  mergedIntoId    String?
+
+  createdAt DateTime @default(now())
+}
+
+model EmailPreference {
+  id       String @id @default(uuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+  agentId  String
+  agent    Agent  @relation(fields: [agentId], references: [id])
+
+  globalOptout      Boolean           @default(false)
+  optoutCategories  Json?             @default("{}")
+  maxFrequency      MaxEmailFrequency? @default(MONTHLY)
+  unsubscribedAt    DateTime?
+  unsubscribeReason String?
+  resubscribedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+// ── Import & Integration ──────────────────────────────────────────────────────
+
+model ImportJob {
+  id             String   @id @default(uuid())
+  agentId        String?
+  agent          Agent?   @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  fileUrl       String?
+  fileName      String?
+  fileFormat    ImportFileFormat?
+  entityType    ImportEntityType?
+  mappingConfig Json?
+  status        ImportStatus     @default(PENDING)
+  totalRows     Int?             @default(0)
+  importedRows  Int?             @default(0)
+  errorRows     Int?             @default(0)
+  errorLog      Json?
+  duplicateRows Int?             @default(0)
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+model Integration {
+  id             String   @id @default(uuid())
+  agentId        String?
+  agent          Agent?   @relation(fields: [agentId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  connectorType       ConnectorType
+  status              IntegrationStatus   @default(DISCONNECTED)
+  authType            AuthType?
+  credentialsVaultId  String?
+  config              Json?               @default("{}")
+  syncMode            SyncMode?           @default(PERIODIC)
+  syncIntervalMinutes Int?                @default(60)
+  lastSyncAt          DateTime?
+  lastError           String?
+  errorCount          Int?                @default(0)
+
+  // Reverse relations
+  fieldMappings      FieldMapping[]
+  syncLogs           SyncLog[]
+  portalPublications PortalPublication[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model FieldMapping {
+  id            String      @id @default(uuid())
+  integrationId String
+  integration   Integration @relation(fields: [integrationId], references: [id])
+
+  entityType      MappingEntityType
+  localField      String
+  externalField   String
+  transformRule   TransformRule?    @default(NONE)
+  transformConfig Json?
+  isActive        Boolean           @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model SyncLog {
+  id            String      @id @default(uuid())
+  integrationId String
+  integration   Integration @relation(fields: [integrationId], references: [id])
+  agentId       String?
+  agent         Agent?      @relation(fields: [agentId], references: [id])
+
+  direction    SyncDirection
+  entityType   SyncEntityType
+  entityId     String?
+  externalId   String?
+  action       SyncAction
+  status       SyncStatus
+  changesDiff  Json?
+  errorMessage String?
+  durationMs   Int?
+
+  createdAt DateTime @default(now())
 }
