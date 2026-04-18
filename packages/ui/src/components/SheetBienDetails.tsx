@@ -1,27 +1,29 @@
 "use client";
 
-import type { ReactNode } from "react";
-
 /**
- * SheetBienDetails - Contenu de la sheet affichant les détails d'un bien
+ * SheetBienDetails - Panneau de décision rapide bien immobilier
  *
  * Structure:
- * - Position 1: Map (L350px x H115px)
- * - Position 2: Lignes 1 et 2 (Badge, Chip, Icon de la section 1 du composant ListBien)
- * - Position 3: Section database (KpiIndicator Qualification)
- * - Position 4: Section engagement (KpiIndicator Engagement)
- * - Position 5: Section conversion (KpiIndicator Conversion)
+ * - Position 1: Map placeholder
+ * - Position 2: Infos bien (badges, chips, DPE)
+ * - Section 3: KPIs inline (qual, ent, conv) variant="straight"
+ * - Section 4: Suggestions IA (2 AiSuggestionBanner max)
+ * - Section 5: Activités récentes (2-3 CardLog)
+ * - Footer sticky: Boutons d'action
  */
 
 import { Badge } from "./Badge";
+import type { BadgeVariant } from "./Badge";
 import { Chip } from "./Chip";
 import { IconDpe, DpeType } from "./IconDpe";
-import { AiSuggestion } from "./AiSuggestion";
 import { KpiIndicator } from "./KpiIndicator";
-import { MapPin, Tag, Home, Square } from "lucide-react";
+import { AiSuggestionBanner } from "./AiSuggestionBanner";
+import { CardLog } from "./CardLog";
+import { Button, IconButton } from "./Button";
+import { MapPin, Tag, Home, Square, MessageCircle, Phone } from "lucide-react";
 
 export interface SheetBienDetailsProps {
-  // Informations du bien
+  // Infos bien
   bienType: string;
   surface: string;
   type: string;
@@ -29,15 +31,35 @@ export interface SheetBienDetailsProps {
   location: string;
   dpe?: DpeType;
 
-  // KPI
+  // KPIs
   qualification: number;
   entretien: number;
   conversion: number;
 
-  // AI Suggestions
-  qualificationAiSuggestions?: number;
-  entretienAiSuggestions?: number;
-  conversionAiSuggestions?: number;
+  // Suggestions IA
+  suggestions?: Array<{
+    text: string;
+    actionLabel?: string;
+    onAction?: () => void;
+  }>;
+
+  // Activités récentes
+  recentLogs?: Array<{
+    date: string;
+    time: string;
+    author: string;
+    category: string;
+    description: string;
+    badgeVariant?: BadgeVariant;
+  }>;
+
+  // Footer actions
+  onViewFiche?: () => void;
+  onViewActions?: () => void;
+  onMessage?: () => void;
+  onCall?: () => void;
+
+  className?: string;
 }
 
 export function SheetBienDetails({
@@ -50,61 +72,22 @@ export function SheetBienDetails({
   qualification,
   entretien,
   conversion,
-  qualificationAiSuggestions = 0,
-  entretienAiSuggestions = 2,
-  conversionAiSuggestions = 0,
+  suggestions,
+  recentLogs,
+  onViewFiche,
+  onViewActions,
+  onMessage,
+  onCall,
+  className = "",
 }: SheetBienDetailsProps) {
-  // Section Card
-  const SectionCard = ({
-    kpiComponent,
-    aiSuggestions,
-    details,
-  }: {
-    kpiComponent: ReactNode;
-    aiSuggestions: number;
-    details: Array<{ label: string; value?: string }>;
-  }) => {
-    return (
-      <div
-        className="rounded-2xl w-full bg-surface-neutral-default border border-edge-default p-6"
-      >
-        <div className="flex flex-col gap-2">
-          {/* KPI + AI Suggestions */}
-          <div className="flex items-center justify-between w-full">
-            {kpiComponent}
-            <AiSuggestion count={aiSuggestions} />
-          </div>
-
-          {/* Details */}
-          {details.map((detail, idx) => (
-            <div key={idx} className="px-2.5 py-2">
-              <p
-                className="font-sans text-base leading-5 tracking-tight text-content-body"
-              >
-                {detail.label}
-                {detail.value && (
-                  <span className="font-bold"> {detail.value}</span>
-                )}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="flex flex-col gap-5 px-5 py-5">
+    <div className={`flex flex-col gap-5 px-5 py-5 pb-[100px] ${className}`.trim()}>
       {/* Position 1: Map */}
       <div
-        className="w-full rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
-        style={{
-          height: "115px",
-        }}
-      >
-      </div>
+        className="w-full h-[115px] rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
+      />
 
-      {/* Position 2: Lignes 1 et 2 (Badge, Chip, Icon) */}
+      {/* Position 2: Infos bien (badges, chips, DPE) */}
       <div className="flex flex-col gap-6">
         {/* Ligne 1: Badge type + Chip prix + Badge CARNET */}
         <div className="flex gap-2 items-center">
@@ -155,44 +138,60 @@ export function SheetBienDetails({
         </div>
       </div>
 
-      {/* Position 3: Section database (Qualification) */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
-        }
-        aiSuggestions={qualificationAiSuggestions}
-        details={[
-          { label: "Informations de profil :", value: "78%" },
-          { label: "Informations de contact :", value: "80%" },
-          { label: "Informations professionnelles :", value: "20%" },
-        ]}
-      />
+      {/* Section 3 — KPIs inline */}
+      <div className="flex items-center justify-between gap-4">
+        <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
+        <KpiIndicator kpi="ent" value={`${entretien}%`} percentage={entretien} variant="straight" />
+        <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
+      </div>
 
-      {/* Position 4: Section entretien (Entretien) */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="ent" value={`${entretien}%`} percentage={entretien} variant="straight" />
-        }
-        aiSuggestions={entretienAiSuggestions}
-        details={[
-          { label: "Carnet d'entretien :", value: "actif" },
-          { label: "Suivi d'entretien :", value: "18%" },
-          { label: "Suivi financier :", value: "18%" },
-        ]}
-      />
+      {/* Section 4 — Suggestions IA */}
+      {suggestions && suggestions.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {suggestions.slice(0, 2).map((suggestion, idx) => (
+            <AiSuggestionBanner
+              key={idx}
+              suggestion={suggestion.text}
+              actionLabel={suggestion.actionLabel}
+              onAction={suggestion.onAction}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Position 5: Section conversion (Conversion) */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
-        }
-        aiSuggestions={conversionAiSuggestions}
-        details={[
-          { label: "Date du dernier mandat :", value: "> 2 ans" },
-          { label: "Projet(s) immobilier(s) :", value: "> 12 mois" },
-          { label: "Projection prochain mandat :", value: "> 6 mois" },
-        ]}
-      />
+      {/* Section 5 — Activités récentes */}
+      {recentLogs && recentLogs.length > 0 && (
+        <div className="flex flex-col gap-0">
+          {recentLogs.slice(0, 3).map((log, idx) => (
+            <CardLog
+              key={idx}
+              date={log.date}
+              time={log.time}
+              author={log.author}
+              category={log.category}
+              description={log.description}
+              badgeVariant={log.badgeVariant}
+              className="w-full"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Footer sticky */}
+      <div className="fixed bottom-0 left-0 right-0 bg-surface-neutral-default border-t border-edge-divider px-5 py-4 flex flex-col gap-3">
+        <div className="flex gap-3">
+          <Button variant="primary" onClick={onViewFiche} className="flex-1">
+            Voir la Fiche
+          </Button>
+          <Button variant="default" onClick={onViewActions} className="flex-1">
+            Voir les actions
+          </Button>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <IconButton variant="default" onClick={onMessage} icon={<MessageCircle size={20} />} />
+          <IconButton variant="default" onClick={onCall} icon={<Phone size={20} />} />
+        </div>
+      </div>
     </div>
   );
 }

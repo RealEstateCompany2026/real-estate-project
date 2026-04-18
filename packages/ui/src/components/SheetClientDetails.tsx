@@ -1,39 +1,53 @@
 "use client";
 
 /**
- * SheetClientDetails - Contenu de la sheet affichant les détails KPI d'un client
+ * SheetClientDetails - Panneau de décision rapide client
  *
- * Affiche 4 sections :
- * - Qualification
- * - Engagement
- * - Conversion
- * - Réactivation
- *
- * Chaque section contient un organisme KPI + badge AI suggestions + détails
+ * Structure:
+ * - Section 1: KPIs inline (qual, eng, conv, reac) variant="straight"
+ * - Section 2: Suggestions IA (2 AiSuggestionBanner max)
+ * - Section 3: Activités récentes (2-3 CardLog)
+ * - Footer sticky: Boutons d'action (Voir la Fiche, Voir les actions, Message, Phone)
  */
 
 import { KpiIndicator } from "./KpiIndicator";
-import { AiSuggestion } from "./AiSuggestion";
-
-export interface KpiDetail {
-  label: string;
-  value?: string;
-}
+import { AiSuggestionBanner } from "./AiSuggestionBanner";
+import { CardLog } from "./CardLog";
+import { Button, IconButton } from "./Button";
+import { MessageCircle, Phone } from "lucide-react";
+import type { BadgeVariant } from "./Badge";
 
 export interface SheetClientDetailsProps {
+  // KPIs (0-100)
   qualification: number;
   engagement: number;
   conversion: number;
   reactivation: number;
-  qualificationAiSuggestions?: number;
-  engagementAiSuggestions?: number;
-  conversionAiSuggestions?: number;
-  reactivationAiSuggestions?: number;
-  /** Sous-métriques dynamiques par section KPI */
-  qualificationDetails?: KpiDetail[];
-  engagementDetails?: KpiDetail[];
-  conversionDetails?: KpiDetail[];
-  reactivationDetails?: KpiDetail[];
+
+  // Suggestions IA (2 max affichées)
+  suggestions?: Array<{
+    text: string;
+    actionLabel?: string;
+    onAction?: () => void;
+  }>;
+
+  // Activités récentes (2-3 logs)
+  recentLogs?: Array<{
+    date: string;
+    time: string;
+    author: string;
+    category: string;
+    description: string;
+    badgeVariant?: BadgeVariant;
+  }>;
+
+  // Footer actions
+  onViewFiche?: () => void;
+  onViewActions?: () => void;
+  onMessage?: () => void;
+  onCall?: () => void;
+
+  className?: string;
 }
 
 export function SheetClientDetails({
@@ -41,91 +55,71 @@ export function SheetClientDetails({
   engagement,
   conversion,
   reactivation,
-  qualificationAiSuggestions = 0,
-  engagementAiSuggestions = 0,
-  conversionAiSuggestions = 0,
-  reactivationAiSuggestions = 0,
-  qualificationDetails = [],
-  engagementDetails = [],
-  conversionDetails = [],
-  reactivationDetails = [],
+  suggestions,
+  recentLogs,
+  onViewFiche,
+  onViewActions,
+  onMessage,
+  onCall,
+  className = "",
 }: SheetClientDetailsProps) {
-  // Section Card
-  const SectionCard = ({
-    kpiComponent,
-    aiSuggestions,
-    details,
-  }: {
-    kpiComponent: React.ReactNode;
-    aiSuggestions: number;
-    details: Array<{ label: string; value?: string }>;
-  }) => {
-    return (
-      <div
-        className="rounded-2xl w-full bg-surface-neutral-default border border-edge-default p-6"
-      >
-        <div className="flex flex-col gap-2">
-          {/* KPI + AI Suggestions */}
-          <div className="flex items-center justify-between w-full">
-            {kpiComponent}
-            <AiSuggestion count={aiSuggestions} />
-          </div>
+  return (
+    <div className={`flex flex-col gap-5 px-5 py-5 pb-[100px] ${className}`.trim()}>
+      {/* Section 1 — KPIs inline */}
+      <div className="flex items-center justify-between gap-4">
+        <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
+        <KpiIndicator kpi="eng" value={`${engagement}%`} percentage={engagement} variant="straight" />
+        <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
+        <KpiIndicator kpi="reac" value={`${reactivation}%`} percentage={reactivation} variant="straight" />
+      </div>
 
-          {/* Details */}
-          {details.map((detail, idx) => (
-            <div key={idx} className="px-2.5 py-2">
-              <p
-                className="font-sans text-base leading-5 tracking-tight text-content-body"
-              >
-                {detail.label}
-                {detail.value && (
-                  <span className="font-bold"> {detail.value}</span>
-                )}
-              </p>
-            </div>
+      {/* Section 2 — Suggestions IA */}
+      {suggestions && suggestions.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {suggestions.slice(0, 2).map((suggestion, idx) => (
+            <AiSuggestionBanner
+              key={idx}
+              suggestion={suggestion.text}
+              actionLabel={suggestion.actionLabel}
+              onAction={suggestion.onAction}
+            />
           ))}
         </div>
+      )}
+
+      {/* Section 3 — Activités récentes */}
+      {recentLogs && recentLogs.length > 0 && (
+        <div className="flex flex-col gap-0">
+          {recentLogs.slice(0, 3).map((log, idx) => (
+            <CardLog
+              key={idx}
+              date={log.date}
+              time={log.time}
+              author={log.author}
+              category={log.category}
+              description={log.description}
+              badgeVariant={log.badgeVariant}
+              className="w-full"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Footer sticky */}
+      <div className="fixed bottom-0 left-0 right-0 bg-surface-neutral-default border-t border-edge-divider px-5 py-4 flex flex-col gap-3">
+        <div className="flex gap-3">
+          <Button variant="primary" onClick={onViewFiche} className="flex-1">
+            Voir la Fiche
+          </Button>
+          <Button variant="default" onClick={onViewActions} className="flex-1">
+            Voir les actions
+          </Button>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <IconButton variant="default" onClick={onMessage} icon={<MessageCircle size={20} />} />
+          <IconButton variant="default" onClick={onCall} icon={<Phone size={20} />} />
+        </div>
       </div>
-    );
-  };
-
-  return (
-    <div className="flex flex-col gap-3 px-5 py-5">
-      {/* Qualification */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
-        }
-        aiSuggestions={qualificationAiSuggestions}
-        details={qualificationDetails}
-      />
-
-      {/* Engagement */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="eng" value={`${engagement}%`} percentage={engagement} variant="straight" />
-        }
-        aiSuggestions={engagementAiSuggestions}
-        details={engagementDetails}
-      />
-
-      {/* Conversion */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="conv" value={`${conversion}%`} percentage={conversion} variant="straight" />
-        }
-        aiSuggestions={conversionAiSuggestions}
-        details={conversionDetails}
-      />
-
-      {/* Réactivation */}
-      <SectionCard
-        kpiComponent={
-          <KpiIndicator kpi="reac" value={`${reactivation}%`} percentage={reactivation} variant="straight" />
-        }
-        aiSuggestions={reactivationAiSuggestions}
-        details={reactivationDetails}
-      />
     </div>
   );
 }
