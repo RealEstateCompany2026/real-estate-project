@@ -14,6 +14,7 @@ import { ButtonSort } from '@real-estate/ui/button-sort';
 import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
 import { Chip } from '@real-estate/ui/chip';
+import { IconDpe } from '@real-estate/ui/icon-dpe';
 import { Button } from '@real-estate/ui/button';
 import { IconButton } from '@real-estate/ui/button';
 import { SheetBienDetails } from '@real-estate/ui/sheet-bien-details';
@@ -404,6 +405,14 @@ export function PropertyListView() {
           setSelectedProperty(null);
         }}
         title={selectedProperty ? `${selectedProperty.propertyType} . ${selectedProperty.surface}` : ''}
+        headerAfterTitle={
+          selectedProperty && (
+            <div className="flex items-center gap-2">
+              <Chip size="small">{selectedProperty.city}</Chip>
+              <IconDpe type={selectedProperty.dpeGrade} />
+            </div>
+          )
+        }
         width="narrow"
         footer={
           selectedProperty ? (

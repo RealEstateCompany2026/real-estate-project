@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Sheet } from "../components/Sheet";
+import { Badge } from "../components/Badge";
+import { Button } from "../components/Button";
 
 const meta: Meta<typeof Sheet> = {
   title: "Design System/Organisms/Sheet",
@@ -137,6 +139,53 @@ export const WideWithFooter: Story = {
           <div style={{ padding: 40, minHeight: 400 }}>
             <p style={{ color: "var(--text-body)" }}>
               Sheet wide avec footer sticky.
+            </p>
+          </div>
+        </Sheet>
+      </div>
+    );
+  },
+};
+
+/* ── With Header Composable ────────────────── */
+
+export const WithHeaderComposable: Story = {
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <div style={{ padding: 40 }}>
+        <button
+          onClick={() => setIsOpen(true)}
+          style={{
+            padding: "10px 20px",
+            borderRadius: 8,
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          Ouvrir header composable
+        </button>
+        <Sheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Annonce"
+          width="wide"
+          headerAfterTitle={
+            <div className="flex items-center gap-3">
+              <Badge variant="success">ÉDITION</Badge>
+              <Badge variant="warning">RÉVISION</Badge>
+              <Badge variant="disabled">PUBLICATION</Badge>
+            </div>
+          }
+          headerActions={
+            <Button variant="outline" onClick={() => {}}>
+              Publier
+            </Button>
+          }
+        >
+          <div style={{ padding: 40, minHeight: 400 }}>
+            <p style={{ color: "var(--text-body)" }}>
+              Header composable : titre + badges (headerAfterTitle) + bouton (headerActions) + close.
             </p>
           </div>
         </Sheet>

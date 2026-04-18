@@ -847,23 +847,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         isOpen={gallerySheetOpen}
         onClose={() => setGallerySheetOpen(false)}
         width="wide"
-        customHeader={
-          <div className="flex items-center justify-between px-[40px] pt-[51px] pb-[20px]">
-            <h4
-              className="text-[28px] font-bold leading-[34px] tracking-[0.28px]"
-              style={{ color: 'var(--text-headings)' }}
-            >
-              Galerie ({photos.length})
-            </h4>
-            <button
-              onClick={() => setGallerySheetOpen(false)}
-              className="p-[12px] rounded-[16px]"
-              style={{ color: 'var(--text-caption)' }}
-            >
-              <X size={20} />
-            </button>
-          </div>
-        }
+        title={`Galerie (${photos.length})`}
         footer={
           <div className="sticky bottom-0 flex justify-end gap-[12px] px-[40px] pb-[100px] pt-[16px]"
             style={{ backgroundColor: 'var(--surface-neutral-default)' }}
@@ -1214,61 +1198,24 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           isOpen={annonceSheetListing !== null}
           onClose={() => setAnnonceSheetListing(null)}
           width="wide"
-          customHeader={
-            <div className="px-[40px] pt-[51px] pb-[20px]">
-              {/* Row 1 : Titre + badges workflow + Switch publier + Close */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-[16px]">
-                  <h4
-                    className="text-[28px] font-bold leading-[34px] tracking-[0.28px]"
-                    style={{ color: 'var(--text-headings)' }}
-                  >
-                    Annonce
-                  </h4>
-                  {annonceSheetListing && (
-                    <>
-                      <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).edition}>ÉDITION</Badge>
-                      <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).revision}>RÉVISION</Badge>
-                      <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).publication}>PUBLICATION</Badge>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center gap-[16px]">
-                  {/* Switch Publier */}
-                  <div className="flex items-center gap-[8px]">
-                    <span
-                      className="text-[14px] font-semibold leading-[20px]"
-                      style={{ color: 'var(--text-caption)' }}
-                    >
-                      Publier
-                    </span>
-                    <Switch
-                      checked={annonceSheetListing?.status === 'PUBLISHED'}
-                      onChange={() => { /* TODO: toggle publication status */ }}
-                    />
-                  </div>
-                  <button
-                    onClick={() => setAnnonceSheetListing(null)}
-                    className="p-[12px] rounded-[16px]"
-                    style={{ color: 'var(--text-caption)' }}
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
+          title="Annonce"
+          headerAfterTitle={
+            annonceSheetListing && (
+              <div className="flex items-center gap-4">
+                <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).edition}>ÉDITION</Badge>
+                <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).revision}>RÉVISION</Badge>
+                <Badge variant={listingStatusToWorkflow(annonceSheetListing.status).publication}>PUBLICATION</Badge>
               </div>
-
-              {/* Row 2 : AppBarAnnonce — infos du bien */}
-              <AppBarAnnonce
-                type={PROPERTY_TYPE_LABELS[property.type]}
-                surface={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : '—'}
-                annee={property.constructionYear ? String(property.constructionYear) : '—'}
-                ville={property.addressCity ?? '—'}
-                prix={formatPrice(property.desiredSellingPrice ?? property.estimatedMarketValue)}
-                prixM2={
-                  property.livingAreaSqm && (property.desiredSellingPrice || property.estimatedMarketValue)
-                    ? `${formatPrice(Math.round(Number(property.desiredSellingPrice || property.estimatedMarketValue) / Number(property.livingAreaSqm)))} /m²`
-                    : '—'
-                }
+            )
+          }
+          headerActions={
+            <div className="flex items-center gap-2">
+              <span className="text-[14px] font-semibold leading-[20px] text-content-caption">
+                Publier
+              </span>
+              <Switch
+                checked={annonceSheetListing?.status === 'PUBLISHED'}
+                onChange={() => { /* TODO: toggle publication status */ }}
               />
             </div>
           }
@@ -1288,6 +1235,20 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           }
         >
           <div className="px-[40px] py-[20px] flex flex-col gap-[40px]">
+
+            {/* AppBarAnnonce — infos du bien */}
+            <AppBarAnnonce
+              type={PROPERTY_TYPE_LABELS[property.type]}
+              surface={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : '—'}
+              annee={property.constructionYear ? String(property.constructionYear) : '—'}
+              ville={property.addressCity ?? '—'}
+              prix={formatPrice(property.desiredSellingPrice ?? property.estimatedMarketValue)}
+              prixM2={
+                property.livingAreaSqm && (property.desiredSellingPrice || property.estimatedMarketValue)
+                  ? `${formatPrice(Math.round(Number(property.desiredSellingPrice || property.estimatedMarketValue) / Number(property.livingAreaSqm)))} /m²`
+                  : '—'
+              }
+            />
 
             {/* Section 1 — Diaporama */}
             <section>

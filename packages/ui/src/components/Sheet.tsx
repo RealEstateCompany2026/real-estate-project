@@ -43,8 +43,15 @@ export interface SheetProps {
   className?: string;
   /** Icône personnalisée pour le bouton de fermeture */
   closeIcon?: React.ReactNode;
-  /** Header personnalisé (remplace le header par défaut) */
+  /**
+   * Header personnalisé (remplace le header par défaut)
+   * @deprecated Utiliser `headerAfterTitle` et `headerActions` à la place
+   */
   customHeader?: React.ReactNode;
+  /** Composants affichés après le titre (badges, chips, IconDpe, etc.) */
+  headerAfterTitle?: React.ReactNode;
+  /** Composants affichés avant le close button (switches, boutons action, etc.) */
+  headerActions?: React.ReactNode;
 }
 
 export const Sheet: React.FC<SheetProps> = ({
@@ -58,6 +65,8 @@ export const Sheet: React.FC<SheetProps> = ({
   className = "",
   closeIcon,
   customHeader,
+  headerAfterTitle,
+  headerActions,
 }: SheetProps) => {
   const sheetWidth = width === "narrow" ? "420px" : "1024px";
   const isNarrow = width === "narrow";
@@ -91,10 +100,9 @@ export const Sheet: React.FC<SheetProps> = ({
     <>
       {/* Overlay (Backdrop) */}
       <div
-        className="fixed inset-0 z-40 transition-opacity duration-300"
+        className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
       />
 
       {/* Sheet Container */}
@@ -102,59 +110,49 @@ export const Sheet: React.FC<SheetProps> = ({
         className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col
           transition-transform duration-300
           rounded-tl-[16px] rounded-bl-[16px]
+          bg-surface-neutral-default shadow-[0px_0px_10px_7px_rgba(0,0,0,0.05)]
           ${className}`}
         style={{
           width: sheetWidth,
-          backgroundColor: "var(--surface-neutral-default)",
-          boxShadow: "0px 0px 10px 7px rgba(0, 0, 0, 0.05)",
           transform: isOpen ? "translateX(0)" : "translateX(100%)",
         }}
       >
         {/* Header */}
         {customHeader ? (
           <div
-            className="sticky top-0 z-10"
-            style={{
-              borderBottom: showHeaderDivider
-                ? "1px solid var(--border-neutral-default)"
-                : "none",
-              backgroundColor: "var(--surface-neutral-default)",
-            }}
+            className={`sticky top-0 z-10 bg-surface-neutral-default ${
+              showHeaderDivider ? "border-b border-edge-default" : ""
+            }`}
           >
             {customHeader}
           </div>
         ) : (
           <div
-            className="sticky top-0 z-10 flex items-center justify-between"
-            style={{
-              padding: isNarrow ? "47px 20px 0 20px" : "51px 40px 0 40px",
-              borderBottom: showHeaderDivider
-                ? "1px solid var(--border-neutral-default)"
-                : "none",
-              backgroundColor: "var(--surface-neutral-default)",
-              /* Inherit border-radius from container for sticky header */
-              borderTopLeftRadius: "16px",
-            }}
+            className={`sticky top-0 z-10 flex items-center justify-between rounded-tl-[16px] bg-surface-neutral-default ${
+              isNarrow
+                ? "pt-[47px] px-[20px]"
+                : "pt-[51px] px-[40px]"
+            } ${showHeaderDivider ? "border-b border-edge-default" : ""}`}
           >
-            {/* Title — H4 Bold */}
-            <div className="flex items-center p-[10px]">
-              <h4
-                className="text-[28px] font-bold leading-[34px] tracking-[0.28px] whitespace-nowrap"
-                style={{ color: "var(--text-headings)" }}
-              >
+            {/* Left side — Title + headerAfterTitle */}
+            <div className="flex items-center gap-3 p-[10px]">
+              <h4 className="text-[28px] font-bold leading-[34px] tracking-[0.28px] whitespace-nowrap text-content-headings">
                 {title}
               </h4>
+              {headerAfterTitle}
             </div>
 
-            {/* Close Button — icon button */}
-            <button
-              onClick={onClose}
-              className="p-[12px] rounded-[16px] transition-colors"
-              style={{ color: "var(--text-caption)" }}
-              aria-label="Fermer"
-            >
-              {closeIcon ? closeIcon : <X size={20} />}
-            </button>
+            {/* Right side — headerActions + Close Button */}
+            <div className="flex items-center gap-3">
+              {headerActions}
+              <button
+                onClick={onClose}
+                className="p-[12px] rounded-[16px] transition-colors text-content-caption"
+                aria-label="Fermer"
+              >
+                {closeIcon ? closeIcon : <X size={20} />}
+              </button>
+            </div>
           </div>
         )}
 
