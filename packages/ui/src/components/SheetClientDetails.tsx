@@ -106,19 +106,15 @@ export function SheetClientDetails({
       )}
 
       {/* Footer sticky */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface-neutral-default border-t border-edge-divider px-5 py-4 flex flex-col gap-3">
-        <div className="flex gap-3">
-          <Button variant="primary" onClick={onViewFiche} className="flex-1">
-            Voir la Fiche
-          </Button>
-          <Button variant="default" onClick={onViewActions} className="flex-1">
-            Voir les actions
-          </Button>
-        </div>
-        <div className="flex gap-3 justify-center">
-          <IconButton variant="default" onClick={onMessage} icon={<MessageCircle size={20} />} />
-          <IconButton variant="default" onClick={onCall} icon={<Phone size={20} />} />
-        </div>
+      <div className="fixed bottom-0 left-0 right-0 bg-surface-neutral-default border-t border-edge-divider px-5 py-4 flex items-center gap-3">
+        <Button variant="primary" onClick={onViewFiche} className="flex-1">
+          Voir la Fiche
+        </Button>
+        <Button variant="default" onClick={onViewActions} className="flex-1">
+          Voir les actions
+        </Button>
+        <IconButton variant="default" onClick={onMessage} icon={<MessageCircle size={20} />} />
+        <IconButton variant="default" onClick={onCall} icon={<Phone size={20} />} />
       </div>
     </div>
   );
