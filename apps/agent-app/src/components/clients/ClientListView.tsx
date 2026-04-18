@@ -15,7 +15,9 @@ import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
 import { Chip } from '@real-estate/ui/chip';
 import { Button } from '@real-estate/ui/button';
-import { SheetClientDetails, type KpiDetail } from '@real-estate/ui/sheet-client-details';
+import { IconButton } from '@real-estate/ui/button';
+import { SheetClientDetails } from '@real-estate/ui/sheet-client-details';
+import { MessageCircle, Phone } from 'lucide-react';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -30,6 +32,11 @@ interface ClientKpis {
   engagement: number;
   conversion: number;
   reactivation: number;
+}
+
+interface KpiDetail {
+  label: string;
+  value?: string;
 }
 
 interface ClientKpiDetails {
@@ -48,6 +55,9 @@ interface ClientWithKpis extends ClientListItem {
   kpiDetails: ClientKpiDetails;
   aiSuggestions: number;
   badges: Array<{ label: string; variant?: 'default' | 'success' | 'error' | 'warning' | 'information' }>;
+  // Nouvelles données pour Sheet
+  suggestions: Array<{ text: string; actionLabel: string }>;
+  recentActivities: Array<{ date: string; time: string; author: string; category: string; description: string; badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled' }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -179,6 +189,14 @@ export function ClientListView() {
           kpiDetails: mockKpiDetails(kpis),
           aiSuggestions: Math.floor(Math.random() * 20),
           badges: statusToBadges(c.status),
+          suggestions: [
+            { text: "Relancer ce client — inactif depuis 30 jours", actionLabel: "Programmer" },
+            { text: "Proposer une estimation gratuite pour son bien", actionLabel: "Envoyer" },
+          ],
+          recentActivities: [
+            { date: "15 avr. 2026", time: "14:32", author: "Agent", category: "Appel", description: "Échange sur les critères de recherche", badgeVariant: "success" as const },
+            { date: "12 avr. 2026", time: "09:15", author: "Agent", category: "Email", description: "Envoi de biens correspondants", badgeVariant: "information" as const },
+          ],
         };
       });
 
@@ -364,24 +382,23 @@ export function ClientListView() {
         width="narrow"
         footer={
           selectedClient ? (
-            <div className="flex gap-[12px] p-[20px] border-t border-edge-default">
+            <>
+              <IconButton variant="default" onClick={() => window.location.href = `tel:`} icon={<Phone size={20} />} />
+              <IconButton variant="default" onClick={() => {}} icon={<MessageCircle size={20} />} />
               <Button
-                variant="outline"
+                variant="default"
                 className="flex-1"
                 onClick={() => {
                   setSheetOpen(false);
                   router.push(`/clients/${selectedClient.id}`);
                 }}
               >
-                Voir la fiche
+                Voir la Fiche
               </Button>
-              <Button
-                variant="primary"
-                className="flex-1"
-              >
+              <Button variant="primary" className="flex-1">
                 Voir les actions
               </Button>
-            </div>
+            </>
           ) : undefined
         }
       >
@@ -391,14 +408,8 @@ export function ClientListView() {
             engagement={selectedClient.kpis.engagement}
             conversion={selectedClient.kpis.conversion}
             reactivation={selectedClient.kpis.reactivation}
-            qualificationAiSuggestions={selectedClient.kpiDetails.qualificationAiSuggestions}
-            engagementAiSuggestions={selectedClient.kpiDetails.engagementAiSuggestions}
-            conversionAiSuggestions={selectedClient.kpiDetails.conversionAiSuggestions}
-            reactivationAiSuggestions={selectedClient.kpiDetails.reactivationAiSuggestions}
-            qualificationDetails={selectedClient.kpiDetails.qualificationDetails}
-            engagementDetails={selectedClient.kpiDetails.engagementDetails}
-            conversionDetails={selectedClient.kpiDetails.conversionDetails}
-            reactivationDetails={selectedClient.kpiDetails.reactivationDetails}
+            suggestions={selectedClient.suggestions.map(s => ({ text: s.text, actionLabel: s.actionLabel }))}
+            recentLogs={selectedClient.recentActivities}
           />
         )}
       </Sheet>

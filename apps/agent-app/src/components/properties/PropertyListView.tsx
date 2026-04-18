@@ -15,7 +15,9 @@ import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { ViewModeDropdown, type ViewMode } from '@real-estate/ui/view-mode-dropdown';
 import { Chip } from '@real-estate/ui/chip';
 import { Button } from '@real-estate/ui/button';
+import { IconButton } from '@real-estate/ui/button';
 import { SheetBienDetails } from '@real-estate/ui/sheet-bien-details';
+import { MessageCircle, Phone } from 'lucide-react';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -61,6 +63,8 @@ interface PropertyDisplayItem {
 interface PropertyWithKpis extends PropertyDisplayItem {
   kpis: PropertyKpis;
   aiSuggestions: number;
+  suggestions: Array<{ text: string; actionLabel: string }>;
+  recentActivities: Array<{ date: string; time: string; author: string; category: string; description: string; badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled' }>;
 }
 
 interface PropertyKpis {
@@ -192,6 +196,14 @@ export function PropertyListView() {
           ...displayItem,
           kpis: mockKpis(),
           aiSuggestions: Math.floor(Math.random() * 5),
+          suggestions: [
+            { text: "Ce bien correspond à 3 acquéreurs actifs", actionLabel: "Envoyer" },
+            { text: "Photos à mettre à jour — dernier shooting il y a 8 mois", actionLabel: "Programmer" },
+          ],
+          recentActivities: [
+            { date: "16 avr. 2026", time: "15:30", author: "Agent", category: "Visite", description: "Visite avec retour positif", badgeVariant: "success" as const },
+            { date: "14 avr. 2026", time: "10:00", author: "Agent", category: "Appel", description: "Point mensuel avec le propriétaire", badgeVariant: "information" as const },
+          ],
         };
       });
 
@@ -395,24 +407,23 @@ export function PropertyListView() {
         width="narrow"
         footer={
           selectedProperty ? (
-            <div className="flex gap-[12px] p-[20px] border-t border-edge-default">
+            <>
+              <IconButton variant="default" onClick={() => window.location.href = `tel:`} icon={<Phone size={20} />} />
+              <IconButton variant="default" onClick={() => {}} icon={<MessageCircle size={20} />} />
               <Button
-                variant="outline"
+                variant="default"
                 className="flex-1"
                 onClick={() => {
                   setSheetOpen(false);
                   router.push(`/properties/${selectedProperty.id}`);
                 }}
               >
-                Voir la fiche
+                Voir la Fiche
               </Button>
-              <Button
-                variant="primary"
-                className="flex-1"
-              >
+              <Button variant="primary" className="flex-1">
                 Voir les actions
               </Button>
-            </div>
+            </>
           ) : undefined
         }
       >
@@ -427,6 +438,8 @@ export function PropertyListView() {
             qualification={selectedProperty.kpis.qualification}
             entretien={selectedProperty.kpis.entretien}
             conversion={selectedProperty.kpis.conversion}
+            suggestions={selectedProperty.suggestions.map(s => ({ text: s.text, actionLabel: s.actionLabel }))}
+            recentLogs={selectedProperty.recentActivities}
           />
         )}
       </Sheet>

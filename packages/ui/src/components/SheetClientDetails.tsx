@@ -13,8 +13,6 @@
 import { KpiIndicator } from "./KpiIndicator";
 import { AiSuggestionBanner } from "./AiSuggestionBanner";
 import { CardLog } from "./CardLog";
-import { Button, IconButton } from "./Button";
-import { MessageCircle, Phone } from "lucide-react";
 import type { BadgeVariant } from "./Badge";
 
 export interface SheetClientDetailsProps {
@@ -41,12 +39,6 @@ export interface SheetClientDetailsProps {
     badgeVariant?: BadgeVariant;
   }>;
 
-  // Footer actions
-  onViewFiche?: () => void;
-  onViewActions?: () => void;
-  onMessage?: () => void;
-  onCall?: () => void;
-
   className?: string;
 }
 
@@ -57,14 +49,10 @@ export function SheetClientDetails({
   reactivation,
   suggestions,
   recentLogs,
-  onViewFiche,
-  onViewActions,
-  onMessage,
-  onCall,
   className = "",
 }: SheetClientDetailsProps) {
   return (
-    <div className={`flex flex-col gap-5 px-5 py-5 pb-[100px] ${className}`.trim()}>
+    <div className={`flex flex-col gap-5 px-5 py-5 ${className}`.trim()}>
       {/* Section 1 — KPIs inline */}
       <div className="flex items-center justify-between gap-4">
         <KpiIndicator kpi="qual" value={`${qualification}%`} percentage={qualification} variant="straight" />
@@ -105,17 +93,6 @@ export function SheetClientDetails({
         </div>
       )}
 
-      {/* Footer sticky */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface-neutral-default border-t border-edge-divider px-5 py-4 flex items-center gap-3">
-        <IconButton variant="default" onClick={onCall} icon={<Phone size={20} />} />
-        <IconButton variant="default" onClick={onMessage} icon={<MessageCircle size={20} />} />
-        <Button variant="default" onClick={onViewFiche} className="flex-1">
-          Voir la Fiche
-        </Button>
-        <Button variant="primary" onClick={onViewActions} className="flex-1">
-          Voir les actions
-        </Button>
-      </div>
     </div>
   );
 }

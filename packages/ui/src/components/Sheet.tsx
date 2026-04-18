@@ -162,7 +162,11 @@ export const Sheet: React.FC<SheetProps> = ({
         <div className="flex-1 overflow-y-auto">{children}</div>
 
         {/* Footer (sticky bottom) */}
-        {footer && footer}
+        {footer && (
+          <div className="sticky bottom-0 bg-surface-neutral-default border-t border-edge-divider px-5 py-4 flex items-center gap-3">
+            {footer}
+          </div>
+        )}
       </div>
     </>
   );
