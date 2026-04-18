@@ -408,6 +408,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
     floorLevel: '',
     numberOfFloors: '',
   });
+  const [characteristicsFormInitial, setCharacteristicsFormInitial] = useState<typeof characteristicsForm | null>(null);
+  const isCharacteristicsDirty = characteristicsFormInitial !== null && JSON.stringify(characteristicsForm) !== JSON.stringify(characteristicsFormInitial);
   const [isDocUploadSheetOpen, setIsDocUploadSheetOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -598,7 +600,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   const handleOpenCharacteristicsSheet = useCallback(() => {
     if (!data) return;
     const p = data.property;
-    setCharacteristicsForm({
+    const initialValues = {
       type: p.type ?? '',
       condition: p.condition ?? '',
       numberOfRooms: p.numberOfRooms?.toString() ?? '',
@@ -637,7 +639,9 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       dpeComplianceDeadline: p.dpeComplianceDeadline ?? '',
       floorLevel: p.floorLevel?.toString() ?? '',
       numberOfFloors: p.numberOfFloors?.toString() ?? '',
-    });
+    };
+    setCharacteristicsForm(initialValues);
+    setCharacteristicsFormInitial(initialValues);
     setIsCharacteristicsSheetOpen(true);
   }, [data]);
 
@@ -1632,16 +1636,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         title="Éditer les caractéristiques"
         width="narrow"
         footer={
-          <div className="px-[20px] py-[16px] border-t border-edge-default">
-            <Button
-              variant="primary"
-              onClick={handleSaveCharacteristics}
-              disabled={isSavingCharacteristics}
-              className="w-full"
-            >
-              {isSavingCharacteristics ? 'Enregistrement…' : 'Enregistrer'}
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            onClick={handleSaveCharacteristics}
+            disabled={isSavingCharacteristics || !isCharacteristicsDirty}
+            className="w-full"
+          >
+            {isSavingCharacteristics ? 'Enregistrement…' : 'Enregistrer'}
+          </Button>
         }
       >
         <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
@@ -2068,16 +2070,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         title="Ajouter un document"
         width="narrow"
         footer={
-          <div className="px-[20px] py-[16px] border-t border-edge-default">
-            <Button
-              variant="primary"
-              onClick={handleUploadDocument}
-              disabled={isUploading || !uploadFile}
-              className="w-full"
-            >
-              {isUploading ? 'Upload en cours…' : 'Enregistrer'}
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            onClick={handleUploadDocument}
+            disabled={isUploading || !uploadFile}
+            className="w-full"
+          >
+            {isUploading ? 'Upload en cours…' : 'Enregistrer'}
+          </Button>
         }
       >
         <div className="flex flex-col gap-[20px] px-[20px] py-[20px]">

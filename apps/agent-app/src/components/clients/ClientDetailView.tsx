@@ -409,6 +409,8 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     employer: '',
     incomeBracket: '',
   });
+  const [profileFormInitial, setProfileFormInitial] = useState<typeof profileForm | null>(null);
+  const isProfileDirty = profileFormInitial !== null && JSON.stringify(profileForm) !== JSON.stringify(profileFormInitial);
   const [isDocUploadSheetOpen, setIsDocUploadSheetOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -563,7 +565,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const handleOpenProfileSheet = useCallback(() => {
     if (!data) return;
     const c = data.client;
-    setProfileForm({
+    const initialValues = {
       gender: c.gender ?? '',
       lastName: c.lastName ?? '',
       firstName: c.firstName ?? '',
@@ -579,7 +581,9 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       jobTitle: c.jobTitle ?? '',
       employer: c.employer ?? '',
       incomeBracket: c.incomeBracket ?? '',
-    });
+    };
+    setProfileForm(initialValues);
+    setProfileFormInitial(initialValues);
     setIsProfileSheetOpen(true);
   }, [data]);
 
@@ -1098,16 +1102,14 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         title="Éditer le profil"
         width="narrow"
         footer={
-          <div className="px-[20px] py-[16px] border-t border-edge-default">
-            <Button
-              variant="primary"
-              onClick={handleSaveProfile}
-              disabled={isSavingProfile}
-              className="w-full"
-            >
-              {isSavingProfile ? 'Enregistrement…' : 'Enregistrer'}
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            onClick={handleSaveProfile}
+            disabled={isSavingProfile || !isProfileDirty}
+            className="w-full"
+          >
+            {isSavingProfile ? 'Enregistrement…' : 'Enregistrer'}
+          </Button>
         }
       >
         <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
@@ -1204,16 +1206,14 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         title="Ajouter un document"
         width="narrow"
         footer={
-          <div className="px-[20px] py-[16px] border-t border-edge-default">
-            <Button
-              variant="primary"
-              onClick={handleUploadDocument}
-              disabled={isUploading || !uploadFile}
-              className="w-full"
-            >
-              {isUploading ? 'Upload en cours…' : 'Enregistrer'}
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            onClick={handleUploadDocument}
+            disabled={isUploading || !uploadFile}
+            className="w-full"
+          >
+            {isUploading ? 'Upload en cours…' : 'Enregistrer'}
+          </Button>
         }
       >
         <div className="flex flex-col gap-[20px] px-[20px] py-[20px]">
