@@ -391,24 +391,43 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
     bedroom2AreaSqm: '',
     bedroom3AreaSqm: '',
     bedroom4AreaSqm: '',
+    mainRoomEquipment: '',
+    kitchenEquipment: '',
+    bedroom1Equipment: '',
+    bedroom2Equipment: '',
+    bedroom3Equipment: '',
+    bedroom4Equipment: '',
     showerRoomCount: '',
     toiletCount: '',
+    bathroomAreaSqm: '',
+    bathroomEquipment: '',
+    toiletAreaSqm: '',
+    toiletEquipment: '',
     balconyAreaSqm: '',
     gardenAreaSqm: '',
     basementAreaSqm: '',
     atticAreaSqm: '',
     parkingSpotCount: '',
+    parkingWidthM: '',
+    parkingLengthM: '',
     hotWaterSystem: '',
     hasElevator: '',
+    hasDigicode: '',
+    hasGreenSpace: '',
     hasIntercom: '',
     hasHomeAutomation: '',
     hasPool: '',
+    hasSmartphoneControl: '',
+    shutterType: '',
     dpeEnergyKwh: '',
     dpeGasGco2: '',
     dpeValidityDate: '',
     dpeComplianceDeadline: '',
     floorLevel: '',
     numberOfFloors: '',
+    neighborhoodName: '',
+    poolType: '',
+    mainViewType: '',
   });
   const [characteristicsFormInitial, setCharacteristicsFormInitial] = useState<typeof characteristicsForm | null>(null);
   const isCharacteristicsDirty = characteristicsFormInitial !== null && JSON.stringify(characteristicsForm) !== JSON.stringify(characteristicsFormInitial);
@@ -657,6 +676,9 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       dpeComplianceDeadline: p.dpeComplianceDeadline ?? '',
       floorLevel: p.floorLevel?.toString() ?? '',
       numberOfFloors: p.numberOfFloors?.toString() ?? '',
+      neighborhoodName: p.neighborhoodName ?? '',
+      poolType: p.poolType ?? '',
+      mainViewType: p.mainViewType ?? '',
     };
     setCharacteristicsForm(initialValues);
     setCharacteristicsFormInitial(initialValues);
@@ -725,6 +747,9 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           dpeComplianceDeadline: characteristicsForm.dpeComplianceDeadline || null,
           floorLevel: characteristicsForm.floorLevel ? parseInt(characteristicsForm.floorLevel) : null,
           numberOfFloors: characteristicsForm.numberOfFloors ? parseInt(characteristicsForm.numberOfFloors) : null,
+          neighborhoodName: characteristicsForm.neighborhoodName || null,
+          poolType: characteristicsForm.poolType || null,
+          mainViewType: characteristicsForm.mainViewType || null,
         })
         .eq('id', data.property.id);
 
@@ -961,16 +986,38 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             {/* Localisation col */}
             <ProfileField label="Adresse" value={property.address} />
             <ProfileField label="Type de bien" value={PROPERTY_TYPE_LABELS[property.type]} />
-            <div className="flex items-center gap-[8px]">
-              {property.dpeEnergyClass && <IconDpe classe={property.dpeEnergyClass} size="small" />}
-              <ProfileField label="DPE" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
+            <div className="flex gap-[16px] py-[8px]">
+              <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption shrink-0 w-[112px]">DPE</span>
+              <div className="flex flex-col items-start gap-[4px]">
+                {property.dpeEnergyClass ? (
+                  <>
+                    <IconDpe classe={property.dpeEnergyClass} size="medium" />
+                    {property.dpeEnergyKwh && (
+                      <span className="text-[13px] leading-[16px] text-content-caption">{property.dpeEnergyKwh} kWh/m²/an</span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-body">-</span>
+                )}
+              </div>
             </div>
 
             <ProfileField label="Quartier" value={property.neighborhoodName} />
             <ProfileField label="État" value={property.condition ? PROPERTY_CONDITION_LABELS[property.condition] : null} />
-            <div className="flex items-center gap-[8px]">
-              {property.dpeGasEmissionClass && <IconGes classe={property.dpeGasEmissionClass} size="small" />}
-              <ProfileField label="GES" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
+            <div className="flex gap-[16px] py-[8px]">
+              <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption shrink-0 w-[112px]">GES</span>
+              <div className="flex flex-col items-start gap-[4px]">
+                {property.dpeGasEmissionClass ? (
+                  <>
+                    <IconGes classe={property.dpeGasEmissionClass} size="medium" />
+                    {property.dpeGasGco2 && (
+                      <span className="text-[13px] leading-[16px] text-content-caption">{property.dpeGasGco2} gCO₂/m²/an</span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-body">-</span>
+                )}
+              </div>
             </div>
 
             {/* Étages — logique conditionnelle */}
@@ -1191,9 +1238,20 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                     </p>
                     <div className="flex flex-col gap-[8px]">
                       <ProfileField label="Date" value={property.dpeValidityDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeValidityDate)) : null} />
-                      <div className="flex items-center gap-[8px]">
-                        {property.dpeEnergyClass && <IconDpe classe={property.dpeEnergyClass} size="small" />}
-                        <ProfileField label="Énergie" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
+                      <div className="flex gap-[16px] py-[8px]">
+                        <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption shrink-0 w-[112px]">Énergie</span>
+                        <div className="flex flex-col items-start gap-[4px]">
+                          {property.dpeEnergyClass ? (
+                            <>
+                              <IconDpe classe={property.dpeEnergyClass} size="medium" />
+                              {property.dpeEnergyKwh && (
+                                <span className="text-[13px] leading-[16px] text-content-caption">{property.dpeEnergyKwh} kWh/m²/an</span>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-body">-</span>
+                          )}
+                        </div>
                       </div>
                       <ProfileField label="Conformité" value={property.dpeComplianceDeadline ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeComplianceDeadline)) : null} />
                     </div>
@@ -1205,9 +1263,20 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                     </p>
                     <div className="flex flex-col gap-[8px]">
                       <ProfileField label="Date" value={property.dpeValidityDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeValidityDate)) : null} />
-                      <div className="flex items-center gap-[8px]">
-                        {property.dpeGasEmissionClass && <IconGes classe={property.dpeGasEmissionClass} size="small" />}
-                        <ProfileField label="GES" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
+                      <div className="flex gap-[16px] py-[8px]">
+                        <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption shrink-0 w-[112px]">GES</span>
+                        <div className="flex flex-col items-start gap-[4px]">
+                          {property.dpeGasEmissionClass ? (
+                            <>
+                              <IconGes classe={property.dpeGasEmissionClass} size="medium" />
+                              {property.dpeGasGco2 && (
+                                <span className="text-[13px] leading-[16px] text-content-caption">{property.dpeGasGco2} gCO₂/m²/an</span>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-body">-</span>
+                          )}
+                        </div>
                       </div>
                       <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
                       <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
@@ -1909,7 +1978,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             title="Localisation"
             defaultExpanded={false}
             badge={(() => {
-              const fields = [characteristicsForm.floorLevel, characteristicsForm.numberOfFloors];
+              const fields = [characteristicsForm.floorLevel, characteristicsForm.numberOfFloors, characteristicsForm.neighborhoodName];
               const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
               const pct = Math.round((filled / fields.length) * 100);
               const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
@@ -1932,6 +2001,13 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 type="number"
                 placeholder="0"
                 {...emptyProps(characteristicsForm.numberOfFloors)}
+              />
+              <InputFieldOutlined
+                label="Quartier"
+                value={characteristicsForm.neighborhoodName}
+                onChange={(v) => updateCharacteristicsField('neighborhoodName', v)}
+                placeholder="Ex : Marais, Bastille"
+                {...emptyProps(characteristicsForm.neighborhoodName)}
               />
             </div>
           </CollapsibleSection>
@@ -2062,66 +2138,82 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 placeholder="0"
                 {...emptyProps(characteristicsForm.bedroomCount)}
               />
-              <InputFieldOutlined
-                label="Chambre 1 (m²)"
-                value={characteristicsForm.bedroom1AreaSqm}
-                onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
-                type="number"
-                placeholder="0"
-                {...emptyProps(characteristicsForm.bedroom1AreaSqm)}
-              />
-              <InputFieldOutlined
-                label="Équipements chambre 1"
-                value={characteristicsForm.bedroom1Equipment}
-                onChange={(v) => updateCharacteristicsField('bedroom1Equipment', v)}
-                placeholder="Ex : placard intégré, prises RJ45"
-                {...emptyProps(characteristicsForm.bedroom1Equipment)}
-              />
-              <InputFieldOutlined
-                label="Chambre 2 (m²)"
-                value={characteristicsForm.bedroom2AreaSqm}
-                onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
-                type="number"
-                placeholder="0"
-                {...emptyProps(characteristicsForm.bedroom2AreaSqm)}
-              />
-              <InputFieldOutlined
-                label="Équipements chambre 2"
-                value={characteristicsForm.bedroom2Equipment}
-                onChange={(v) => updateCharacteristicsField('bedroom2Equipment', v)}
-                placeholder="Ex : placard intégré, prises RJ45"
-                {...emptyProps(characteristicsForm.bedroom2Equipment)}
-              />
-              <InputFieldOutlined
-                label="Chambre 3 (m²)"
-                value={characteristicsForm.bedroom3AreaSqm}
-                onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
-                type="number"
-                placeholder="0"
-                {...emptyProps(characteristicsForm.bedroom3AreaSqm)}
-              />
-              <InputFieldOutlined
-                label="Équipements chambre 3"
-                value={characteristicsForm.bedroom3Equipment}
-                onChange={(v) => updateCharacteristicsField('bedroom3Equipment', v)}
-                placeholder="Ex : placard intégré, prises RJ45"
-                {...emptyProps(characteristicsForm.bedroom3Equipment)}
-              />
-              <InputFieldOutlined
-                label="Chambre 4 (m²)"
-                value={characteristicsForm.bedroom4AreaSqm}
-                onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
-                type="number"
-                placeholder="0"
-                {...emptyProps(characteristicsForm.bedroom4AreaSqm)}
-              />
-              <InputFieldOutlined
-                label="Équipements chambre 4"
-                value={characteristicsForm.bedroom4Equipment}
-                onChange={(v) => updateCharacteristicsField('bedroom4Equipment', v)}
-                placeholder="Ex : placard intégré, prises RJ45"
-                {...emptyProps(characteristicsForm.bedroom4Equipment)}
-              />
+              {parseInt(characteristicsForm.bedroomCount || '0') >= 1 && (
+                <>
+                  <InputFieldOutlined
+                    label="Chambre 1 (m²)"
+                    value={characteristicsForm.bedroom1AreaSqm}
+                    onChange={(v) => updateCharacteristicsField('bedroom1AreaSqm', v)}
+                    type="number"
+                    placeholder="0"
+                    {...emptyProps(characteristicsForm.bedroom1AreaSqm)}
+                  />
+                  <InputFieldOutlined
+                    label="Équipements chambre 1"
+                    value={characteristicsForm.bedroom1Equipment}
+                    onChange={(v) => updateCharacteristicsField('bedroom1Equipment', v)}
+                    placeholder="Ex : placard intégré, prises RJ45"
+                    {...emptyProps(characteristicsForm.bedroom1Equipment)}
+                  />
+                </>
+              )}
+              {parseInt(characteristicsForm.bedroomCount || '0') >= 2 && (
+                <>
+                  <InputFieldOutlined
+                    label="Chambre 2 (m²)"
+                    value={characteristicsForm.bedroom2AreaSqm}
+                    onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
+                    type="number"
+                    placeholder="0"
+                    {...emptyProps(characteristicsForm.bedroom2AreaSqm)}
+                  />
+                  <InputFieldOutlined
+                    label="Équipements chambre 2"
+                    value={characteristicsForm.bedroom2Equipment}
+                    onChange={(v) => updateCharacteristicsField('bedroom2Equipment', v)}
+                    placeholder="Ex : placard intégré, prises RJ45"
+                    {...emptyProps(characteristicsForm.bedroom2Equipment)}
+                  />
+                </>
+              )}
+              {parseInt(characteristicsForm.bedroomCount || '0') >= 3 && (
+                <>
+                  <InputFieldOutlined
+                    label="Chambre 3 (m²)"
+                    value={characteristicsForm.bedroom3AreaSqm}
+                    onChange={(v) => updateCharacteristicsField('bedroom3AreaSqm', v)}
+                    type="number"
+                    placeholder="0"
+                    {...emptyProps(characteristicsForm.bedroom3AreaSqm)}
+                  />
+                  <InputFieldOutlined
+                    label="Équipements chambre 3"
+                    value={characteristicsForm.bedroom3Equipment}
+                    onChange={(v) => updateCharacteristicsField('bedroom3Equipment', v)}
+                    placeholder="Ex : placard intégré, prises RJ45"
+                    {...emptyProps(characteristicsForm.bedroom3Equipment)}
+                  />
+                </>
+              )}
+              {parseInt(characteristicsForm.bedroomCount || '0') >= 4 && (
+                <>
+                  <InputFieldOutlined
+                    label="Chambre 4 (m²)"
+                    value={characteristicsForm.bedroom4AreaSqm}
+                    onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
+                    type="number"
+                    placeholder="0"
+                    {...emptyProps(characteristicsForm.bedroom4AreaSqm)}
+                  />
+                  <InputFieldOutlined
+                    label="Équipements chambre 4"
+                    value={characteristicsForm.bedroom4Equipment}
+                    onChange={(v) => updateCharacteristicsField('bedroom4Equipment', v)}
+                    placeholder="Ex : placard intégré, prises RJ45"
+                    {...emptyProps(characteristicsForm.bedroom4Equipment)}
+                  />
+                </>
+              )}
               <InputFieldOutlined
                 label="Salles de bain"
                 value={characteristicsForm.bathroomCount}
@@ -2240,7 +2332,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             title="Équipements"
             defaultExpanded={false}
             badge={(() => {
-              const fields = [characteristicsForm.heatingType, characteristicsForm.hotWaterSystem, characteristicsForm.parkingType, characteristicsForm.parkingSpotCount, characteristicsForm.parkingWidthM, characteristicsForm.parkingLengthM, characteristicsForm.hasElevator, characteristicsForm.hasDigicode, characteristicsForm.hasGreenSpace, characteristicsForm.hasIntercom, characteristicsForm.hasHomeAutomation, characteristicsForm.hasSmartphoneControl, characteristicsForm.shutterType, characteristicsForm.hasPool];
+              const fields = [characteristicsForm.heatingType, characteristicsForm.hotWaterSystem, characteristicsForm.parkingType, characteristicsForm.parkingSpotCount, characteristicsForm.parkingWidthM, characteristicsForm.parkingLengthM, characteristicsForm.hasElevator, characteristicsForm.hasDigicode, characteristicsForm.hasGreenSpace, characteristicsForm.hasIntercom, characteristicsForm.hasHomeAutomation, characteristicsForm.hasSmartphoneControl, characteristicsForm.shutterType, characteristicsForm.hasPool, characteristicsForm.poolType, characteristicsForm.mainViewType];
               const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
               const pct = Math.round((filled / fields.length) * 100);
               const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
@@ -2368,6 +2460,26 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                   { value: 'true', label: 'Oui' },
                   { value: 'false', label: 'Non' },
                 ]}
+              />
+              {characteristicsForm.hasPool === 'true' && (
+                <SelectField
+                  label="Type de piscine"
+                  value={characteristicsForm.poolType}
+                  onChange={(v) => updateCharacteristicsField('poolType', v)}
+                  options={Object.entries(POOL_TYPE_LABELS).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                />
+              )}
+              <SelectField
+                label="Vue"
+                value={characteristicsForm.mainViewType}
+                onChange={(v) => updateCharacteristicsField('mainViewType', v)}
+                options={Object.entries(VIEW_TYPE_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
               />
             </div>
           </CollapsibleSection>
