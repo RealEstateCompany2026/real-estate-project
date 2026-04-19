@@ -39,6 +39,38 @@ export const Vente: Story = {
   },
 };
 
+export const Acquisition: Story = {
+  args: {
+    dealType: "ACQUISITION",
+    mandateVariant: "warning",
+    reference: "MRA-0018",
+    propertyType: "Maison",
+    propertyCity: "Lyon",
+    clientName: "Marie Martin",
+    pipelineStage: "VISITES",
+    winProbability: 60,
+    weightedRevenue: "7 200 €",
+    matchedPropertiesCount: 12,
+    visitsCount: 5,
+    offerStatus: "disabled",
+  },
+};
+
+export const Location: Story = {
+  args: {
+    dealType: "LOCATION",
+    mandateVariant: "success",
+    reference: "MRL-0007",
+    clientName: "Pierre Lefèvre",
+    pipelineStage: "PROMOTION",
+    winProbability: 35,
+    weightedRevenue: "840 €",
+    matchedPropertiesCount: 6,
+    visitsCount: 2,
+    applicationStatus: "warning",
+  },
+};
+
 export const Gestion: Story = {
   args: {
     dealType: "GESTION",
@@ -56,19 +88,5 @@ export const Gestion: Story = {
     rentStatus: "success",
     maintenanceStatus: "disabled",
     mandateEndDate: "15 sept. 2027",
-  },
-};
-
-export const VenteHover: Story = {
-  args: {
-    ...Vente.args,
-    forceHover: true,
-  },
-};
-
-export const VenteDark: Story = {
-  args: {
-    ...Vente.args,
-    theme: "dark",
   },
 };

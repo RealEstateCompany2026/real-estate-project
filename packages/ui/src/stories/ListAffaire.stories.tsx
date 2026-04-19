@@ -91,20 +91,6 @@ export const Gestion: Story = {
   },
 };
 
-export const VenteHover: Story = {
-  args: {
-    ...Vente.args,
-    forceHover: true,
-  },
-};
-
-export const VenteDark: Story = {
-  args: {
-    ...Vente.args,
-    theme: "dark",
-  },
-};
-
 export const MandatNonSigne: Story = {
   args: {
     dealType: "VENTE",

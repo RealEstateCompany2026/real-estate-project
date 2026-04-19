@@ -1,37 +1,11 @@
-/**
- * MOLECULE: ListAffaire
- *
- * Item de liste pour une affaire immobilière avec zone variable selon le type.
- * Suit le même pattern que ListBien / ListClient.
- *
- * Largeur totale : 1191px (600px gauche + 1px divider + 590px droite)
- * Hauteur        : 120px
- *
- * Section gauche (~600px) :
- *   - Badge type affaire (variant = statut mandat)
- *   - Span référence (ex : "MV-0042")
- *   - 4 Chips bien (type, surface, ville, prix)
- *   - 1 Chip client (User icon)
- *   - Span étape pipeline
- *
- * Section droite (~590px) :
- *   - KpiIndicator probabilité de gain (%)
- *   - Span CA pondéré
- *   - Zone variable selon dealType
- *
- * États : default light, hover light, default dark, hover dark
- */
-
 "use client";
 
-import { useState } from "react";
+import React from "react";
 import { Home, Maximize2, MapPin, Tag, User, TrendingUp } from "lucide-react";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
 import { Chip } from "./Chip";
 import { KpiIndicator } from "./KpiIndicator";
-import { VerticalDivider } from "./VerticalDivider";
-import { ListItemDivider } from "./ListItemDivider";
 import {
   DealType,
   DEAL_TYPE_LABELS,
@@ -39,8 +13,18 @@ import {
   PIPELINE_STAGE_LABELS,
 } from "./deal-types";
 
+/**
+ * ListAffaire - Ligne de liste affaire immobilière
+ * Organism du design system RealAgent
+ *
+ * Affiche une ligne avec :
+ * - Section gauche : Badge type + référence + chips bien/client + étape pipeline
+ * - Section droite : KPI probabilité + CA pondéré + zone variable selon dealType
+ *
+ * Pattern identique à ListBien : Tailwind `group` + CSS variables, ZERO useState.
+ */
+
 export interface ListAffaireProps {
-  // Tronc commun
   dealType: DealType;
   mandateVariant?: BadgeVariant;
   reference: string;
@@ -53,28 +37,24 @@ export interface ListAffaireProps {
   lastActivityDate?: string;
   winProbability?: number;
   weightedRevenue?: string;
-
-  // Variant Vente
   listingStatus?: BadgeVariant;
   leadsCount?: number;
   visitsCount?: number;
   offerStatus?: BadgeVariant;
-
-  // Variant Acquisition / Location
   matchedPropertiesCount?: number;
   applicationStatus?: BadgeVariant;
-
-  // Variant Gestion
   occupancyStatus?: BadgeVariant;
   rentStatus?: BadgeVariant;
   maintenanceStatus?: BadgeVariant;
   mandateEndDate?: string;
-
-  // Common
   onDealClick?: () => void;
   className?: string;
-  theme?: "light" | "dark";
-  forceHover?: boolean;
+}
+
+function VerticalDivider() {
+  return (
+    <div className="divider h-[84px] w-px bg-[var(--border-divider)] dark:group-hover:bg-[var(--neutral-600)] shrink-0 transition-colors" />
+  );
 }
 
 export function ListAffaire({
@@ -102,94 +82,25 @@ export function ListAffaire({
   mandateEndDate,
   onDealClick,
   className = "",
-  theme = "light",
-  forceHover = false,
 }: ListAffaireProps) {
-  const [isHovered, setIsHovered] = useState(forceHover);
+  const iconColor = "var(--icon-neutral-default)";
 
-  const isDark = theme === "dark";
-  const hovered = forceHover || isHovered;
-
-  const iconColor = isDark ? "#d0d1d4" : "#444955";
-
-  const getBorderColor = () => {
-    if (isDark) {
-      return hovered ? "#333740" : "#22252B"; // neutral-600 : neutral-700
-    }
-    return hovered ? "#C7C8CB" : "#ECEDEE"; // neutral-200 : neutral-50
-  };
-
-  const getBackgroundColor = () => {
-    if (isDark) {
-      return hovered ? "#22252B" : "#111215"; // neutral-700 : neutral-800
-    }
-    return hovered ? "#ECEDEE" : "#FFFFFF"; // neutral-50 : neutral-white
-  };
-
-  const getTextSecondaryColor = () => {
-    return isDark ? "#A1A4AA" : "#A1A4AA"; // neutral-400
-  };
-
-  const getTextBodyColor = () => {
-    return isDark ? "#D0D1D4" : "#444955"; // neutral-300 dark / neutral-500 light
-  };
-
-  // Zone variable selon le type d'affaire
   const renderVariableZone = () => {
     switch (dealType) {
       case "VENTE":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            {/* Annonce */}
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Annonce
-              </span>
-              <Badge variant={listingStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Annonce</span>
+              <Badge variant={listingStatus ?? "disabled"} />
             </div>
-            {/* Leads + Visites */}
             <div className="flex items-center gap-[16px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  color: getTextBodyColor(),
-                }}
-              >
-                {leadsCount ?? 0} leads
-              </span>
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  color: getTextBodyColor(),
-                }}
-              >
-                {visitsCount ?? 0} visites
-              </span>
+              <span className="text-sm font-semibold font-roboto text-content-body">{leadsCount ?? 0} leads</span>
+              <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
             </div>
-            {/* Promesse */}
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Promesse
-              </span>
-              <Badge variant={offerStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Promesse</span>
+              <Badge variant={offerStatus ?? "disabled"} />
             </div>
           </div>
         );
@@ -197,38 +108,11 @@ export function ListAffaire({
       case "ACQUISITION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "14px",
-                fontWeight: 600,
-                color: getTextBodyColor(),
-              }}
-            >
-              {matchedPropertiesCount ?? 0} biens matchés
-            </span>
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "14px",
-                fontWeight: 600,
-                color: getTextBodyColor(),
-              }}
-            >
-              {visitsCount ?? 0} visites
-            </span>
+            <span className="text-sm font-semibold font-roboto text-content-body">{matchedPropertiesCount ?? 0} biens matchés</span>
+            <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Promesse
-              </span>
-              <Badge variant={offerStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Promesse</span>
+              <Badge variant={offerStatus ?? "disabled"} />
             </div>
           </div>
         );
@@ -236,38 +120,11 @@ export function ListAffaire({
       case "LOCATION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "14px",
-                fontWeight: 600,
-                color: getTextBodyColor(),
-              }}
-            >
-              {matchedPropertiesCount ?? 0} biens matchés
-            </span>
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "14px",
-                fontWeight: 600,
-                color: getTextBodyColor(),
-              }}
-            >
-              {visitsCount ?? 0} visites
-            </span>
+            <span className="text-sm font-semibold font-roboto text-content-body">{matchedPropertiesCount ?? 0} biens matchés</span>
+            <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Dossier
-              </span>
-              <Badge variant={applicationStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Dossier</span>
+              <Badge variant={applicationStatus ?? "disabled"} />
             </div>
           </div>
         );
@@ -276,53 +133,19 @@ export function ListAffaire({
         return (
           <div className="flex flex-col gap-[8px] items-start">
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Occupation
-              </span>
-              <Badge variant={occupancyStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Occupation</span>
+              <Badge variant={occupancyStatus ?? "disabled"} />
             </div>
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Loyer
-              </span>
-              <Badge variant={rentStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Loyer</span>
+              <Badge variant={rentStatus ?? "disabled"} />
             </div>
             <div className="flex items-center gap-[8px]">
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                Entretien
-              </span>
-              <Badge variant={maintenanceStatus ?? "disabled"} theme={theme} />
+              <span className="text-xs font-normal font-roboto text-content-secondary">Entretien</span>
+              <Badge variant={maintenanceStatus ?? "disabled"} />
             </div>
             {mandateEndDate && (
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
+              <span className="text-xs font-normal font-roboto text-content-secondary">
                 Échéance {mandateEndDate}
               </span>
             )}
@@ -335,217 +158,87 @@ export function ListAffaire({
   };
 
   return (
-    <div className={className} style={{ paddingTop: "15px", paddingBottom: "15px" }}>
-      <div
-        className="flex items-center transition-colors"
-        style={{
-          width: "1191px",
-          height: "120px",
-          border: `1px solid ${getBorderColor()}`,
-          borderRadius: "16px",
-          backgroundColor: getBackgroundColor(),
-          cursor: onDealClick ? "pointer" : "default",
-        }}
-        onMouseEnter={() => !forceHover && setIsHovered(true)}
-        onMouseLeave={() => !forceHover && setIsHovered(false)}
-        onClick={onDealClick}
-      >
-        {/* Section gauche (~600px) */}
-        <div
-          className="flex flex-col justify-center gap-[8px] px-[20px]"
-          style={{ width: "600px", height: "100%" }}
-        >
-          {/* Ligne 1 : Badge type + Référence */}
-          <div className="flex items-center gap-[10px]">
-            <Badge
-              variant={mandateVariant}
-              label={DEAL_TYPE_LABELS[dealType]}
-              theme={theme}
-            />
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "12px",
-                fontWeight: 400,
-                color: getTextSecondaryColor(),
-                whiteSpace: "nowrap",
-              }}
-            >
-              {reference}
+    <div
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
+      onClick={onDealClick}
+    >
+      {/* Section gauche */}
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full" style={{ width: "600px" }}>
+        {/* Ligne 1 : Badge type + Référence + Pipeline */}
+        <div className="flex items-center gap-[10px]">
+          <Badge variant={mandateVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
+          <span className="text-xs font-normal font-roboto text-content-secondary whitespace-nowrap">
+            {reference}
+          </span>
+          {pipelineStage && (
+            <span className="text-xs font-normal font-roboto text-content-secondary whitespace-nowrap">
+              · {PIPELINE_STAGE_LABELS[pipelineStage]}
             </span>
-            {pipelineStage && (
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                  whiteSpace: "nowrap",
-                }}
-              >
-                · {PIPELINE_STAGE_LABELS[pipelineStage]}
-              </span>
-            )}
-          </div>
-
-          {/* Ligne 2 : 4 Chips bien */}
-          <div className="flex items-center gap-[12px] flex-wrap">
-            {propertyType && (
-              <Chip
-                size="small"
-                icon={<Home size={16} style={{ color: iconColor }} />}
-                iconPosition="left"
-                theme={theme}
-              >
-                {propertyType}
-              </Chip>
-            )}
-            {propertySurface && (
-              <Chip
-                size="small"
-                icon={<Maximize2 size={16} style={{ color: iconColor }} />}
-                iconPosition="left"
-                theme={theme}
-              >
-                {propertySurface}
-              </Chip>
-            )}
-            {propertyCity && (
-              <Chip
-                size="small"
-                icon={<MapPin size={16} style={{ color: iconColor }} />}
-                iconPosition="left"
-                theme={theme}
-              >
-                {propertyCity}
-              </Chip>
-            )}
-            {propertyPrice && (
-              <Chip
-                size="small"
-                icon={<Tag size={16} style={{ color: iconColor }} />}
-                iconPosition="left"
-                theme={theme}
-              >
-                {propertyPrice}
-              </Chip>
-            )}
-          </div>
-
-          {/* Ligne 3 : Chip client + date dernière activité */}
-          <div className="flex items-center gap-[12px]">
-            {clientName && (
-              <Chip
-                size="small"
-                icon={<User size={16} style={{ color: iconColor }} />}
-                iconPosition="left"
-                theme={theme}
-              >
-                {clientName}
-              </Chip>
-            )}
-            {lastActivityDate && (
-              <span
-                style={{
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  color: getTextSecondaryColor(),
-                }}
-              >
-                {lastActivityDate}
-              </span>
-            )}
-          </div>
+          )}
         </div>
 
-        {/* Divider */}
-        <div className="flex items-center" style={{ width: "30px", height: "100%" }}>
-          <div style={{ width: "15px" }} />
-          <div style={{ width: "1px", height: "84px" }}>
-            <VerticalDivider
-              height={84}
-              theme={theme}
-              variant={hovered ? "hover" : "default"}
-            />
-          </div>
-          <div style={{ width: "14px" }} />
+        {/* Ligne 2 : Chips bien */}
+        <div className="flex items-center gap-[12px] flex-wrap">
+          {propertyType && (
+            <Chip size="small" icon={<Home size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {propertyType}
+            </Chip>
+          )}
+          {propertySurface && (
+            <Chip size="small" icon={<Maximize2 size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {propertySurface}
+            </Chip>
+          )}
+          {propertyCity && (
+            <Chip size="small" icon={<MapPin size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {propertyCity}
+            </Chip>
+          )}
+          {propertyPrice && (
+            <Chip size="small" icon={<Tag size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {propertyPrice}
+            </Chip>
+          )}
         </div>
 
-        {/* Section droite (~590px) */}
-        <div
-          className="flex items-center gap-[24px] px-[20px]"
-          style={{ width: "561px", height: "100%" }}
-        >
-          {/* KpiIndicator probabilité */}
-          <div style={{ width: "90px" }}>
-            <KpiIndicator
-              icon={<TrendingUp size={16} style={{ color: iconColor }} />}
-              value={`${winProbability}%`}
-              percentage={winProbability}
-              variant="vertical"
-              hover={hovered}
-              theme={theme}
-            />
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center" style={{ width: "30px", height: "100%" }}>
-            <div style={{ width: "15px" }} />
-            <div style={{ width: "1px", height: "84px" }}>
-              <VerticalDivider
-                height={84}
-                theme={theme}
-                variant={hovered ? "hover" : "default"}
-              />
-            </div>
-            <div style={{ width: "14px" }} />
-          </div>
-
-          {/* CA pondéré */}
-          <div className="flex flex-col gap-[4px]" style={{ minWidth: "100px" }}>
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "12px",
-                fontWeight: 400,
-                color: getTextSecondaryColor(),
-              }}
-            >
-              CA pondéré
-            </span>
-            <span
-              style={{
-                fontFamily: "Roboto, sans-serif",
-                fontSize: "16px",
-                fontWeight: 600,
-                color: getTextBodyColor(),
-                whiteSpace: "nowrap",
-              }}
-            >
-              {weightedRevenue ?? "—"}
-            </span>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center" style={{ width: "30px", height: "100%" }}>
-            <div style={{ width: "15px" }} />
-            <div style={{ width: "1px", height: "84px" }}>
-              <VerticalDivider
-                height={84}
-                theme={theme}
-                variant={hovered ? "hover" : "default"}
-              />
-            </div>
-            <div style={{ width: "14px" }} />
-          </div>
-
-          {/* Zone variable */}
-          <div className="flex-1">{renderVariableZone()}</div>
+        {/* Ligne 3 : Chip client + date */}
+        <div className="flex items-center gap-[12px]">
+          {clientName && (
+            <Chip size="small" icon={<User size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {clientName}
+            </Chip>
+          )}
+          {lastActivityDate && (
+            <span className="text-xs font-normal font-roboto text-content-secondary">{lastActivityDate}</span>
+          )}
         </div>
       </div>
 
-      <ListItemDivider />
+      <VerticalDivider />
+
+      {/* KPI probabilité */}
+      <KpiIndicator
+        icon={<TrendingUp size={16} style={{ color: iconColor }} />}
+        value={`${winProbability}%`}
+        percentage={winProbability}
+        variant="vertical"
+        className="w-[90px]"
+      />
+
+      <VerticalDivider />
+
+      {/* CA pondéré */}
+      <div className="flex flex-col gap-[4px] px-[20px]" style={{ minWidth: "100px" }}>
+        <span className="text-xs font-normal font-roboto text-content-secondary">CA pondéré</span>
+        <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+          {weightedRevenue ?? "\u2014"}
+        </span>
+      </div>
+
+      <VerticalDivider />
+
+      {/* Zone variable */}
+      <div className="flex-1 px-[20px]">{renderVariableZone()}</div>
     </div>
   );
 }
