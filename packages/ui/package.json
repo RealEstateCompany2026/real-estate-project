@@ -87,7 +87,10 @@
         "./collapsible-section": {
             "import": "./src/components/CollapsibleSection.tsx",
             "types": "./src/components/CollapsibleSection.tsx"
-        }
+        },
+        "./list-affaire": "./src/components/ListAffaire.tsx",
+        "./card-affaire": "./src/components/CardAffaire.tsx",
+        "./deal-types": "./src/components/deal-types.ts"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
