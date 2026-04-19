@@ -28,6 +28,8 @@ import { FileUpload } from '@real-estate/ui/file-upload';
 import { ListClient } from '@real-estate/ui/list-client';
 import { Switch } from '@real-estate/ui/switch';
 import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
+import { IconDpe } from '@real-estate/ui/icon-dpe';
+import { IconGes } from '@real-estate/ui/icon-ges';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -35,6 +37,7 @@ import type { Property, PropertyMedia, OperationType, DpeClass } from '@/types/p
 import {
   PROPERTY_TYPE_LABELS, PROPERTY_CONDITION_LABELS, OPERATION_TYPE_LABELS,
   HEATING_TYPE_LABELS, HOT_WATER_SYSTEM_LABELS, KITCHEN_TYPE_LABELS, PARKING_TYPE_LABELS,
+  POOL_TYPE_LABELS, VIEW_TYPE_LABELS,
 } from '@/types/property';
 import { formatPrice } from '@/lib/utils/format';
 
@@ -910,7 +913,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             </Button>
           </div>
 
-          {/* Grille 3 colonnes — Localisation / Type / Diagnostics */}
+          {/* Grille 3 colonnes — Overview */}
           <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px] mb-[50px]">
             {/* Headers */}
             <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
@@ -925,23 +928,58 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
 
             {/* Localisation col */}
             <ProfileField label="Adresse" value={property.address} />
-            <ProfileField label="Date de construction" value={property.constructionYear?.toString()} />
-            <ProfileField label="DPE" value={property.dpeEnergyClass && property.dpeEnergyKwh ? `${property.dpeEnergyClass} (${property.dpeEnergyKwh} kWh/m²/an)` : null} />
-
-            <ProfileField label="Étage" value={property.floorLevel ? `${property.floorLevel}ème / ${property.numberOfFloors ?? '?'} étages` : null} />
             <ProfileField label="Type de bien" value={PROPERTY_TYPE_LABELS[property.type]} />
-            <ProfileField label="GES" value={property.dpeGasEmissionClass && property.dpeGasGco2 ? `${property.dpeGasEmissionClass} (${property.dpeGasGco2} gCO₂/m²/an)` : null} />
+            <div className="flex items-center gap-[8px]">
+              {property.dpeEnergyClass && <IconDpe classe={property.dpeEnergyClass} size="small" />}
+              <ProfileField label="DPE" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
+            </div>
 
-            <ProfileField label="Nombre d'étages" value={property.numberOfFloors ? `${property.numberOfFloors} étages` : null} />
-            <ProfileField label="Surface habitable" value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
-            <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+            <ProfileField label="Quartier" value={property.neighborhoodName} />
+            <ProfileField label="État" value={property.condition ? PROPERTY_CONDITION_LABELS[property.condition] : null} />
+            <div className="flex items-center gap-[8px]">
+              {property.dpeGasEmissionClass && <IconGes classe={property.dpeGasEmissionClass} size="small" />}
+              <ProfileField label="GES" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
+            </div>
+
+            {/* Étages — logique conditionnelle */}
+            {['STUDIO', 'T1', 'T2', 'T3', 'T4', 'APPARTEMENT', 'LOFT'].includes(property.type) ? (
+              <>
+                <ProfileField label="Étage" value={property.floorLevel ? `${property.floorLevel}ème` : null} />
+                <ProfileField label="Date de construction" value={property.constructionYear?.toString()} />
+                <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+
+                <ProfileField label="Étages immeuble" value={property.numberOfFloors ? `${property.numberOfFloors} étages` : null} />
+                <ProfileField label="Surface habitable" value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
+                <div />
+              </>
+            ) : ['MAISON', 'MAISON_DE_VILLE'].includes(property.type) ? (
+              <>
+                <ProfileField label="Niveaux" value={property.numberOfFloors ? `${property.numberOfFloors} niveaux` : null} />
+                <ProfileField label="Date de construction" value={property.constructionYear?.toString()} />
+                <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+
+                <div />
+                <ProfileField label="Surface habitable" value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
+                <div />
+              </>
+            ) : (
+              <>
+                <div />
+                <ProfileField label="Date de construction" value={property.constructionYear?.toString()} />
+                <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+
+                <div />
+                <ProfileField label="Surface habitable" value={property.livingAreaSqm ? `${property.livingAreaSqm} m²` : null} />
+                <div />
+              </>
+            )}
 
             <div />
             <ProfileField label="Surface extérieure" value={(() => {
               const ext = (property.terraceAreaSqm ?? 0) + (property.balconyAreaSqm ?? 0) + (property.gardenAreaSqm ?? 0);
               return ext > 0 ? `${ext} m²` : null;
             })()} />
-            <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
+            <div />
 
             <div />
             <ProfileField label="Nombre de pièces" value={property.numberOfRooms?.toString()} />
@@ -965,22 +1003,23 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
 
           {showMoreCharacteristics && (
             <div className="mt-[30px] flex flex-col gap-[50px]">
-              {/* B.1 — Caractéristiques par pièce */}
+              {/* B.1 — Pièces */}
               <div>
                 <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
-                  Caractéristiques par pièce
+                  Pièces
                 </h6>
                 <div className="grid grid-cols-3 gap-x-[60px] gap-y-[24px]">
-                  {/* Colonne 1 */}
+                  {/* Colonne 1 — Séjour + Cuisine */}
                   <div className="flex flex-col gap-[24px]">
-                    {/* Bloc Pièce à vivre */}
                     <div>
                       <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                         Pièce à vivre
                       </p>
-                      <ProfileField label="Surface" value={property.mainRoomAreaSqm ? `${property.mainRoomAreaSqm} m²` : null} />
+                      <div className="flex flex-col gap-[8px]">
+                        <ProfileField label="Surface" value={property.mainRoomAreaSqm ? `${property.mainRoomAreaSqm} m²` : null} />
+                        <ProfileField label="Équipements" value={null} />
+                      </div>
                     </div>
-                    {/* Bloc Cuisine */}
                     <div>
                       <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                         Cuisine
@@ -988,6 +1027,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Surface" value={property.kitchenAreaSqm ? `${property.kitchenAreaSqm} m²` : null} />
                         <ProfileField label="Type" value={property.kitchenType ? KITCHEN_TYPE_LABELS[property.kitchenType] : null} />
+                        <ProfileField label="Équipements" value={null} />
                       </div>
                     </div>
                   </div>
@@ -998,14 +1038,20 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                         Chambre 1
                       </p>
-                      <ProfileField label="Surface" value={property.bedroom1AreaSqm ? `${property.bedroom1AreaSqm} m²` : null} />
+                      <div className="flex flex-col gap-[8px]">
+                        <ProfileField label="Surface" value={property.bedroom1AreaSqm ? `${property.bedroom1AreaSqm} m²` : null} />
+                        <ProfileField label="Équipements" value={null} />
+                      </div>
                     </div>
                     {property.bedroomCount !== null && property.bedroomCount >= 2 && (
                       <div>
                         <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                           Chambre 2
                         </p>
-                        <ProfileField label="Surface" value={property.bedroom2AreaSqm ? `${property.bedroom2AreaSqm} m²` : null} />
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Surface" value={property.bedroom2AreaSqm ? `${property.bedroom2AreaSqm} m²` : null} />
+                          <ProfileField label="Équipements" value={null} />
+                        </div>
                       </div>
                     )}
                     {property.bedroomCount !== null && property.bedroomCount >= 3 && (
@@ -1013,7 +1059,10 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                         <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                           Chambre 3
                         </p>
-                        <ProfileField label="Surface" value={property.bedroom3AreaSqm ? `${property.bedroom3AreaSqm} m²` : null} />
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Surface" value={property.bedroom3AreaSqm ? `${property.bedroom3AreaSqm} m²` : null} />
+                          <ProfileField label="Équipements" value={null} />
+                        </div>
                       </div>
                     )}
                     {property.bedroomCount !== null && property.bedroomCount >= 4 && (
@@ -1021,7 +1070,10 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                         <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                           Chambre 4
                         </p>
-                        <ProfileField label="Surface" value={property.bedroom4AreaSqm ? `${property.bedroom4AreaSqm} m²` : null} />
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Surface" value={property.bedroom4AreaSqm ? `${property.bedroom4AreaSqm} m²` : null} />
+                          <ProfileField label="Équipements" value={null} />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1030,17 +1082,23 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                   <div className="flex flex-col gap-[24px]">
                     <div>
                       <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
-                        WC
-                      </p>
-                      <ProfileField label="Nombre" value={property.toiletCount?.toString()} />
-                    </div>
-                    <div>
-                      <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
                         Salle de bain
                       </p>
                       <div className="flex flex-col gap-[8px]">
-                        <ProfileField label="Salle de bain" value={property.bathroomCount?.toString()} />
-                        <ProfileField label="Salle d'eau" value={property.showerRoomCount?.toString()} />
+                        <ProfileField label="Baignoire (nb)" value={property.bathroomCount?.toString()} />
+                        <ProfileField label="Douche (nb)" value={property.showerRoomCount?.toString()} />
+                        <ProfileField label="Surface" value={null} />
+                        <ProfileField label="Équipements" value={null} />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                        WC
+                      </p>
+                      <div className="flex flex-col gap-[8px]">
+                        <ProfileField label="Nombre" value={property.toiletCount?.toString()} />
+                        <ProfileField label="Surface" value={null} />
+                        <ProfileField label="Équipements" value={null} />
                       </div>
                     </div>
                   </div>
@@ -1052,11 +1110,40 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
                   Équipements
                 </h6>
-                <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
-                  <ProfileField label="Domotique" value={property.hasHomeAutomation !== null ? (property.hasHomeAutomation ? 'Oui' : 'Non') : null} />
-                  <ProfileField label="Interphone" value={property.hasIntercom !== null ? (property.hasIntercom ? 'Oui' : 'Non') : null} />
-                  <ProfileField label="Piscine" value={property.hasPool !== null ? (property.hasPool ? 'Oui' : 'Non') : null} />
+                <div className="grid grid-cols-2 gap-x-[60px] gap-y-[24px]">
+                  {/* Colonne 1 — Domotique */}
+                  <div>
+                    <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                      Domotique
+                    </p>
+                    <div className="flex flex-col gap-[8px]">
+                      <ProfileField label="Interphone" value={property.hasIntercom !== null ? (property.hasIntercom ? 'Oui' : 'Non') : null} />
+                      <ProfileField label="Domotique" value={property.hasHomeAutomation !== null ? (property.hasHomeAutomation ? 'Oui' : 'Non') : null} />
+                      <ProfileField label="Commande par téléphone" value={null} />
+                    </div>
+                  </div>
+                  {/* Colonne 2 — Fermetures */}
+                  <div>
+                    <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                      Fermetures
+                    </p>
+                    <div className="flex flex-col gap-[8px]">
+                      <ProfileField label="Type de fermetures" value={null} />
+                    </div>
+                  </div>
                 </div>
+                {/* Bloc Piscine — conditionnel */}
+                {property.hasPool && (
+                  <div className="mt-[24px]">
+                    <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                      Piscine
+                    </p>
+                    <div className="flex flex-col gap-[8px]">
+                      <ProfileField label="Piscine" value="Oui" />
+                      <ProfileField label="Type" value={property.poolType ? POOL_TYPE_LABELS[property.poolType] : null} />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* B.3 — Énergie */}
@@ -1064,49 +1151,121 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
                   Énergie
                 </h6>
-                <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
-                  <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
-                  <ProfileField label="DPE" value={property.dpeEnergyClass} />
-                  <ProfileField label="Validité DPE" value={property.dpeValidityDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeValidityDate)) : null} />
-
-                  <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
-                  <ProfileField label="GES" value={property.dpeGasEmissionClass} />
-                  <ProfileField label="Conformité" value={property.dpeComplianceDeadline ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeComplianceDeadline)) : null} />
-
-                  <div />
-                  <ProfileField label="Énergie" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
-                  <div />
-
-                  <div />
-                  <ProfileField label="GES" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
-                  <div />
+                <div className="grid grid-cols-2 gap-x-[60px] gap-y-[24px]">
+                  {/* Colonne 1 — DPE */}
+                  <div>
+                    <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                      DPE
+                    </p>
+                    <div className="flex flex-col gap-[8px]">
+                      <ProfileField label="Date" value={property.dpeValidityDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeValidityDate)) : null} />
+                      <div className="flex items-center gap-[8px]">
+                        {property.dpeEnergyClass && <IconDpe classe={property.dpeEnergyClass} size="small" />}
+                        <ProfileField label="Énergie" value={property.dpeEnergyKwh ? `${property.dpeEnergyKwh} kWh/m²/an` : null} />
+                      </div>
+                      <ProfileField label="Conformité" value={property.dpeComplianceDeadline ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeComplianceDeadline)) : null} />
+                    </div>
+                  </div>
+                  {/* Colonne 2 — GES */}
+                  <div>
+                    <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                      GES
+                    </p>
+                    <div className="flex flex-col gap-[8px]">
+                      <ProfileField label="Date" value={property.dpeValidityDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(property.dpeValidityDate)) : null} />
+                      <div className="flex items-center gap-[8px]">
+                        {property.dpeGasEmissionClass && <IconGes classe={property.dpeGasEmissionClass} size="small" />}
+                        <ProfileField label="GES" value={property.dpeGasGco2 ? `${property.dpeGasGco2} gCO₂/m²/an` : null} />
+                      </div>
+                      <ProfileField label="Chauffage" value={property.heatingType ? HEATING_TYPE_LABELS[property.heatingType] : null} />
+                      <ProfileField label="Eau chaude" value={property.hotWaterSystem ? HOT_WATER_SYSTEM_LABELS[property.hotWaterSystem] : null} />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* B.4 — Stationnement */}
-              <div>
-                <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
-                  Stationnement
-                </h6>
-                <div className="grid grid-cols-2 gap-x-[60px] gap-y-[8px]">
-                  <ProfileField label="Type" value={property.parkingType ? PARKING_TYPE_LABELS[property.parkingType] : null} />
-                  <ProfileField label="Quantité" value={property.parkingSpotCount ? `${property.parkingSpotCount} place(s)` : null} />
+              {property.parkingType && property.parkingType !== 'AUCUN' && (
+                <div>
+                  <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
+                    Stationnement
+                  </h6>
+                  <div className="grid grid-cols-2 gap-x-[60px] gap-y-[24px]">
+                    <div>
+                      <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                        Stationnement 1
+                      </p>
+                      <div className="flex flex-col gap-[8px]">
+                        <ProfileField label="Type" value={PARKING_TYPE_LABELS[property.parkingType]} />
+                        <ProfileField label="Quantité" value={property.parkingSpotCount ? `${property.parkingSpotCount} place(s)` : null} />
+                        <ProfileField label="Dimensions" value={null} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* B.5 — Annexes (afficher seulement les non-null) */}
+              {/* B.5 — Annexes */}
               {(property.basementAreaSqm || property.atticAreaSqm || property.terraceAreaSqm || property.balconyAreaSqm || property.gardenAreaSqm || property.landAreaSqm) && (
                 <div>
                   <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
                     Annexes
                   </h6>
-                  <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
-                    {property.basementAreaSqm && <ProfileField label="Cave" value={`${property.basementAreaSqm} m²`} />}
-                    {property.atticAreaSqm && <ProfileField label="Grenier" value={`${property.atticAreaSqm} m²`} />}
-                    {property.terraceAreaSqm && <ProfileField label="Terrasse" value={`${property.terraceAreaSqm} m²`} />}
-                    {property.balconyAreaSqm && <ProfileField label="Balcon" value={`${property.balconyAreaSqm} m²`} />}
-                    {property.gardenAreaSqm && <ProfileField label="Jardin" value={`${property.gardenAreaSqm} m²`} />}
-                    {property.landAreaSqm && <ProfileField label="Terrain" value={`${property.landAreaSqm} m²`} />}
+                  <div className="grid grid-cols-2 gap-x-[60px] gap-y-[24px]">
+                    {property.basementAreaSqm && (
+                      <div>
+                        <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">Cave</p>
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Type" value="Cave" />
+                          <ProfileField label="Surface" value={`${property.basementAreaSqm} m²`} />
+                        </div>
+                      </div>
+                    )}
+                    {property.atticAreaSqm && (
+                      <div>
+                        <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">Grenier</p>
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Type" value="Grenier" />
+                          <ProfileField label="Surface" value={`${property.atticAreaSqm} m²`} />
+                        </div>
+                      </div>
+                    )}
+                    {property.terraceAreaSqm && (
+                      <div>
+                        <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">Terrasse</p>
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Type" value="Terrasse" />
+                          <ProfileField label="Surface" value={`${property.terraceAreaSqm} m²`} />
+                        </div>
+                      </div>
+                    )}
+                    {property.balconyAreaSqm && (
+                      <div>
+                        <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">Balcon</p>
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Type" value="Balcon" />
+                          <ProfileField label="Surface" value={`${property.balconyAreaSqm} m²`} />
+                        </div>
+                      </div>
+                    )}
+                    {property.gardenAreaSqm && (
+                      <div>
+                        <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">Jardin</p>
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Type" value="Jardin" />
+                          <ProfileField label="Surface" value={`${property.gardenAreaSqm} m²`} />
+                        </div>
+                      </div>
+                    )}
+                    {property.landAreaSqm && (
+                      <div>
+                        <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">Terrain</p>
+                        <div className="flex flex-col gap-[8px]">
+                          <ProfileField label="Type" value="Terrain" />
+                          <ProfileField label="Surface" value={`${property.landAreaSqm} m²`} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1116,9 +1275,12 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
                   Parties Communes
                 </h6>
-                <div className="grid grid-cols-2 gap-x-[60px] gap-y-[8px]">
+                <div className="flex flex-col gap-[8px]">
+                  <ProfileField label="Digicode" value={null} />
                   <ProfileField label="Ascenseur" value={property.hasElevator !== null ? (property.hasElevator ? 'Oui' : 'Non') : null} />
+                  <ProfileField label="Espace vert" value={null} />
                   <ProfileField label="Exposition" value={property.exposures?.length ? property.exposures.join(', ') : property.mainExposure} />
+                  <ProfileField label="Vue" value={property.mainViewType ? VIEW_TYPE_LABELS[property.mainViewType] : null} />
                 </div>
               </div>
 
@@ -1128,28 +1290,38 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                   <h6 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings mb-[24px]">
                     Copropriété
                   </h6>
-                  <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
-                    <ProfileField label="Type" value={data.coOwnership.type} />
-                    <ProfileField label="Nombre de lots" value={data.coOwnership.numberOfLots?.toString()} />
-                    <ProfileField label="Charges annuelles" value={data.coOwnership.estimatedAnnualFees ? `${data.coOwnership.estimatedAnnualFees} €` : null} />
-
-                    <ProfileField label="Numéro de lot" value={data.coOwnership.lotNumber} />
-                    <ProfileField label="Syndic" value={data.coOwnership.syndicName} />
-                    <ProfileField label="Charges mensuelles" value={data.coOwnership.monthlyCharges ? `${data.coOwnership.monthlyCharges} €/mois` : null} />
-
-                    <ProfileField label="Dernière AG" value={data.coOwnership.lastAgmDate ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(data.coOwnership.lastAgmDate)) : null} />
-                    <ProfileField label="Travaux votés" value={data.coOwnership.plannedWorkAmount ? `${data.coOwnership.plannedWorkAmount} €` : null} />
-                    <div />
-
-                    <ProfileField label="Procédures en cours" value={data.coOwnership.hasCurrentLegalProcedures !== null ? (data.coOwnership.hasCurrentLegalProcedures ? 'Oui' : 'Non') : null} />
-                    <ProfileField label="Procédures votées" value={data.coOwnership.hasPlannedLegalProcedures !== null ? (data.coOwnership.hasPlannedLegalProcedures ? 'Oui' : 'Non') : null} />
-                    <div />
-
-                    {data.coOwnership.legalProcedureDetails && (
-                      <div className="col-span-3">
-                        <ProfileField label="Détails" value={data.coOwnership.legalProcedureDetails} />
+                  <div className="grid grid-cols-2 gap-x-[60px] gap-y-[24px]">
+                    {/* Colonne 1 — Description */}
+                    <div>
+                      <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                        Description
+                      </p>
+                      <div className="flex flex-col gap-[8px]">
+                        <ProfileField label="Type" value={data.coOwnership.type} />
+                        <ProfileField label="Nombre de lots" value={data.coOwnership.numberOfLots?.toString()} />
+                        <ProfileField label="Charges annuelles" value={data.coOwnership.estimatedAnnualFees ? `${data.coOwnership.estimatedAnnualFees} €` : null} />
                       </div>
-                    )}
+                    </div>
+                    {/* Colonne 2 — Procédures */}
+                    <div>
+                      <p className="text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[8px]">
+                        Procédures
+                      </p>
+                      <div className="flex flex-col gap-[8px]">
+                        <div className="flex items-center gap-[8px]">
+                          <ProfileField label="En cours" value={data.coOwnership.hasCurrentLegalProcedures !== null ? (data.coOwnership.hasCurrentLegalProcedures ? 'Oui' : 'Non') : null} />
+                          {data.coOwnership.hasCurrentLegalProcedures && (
+                            <a href="#documents" className="text-xs text-content-branded-action hover:underline">Voir documents</a>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-[8px]">
+                          <ProfileField label="Votées" value={data.coOwnership.hasPlannedLegalProcedures !== null ? (data.coOwnership.hasPlannedLegalProcedures ? 'Oui' : 'Non') : null} />
+                          {data.coOwnership.hasPlannedLegalProcedures && (
+                            <a href="#documents" className="text-xs text-content-branded-action hover:underline">Voir documents</a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

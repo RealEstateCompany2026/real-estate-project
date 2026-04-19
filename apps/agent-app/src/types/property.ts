@@ -20,6 +20,9 @@ export type Exposure = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SO' | 'O' | 'NO';
 
 export type DpeClass = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
 
+export type ViewType = 'SUR_RUE' | 'SUR_COUR' | 'DEGAGEE' | 'SUR_JARDIN' | 'PANORAMIQUE';
+export type PoolType = 'ENTERREE' | 'SEMI_ENTERREE' | 'HORS_SOL' | 'AUCUNE';
+
 export type ParkingType = 'BOX_FERME' | 'PARKING_EXTERIEUR' | 'GARAGE' | 'AUCUN';
 
 export type KitchenType = 'SEPAREE' | 'OUVERTE' | 'AMERICAINE' | 'KITCHENETTE';
@@ -59,6 +62,7 @@ export interface Property {
   addressCity: string | null;
   addressLat: number | null;
   addressLng: number | null;
+  neighborhoodName: string | null;
 
   // Surfaces
   livingAreaSqm: number | null;
@@ -99,6 +103,8 @@ export interface Property {
   hasIntercom: boolean | null;
   hasPool: boolean | null;
   hasHomeAutomation: boolean | null;
+  poolType: PoolType | null;
+  mainViewType: ViewType | null;
 
   // DPE
   dpeEnergyClass: DpeClass | null;
@@ -228,6 +234,21 @@ export const PROPERTY_CONDITION_LABELS: Record<PropertyCondition, string> = {
   BON_ETAT: 'Bon état',
   A_RENOVER: 'À rénover',
   ANCIEN: 'Ancien',
+};
+
+export const VIEW_TYPE_LABELS: Record<ViewType, string> = {
+  SUR_RUE: 'Sur rue',
+  SUR_COUR: 'Sur cour',
+  DEGAGEE: 'Dégagée',
+  SUR_JARDIN: 'Sur jardin',
+  PANORAMIQUE: 'Panoramique',
+};
+
+export const POOL_TYPE_LABELS: Record<PoolType, string> = {
+  ENTERREE: 'Enterrée',
+  SEMI_ENTERREE: 'Semi-enterrée',
+  HORS_SOL: 'Hors-sol',
+  AUCUNE: 'Aucune',
 };
 
 export const DPE_COLORS: Record<DpeClass, string> = {
