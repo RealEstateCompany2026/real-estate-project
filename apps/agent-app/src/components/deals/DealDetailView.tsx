@@ -13,6 +13,12 @@ import {
   Landmark,
   BadgeEuro,
   MessageSquare,
+  Search,
+  Home,
+  FileCheck,
+  ScrollText,
+  Wrench,
+  PieChart,
 } from 'lucide-react';
 
 // ── DS Components ──
@@ -36,6 +42,10 @@ import { ListAnnonce } from '@real-estate/ui/list-annonce';
 import { KpiIndicator } from '@real-estate/ui/kpi-indicator';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
+import { ListBail } from '@real-estate/ui/list-bail';
+import { ListCandidatureLocataire } from '@real-estate/ui/list-candidature-locataire';
+import { ListFinancement } from '@real-estate/ui/list-financement';
+import { ListBien } from '@real-estate/ui/list-bien';
 import type { DealType } from '@real-estate/ui/deal-types';
 
 // ── App-level ──
@@ -48,7 +58,7 @@ import { createClient } from '@/lib/supabase/client';
 interface DealRow {
   id: string;
   reference: string | null;
-  dealType: DealType | null;
+  type: DealType | null;
   pipelineStage: string | null;
   saleMandateStatus: string | null;
   purchaseOfferStatus: string | null;
@@ -61,8 +71,36 @@ interface DealRow {
   listingId: string | null;
   clientId: string | null;
   propertyId: string | null;
+  status: string | null;
+  trend: string | null;
   Client: { id: string; firstName: string | null; lastName: string | null; status: string | null } | null;
   Property: { id: string; type: string | null; livingAreaSqm: number | null; addressCity: string | null; desiredSellingPrice: number | null; dpeEnergyClass: string | null } | null;
+
+  // Mandat
+  mandateWaived: boolean;
+  mgmtMandateStatus: string | null;
+  saleMandateEndDate: string | null;
+
+  // Acquisition
+  acquisitionMinBudget: number | null;
+  acquisitionMaxBudget: number | null;
+  acquisitionCriteriaSummary: string | null;
+
+  // Location
+  locationMinBudget: number | null;
+  locationCriteriaSummary: string | null;
+  bailType: string | null;
+  bailMonthlyRent: number | null;
+  bailCharges: number | null;
+  bailDepositAmount: number | null;
+  bailSignedDate: string | null;
+  bailStartDate: string | null;
+  bailEndDate: string | null;
+
+  // Gestion
+  occupancyStatus: string | null;
+  rentPaymentStatus: string | null;
+  maintenanceStatus: string | null;
 }
 
 interface EventRow {
@@ -187,6 +225,22 @@ function mapVisiteStatus(
   }
 }
 
+// ── Visite recherche workflow mapping ──
+
+function mapVisiteRechercheStatus(
+  status: string | null,
+  step: 'programme' | 'cr',
+): BadgeVariant {
+  switch (step) {
+    case 'programme':
+      return status === 'ANNULE' || status === 'NO_SHOW' ? 'error' : 'success';
+    case 'cr':
+      return status === 'TERMINE' ? 'success' : 'disabled';
+    default:
+      return 'disabled';
+  }
+}
+
 // ── Offer workflow mapping ──
 
 function mapOfferWorkflow(
@@ -198,6 +252,31 @@ function mapOfferWorkflow(
   const idx = order.indexOf(status ?? '');
   if (idx < 0) return 'disabled';
   return idx >= stepMap[step] ? 'success' : 'disabled';
+}
+
+// ── Offer recherche workflow mapping ──
+
+function mapOfferRechercheWorkflow(
+  status: string | null,
+  step: 'envoyee' | 'acceptee',
+): BadgeVariant {
+  const order = ['ENVOYEE', 'ACCEPTEE'];
+  const stepMap: Record<string, number> = { envoyee: 0, acceptee: 1 };
+  const idx = order.indexOf(status ?? '');
+  if (idx < 0) return 'disabled';
+  return idx >= stepMap[step] ? 'success' : 'disabled';
+}
+
+// ── Bail workflow mapping ──
+
+function mapBailWorkflow(
+  bailSignedDate: string | null,
+  step: 'edition' | 'revision' | 'signature',
+): BadgeVariant {
+  if (!bailSignedDate) {
+    return step === 'edition' ? 'success' : 'disabled';
+  }
+  return 'success'; // bail signe = tout valide
 }
 
 // ── Notarial status mapping ──
@@ -289,7 +368,17 @@ function mockGraphData() {
   ];
 }
 
-// ── Ancres Vente ──
+// ── Mandate end date helper ──
+
+function isMandateEndingSoon(endDate: string | null): boolean {
+  if (!endDate) return false;
+  const end = new Date(endDate);
+  const now = new Date();
+  const threeMonths = 3 * 30 * 24 * 60 * 60 * 1000;
+  return end.getTime() - now.getTime() < threeMonths && end.getTime() > now.getTime();
+}
+
+// ── Ancres par variant ──
 
 const ancresVente = [
   { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
@@ -300,6 +389,40 @@ const ancresVente = [
   { id: 'promesse', label: 'Promesses', icon: <Heart size={20} /> },
   { id: 'notaire', label: 'Notaire', icon: <Landmark size={20} /> },
   { id: 'ca', label: 'Budget', icon: <BadgeEuro size={20} /> },
+  { id: 'messages', label: 'Messages', icon: <MessageSquare size={20} /> },
+];
+
+const ancresAcquisition = [
+  { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
+  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'recherche', label: 'Recherche', icon: <Search size={20} /> },
+  { id: 'biens', label: 'Biens', icon: <Home size={20} /> },
+  { id: 'visites', label: 'Visites', icon: <DoorOpen size={20} /> },
+  { id: 'promesse', label: 'Promesses', icon: <Heart size={20} /> },
+  { id: 'notaire', label: 'Notaire', icon: <Landmark size={20} /> },
+  { id: 'ca', label: 'Budget', icon: <BadgeEuro size={20} /> },
+  { id: 'messages', label: 'Messages', icon: <MessageSquare size={20} /> },
+];
+
+const ancresLocation = [
+  { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
+  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'recherche', label: 'Recherche', icon: <Search size={20} /> },
+  { id: 'biens', label: 'Biens', icon: <Home size={20} /> },
+  { id: 'visites', label: 'Visites', icon: <DoorOpen size={20} /> },
+  { id: 'dossiers', label: 'Dossiers', icon: <FileCheck size={20} /> },
+  { id: 'bail', label: 'Bail', icon: <ScrollText size={20} /> },
+  { id: 'ca', label: 'Budget', icon: <BadgeEuro size={20} /> },
+  { id: 'messages', label: 'Messages', icon: <MessageSquare size={20} /> },
+];
+
+const ancresGestion = [
+  { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
+  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'occupation', label: 'Occupation', icon: <Home size={20} /> },
+  { id: 'loyers', label: 'Loyers', icon: <BadgeEuro size={20} /> },
+  { id: 'entretien', label: 'Entretien', icon: <Wrench size={20} /> },
+  { id: 'ca', label: 'Budget', icon: <PieChart size={20} /> },
   { id: 'messages', label: 'Messages', icon: <MessageSquare size={20} /> },
 ];
 
@@ -323,6 +446,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<ActivityFilter>('Tout');
+  const [bienFilter, setBienFilter] = useState<'tous' | 'shortlist'>('tous');
 
   // ── Fetch ──
   useEffect(() => {
@@ -399,6 +523,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   // ── Derived data ──
   const visitEvents = events.filter((e) => e.type === 'VISITE');
   const noteEvents = events.filter((e) => e.type === 'NOTE');
+  const entretienEvents = events.filter((e) => e.type === 'ENTRETIEN');
 
   const filteredEvents = activeFilter === 'Tout'
     ? events
@@ -407,6 +532,15 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const clientFullName = deal?.Client
     ? `${deal.Client.firstName ?? ''} ${deal.Client.lastName ?? ''}`.trim()
     : '\u2014';
+
+  // ── Current type + ancres dynamiques ──
+  const currentType = (deal?.type as DealType) ?? 'VENTE';
+  const ancres = {
+    VENTE: ancresVente,
+    ACQUISITION: ancresAcquisition,
+    LOCATION: ancresLocation,
+    GESTION: ancresGestion,
+  }[currentType] ?? ancresVente;
 
   // ── Loading ──
   if (isLoading) {
@@ -422,7 +556,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
         <p className="text-lg text-content-body">{error ?? 'Erreur inconnue'}</p>
-        <Button variant="ghost" onClick={() => router.push('/affaires')}>
+        <Button variant="ghost" onClick={() => router.push('/deals')}>
           Retour aux affaires
         </Button>
       </div>
@@ -448,6 +582,11 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     }
   }
 
+  // ── Mandate status key (GESTION uses mgmtMandateStatus) ──
+  const mandateStatusKey = currentType === 'GESTION'
+    ? (deal.mgmtMandateStatus ?? 'NON_CREE')
+    : (deal.saleMandateStatus ?? 'NON_CREE');
+
   // ── Render ──
   return (
     <div className="flex flex-col min-h-screen bg-surface-page">
@@ -455,13 +594,13 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       <div className="sticky top-0 z-30">
         <AppBarFicheAffaire
           dealId={deal.reference ?? deal.id.slice(0, 8)}
-          dealType={(deal.dealType as DealType) ?? 'VENTE'}
+          dealType={currentType}
           propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
           surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
           city={deal.Property?.addressCity ?? '\u2014'}
           price={formatPrice(deal.Property?.desiredSellingPrice)}
           aiSuggestions={0}
-          onBack={() => router.push('/affaires')}
+          onBack={() => router.push('/deals')}
         />
       </div>
 
@@ -476,7 +615,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       {/* ── AppBarAffaireAncres (sticky) ── */}
       <div className="sticky top-[100px] z-20">
         <AppBarAffaireAncres
-          items={ancresVente}
+          items={ancres}
           onItemClick={(id) =>
             document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
           }
@@ -485,24 +624,57 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
       {/* ── Sections ── */}
       <div className="flex flex-col">
-        {/* ─────────── Section Mandat (AFF-V01) ─────────── */}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Mandat (commune, adaptee par variant) ──              */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         <section id="mandat" className="px-5 py-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Mandat</h5>
-            <Badge variant={MANDATE_STATUS_VARIANT[deal.saleMandateStatus ?? 'NON_CREE'] ?? 'disabled'}>
-              {MANDATE_STATUS_LABELS[deal.saleMandateStatus ?? 'NON_CREE'] ?? 'Non cr\u00e9\u00e9'}
-            </Badge>
+            {/* ACQ/LOC : indicateur mandateWaived */}
+            {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived ? (
+              <Chip variant="filled" label="Mandat non n\u00e9cessaire" />
+            ) : (
+              <Badge variant={MANDATE_STATUS_VARIANT[mandateStatusKey] ?? 'disabled'}>
+                {MANDATE_STATUS_LABELS[mandateStatusKey] ?? 'Non cr\u00e9\u00e9'}
+              </Badge>
+            )}
           </div>
-          <ListMandat
-            reference={deal.reference ?? '\u2014'}
-            workflow={{
-              edition: mapMandateWorkflow(deal.saleMandateStatus, 'edition'),
-              revision: mapMandateWorkflow(deal.saleMandateStatus, 'revision'),
-              signature: mapMandateWorkflow(deal.saleMandateStatus, 'signature'),
-            }}
-            aiSuggestions={0}
-          />
-          {deal.saleMandateStatus !== 'SIGNE' && (
+
+          {/* Ne pas afficher le workflow si mandat waived (ACQ/LOC) */}
+          {!((currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived) && (
+            <ListMandat
+              reference={deal.reference ?? '\u2014'}
+              workflow={{
+                edition: mapMandateWorkflow(mandateStatusKey, 'edition'),
+                revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
+                signature: mapMandateWorkflow(mandateStatusKey, 'signature'),
+              }}
+              aiSuggestions={0}
+            />
+          )}
+
+          {/* GESTION : date d'echeance mandat + AiSuggestion si < 3 mois */}
+          {currentType === 'GESTION' && deal.saleMandateEndDate && (
+            <div className="flex flex-col gap-2 text-sm text-content-body">
+              <div className="flex justify-between">
+                <span>\u00c9ch\u00e9ance mandat</span>
+                <span className="font-semibold">
+                  {new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
+          )}
+          {currentType === 'GESTION' && isMandateEndingSoon(deal.saleMandateEndDate) && (
+            <AiSuggestionBanner
+              suggestion="Le mandat de gestion arrive \u00e0 \u00e9ch\u00e9ance dans moins de 3 mois. Pr\u00e9voir le renouvellement."
+              variant="compact"
+            />
+          )}
+
+          {/* VENTE + ACQ/LOC (sans waived) : suggestion relance si non signe */}
+          {currentType !== 'GESTION' && mandateStatusKey !== 'SIGNE' &&
+            !((currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived) && (
             <AiSuggestionBanner
               suggestion="Relancer le client pour la signature du mandat"
               variant="compact"
@@ -510,7 +682,9 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           )}
         </section>
 
-        {/* ─────────── Section Activites (AFF-V02) ─────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Activites (commune) ──                                */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         <section id="activite" className="px-5 py-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Activit\u00e9s</h5>
@@ -551,121 +725,370 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           )}
         </section>
 
-        {/* ─────────── Section Annonce (AFF-V03) ─────────── */}
-        <section id="annonce" className="px-5 py-6 flex flex-col gap-4">
-          <h5 className="text-xl font-bold text-content-headings">Annonce</h5>
-          {listing ? (
-            <>
-              <ListAnnonce
-                city={deal.Property?.addressCity ?? '\u2014'}
-                propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m\u00b2` : '\u2014'}
-                dpeGrade={
-                  deal.Property?.dpeEnergyClass &&
-                  ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-                    ? (deal.Property.dpeEnergyClass as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G')
-                    : undefined
-                }
-                ownerName={clientFullName}
-                workflow={annonceWorkflow}
-              />
-              <div className="flex gap-4">
-                <KpiIndicator
-                  icon={<Inbox size={20} />}
-                  value={String(listing.viewsCount ?? 0)}
-                  percentage={Math.min(100, (listing.viewsCount ?? 0))}
-                />
-                <KpiIndicator
-                  icon={<MessageSquare size={20} />}
-                  value={String(listing.contactsCount ?? 0)}
-                  percentage={Math.min(100, (listing.contactsCount ?? 0) * 10)}
-                />
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Sections VENTE only : Annonce + Leads ──                      */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {currentType === 'VENTE' && (
+          <>
+            {/* ─────────── Section Annonce (AFF-V03) ─────────── */}
+            <section id="annonce" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Annonce</h5>
+              {listing ? (
+                <>
+                  <ListAnnonce
+                    city={deal.Property?.addressCity ?? '\u2014'}
+                    propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
+                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m\u00b2` : '\u2014'}
+                    dpeGrade={
+                      deal.Property?.dpeEnergyClass &&
+                      ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
+                        ? (deal.Property.dpeEnergyClass as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G')
+                        : undefined
+                    }
+                    ownerName={clientFullName}
+                    workflow={annonceWorkflow}
+                  />
+                  <div className="flex gap-4">
+                    <KpiIndicator
+                      icon={<Inbox size={20} />}
+                      value={String(listing.viewsCount ?? 0)}
+                      percentage={Math.min(100, (listing.viewsCount ?? 0))}
+                    />
+                    <KpiIndicator
+                      icon={<MessageSquare size={20} />}
+                      value={String(listing.contactsCount ?? 0)}
+                      percentage={Math.min(100, (listing.contactsCount ?? 0) * 10)}
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-content-subtle italic">Aucune annonce cr\u00e9\u00e9e</p>
+              )}
+            </section>
+
+            {/* ─────────── Section Leads (AFF-V04) ─────────── */}
+            <section id="leads" className="px-5 py-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xl font-bold text-content-headings">Leads</h5>
+                <Badge variant="default">{deal.infoRequestsCount ?? 0}</Badge>
               </div>
-            </>
-          ) : (
-            <p className="text-sm text-content-subtle italic">Aucune annonce cr\u00e9\u00e9e</p>
-          )}
-        </section>
+              <p className="text-sm text-content-subtle italic">
+                {(deal.infoRequestsCount ?? 0) === 0
+                  ? "Aucune demande d\u2019information re\u00e7ue"
+                  : `${deal.infoRequestsCount} demande(s) d\u2019information`}
+              </p>
+            </section>
+          </>
+        )}
 
-        {/* ─────────── Section Leads (AFF-V04) ─────────── */}
-        <section id="leads" className="px-5 py-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h5 className="text-xl font-bold text-content-headings">Leads</h5>
-            <Badge variant="default">{deal.infoRequestsCount ?? 0}</Badge>
-          </div>
-          <p className="text-sm text-content-subtle italic">
-            {(deal.infoRequestsCount ?? 0) === 0
-              ? "Aucune demande d\u2019information re\u00e7ue"
-              : `${deal.infoRequestsCount} demande(s) d\u2019information`}
-          </p>
-        </section>
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Sections ACQUISITION + LOCATION : Recherche + Biens ──        */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && (
+          <>
+            {/* ─────────── Section Recherche ─────────── */}
+            <section id="recherche" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Recherche</h5>
+              <div className="flex flex-col gap-2 text-sm text-content-body">
+                <div className="flex justify-between">
+                  <span>Crit\u00e8res</span>
+                  <span className="font-semibold">
+                    {deal.acquisitionCriteriaSummary || deal.locationCriteriaSummary || '\u2014'}
+                  </span>
+                </div>
+                {currentType === 'ACQUISITION' && (
+                  <div className="flex justify-between">
+                    <span>Budget</span>
+                    <span className="font-semibold">
+                      {formatPrice(deal.acquisitionMinBudget)} \u2014 {formatPrice(deal.acquisitionMaxBudget)}
+                    </span>
+                  </div>
+                )}
+                {currentType === 'LOCATION' && (
+                  <div className="flex justify-between">
+                    <span>Loyer max</span>
+                    <span className="font-semibold">{formatPrice(deal.locationMinBudget)}/mois</span>
+                  </div>
+                )}
+              </div>
+            </section>
 
-        {/* ─────────── Section Visites (AFF-V05) ─────────── */}
-        <section id="visites" className="px-5 py-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h5 className="text-xl font-bold text-content-headings">Visites</h5>
-            <Badge variant="default">{visitEvents.length}</Badge>
-          </div>
-          {visitEvents.map((v) => (
-            <ListVisite
-              key={v.id}
-              useCase="vente"
-              dateTime={formatDateTime(v.eventDate)}
-              contactName={clientFullName}
-              workflow={{
-                calendrier: mapVisiteStatus(v.status, 'calendrier'),
-                odj: mapVisiteStatus(v.status, 'odj'),
-                cr: mapVisiteStatus(v.status, 'cr'),
-              }}
-            />
-          ))}
-          {visitEvents.length === 0 && (
-            <p className="text-sm text-content-subtle italic">Aucune visite planifi\u00e9e</p>
-          )}
-        </section>
+            {/* ─────────── Section Biens matches ─────────── */}
+            <section id="biens" className="px-5 py-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xl font-bold text-content-headings">Biens</h5>
+                <Badge variant="default">0</Badge>
+              </div>
+              <div className="flex gap-2">
+                <Chip variant={bienFilter === 'tous' ? 'filled' : 'outlined'} label="Tous" onClick={() => setBienFilter('tous')} />
+                <Chip variant={bienFilter === 'shortlist' ? 'filled' : 'outlined'} label="Shortlist" onClick={() => setBienFilter('shortlist')} />
+              </div>
+              {/* Placeholder — le matching sera implemente plus tard */}
+              <p className="text-sm text-content-subtle italic">
+                La recherche de biens correspondants sera disponible prochainement
+              </p>
+            </section>
+          </>
+        )}
 
-        {/* ─────────── Section Promesses (AFF-V06) ─────────── */}
-        <section id="promesse" className="px-5 py-6 flex flex-col gap-4">
-          <h5 className="text-xl font-bold text-content-headings">Promesses</h5>
-          {deal.purchaseOfferStatus ? (
-            <ListPromesse
-              useCase="vente"
-              contactName="Acqu\u00e9reur"
-              workflow={{
-                recue: mapOfferWorkflow(deal.purchaseOfferStatus, 'recue'),
-                transmise: mapOfferWorkflow(deal.purchaseOfferStatus, 'transmise'),
-                accord: mapOfferWorkflow(deal.purchaseOfferStatus, 'accord'),
-              }}
-            />
-          ) : (
-            <p className="text-sm text-content-subtle italic">Aucune offre re\u00e7ue</p>
-          )}
-        </section>
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Visites (VENTE + ACQUISITION + LOCATION) ──           */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {currentType !== 'GESTION' && (
+          <section id="visites" className="px-5 py-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xl font-bold text-content-headings">Visites</h5>
+              <Badge variant="default">{visitEvents.length}</Badge>
+            </div>
+            {visitEvents.map((v) => (
+              currentType === 'VENTE' ? (
+                <ListVisite
+                  key={v.id}
+                  useCase="vente"
+                  dateTime={formatDateTime(v.eventDate)}
+                  contactName={clientFullName}
+                  workflow={{
+                    calendrier: mapVisiteStatus(v.status, 'calendrier'),
+                    odj: mapVisiteStatus(v.status, 'odj'),
+                    cr: mapVisiteStatus(v.status, 'cr'),
+                  }}
+                />
+              ) : (
+                <ListVisite
+                  key={v.id}
+                  useCase="recherche"
+                  dateTime={formatDateTime(v.eventDate)}
+                  contactName={clientFullName}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
+                  city={deal.Property?.addressCity ?? '\u2014'}
+                  workflow={{
+                    programme: mapVisiteRechercheStatus(v.status, 'programme'),
+                    cr: mapVisiteRechercheStatus(v.status, 'cr'),
+                  }}
+                />
+              )
+            ))}
+            {visitEvents.length === 0 && (
+              <p className="text-sm text-content-subtle italic">Aucune visite planifi\u00e9e</p>
+            )}
+          </section>
+        )}
 
-        {/* ─────────── Section Financement (AFF-V07) ─────────── */}
-        <section id="finance" className="px-5 py-6 flex flex-col gap-4">
-          <h5 className="text-xl font-bold text-content-headings">Financement</h5>
-          <p className="text-sm text-content-subtle italic">Aucun dossier de financement</p>
-        </section>
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Sections VENTE + ACQUISITION : Promesses + Financement + Notaire ── */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {(currentType === 'VENTE' || currentType === 'ACQUISITION') && (
+          <>
+            {/* ─────────── Section Promesses ─────────── */}
+            <section id="promesse" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Promesses</h5>
+              {currentType === 'VENTE' ? (
+                deal.purchaseOfferStatus ? (
+                  <ListPromesse
+                    useCase="vente"
+                    contactName="Acqu\u00e9reur"
+                    workflow={{
+                      recue: mapOfferWorkflow(deal.purchaseOfferStatus, 'recue'),
+                      transmise: mapOfferWorkflow(deal.purchaseOfferStatus, 'transmise'),
+                      accord: mapOfferWorkflow(deal.purchaseOfferStatus, 'accord'),
+                    }}
+                  />
+                ) : (
+                  <p className="text-sm text-content-subtle italic">Aucune offre re\u00e7ue</p>
+                )
+              ) : (
+                /* ACQUISITION : useCase="recherche" */
+                deal.purchaseOfferStatus ? (
+                  <ListPromesse
+                    useCase="recherche"
+                    contactName={clientFullName}
+                    propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
+                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
+                    city={deal.Property?.addressCity ?? '\u2014'}
+                    workflow={{
+                      envoyee: mapOfferRechercheWorkflow(deal.purchaseOfferStatus, 'envoyee'),
+                      acceptee: mapOfferRechercheWorkflow(deal.purchaseOfferStatus, 'acceptee'),
+                    }}
+                  />
+                ) : (
+                  <p className="text-sm text-content-subtle italic">Aucune promesse envoy\u00e9e</p>
+                )
+              )}
+            </section>
 
-        {/* ─────────── Section Notaire (AFF-V08) ─────────── */}
-        <section id="notaire" className="px-5 py-6 flex flex-col gap-4">
-          <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
-          {deal.notarialDeedStatus ? (
-            <ListActeNotarie
-              contactName="Notaire"
-              dateTime={deal.notarialDeedDate ? formatDateTime(deal.notarialDeedDate) : '\u2014'}
-              status={{
-                label: NOTARIAL_STATUS_LABELS[deal.notarialDeedStatus] ?? deal.notarialDeedStatus,
-                variant: NOTARIAL_STATUS_VARIANT[deal.notarialDeedStatus] ?? 'default',
-              }}
-            />
-          ) : (
-            <p className="text-sm text-content-subtle italic">Aucun acte notari\u00e9 en cours</p>
-          )}
-        </section>
+            {/* ─────────── Section Financement ─────────── */}
+            <section id="finance" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Financement</h5>
+              {currentType === 'VENTE' ? (
+                <p className="text-sm text-content-subtle italic">Aucun dossier de financement</p>
+              ) : (
+                /* ACQUISITION : useCase="recherche" */
+                <ListFinancement
+                  useCase="recherche"
+                  contactName={clientFullName}
+                  status={{ label: 'En attente', variant: 'default' }}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
+                  city={deal.Property?.addressCity ?? '\u2014'}
+                />
+              )}
+            </section>
 
-        {/* ─────────── Section Budget (AFF-V09) ─────────── */}
+            {/* ─────────── Section Notaire ─────────── */}
+            <section id="notaire" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
+              {deal.notarialDeedStatus ? (
+                <ListActeNotarie
+                  contactName="Notaire"
+                  dateTime={deal.notarialDeedDate ? formatDateTime(deal.notarialDeedDate) : '\u2014'}
+                  status={{
+                    label: NOTARIAL_STATUS_LABELS[deal.notarialDeedStatus] ?? deal.notarialDeedStatus,
+                    variant: NOTARIAL_STATUS_VARIANT[deal.notarialDeedStatus] ?? 'default',
+                  }}
+                />
+              ) : (
+                <p className="text-sm text-content-subtle italic">Aucun acte notari\u00e9 en cours</p>
+              )}
+            </section>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Sections LOCATION only : Dossiers candidature + Bail ──       */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {currentType === 'LOCATION' && (
+          <>
+            {/* ─────────── Section Dossiers candidature ─────────── */}
+            <section id="dossiers" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Dossiers candidature</h5>
+              {/* Placeholder — pas de table dediee pour les dossiers actuellement */}
+              <p className="text-sm text-content-subtle italic">
+                Aucun dossier de candidature
+              </p>
+            </section>
+
+            {/* ─────────── Section Bail ─────────── */}
+            <section id="bail" className="px-5 py-6 flex flex-col gap-4">
+              <h5 className="text-xl font-bold text-content-headings">Bail</h5>
+              {deal.bailType ? (
+                <ListBail
+                  contactName={clientFullName}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
+                  city={deal.Property?.addressCity ?? '\u2014'}
+                  workflow={{
+                    edition: mapBailWorkflow(deal.bailSignedDate, 'edition'),
+                    revision: mapBailWorkflow(deal.bailSignedDate, 'revision'),
+                    signature: mapBailWorkflow(deal.bailSignedDate, 'signature'),
+                  }}
+                />
+              ) : (
+                <p className="text-sm text-content-subtle italic">Aucun bail cr\u00e9\u00e9</p>
+              )}
+              {deal.bailMonthlyRent && (
+                <div className="flex flex-col gap-2 text-sm text-content-body">
+                  <div className="flex justify-between">
+                    <span>Loyer mensuel</span>
+                    <span className="font-semibold">{formatPrice(deal.bailMonthlyRent)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Charges</span>
+                    <span className="font-semibold">{formatPrice(deal.bailCharges)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>D\u00e9p\u00f4t de garantie</span>
+                    <span className="font-semibold">{formatPrice(deal.bailDepositAmount)}</span>
+                  </div>
+                </div>
+              )}
+            </section>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Sections GESTION only : Occupation + Loyers + Entretien ──    */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {currentType === 'GESTION' && (
+          <>
+            {/* ─────────── Section Occupation ─────────── */}
+            <section id="occupation" className="px-5 py-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xl font-bold text-content-headings">Occupation</h5>
+                <Badge variant={deal.occupancyStatus === 'OCCUPE' ? 'success' : 'disabled'}>
+                  {deal.occupancyStatus === 'OCCUPE' ? 'Occup\u00e9' : 'Vacant'}
+                </Badge>
+              </div>
+              {deal.occupancyStatus === 'OCCUPE' && (
+                <Chip variant="filled" label={`Locataire : ${clientFullName}`} />
+              )}
+            </section>
+
+            {/* ─────────── Section Loyers ─────────── */}
+            <section id="loyers" className="px-5 py-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xl font-bold text-content-headings">Loyers</h5>
+                <Badge variant={deal.rentPaymentStatus === 'EN_REGLE' ? 'success' : 'warning'}>
+                  {deal.rentPaymentStatus === 'EN_REGLE' ? 'En r\u00e8gle' : 'En conflit'}
+                </Badge>
+              </div>
+              {deal.bailMonthlyRent && (
+                <div className="flex flex-col gap-2 text-sm text-content-body">
+                  <div className="flex justify-between">
+                    <span>Loyer mensuel</span>
+                    <span className="font-semibold">{formatPrice(deal.bailMonthlyRent)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Charges</span>
+                    <span className="font-semibold">{formatPrice(deal.bailCharges)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>D\u00e9p\u00f4t de garantie</span>
+                    <span className="font-semibold">{formatPrice(deal.bailDepositAmount)}</span>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* ─────────── Section Entretien ─────────── */}
+            <section id="entretien" className="px-5 py-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xl font-bold text-content-headings">Entretien</h5>
+                <Badge variant={
+                  deal.maintenanceStatus === 'URGENT' ? 'error'
+                    : deal.maintenanceStatus === 'PROGRAMME' ? 'warning'
+                    : 'success'
+                }>
+                  {deal.maintenanceStatus === 'URGENT' ? 'Urgent'
+                    : deal.maintenanceStatus === 'PROGRAMME' ? 'Programm\u00e9'
+                    : 'Aucun'}
+                </Badge>
+              </div>
+              {entretienEvents.length > 0 ? (
+                entretienEvents.slice(0, 4).map((e) => {
+                  const eDate = new Date(e.eventDate);
+                  return (
+                    <CardLog
+                      key={e.id}
+                      date={eDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      time={eDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                      author="Agent"
+                      category="ENTRETIEN"
+                      description={e.description ?? ''}
+                      badgeVariant="warning"
+                    />
+                  );
+                })
+              ) : (
+                <p className="text-sm text-content-subtle italic">Aucune intervention signal\u00e9e</p>
+              )}
+            </section>
+          </>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Budget (commune, adaptee par variant) ──              */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         <section id="ca" className="px-5 py-6 flex flex-col gap-4">
           <h5 className="text-xl font-bold text-content-headings">Budget</h5>
           <CardCA
@@ -687,16 +1110,26 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 )}
               </span>
             </div>
-            {deal.finalSalePrice && (
+            {currentType === 'VENTE' && deal.finalSalePrice && (
               <div className="flex justify-between">
                 <span>Prix de vente final</span>
                 <span className="font-semibold">{formatPrice(deal.finalSalePrice)}</span>
               </div>
             )}
+            {currentType === 'GESTION' && deal.bailMonthlyRent && (
+              <div className="flex justify-between">
+                <span>CA annualis\u00e9 (estim\u00e9)</span>
+                <span className="font-semibold">
+                  {formatPrice(deal.bailMonthlyRent * 12)}
+                </span>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* ─────────── Section Documents (AFF-V10) ─────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Documents (commune) ──                                */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         <section className="px-5 py-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Documents</h5>
@@ -728,7 +1161,9 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           )}
         </section>
 
-        {/* ─────────── Section Messages (AFF-V11) ─────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Messages (commune) ──                                 */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         <section id="messages" className="px-5 py-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Messages</h5>
@@ -785,7 +1220,9 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           )}
         </section>
 
-        {/* ─────────── Section Notes (AFF-V12) ─────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Notes (commune) ──                                    */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         <section className="px-5 py-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Notes</h5>

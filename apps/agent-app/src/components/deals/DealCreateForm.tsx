@@ -329,7 +329,7 @@ export function DealCreateForm() {
       }
 
       // 5. Redirection
-      router.push(`/affaires/${newDeal.id}`);
+      router.push(`/deals/${newDeal.id}`);
     } catch (err) {
       console.error('Erreur creation affaire:', err);
       setIsSubmitting(false);
@@ -350,7 +350,7 @@ export function DealCreateForm() {
         saveLabel="Creer l'affaire"
         disabled={!isFormValid || isSubmitting}
         onSave={handleCreate}
-        onClose={() => router.push('/affaires')}
+        onClose={() => router.push('/deals')}
       />
 
       {/* Contenu scrollable */}

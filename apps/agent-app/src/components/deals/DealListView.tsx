@@ -322,7 +322,7 @@ export function DealListView() {
             setPage(0);
           },
         }))}
-        onAdd={() => router.push('/affaires/nouveau')}
+        onAdd={() => router.push('/deals/new')}
         onSearch={() => {
           // TODO: open search overlay
         }}
@@ -461,7 +461,7 @@ export function DealListView() {
                 className="flex-1"
                 onClick={() => {
                   setSheetOpen(false);
-                  router.push(`/affaires/${selectedDeal.id}`);
+                  router.push(`/deals/${selectedDeal.id}`);
                 }}
               >
                 Voir l&apos;affaire
