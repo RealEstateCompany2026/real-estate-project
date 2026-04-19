@@ -88,6 +88,8 @@ interface EventRow {
 
 interface DealRow {
   id: string;
+  saleMandateStatus: string | null;
+  mgmtMandateStatus: string | null;
 }
 
 interface ListingRow {
@@ -180,6 +182,7 @@ interface PropertyDetailData {
   activities: ActivityLog[];
   allActivities: ActivityLog[];
   dealsCount: number;
+  hasActiveMandate: boolean;
   listings: ListingRow[];
   documents: DocumentItem[];
   messages: MessageItem[];
@@ -467,7 +470,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           .eq('propertyId', propertyId)
           .order('eventDate', { ascending: false })
           .limit(100),
-        supabase.from('Deal').select('id').eq('propertyId', propertyId),
+        supabase.from('Deal').select('id, saleMandateStatus, mgmtMandateStatus').eq('propertyId', propertyId),
         supabase.from('Listing').select('id, status, title, description, descriptionSource, alurCompliant, slug, publishedAt, contactFormEnabled, viewCount, leadCount').eq('propertyId', propertyId),
         supabase.from('Document').select('id, title, fileName, type').eq('propertyId', propertyId),
         supabase
@@ -559,6 +562,9 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       const activities: ActivityLog[] = allActivities.slice(0, 4);
 
       const dealsCount = (dealsData ?? []).length;
+      const hasActiveMandate = (dealsData ?? []).some(
+        (d: DealRow) => d.saleMandateStatus != null || d.mgmtMandateStatus != null
+      );
 
       // Handle Listing data — TODO: awaiting schema with workflow badges
       // For now, all listings default to 'disabled' badges
@@ -589,6 +595,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         activities,
         allActivities,
         dealsCount,
+        hasActiveMandate,
         listings,
         documents,
         messages,
@@ -838,7 +845,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
     );
   }
 
-  const { property, photos, kpis, aiSuggestions, activities, allActivities, dealsCount, listings, documents, messages, allMessages, ownerName, coOwnership, matchingBuyers } = data;
+  const { property, photos, kpis, aiSuggestions, activities, allActivities, dealsCount, hasActiveMandate, listings, documents, messages, allMessages, ownerName, coOwnership, matchingBuyers } = data;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -860,12 +867,12 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           ═══════════════════════════════════════════════════════ */}
       <div className="sticky top-0 z-30 bg-surface-page">
         <AppBarFicheBien
-          bienId={property.internalRef ?? `Bien ${PROPERTY_TYPE_LABELS[property.type]}`}
+          title={`${PROPERTY_TYPE_LABELS[property.type]} · ${property.livingAreaSqm ? `${property.livingAreaSqm}m²` : '—'}`}
           transactionType={property.operationTypes?.[0] ? OPERATION_TYPE_LABELS[property.operationTypes[0] as OperationType] : 'VENTE'}
           contactName={ownerName}
           qualification={kpis.qualification}
-          showCarnet={false}
-          showMandat={false}
+          carnetActive={false}
+          mandatActive={hasActiveMandate}
           aiSuggestions={aiSuggestions}
           onBack={() => router.push('/properties')}
         />

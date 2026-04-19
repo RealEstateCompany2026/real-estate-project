@@ -16,18 +16,18 @@ import { AiSuggestion } from "./AiSuggestion";
  */
 
 export interface AppBarFicheBienProps {
-  /** Identifiant du bien */
-  bienId?: string;
+  /** Titre affiché — format "Type · surface" */
+  title?: string;
   /** Type de transaction (À VENDRE, À LOUER, etc.) */
   transactionType?: string;
-  /** Nom du contact/client */
+  /** Nom du contact/propriétaire */
   contactName?: string;
   /** KPI Qualification (0-100) */
   qualification?: number;
-  /** Badge CARNET */
-  showCarnet?: boolean;
-  /** Badge MANDAT */
-  showMandat?: boolean;
+  /** Carnet activé pour ce bien */
+  carnetActive?: boolean;
+  /** Au moins un mandat en cours */
+  mandatActive?: boolean;
   /** Nombre de suggestions IA */
   aiSuggestions?: number;
   /** Callback lors du clic sur le bouton retour */
@@ -35,13 +35,13 @@ export interface AppBarFicheBienProps {
 }
 
 export const AppBarFicheBien: React.FC<AppBarFicheBienProps> = ({
-  bienId = "identifiant du bien",
+  title = "Bien",
   transactionType = "À VENDRE",
-  contactName = "CAPELLO, Jean-François",
-  qualification = 64,
-  showCarnet = true,
-  showMandat = true,
-  aiSuggestions = 1,
+  contactName = "—",
+  qualification = 0,
+  carnetActive = false,
+  mandatActive = false,
+  aiSuggestions = 0,
   onBack,
 }) => {
   return (
@@ -55,9 +55,9 @@ export const AppBarFicheBien: React.FC<AppBarFicheBienProps> = ({
           <ArrowLeft size={20} />
         </button>
 
-        {/* Identifiant du bien - H4 Desktop Bold */}
+        {/* Titre du bien - H4 Desktop Bold */}
         <h4 className="whitespace-nowrap font-bold text-[28px] leading-[34px] tracking-[0.28px] text-content-headings">
-          {bienId}
+          {title}
         </h4>
 
         {/* Badge type transaction */}
@@ -79,23 +79,17 @@ export const AppBarFicheBien: React.FC<AppBarFicheBienProps> = ({
         />
 
         {/* Badge CARNET */}
-        {showCarnet && (
-          <Badge variant="success">
-            CARNET
-          </Badge>
-        )}
+        <Badge variant={carnetActive ? "success" : "disabled"}>
+          CARNET
+        </Badge>
 
         {/* Badge MANDAT */}
-        {showMandat && (
-          <Badge variant="success">
-            MANDAT
-          </Badge>
-        )}
+        <Badge variant={mandatActive ? "success" : "disabled"}>
+          MANDAT
+        </Badge>
 
         {/* Badge IA */}
-        {aiSuggestions > 0 && (
-          <AiSuggestion count={aiSuggestions} />
-        )}
+        <AiSuggestion count={aiSuggestions} />
       </div>
     </div>
   );

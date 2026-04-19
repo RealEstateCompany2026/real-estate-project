@@ -11,12 +11,12 @@ type Story = StoryObj<typeof AppBarFicheBien>;
 
 export const Default: Story = {
   args: {
-    bienId: "BIEN-2026-4521",
+    title: "T3 · 75m²",
     transactionType: "À VENDRE",
     contactName: "Dupont, Jean-François",
     qualification: 64,
-    showCarnet: true,
-    showMandat: true,
+    carnetActive: true,
+    mandatActive: true,
     aiSuggestions: 3,
     onBack: () => console.log("Back clicked"),
   },
@@ -24,12 +24,12 @@ export const Default: Story = {
 
 export const HighQualification: Story = {
   args: {
-    bienId: "BIEN-2026-7834",
+    title: "T5 · 120m²",
     transactionType: "À LOUER",
     contactName: "Martin, Sophie",
     qualification: 92,
-    showCarnet: true,
-    showMandat: false,
+    carnetActive: true,
+    mandatActive: false,
     aiSuggestions: 5,
     onBack: () => console.log("Back clicked"),
   },
@@ -37,38 +37,38 @@ export const HighQualification: Story = {
 
 export const LowQualification: Story = {
   args: {
-    bienId: "BIEN-2026-3159",
+    title: "T2 · 45m²",
     transactionType: "À VENDRE",
     contactName: "Bernard, Pierre",
     qualification: 18,
-    showCarnet: false,
-    showMandat: true,
+    carnetActive: false,
+    mandatActive: true,
     aiSuggestions: 1,
     onBack: () => console.log("Back clicked"),
   },
 };
 
-export const WithoutBadges: Story = {
+export const NoBadgesActive: Story = {
   args: {
-    bienId: "BIEN-2026-5627",
+    title: "Studio · 22m²",
     transactionType: "À VENDRE",
     contactName: "Rousseau, Marie",
     qualification: 45,
-    showCarnet: false,
-    showMandat: false,
-    aiSuggestions: 2,
+    carnetActive: false,
+    mandatActive: false,
+    aiSuggestions: 0,
     onBack: () => console.log("Back clicked"),
   },
 };
 
 export const ManySuggestions: Story = {
   args: {
-    bienId: "BIEN-2026-8903",
+    title: "T4 · 95m²",
     transactionType: "À LOUER",
     contactName: "Laurent, Claude",
     qualification: 78,
-    showCarnet: true,
-    showMandat: true,
+    carnetActive: true,
+    mandatActive: true,
     aiSuggestions: 8,
     onBack: () => console.log("Back clicked"),
   },
