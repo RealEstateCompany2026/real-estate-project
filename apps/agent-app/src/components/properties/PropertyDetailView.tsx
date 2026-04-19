@@ -623,18 +623,34 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       bedroom2AreaSqm: p.bedroom2AreaSqm?.toString() ?? '',
       bedroom3AreaSqm: p.bedroom3AreaSqm?.toString() ?? '',
       bedroom4AreaSqm: p.bedroom4AreaSqm?.toString() ?? '',
+      mainRoomEquipment: p.mainRoomEquipment ?? '',
+      kitchenEquipment: p.kitchenEquipment ?? '',
+      bedroom1Equipment: p.bedroom1Equipment ?? '',
+      bedroom2Equipment: p.bedroom2Equipment ?? '',
+      bedroom3Equipment: p.bedroom3Equipment ?? '',
+      bedroom4Equipment: p.bedroom4Equipment ?? '',
       showerRoomCount: p.showerRoomCount?.toString() ?? '',
       toiletCount: p.toiletCount?.toString() ?? '',
+      bathroomAreaSqm: p.bathroomAreaSqm?.toString() ?? '',
+      bathroomEquipment: p.bathroomEquipment ?? '',
+      toiletAreaSqm: p.toiletAreaSqm?.toString() ?? '',
+      toiletEquipment: p.toiletEquipment ?? '',
       balconyAreaSqm: p.balconyAreaSqm?.toString() ?? '',
       gardenAreaSqm: p.gardenAreaSqm?.toString() ?? '',
       basementAreaSqm: p.basementAreaSqm?.toString() ?? '',
       atticAreaSqm: p.atticAreaSqm?.toString() ?? '',
       parkingSpotCount: p.parkingSpotCount?.toString() ?? '',
+      parkingWidthM: p.parkingWidthM?.toString() ?? '',
+      parkingLengthM: p.parkingLengthM?.toString() ?? '',
       hotWaterSystem: p.hotWaterSystem ?? '',
       hasElevator: p.hasElevator ? 'true' : 'false',
+      hasDigicode: p.hasDigicode ? 'true' : 'false',
+      hasGreenSpace: p.hasGreenSpace ? 'true' : 'false',
       hasIntercom: p.hasIntercom ? 'true' : 'false',
       hasHomeAutomation: p.hasHomeAutomation ? 'true' : 'false',
       hasPool: p.hasPool ? 'true' : 'false',
+      hasSmartphoneControl: p.hasSmartphoneControl ? 'true' : 'false',
+      shutterType: p.shutterType ?? '',
       dpeEnergyKwh: p.dpeEnergyKwh?.toString() ?? '',
       dpeGasGco2: p.dpeGasGco2?.toString() ?? '',
       dpeValidityDate: p.dpeValidityDate ?? '',
@@ -675,18 +691,34 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           bedroom2AreaSqm: characteristicsForm.bedroom2AreaSqm ? parseFloat(characteristicsForm.bedroom2AreaSqm) : null,
           bedroom3AreaSqm: characteristicsForm.bedroom3AreaSqm ? parseFloat(characteristicsForm.bedroom3AreaSqm) : null,
           bedroom4AreaSqm: characteristicsForm.bedroom4AreaSqm ? parseFloat(characteristicsForm.bedroom4AreaSqm) : null,
+          mainRoomEquipment: characteristicsForm.mainRoomEquipment || null,
+          kitchenEquipment: characteristicsForm.kitchenEquipment || null,
+          bedroom1Equipment: characteristicsForm.bedroom1Equipment || null,
+          bedroom2Equipment: characteristicsForm.bedroom2Equipment || null,
+          bedroom3Equipment: characteristicsForm.bedroom3Equipment || null,
+          bedroom4Equipment: characteristicsForm.bedroom4Equipment || null,
           showerRoomCount: characteristicsForm.showerRoomCount ? parseInt(characteristicsForm.showerRoomCount) : null,
           toiletCount: characteristicsForm.toiletCount ? parseInt(characteristicsForm.toiletCount) : null,
+          bathroomAreaSqm: characteristicsForm.bathroomAreaSqm ? parseFloat(characteristicsForm.bathroomAreaSqm) : null,
+          bathroomEquipment: characteristicsForm.bathroomEquipment || null,
+          toiletAreaSqm: characteristicsForm.toiletAreaSqm ? parseFloat(characteristicsForm.toiletAreaSqm) : null,
+          toiletEquipment: characteristicsForm.toiletEquipment || null,
           balconyAreaSqm: characteristicsForm.balconyAreaSqm ? parseFloat(characteristicsForm.balconyAreaSqm) : null,
           gardenAreaSqm: characteristicsForm.gardenAreaSqm ? parseFloat(characteristicsForm.gardenAreaSqm) : null,
           basementAreaSqm: characteristicsForm.basementAreaSqm ? parseFloat(characteristicsForm.basementAreaSqm) : null,
           atticAreaSqm: characteristicsForm.atticAreaSqm ? parseFloat(characteristicsForm.atticAreaSqm) : null,
           parkingSpotCount: characteristicsForm.parkingSpotCount ? parseInt(characteristicsForm.parkingSpotCount) : null,
+          parkingWidthM: characteristicsForm.parkingWidthM ? parseFloat(characteristicsForm.parkingWidthM) : null,
+          parkingLengthM: characteristicsForm.parkingLengthM ? parseFloat(characteristicsForm.parkingLengthM) : null,
           hotWaterSystem: characteristicsForm.hotWaterSystem || null,
           hasElevator: characteristicsForm.hasElevator === 'true',
+          hasDigicode: characteristicsForm.hasDigicode === 'true',
+          hasGreenSpace: characteristicsForm.hasGreenSpace === 'true',
           hasIntercom: characteristicsForm.hasIntercom === 'true',
           hasHomeAutomation: characteristicsForm.hasHomeAutomation === 'true',
           hasPool: characteristicsForm.hasPool === 'true',
+          hasSmartphoneControl: characteristicsForm.hasSmartphoneControl === 'true',
+          shutterType: characteristicsForm.shutterType || null,
           dpeEnergyKwh: characteristicsForm.dpeEnergyKwh ? parseFloat(characteristicsForm.dpeEnergyKwh) : null,
           dpeGasGco2: characteristicsForm.dpeGasGco2 ? parseFloat(characteristicsForm.dpeGasGco2) : null,
           dpeValidityDate: characteristicsForm.dpeValidityDate || null,
@@ -1975,7 +2007,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             title="Pièces"
             defaultExpanded={false}
             badge={(() => {
-              const fields = [characteristicsForm.mainRoomAreaSqm, characteristicsForm.kitchenAreaSqm, characteristicsForm.kitchenType, characteristicsForm.bedroomCount, characteristicsForm.bedroom1AreaSqm, characteristicsForm.bedroom2AreaSqm, characteristicsForm.bedroom3AreaSqm, characteristicsForm.bedroom4AreaSqm, characteristicsForm.bathroomCount, characteristicsForm.showerRoomCount, characteristicsForm.toiletCount];
+              const fields = [characteristicsForm.mainRoomAreaSqm, characteristicsForm.mainRoomEquipment, characteristicsForm.kitchenAreaSqm, characteristicsForm.kitchenType, characteristicsForm.kitchenEquipment, characteristicsForm.bedroomCount, characteristicsForm.bedroom1AreaSqm, characteristicsForm.bedroom1Equipment, characteristicsForm.bedroom2AreaSqm, characteristicsForm.bedroom2Equipment, characteristicsForm.bedroom3AreaSqm, characteristicsForm.bedroom3Equipment, characteristicsForm.bedroom4AreaSqm, characteristicsForm.bedroom4Equipment, characteristicsForm.bathroomCount, characteristicsForm.bathroomAreaSqm, characteristicsForm.bathroomEquipment, characteristicsForm.showerRoomCount, characteristicsForm.toiletCount, characteristicsForm.toiletAreaSqm, characteristicsForm.toiletEquipment];
               const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
               const pct = Math.round((filled / fields.length) * 100);
               const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
@@ -1990,6 +2022,13 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 type="number"
                 placeholder="0"
                 {...emptyProps(characteristicsForm.mainRoomAreaSqm)}
+              />
+              <InputFieldOutlined
+                label="Équipements pièce à vivre"
+                value={characteristicsForm.mainRoomEquipment}
+                onChange={(v) => updateCharacteristicsField('mainRoomEquipment', v)}
+                placeholder="Ex : prises RJ45, placard intégré"
+                {...emptyProps(characteristicsForm.mainRoomEquipment)}
               />
               <InputFieldOutlined
                 label="Cuisine (m²)"
@@ -2009,6 +2048,13 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 }))}
               />
               <InputFieldOutlined
+                label="Équipements cuisine"
+                value={characteristicsForm.kitchenEquipment}
+                onChange={(v) => updateCharacteristicsField('kitchenEquipment', v)}
+                placeholder="Ex : îlot central, hotte, électroménager"
+                {...emptyProps(characteristicsForm.kitchenEquipment)}
+              />
+              <InputFieldOutlined
                 label="Chambres"
                 value={characteristicsForm.bedroomCount}
                 onChange={(v) => updateCharacteristicsField('bedroomCount', v)}
@@ -2025,12 +2071,26 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 {...emptyProps(characteristicsForm.bedroom1AreaSqm)}
               />
               <InputFieldOutlined
+                label="Équipements chambre 1"
+                value={characteristicsForm.bedroom1Equipment}
+                onChange={(v) => updateCharacteristicsField('bedroom1Equipment', v)}
+                placeholder="Ex : placard intégré, prises RJ45"
+                {...emptyProps(characteristicsForm.bedroom1Equipment)}
+              />
+              <InputFieldOutlined
                 label="Chambre 2 (m²)"
                 value={characteristicsForm.bedroom2AreaSqm}
                 onChange={(v) => updateCharacteristicsField('bedroom2AreaSqm', v)}
                 type="number"
                 placeholder="0"
                 {...emptyProps(characteristicsForm.bedroom2AreaSqm)}
+              />
+              <InputFieldOutlined
+                label="Équipements chambre 2"
+                value={characteristicsForm.bedroom2Equipment}
+                onChange={(v) => updateCharacteristicsField('bedroom2Equipment', v)}
+                placeholder="Ex : placard intégré, prises RJ45"
+                {...emptyProps(characteristicsForm.bedroom2Equipment)}
               />
               <InputFieldOutlined
                 label="Chambre 3 (m²)"
@@ -2041,6 +2101,13 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 {...emptyProps(characteristicsForm.bedroom3AreaSqm)}
               />
               <InputFieldOutlined
+                label="Équipements chambre 3"
+                value={characteristicsForm.bedroom3Equipment}
+                onChange={(v) => updateCharacteristicsField('bedroom3Equipment', v)}
+                placeholder="Ex : placard intégré, prises RJ45"
+                {...emptyProps(characteristicsForm.bedroom3Equipment)}
+              />
+              <InputFieldOutlined
                 label="Chambre 4 (m²)"
                 value={characteristicsForm.bedroom4AreaSqm}
                 onChange={(v) => updateCharacteristicsField('bedroom4AreaSqm', v)}
@@ -2049,12 +2116,34 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 {...emptyProps(characteristicsForm.bedroom4AreaSqm)}
               />
               <InputFieldOutlined
+                label="Équipements chambre 4"
+                value={characteristicsForm.bedroom4Equipment}
+                onChange={(v) => updateCharacteristicsField('bedroom4Equipment', v)}
+                placeholder="Ex : placard intégré, prises RJ45"
+                {...emptyProps(characteristicsForm.bedroom4Equipment)}
+              />
+              <InputFieldOutlined
                 label="Salles de bain"
                 value={characteristicsForm.bathroomCount}
                 onChange={(v) => updateCharacteristicsField('bathroomCount', v)}
                 type="number"
                 placeholder="0"
                 {...emptyProps(characteristicsForm.bathroomCount)}
+              />
+              <InputFieldOutlined
+                label="Surface SDB (m²)"
+                value={characteristicsForm.bathroomAreaSqm}
+                onChange={(v) => updateCharacteristicsField('bathroomAreaSqm', v)}
+                type="number"
+                placeholder="0"
+                {...emptyProps(characteristicsForm.bathroomAreaSqm)}
+              />
+              <InputFieldOutlined
+                label="Équipements SDB"
+                value={characteristicsForm.bathroomEquipment}
+                onChange={(v) => updateCharacteristicsField('bathroomEquipment', v)}
+                placeholder="Ex : double vasque, douche italienne"
+                {...emptyProps(characteristicsForm.bathroomEquipment)}
               />
               <InputFieldOutlined
                 label="Douches"
@@ -2071,6 +2160,21 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 type="number"
                 placeholder="0"
                 {...emptyProps(characteristicsForm.toiletCount)}
+              />
+              <InputFieldOutlined
+                label="Surface WC (m²)"
+                value={characteristicsForm.toiletAreaSqm}
+                onChange={(v) => updateCharacteristicsField('toiletAreaSqm', v)}
+                type="number"
+                placeholder="0"
+                {...emptyProps(characteristicsForm.toiletAreaSqm)}
+              />
+              <InputFieldOutlined
+                label="Équipements WC"
+                value={characteristicsForm.toiletEquipment}
+                onChange={(v) => updateCharacteristicsField('toiletEquipment', v)}
+                placeholder="Ex : WC suspendu, lavabo"
+                {...emptyProps(characteristicsForm.toiletEquipment)}
               />
             </div>
           </CollapsibleSection>
@@ -2136,7 +2240,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             title="Équipements"
             defaultExpanded={false}
             badge={(() => {
-              const fields = [characteristicsForm.heatingType, characteristicsForm.hotWaterSystem, characteristicsForm.parkingType, characteristicsForm.parkingSpotCount, characteristicsForm.hasElevator, characteristicsForm.hasIntercom, characteristicsForm.hasHomeAutomation, characteristicsForm.hasPool];
+              const fields = [characteristicsForm.heatingType, characteristicsForm.hotWaterSystem, characteristicsForm.parkingType, characteristicsForm.parkingSpotCount, characteristicsForm.parkingWidthM, characteristicsForm.parkingLengthM, characteristicsForm.hasElevator, characteristicsForm.hasDigicode, characteristicsForm.hasGreenSpace, characteristicsForm.hasIntercom, characteristicsForm.hasHomeAutomation, characteristicsForm.hasSmartphoneControl, characteristicsForm.shutterType, characteristicsForm.hasPool];
               const filled = fields.filter(f => f != null && f !== '' && f !== '0').length;
               const pct = Math.round((filled / fields.length) * 100);
               const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
@@ -2179,10 +2283,44 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                 placeholder="0"
                 {...emptyProps(characteristicsForm.parkingSpotCount)}
               />
+              <InputFieldOutlined
+                label="Largeur parking (m)"
+                value={characteristicsForm.parkingWidthM}
+                onChange={(v) => updateCharacteristicsField('parkingWidthM', v)}
+                type="number"
+                placeholder="0"
+                {...emptyProps(characteristicsForm.parkingWidthM)}
+              />
+              <InputFieldOutlined
+                label="Longueur parking (m)"
+                value={characteristicsForm.parkingLengthM}
+                onChange={(v) => updateCharacteristicsField('parkingLengthM', v)}
+                type="number"
+                placeholder="0"
+                {...emptyProps(characteristicsForm.parkingLengthM)}
+              />
               <SelectField
                 label="Ascenseur"
                 value={characteristicsForm.hasElevator}
                 onChange={(v) => updateCharacteristicsField('hasElevator', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+              <SelectField
+                label="Digicode"
+                value={characteristicsForm.hasDigicode}
+                onChange={(v) => updateCharacteristicsField('hasDigicode', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+              <SelectField
+                label="Espace vert"
+                value={characteristicsForm.hasGreenSpace}
+                onChange={(v) => updateCharacteristicsField('hasGreenSpace', v)}
                 options={[
                   { value: 'true', label: 'Oui' },
                   { value: 'false', label: 'Non' },
@@ -2205,6 +2343,22 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                   { value: 'true', label: 'Oui' },
                   { value: 'false', label: 'Non' },
                 ]}
+              />
+              <SelectField
+                label="Commande par téléphone"
+                value={characteristicsForm.hasSmartphoneControl}
+                onChange={(v) => updateCharacteristicsField('hasSmartphoneControl', v)}
+                options={[
+                  { value: 'true', label: 'Oui' },
+                  { value: 'false', label: 'Non' },
+                ]}
+              />
+              <InputFieldOutlined
+                label="Type de fermetures"
+                value={characteristicsForm.shutterType}
+                onChange={(v) => updateCharacteristicsField('shutterType', v)}
+                placeholder="Ex : volet roulant, volet battant, store"
+                {...emptyProps(characteristicsForm.shutterType)}
               />
               <SelectField
                 label="Piscine"
