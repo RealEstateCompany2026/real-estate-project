@@ -71,6 +71,7 @@ export interface Property {
   balconyAreaSqm: number | null;
   gardenAreaSqm: number | null;
   mainRoomAreaSqm: number | null;
+  mainRoomEquipment: string | null;
   kitchenAreaSqm: number | null;
   basementAreaSqm: number | null;
   atticAreaSqm: number | null;
@@ -81,10 +82,18 @@ export interface Property {
   bathroomCount: number | null;
   showerRoomCount: number | null;
   toiletCount: number | null;
+  bathroomAreaSqm: number | null;
+  bathroomEquipment: string | null;
+  toiletAreaSqm: number | null;
+  toiletEquipment: string | null;
   bedroom1AreaSqm: number | null;
   bedroom2AreaSqm: number | null;
   bedroom3AreaSqm: number | null;
   bedroom4AreaSqm: number | null;
+  bedroom1Equipment: string | null;
+  bedroom2Equipment: string | null;
+  bedroom3Equipment: string | null;
+  bedroom4Equipment: string | null;
 
   // Construction
   floorLevel: number | null;
@@ -97,12 +106,19 @@ export interface Property {
   mainExposure: Exposure | null;    // Legacy single — conservé pour rétrocompatibilité
   exposures: Exposure[];             // Source de vérité — multi-exposition
   kitchenType: KitchenType | null;
+  kitchenEquipment: string | null;
   parkingType: ParkingType | null;
   parkingSpotCount: number | null;
+  parkingWidthM: number | null;
+  parkingLengthM: number | null;
   hasElevator: boolean | null;
+  hasDigicode: boolean | null;
+  hasGreenSpace: boolean | null;
   hasIntercom: boolean | null;
   hasPool: boolean | null;
   hasHomeAutomation: boolean | null;
+  hasSmartphoneControl: boolean | null;
+  shutterType: string | null;
   poolType: PoolType | null;
   mainViewType: ViewType | null;
 

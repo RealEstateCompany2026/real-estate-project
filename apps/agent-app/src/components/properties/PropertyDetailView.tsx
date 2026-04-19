@@ -1017,7 +1017,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       </p>
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Surface" value={property.mainRoomAreaSqm ? `${property.mainRoomAreaSqm} m²` : null} />
-                        <ProfileField label="Équipements" value={null} />
+                        <ProfileField label="Équipements" value={property.mainRoomEquipment} />
                       </div>
                     </div>
                     <div>
@@ -1027,7 +1027,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Surface" value={property.kitchenAreaSqm ? `${property.kitchenAreaSqm} m²` : null} />
                         <ProfileField label="Type" value={property.kitchenType ? KITCHEN_TYPE_LABELS[property.kitchenType] : null} />
-                        <ProfileField label="Équipements" value={null} />
+                        <ProfileField label="Équipements" value={property.kitchenEquipment} />
                       </div>
                     </div>
                   </div>
@@ -1040,7 +1040,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       </p>
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Surface" value={property.bedroom1AreaSqm ? `${property.bedroom1AreaSqm} m²` : null} />
-                        <ProfileField label="Équipements" value={null} />
+                        <ProfileField label="Équipements" value={property.bedroom1Equipment} />
                       </div>
                     </div>
                     {property.bedroomCount !== null && property.bedroomCount >= 2 && (
@@ -1050,7 +1050,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                         </p>
                         <div className="flex flex-col gap-[8px]">
                           <ProfileField label="Surface" value={property.bedroom2AreaSqm ? `${property.bedroom2AreaSqm} m²` : null} />
-                          <ProfileField label="Équipements" value={null} />
+                          <ProfileField label="Équipements" value={property.bedroom2Equipment} />
                         </div>
                       </div>
                     )}
@@ -1061,7 +1061,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                         </p>
                         <div className="flex flex-col gap-[8px]">
                           <ProfileField label="Surface" value={property.bedroom3AreaSqm ? `${property.bedroom3AreaSqm} m²` : null} />
-                          <ProfileField label="Équipements" value={null} />
+                          <ProfileField label="Équipements" value={property.bedroom3Equipment} />
                         </div>
                       </div>
                     )}
@@ -1072,7 +1072,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                         </p>
                         <div className="flex flex-col gap-[8px]">
                           <ProfileField label="Surface" value={property.bedroom4AreaSqm ? `${property.bedroom4AreaSqm} m²` : null} />
-                          <ProfileField label="Équipements" value={null} />
+                          <ProfileField label="Équipements" value={property.bedroom4Equipment} />
                         </div>
                       </div>
                     )}
@@ -1087,8 +1087,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Baignoire (nb)" value={property.bathroomCount?.toString()} />
                         <ProfileField label="Douche (nb)" value={property.showerRoomCount?.toString()} />
-                        <ProfileField label="Surface" value={null} />
-                        <ProfileField label="Équipements" value={null} />
+                        <ProfileField label="Surface" value={property.bathroomAreaSqm ? `${property.bathroomAreaSqm} m²` : null} />
+                        <ProfileField label="Équipements" value={property.bathroomEquipment} />
                       </div>
                     </div>
                     <div>
@@ -1097,8 +1097,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       </p>
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Nombre" value={property.toiletCount?.toString()} />
-                        <ProfileField label="Surface" value={null} />
-                        <ProfileField label="Équipements" value={null} />
+                        <ProfileField label="Surface" value={property.toiletAreaSqm ? `${property.toiletAreaSqm} m²` : null} />
+                        <ProfileField label="Équipements" value={property.toiletEquipment} />
                       </div>
                     </div>
                   </div>
@@ -1119,7 +1119,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                     <div className="flex flex-col gap-[8px]">
                       <ProfileField label="Interphone" value={property.hasIntercom !== null ? (property.hasIntercom ? 'Oui' : 'Non') : null} />
                       <ProfileField label="Domotique" value={property.hasHomeAutomation !== null ? (property.hasHomeAutomation ? 'Oui' : 'Non') : null} />
-                      <ProfileField label="Commande par téléphone" value={null} />
+                      <ProfileField label="Commande par téléphone" value={property.hasSmartphoneControl !== null ? (property.hasSmartphoneControl ? 'Oui' : 'Non') : null} />
                     </div>
                   </div>
                   {/* Colonne 2 — Fermetures */}
@@ -1128,7 +1128,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       Fermetures
                     </p>
                     <div className="flex flex-col gap-[8px]">
-                      <ProfileField label="Type de fermetures" value={null} />
+                      <ProfileField label="Type de fermetures" value={property.shutterType} />
                     </div>
                   </div>
                 </div>
@@ -1198,7 +1198,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                       <div className="flex flex-col gap-[8px]">
                         <ProfileField label="Type" value={PARKING_TYPE_LABELS[property.parkingType]} />
                         <ProfileField label="Quantité" value={property.parkingSpotCount ? `${property.parkingSpotCount} place(s)` : null} />
-                        <ProfileField label="Dimensions" value={null} />
+                        <ProfileField label="Dimensions" value={property.parkingWidthM && property.parkingLengthM ? `${property.parkingWidthM}m × ${property.parkingLengthM}m` : null} />
                       </div>
                     </div>
                   </div>
@@ -1276,9 +1276,9 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                   Parties Communes
                 </h6>
                 <div className="flex flex-col gap-[8px]">
-                  <ProfileField label="Digicode" value={null} />
+                  <ProfileField label="Digicode" value={property.hasDigicode !== null ? (property.hasDigicode ? 'Oui' : 'Non') : null} />
                   <ProfileField label="Ascenseur" value={property.hasElevator !== null ? (property.hasElevator ? 'Oui' : 'Non') : null} />
-                  <ProfileField label="Espace vert" value={null} />
+                  <ProfileField label="Espace vert" value={property.hasGreenSpace !== null ? (property.hasGreenSpace ? 'Oui' : 'Non') : null} />
                   <ProfileField label="Exposition" value={property.exposures?.length ? property.exposures.join(', ') : property.mainExposure} />
                   <ProfileField label="Vue" value={property.mainViewType ? VIEW_TYPE_LABELS[property.mainViewType] : null} />
                 </div>
