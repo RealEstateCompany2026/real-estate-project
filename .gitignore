@@ -50,6 +50,9 @@ pnpm-debug.log*
 packages/database/prisma/*.db
 packages/database/prisma/*.db-journal
 
+# Storybook
+storybook-static/
+
 # Figma debug output
 figma_debug.json
 figma_styles.json
