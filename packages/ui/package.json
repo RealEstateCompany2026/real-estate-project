@@ -91,7 +91,18 @@
         "./list-affaire": "./src/components/ListAffaire.tsx",
         "./card-affaire": "./src/components/CardAffaire.tsx",
         "./deal-types": "./src/components/deal-types.ts",
-        "./app-bar-fiche-affaire-ajout": "./src/components/AppBarFicheAffaireAjout.tsx"
+        "./app-bar-fiche-affaire-ajout": "./src/components/AppBarFicheAffaireAjout.tsx",
+        "./app-bar-fiche-affaire": "./src/components/AppBarFicheAffaire.tsx",
+        "./app-bar-affaire-ancres": "./src/components/AppBarAffaireAncres.tsx",
+        "./list-mandat": "./src/components/ListMandat.tsx",
+        "./list-visite": "./src/components/ListVisite.tsx",
+        "./list-promesse": "./src/components/ListPromesse.tsx",
+        "./list-financement": "./src/components/ListFinancement.tsx",
+        "./list-acte-notarie": "./src/components/ListActeNotarie.tsx",
+        "./card-ca": "./src/components/CardCA.tsx",
+        "./list-bail": "./src/components/ListBail.tsx",
+        "./list-candidature-locataire": "./src/components/ListCandidatureLocataire.tsx",
+        "./message-edit": "./src/components/MessageEdit.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",

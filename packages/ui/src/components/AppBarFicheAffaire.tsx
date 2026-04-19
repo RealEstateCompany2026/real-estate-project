@@ -4,6 +4,7 @@ import React from "react";
 import { ArrowLeft, Home, Maximize2, MapPin, Tag } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
 import { AiSuggestion } from "./AiSuggestion";
+import { type DealType } from "./deal-types";
 
 /**
  * AppBarFicheAffaire - Barre d'en-tête de fiche affaire
@@ -17,7 +18,7 @@ import { AiSuggestion } from "./AiSuggestion";
  * Composition :
  *   1. Bouton retour (← vers liste affaires)
  *   2. Identifiant affaire [deal_id] — H4 Bold
- *   3. Badge type affaire [DealType] (VENTE, BAIL, ACQUISITION, LOCATION)
+ *   3. Badge type affaire [DealType] (VENTE, GESTION, ACQUISITION, LOCATION)
  *   4. Type de bien [PropertyType] (Home icon + T1, T2, T3…)
  *   5. Surface [living_area_sqm]
  *   6. Ville (extrait de [address_full])
@@ -25,11 +26,9 @@ import { AiSuggestion } from "./AiSuggestion";
  *   8. AI suggestions
  */
 
-export type DealType = "VENTE" | "BAIL" | "ACQUISITION" | "LOCATION";
-
 const DEAL_TYPE_VARIANT: Record<DealType, BadgeVariant> = {
   VENTE: "success",
-  BAIL: "information",
+  GESTION: "information",
   ACQUISITION: "warning",
   LOCATION: "default",
 };
