@@ -1,0 +1,116 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { ListAffaire } from "../components/ListAffaire";
+
+const meta: Meta<typeof ListAffaire> = {
+  title: "Design System/Organisms/ListAffaire",
+  component: ListAffaire,
+  parameters: {
+    layout: "padded",
+    docs: {
+      description: {
+        component:
+          "Ligne de liste affaire immobilière — badge type + chips bien/client + KPI probabilité + CA pondéré + zone variable selon dealType.",
+      },
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof ListAffaire>;
+
+export const Vente: Story = {
+  args: {
+    dealType: "VENTE",
+    mandateVariant: "success",
+    reference: "MV-0042",
+    propertyType: "T3",
+    propertySurface: "85 m²",
+    propertyCity: "Montpellier",
+    propertyPrice: "320 000 €",
+    clientName: "Jean Dupont",
+    pipelineStage: "PROMOTION",
+    winProbability: 45,
+    weightedRevenue: "4 500 €",
+    lastActivityDate: "15 avr. 2026",
+    leadsCount: 8,
+    visitsCount: 3,
+    listingStatus: "success",
+    offerStatus: "disabled",
+  },
+};
+
+export const Acquisition: Story = {
+  args: {
+    dealType: "ACQUISITION",
+    mandateVariant: "warning",
+    reference: "MRA-0018",
+    propertyType: "Maison",
+    propertyCity: "Lyon",
+    clientName: "Marie Martin",
+    pipelineStage: "VISITES",
+    winProbability: 60,
+    weightedRevenue: "7 200 €",
+    matchedPropertiesCount: 12,
+    visitsCount: 5,
+    offerStatus: "disabled",
+  },
+};
+
+export const Location: Story = {
+  args: {
+    dealType: "LOCATION",
+    mandateVariant: "success",
+    reference: "MRL-0007",
+    clientName: "Pierre Lefèvre",
+    pipelineStage: "PROMOTION",
+    winProbability: 35,
+    weightedRevenue: "840 €",
+    matchedPropertiesCount: 6,
+    visitsCount: 2,
+    applicationStatus: "warning",
+  },
+};
+
+export const Gestion: Story = {
+  args: {
+    dealType: "GESTION",
+    mandateVariant: "success",
+    reference: "MG-0031",
+    propertyType: "T4",
+    propertySurface: "110 m²",
+    propertyCity: "Nîmes",
+    propertyPrice: "1 200 €/mois",
+    clientName: "Sophie Bernard",
+    pipelineStage: "GESTION",
+    winProbability: 90,
+    weightedRevenue: "2 160 €",
+    occupancyStatus: "success",
+    rentStatus: "success",
+    maintenanceStatus: "disabled",
+    mandateEndDate: "15 sept. 2027",
+  },
+};
+
+export const VenteHover: Story = {
+  args: {
+    ...Vente.args,
+    forceHover: true,
+  },
+};
+
+export const VenteDark: Story = {
+  args: {
+    ...Vente.args,
+    theme: "dark",
+  },
+};
+
+export const MandatNonSigne: Story = {
+  args: {
+    dealType: "VENTE",
+    mandateVariant: "disabled",
+    reference: "MV-0043",
+    pipelineStage: "MANDAT",
+    winProbability: 15,
+  },
+};
