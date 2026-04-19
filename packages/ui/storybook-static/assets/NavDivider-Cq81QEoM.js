@@ -1,0 +1,1 @@
+import{j as s}from"./jsx-runtime-BjG_zV1W.js";function a({className:e=""}){return s.jsx("div",{className:`bg-edge-subtle ${e}`,style:{width:"10px",height:"1px"}})}a.__docgenInfo={description:"",methods:[],displayName:"NavDivider",props:{className:{required:!1,tsType:{name:"string"},description:"Classe CSS supplémentaire",defaultValue:{value:'""',computed:!1}}}};export{a as N};

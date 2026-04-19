@@ -1,0 +1,3 @@
+import{j as e}from"./jsx-runtime-BjG_zV1W.js";function s({label:t,className:r=""}){return e.jsx("div",{className:`inline-flex items-center h-[20px] px-[8px] py-[4px]
+        rounded-[16px] border border-solid shrink-0 border-edge-neutral-default
+        ${r}`.trim(),children:e.jsx("span",{className:"text-[12px] font-bold leading-[14px] tracking-[0.12px] whitespace-nowrap text-center text-content-caption",children:t})})}s.__docgenInfo={description:"",methods:[],displayName:"MessageBadge",props:{label:{required:!0,tsType:{name:"string"},description:"Texte du badge"},className:{required:!1,tsType:{name:"string"},description:"",defaultValue:{value:'""',computed:!1}}}};export{s as M};

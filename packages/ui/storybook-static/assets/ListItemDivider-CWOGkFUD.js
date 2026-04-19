@@ -1,0 +1,1 @@
+import{j as r}from"./jsx-runtime-BjG_zV1W.js";function s({className:e=""}){return r.jsx("div",{className:`h-px w-full bg-[var(--border-divider)] ${e}`,role:"separator"})}s.__docgenInfo={description:"",methods:[],displayName:"ListItemDivider",props:{className:{required:!1,tsType:{name:"string"},description:"",defaultValue:{value:'""',computed:!1}}}};export{s as L};

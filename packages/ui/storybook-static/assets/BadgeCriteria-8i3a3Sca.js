@@ -1,0 +1,7 @@
+import{j as e}from"./jsx-runtime-BjG_zV1W.js";import{C as s}from"./circle-x-DfRUSFQm.js";function o({variant:n="outlined",label:a,onRemove:i,className:r=""}){const t=n==="outlined";return e.jsx("div",{className:`
+        relative inline-flex items-center rounded-[16px] px-[6px] ${r}
+        ${t?"border border-solid border-edge-neutral-default bg-transparent":"bg-surface-neutral-action"}
+      `.trim(),children:e.jsxs("div",{className:"relative flex items-center px-[6px] py-[4px]",children:[e.jsx("p",{className:`
+            text-sm leading-[16px] tracking-[0.14px] whitespace-nowrap font-bold font-roboto
+            ${t?"text-content-caption":"text-content-body"}
+          `.trim(),children:a}),i&&e.jsx("button",{onClick:i,className:"shrink-0 cursor-pointer hover:opacity-70 transition-opacity ml-[4px]","aria-label":`Remove ${a}`,children:e.jsx(s,{size:18,className:t?"text-content-caption":"text-content-body"})})]})})}o.__docgenInfo={description:"",methods:[],displayName:"BadgeCriteria",props:{variant:{required:!1,tsType:{name:"union",raw:'"outlined" | "default"',elements:[{name:"literal",value:'"outlined"'},{name:"literal",value:'"default"'}]},description:"",defaultValue:{value:'"outlined"',computed:!1}},label:{required:!0,tsType:{name:"string"},description:""},onRemove:{required:!1,tsType:{name:"signature",type:"function",raw:"() => void",signature:{arguments:[],return:{name:"void"}}},description:""},className:{required:!1,tsType:{name:"string"},description:"",defaultValue:{value:'""',computed:!1}}}};export{o as B};

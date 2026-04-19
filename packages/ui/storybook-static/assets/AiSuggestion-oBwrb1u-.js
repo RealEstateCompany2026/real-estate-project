@@ -1,0 +1,4 @@
+import{j as a}from"./jsx-runtime-BjG_zV1W.js";function n({count:e,className:t=""}){const r=e>0;return a.jsx("div",{className:`inline-flex items-center justify-center h-[24px] min-w-[34px]
+        rounded-[16px] border border-solid px-[6px]
+        ${r?"bg-[var(--surface-branded-default)] border-[var(--surface-branded-action-hover)]":"bg-transparent border-[var(--border-disabled)]"}
+        ${t}`,children:a.jsx("span",{className:"text-[14px] font-bold leading-[16px] tracking-[0.14px] whitespace-nowrap px-[6px] py-[4px]",style:{color:r?"var(--text-branded-on-action)":"var(--text-disabled)"},children:e})})}n.__docgenInfo={description:"",methods:[],displayName:"AiSuggestion",props:{count:{required:!0,tsType:{name:"number"},description:""},className:{required:!1,tsType:{name:"string"},description:"",defaultValue:{value:'""',computed:!1}}}};export{n as A};
