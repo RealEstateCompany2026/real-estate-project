@@ -90,7 +90,8 @@
         },
         "./list-affaire": "./src/components/ListAffaire.tsx",
         "./card-affaire": "./src/components/CardAffaire.tsx",
-        "./deal-types": "./src/components/deal-types.ts"
+        "./deal-types": "./src/components/deal-types.ts",
+        "./app-bar-fiche-affaire-ajout": "./src/components/AppBarFicheAffaireAjout.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",

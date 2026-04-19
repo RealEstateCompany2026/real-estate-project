@@ -5,26 +5,32 @@ import { ArrowRight, X } from "lucide-react";
 import { Button } from "./Button";
 
 /**
- * AppBarFicheAffaireAjout - Barre d'en-tête du formulaire d'ajout d'affaire
+ * AppBarFicheAffaireAjout - Barre d'en-tete du formulaire d'ajout d'affaire
  * Organism du design system RealAgent
  *
  * Hauteur fixe : 100px. Layout simple : titre + bouton enregistrer + bouton fermer.
  *
- * Figma : "app bar . fiche affaire . ajout" — h=100px, w=1024px, px=20, py=27
+ * Figma : "app bar . fiche affaire . ajout" -- h=100px, w=1024px, px=20, py=27
  *
  * Composition :
- *   1. Titre "Ajouter une affaire" — H4 Bold
- *   2. Bouton "Enregistrer >" — primary branded
- *   3. Bouton fermer (✕) — icon button
+ *   1. Titre "Ajouter une affaire" -- H4 Bold
+ *   2. Bouton "Enregistrer >" -- primary branded
+ *   3. Bouton fermer (X) -- icon button
+ *
+ * [PHASE 4] Ajout props disabled + saveLabel
  */
 
 export interface AppBarFicheAffaireAjoutProps {
-  /** Titre affiché (par défaut "Ajouter une affaire") */
+  /** Titre affiche (par defaut "Ajouter une affaire") */
   title?: string;
   /** Callback clic sur Enregistrer */
   onSave?: () => void;
-  /** Callback clic sur fermer (✕) */
+  /** Callback clic sur fermer (X) */
   onClose?: () => void;
+  /** Desactive le bouton Enregistrer/Creer */
+  disabled?: boolean;
+  /** Label du bouton d'action (par defaut "Enregistrer") */
+  saveLabel?: string;
   /** Classes CSS additionnelles */
   className?: string;
 }
@@ -33,6 +39,8 @@ export function AppBarFicheAffaireAjout({
   title = "Ajouter une affaire",
   onSave,
   onClose,
+  disabled = false,
+  saveLabel = "Enregistrer",
   className = "",
 }: AppBarFicheAffaireAjoutProps) {
   return (
@@ -46,8 +54,8 @@ export function AppBarFicheAffaireAjout({
 
       {/* Droite : bouton enregistrer + bouton fermer */}
       <div className="flex gap-[24px] items-center">
-        <Button variant="primary" size="default" onClick={onSave}>
-          Enregistrer
+        <Button variant="primary" size="default" onClick={onSave} disabled={disabled}>
+          {saveLabel}
           <ArrowRight size={20} />
         </Button>
 
