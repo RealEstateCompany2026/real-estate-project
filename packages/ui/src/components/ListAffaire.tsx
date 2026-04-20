@@ -210,7 +210,7 @@ export function ListAffaire({
       onClick={onDealClick}
     >
       {/* S1 — Identification (~300px) */}
-      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 min-w-[280px] h-full">
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 min-w-[425px] h-full">
         {/* Ligne 1 : reference + Chip client */}
         <div className="flex items-center gap-[10px]">
           <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
