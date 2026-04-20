@@ -38,6 +38,9 @@ interface DealListItem {
   mgmtMandateStatus: string | null;
   lastActivityDate: string | null;
   createdAt: string;
+  occupancyStatus: string | null;
+  maintenanceStatus: string | null;
+  purchaseOfferStatus: string | null;
   // Jointures
   Client: { firstName: string; lastName: string } | null;
   Property: {
@@ -45,6 +48,7 @@ interface DealListItem {
     livingAreaSqm: number | null;
     addressCity: string | null;
     desiredSellingPrice: number | null;
+    listingStatus: string | null;
   } | null;
   // Compteurs
   infoRequestsCount: number;
@@ -54,14 +58,6 @@ interface DealListItem {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function mandateStatusToVariant(deal: DealListItem): BadgeVariant {
-  const mandateStatus =
-    deal.type === 'GESTION' ? deal.mgmtMandateStatus : deal.saleMandateStatus;
-  if (mandateStatus === 'SIGNE') return 'success';
-  if (mandateStatus === 'NON_CREE') return 'disabled';
-  return 'warning'; // EDITE ou ENVOYE
-}
 
 function formatCurrency(amount: number | null | undefined): string {
   if (amount == null) return '\u2014';
@@ -77,13 +73,29 @@ function computeWeightedRevenue(deal: DealListItem): string {
   return formatCurrency((deal.forecastRevenue * deal.winProbability) / 100);
 }
 
-function formatDate(date: string | null): string {
-  if (!date) return '';
-  return new Date(date).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+function listingStatusToVariant(status: string | null): BadgeVariant {
+  if (status === 'PUBLIEE') return 'success';
+  if (status === 'EDITEE' || status === 'EN_VALIDATION') return 'warning';
+  return 'disabled'; // NON_CREEE, ARCHIVEE, null
+}
+
+function occupancyStatusToVariant(status: string | null): BadgeVariant {
+  if (status === 'OCCUPE') return 'success';
+  return 'disabled'; // VACANT, null
+}
+
+function maintenanceStatusToVariant(status: string | null): BadgeVariant {
+  if (status === 'AUCUN' || status == null) return 'success';
+  if (status === 'PROGRAMME') return 'warning';
+  if (status === 'URGENT') return 'error';
+  return 'disabled';
+}
+
+function purchaseOfferToPromiseVariant(status: string | null): BadgeVariant {
+  if (status === 'ACCEPTEE') return 'success';
+  if (status === 'EN_ATTENTE' || status === 'ENVOYEE' || status === 'CONTRE_OFFRE') return 'warning';
+  if (status === 'REFUSEE') return 'error';
+  return 'disabled'; // AUCUNE, null
 }
 
 // ---------------------------------------------------------------------------
@@ -215,10 +227,11 @@ export function DealListView() {
           id, reference, type, status, pipelineStage, trend,
           forecastRevenue, winProbability, mandateWaived,
           saleMandateStatus, mgmtMandateStatus,
+          occupancyStatus, maintenanceStatus, purchaseOfferStatus,
           lastActivityDate, createdAt,
           infoRequestsCount, visitCount,
           Client(firstName, lastName),
-          Property(type, livingAreaSqm, addressCity, desiredSellingPrice)
+          Property(type, livingAreaSqm, addressCity, desiredSellingPrice, listingStatus)
         `
         )
         .order('lastActivityDate', { ascending: false });
@@ -399,7 +412,7 @@ export function DealListView() {
           <ListAffaire
             key={deal.id}
             dealType={deal.type as DealType}
-            mandateVariant={mandateStatusToVariant(deal)}
+            status={deal.status}
             reference={deal.reference}
             propertyType={deal.Property?.type}
             propertySurface={
@@ -408,22 +421,25 @@ export function DealListView() {
                 : undefined
             }
             propertyCity={deal.Property?.addressCity ?? undefined}
-            propertyPrice={
-              deal.Property?.desiredSellingPrice
-                ? formatCurrency(deal.Property.desiredSellingPrice)
-                : undefined
-            }
             clientName={
               deal.Client
                 ? `${deal.Client.firstName} ${deal.Client.lastName}`
                 : undefined
             }
             pipelineStage={deal.pipelineStage as PipelineStage}
-            lastActivityDate={formatDate(deal.lastActivityDate)}
             winProbability={deal.winProbability ?? 0}
             weightedRevenue={computeWeightedRevenue(deal)}
-            leadsCount={deal.type === 'VENTE' ? deal.infoRequestsCount : undefined}
+            leadsCount={deal.infoRequestsCount}
             visitsCount={deal.visitCount}
+            listingStatus={deal.type === 'VENTE' ? listingStatusToVariant(deal.Property?.listingStatus ?? null) : undefined}
+            occupancyStatus={deal.type === 'GESTION' ? occupancyStatusToVariant(deal.occupancyStatus) : undefined}
+            maintenanceStatus={deal.type === 'GESTION' ? maintenanceStatusToVariant(deal.maintenanceStatus) : undefined}
+            offersCount={deal.purchaseOfferStatus && deal.purchaseOfferStatus !== 'AUCUNE' ? 1 : 0}
+            promiseStatus={
+              (deal.type === 'VENTE' || deal.type === 'ACQUISITION')
+                ? purchaseOfferToPromiseVariant(deal.purchaseOfferStatus)
+                : undefined
+            }
             onDealClick={() => handleDealClick(deal)}
           />
         ))}
