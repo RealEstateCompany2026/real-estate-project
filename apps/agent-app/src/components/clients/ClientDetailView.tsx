@@ -15,6 +15,7 @@ import { Button } from '@real-estate/ui/button';
 import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
+import { ListAffaire } from '@real-estate/ui/list-affaire';
 import { ListBien } from '@real-estate/ui/list-bien';
 import { ListCarnet } from '@real-estate/ui/list-carnet';
 import { MessageReceived } from '@real-estate/ui/message-received';
@@ -28,6 +29,14 @@ import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import type { Client, ClientStatus } from '@/types/client';
+import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
+import {
+  computeWeightedRevenue,
+  listingStatusToVariant,
+  occupancyStatusToVariant,
+  maintenanceStatusToVariant,
+  purchaseOfferToPromiseVariant,
+} from '@/lib/deal-helpers';
 
 // ---------------------------------------------------------------------------
 // Types — prêts pour la dynamisation
@@ -70,6 +79,31 @@ interface EventRow {
 
 interface DealRow {
   id: string;
+}
+
+interface DealSectionItem {
+  id: string;
+  reference: string;
+  type: string;
+  status: string;
+  pipelineStage: string;
+  forecastRevenue: number | null;
+  winProbability: number | null;
+  saleMandateStatus: string | null;
+  mgmtMandateStatus: string | null;
+  occupancyStatus: string | null;
+  maintenanceStatus: string | null;
+  purchaseOfferStatus: string | null;
+  lastActivityDate: string | null;
+  infoRequestsCount: number | null;
+  visitCount: number | null;
+  Property: {
+    type: string;
+    livingAreaSqm: number | null;
+    addressCity: string | null;
+    desiredSellingPrice: number | null;
+    listingStatus: string | null;
+  } | null;
 }
 
 interface PropertyRow {
@@ -134,7 +168,7 @@ interface ClientDetailData {
   graphData: GraphDataPoint[];
   activities: ActivityLog[];
   allActivities: ActivityLog[];
-  dealsCount: number;
+  deals: DealSectionItem[];
   properties: PropertyItem[];
   documents: DocumentItem[];
   messages: MessageItem[];
@@ -389,6 +423,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENGAGEMENT' | 'CONVERSION' | 'REACTIVATION'>('all');
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [isMessageSheetOpen, setIsMessageSheetOpen] = useState(false);
+  const [sheetAffairesOpen, setSheetAffairesOpen] = useState(false);
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -460,7 +495,14 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
       // Fetch deals, properties, documents, messages in parallel
       const [dealsRes, propertiesRes, documentsRes, messagesRes] = await Promise.all([
-        supabase.from('Deal').select('id').eq('clientId', clientId),
+        supabase.from('Deal').select(`
+          id, reference, type, status, pipelineStage,
+          forecastRevenue, winProbability,
+          saleMandateStatus, mgmtMandateStatus,
+          occupancyStatus, maintenanceStatus, purchaseOfferStatus,
+          lastActivityDate, infoRequestsCount, visitCount,
+          Property(type, livingAreaSqm, addressCity, desiredSellingPrice, listingStatus)
+        `).eq('clientId', clientId).order('lastActivityDate', { ascending: false }),
         supabase
           .from('Property')
           .select('id, addressCity, type, livingAreaSqm, dpeEnergyClass, operationTypes, hasMaintenanceLog, desiredSellingPrice, estimatedMarketValue')
@@ -474,7 +516,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           .limit(100),
       ]);
 
-      const dealsCount = (dealsRes.data ?? []).length;
+      const deals = (dealsRes.data ?? []) as unknown as DealSectionItem[];
 
       // Fetch cover photos pour les biens du client
       const propertyIds = ((propertiesRes.data ?? []) as PropertyRow[]).map((p) => p.id);
@@ -535,7 +577,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         graphData: mockGraphData(),
         activities,
         allActivities,
-        dealsCount,
+        deals,
         properties,
         documents,
         messages,
@@ -698,7 +740,8 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     );
   }
 
-  const { client, kpis, aiSuggestions, graphData, activities, allActivities, dealsCount, properties, documents, messages, allMessages } = data;
+  const { client, kpis, aiSuggestions, graphData, activities, allActivities, deals, properties, documents, messages, allMessages } = data;
+  const dealsCount = deals.length;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -909,6 +952,47 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </h3>
             <Badge variant="default">{dealsCount}</Badge>
           </div>
+
+          {deals.length > 0 ? (
+            <div className="flex flex-col gap-[17px]">
+              {deals.slice(0, 3).map((deal) => (
+                <ListAffaire
+                  key={deal.id}
+                  dealType={deal.type as DealType}
+                  status={deal.status}
+                  reference={deal.reference}
+                  propertyType={deal.Property?.type}
+                  propertySurface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                  propertyCity={deal.Property?.addressCity ?? undefined}
+                  pipelineStage={deal.pipelineStage as PipelineStage}
+                  winProbability={deal.winProbability ?? 0}
+                  weightedRevenue={computeWeightedRevenue(deal)}
+                  leadsCount={deal.infoRequestsCount ?? undefined}
+                  visitsCount={deal.visitCount ?? undefined}
+                  listingStatus={deal.type === 'VENTE' ? listingStatusToVariant(deal.Property?.listingStatus ?? null) : undefined}
+                  occupancyStatus={deal.type === 'GESTION' ? occupancyStatusToVariant(deal.occupancyStatus) : undefined}
+                  maintenanceStatus={deal.type === 'GESTION' ? maintenanceStatusToVariant(deal.maintenanceStatus) : undefined}
+                  offersCount={deal.purchaseOfferStatus && deal.purchaseOfferStatus !== 'AUCUNE' ? 1 : 0}
+                  promiseStatus={
+                    (deal.type === 'VENTE' || deal.type === 'ACQUISITION')
+                      ? purchaseOfferToPromiseVariant(deal.purchaseOfferStatus)
+                      : undefined
+                  }
+                  onDealClick={() => router.push(`/deals/${deal.id}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption">Aucune affaire liée</p>
+          )}
+
+          {deals.length > 3 && (
+            <div className="mt-[16px]">
+              <Button variant="ghost" onClick={() => setSheetAffairesOpen(true)}>
+                Voir tout ({dealsCount})
+              </Button>
+            </div>
+          )}
         </section>
 
         {/* Bloc 5 — Biens */}
@@ -1031,6 +1115,48 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       <div className="fixed bottom-8 right-8 z-50">
         <IconButtonMega icon={<Sparkles size={24} />} variant="primary" />
       </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet — Voir tout Affaires (liste exhaustive)
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={sheetAffairesOpen}
+        onClose={() => setSheetAffairesOpen(false)}
+        title="Affaires"
+        width="narrow"
+      >
+        <div className="flex flex-col gap-[17px] px-[20px] py-[20px]">
+          {deals.map((deal) => (
+            <ListAffaire
+              key={deal.id}
+              dealType={deal.type as DealType}
+              status={deal.status}
+              reference={deal.reference}
+              propertyType={deal.Property?.type}
+              propertySurface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+              propertyCity={deal.Property?.addressCity ?? undefined}
+              pipelineStage={deal.pipelineStage as PipelineStage}
+              winProbability={deal.winProbability ?? 0}
+              weightedRevenue={computeWeightedRevenue(deal)}
+              leadsCount={deal.infoRequestsCount ?? undefined}
+              visitsCount={deal.visitCount ?? undefined}
+              listingStatus={deal.type === 'VENTE' ? listingStatusToVariant(deal.Property?.listingStatus ?? null) : undefined}
+              occupancyStatus={deal.type === 'GESTION' ? occupancyStatusToVariant(deal.occupancyStatus) : undefined}
+              maintenanceStatus={deal.type === 'GESTION' ? maintenanceStatusToVariant(deal.maintenanceStatus) : undefined}
+              offersCount={deal.purchaseOfferStatus && deal.purchaseOfferStatus !== 'AUCUNE' ? 1 : 0}
+              promiseStatus={
+                (deal.type === 'VENTE' || deal.type === 'ACQUISITION')
+                  ? purchaseOfferToPromiseVariant(deal.purchaseOfferStatus)
+                  : undefined
+              }
+              onDealClick={() => {
+                setSheetAffairesOpen(false);
+                router.push(`/deals/${deal.id}`);
+              }}
+            />
+          ))}
+        </div>
+      </Sheet>
 
       {/* ═══════════════════════════════════════════════════════
           Sheet — Voir tout Activités (liste exhaustive)

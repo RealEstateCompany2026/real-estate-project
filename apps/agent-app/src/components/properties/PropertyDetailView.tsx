@@ -12,6 +12,7 @@ import { AppBarAnnonce } from '@real-estate/ui/app-bar-annonce';
 import { AppBarBienAncres } from '@real-estate/ui/app-bar-bien-ancres';
 import { GraphCourbe } from '@real-estate/ui/graph-courbe';
 import { ListAnnonce } from '@real-estate/ui/list-annonce';
+import { ListAffaire } from '@real-estate/ui/list-affaire';
 import { ListCarnet } from '@real-estate/ui/list-carnet';
 import { IconButtonMega } from '@real-estate/ui/icon-button-mega';
 import { Spinner } from '@real-estate/ui/spinner';
@@ -34,6 +35,14 @@ import { IconGes } from '@real-estate/ui/icon-ges';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import type { Property, PropertyMedia, OperationType, DpeClass } from '@/types/property';
+import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
+import {
+  computeWeightedRevenue,
+  listingStatusToVariant,
+  occupancyStatusToVariant,
+  maintenanceStatusToVariant,
+  purchaseOfferToPromiseVariant,
+} from '@/lib/deal-helpers';
 import {
   PROPERTY_TYPE_LABELS, PROPERTY_CONDITION_LABELS, OPERATION_TYPE_LABELS,
   HEATING_TYPE_LABELS, HOT_WATER_SYSTEM_LABELS, KITCHEN_TYPE_LABELS, PARKING_TYPE_LABELS,
@@ -90,6 +99,25 @@ interface DealRow {
   id: string;
   saleMandateStatus: string | null;
   mgmtMandateStatus: string | null;
+}
+
+interface DealSectionItem {
+  id: string;
+  reference: string;
+  type: string;
+  status: string;
+  pipelineStage: string;
+  forecastRevenue: number | null;
+  winProbability: number | null;
+  saleMandateStatus: string | null;
+  mgmtMandateStatus: string | null;
+  occupancyStatus: string | null;
+  maintenanceStatus: string | null;
+  purchaseOfferStatus: string | null;
+  lastActivityDate: string | null;
+  infoRequestsCount: number | null;
+  visitCount: number | null;
+  Client: { firstName: string; lastName: string } | null;
 }
 
 interface ListingRow {
@@ -181,7 +209,7 @@ interface PropertyDetailData {
   aiSuggestions: number;
   activities: ActivityLog[];
   allActivities: ActivityLog[];
-  dealsCount: number;
+  deals: DealSectionItem[];
   hasActiveMandate: boolean;
   listings: ListingRow[];
   documents: DocumentItem[];
@@ -369,6 +397,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'QUALIFICATION' | 'ENTRETIEN' | 'CONVERSION'>('all');
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [isMessageSheetOpen, setIsMessageSheetOpen] = useState(false);
+  const [sheetAffairesOpen, setSheetAffairesOpen] = useState(false);
   const [isCharacteristicsSheetOpen, setIsCharacteristicsSheetOpen] = useState(false);
   const [isSavingCharacteristics, setIsSavingCharacteristics] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -470,7 +499,14 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           .eq('propertyId', propertyId)
           .order('eventDate', { ascending: false })
           .limit(100),
-        supabase.from('Deal').select('id, saleMandateStatus, mgmtMandateStatus').eq('propertyId', propertyId),
+        supabase.from('Deal').select(`
+          id, reference, type, status, pipelineStage,
+          forecastRevenue, winProbability,
+          saleMandateStatus, mgmtMandateStatus,
+          occupancyStatus, maintenanceStatus, purchaseOfferStatus,
+          lastActivityDate, infoRequestsCount, visitCount,
+          Client(firstName, lastName)
+        `).eq('propertyId', propertyId).order('lastActivityDate', { ascending: false }),
         supabase.from('Listing').select('id, status, title, description, descriptionSource, alurCompliant, slug, publishedAt, contactFormEnabled, viewCount, leadCount').eq('propertyId', propertyId),
         supabase.from('Document').select('id, title, fileName, type').eq('propertyId', propertyId),
         supabase
@@ -561,9 +597,9 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       }));
       const activities: ActivityLog[] = allActivities.slice(0, 4);
 
-      const dealsCount = (dealsData ?? []).length;
-      const hasActiveMandate = (dealsData ?? []).some(
-        (d: DealRow) => d.saleMandateStatus != null || d.mgmtMandateStatus != null
+      const deals = (dealsData ?? []) as unknown as DealSectionItem[];
+      const hasActiveMandate = deals.some(
+        (d) => d.saleMandateStatus != null || d.mgmtMandateStatus != null
       );
 
       // Handle Listing data — TODO: awaiting schema with workflow badges
@@ -594,7 +630,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
         aiSuggestions: Math.floor(Math.random() * 15) + 1,
         activities,
         allActivities,
-        dealsCount,
+        deals,
         hasActiveMandate,
         listings,
         documents,
@@ -845,7 +881,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
     );
   }
 
-  const { property, photos, kpis, aiSuggestions, activities, allActivities, dealsCount, hasActiveMandate, listings, documents, messages, allMessages, ownerName, coOwnership, matchingBuyers } = data;
+  const { property, photos, kpis, aiSuggestions, activities, allActivities, deals, hasActiveMandate, listings, documents, messages, allMessages, ownerName, coOwnership, matchingBuyers } = data;
+  const dealsCount = deals.length;
   const filteredActivities = activeFilter === 'all'
     ? activities
     : activities.filter((a) => a.category === activeFilter);
@@ -1514,6 +1551,49 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             </h3>
             <Badge variant="default">{dealsCount}</Badge>
           </div>
+
+          {deals.length > 0 ? (
+            <div className="flex flex-col gap-[17px]">
+              {deals.slice(0, 3).map((deal) => (
+                <ListAffaire
+                  key={deal.id}
+                  dealType={deal.type as DealType}
+                  status={deal.status}
+                  reference={deal.reference}
+                  clientName={
+                    deal.Client
+                      ? `${deal.Client.firstName} ${deal.Client.lastName}`
+                      : undefined
+                  }
+                  pipelineStage={deal.pipelineStage as PipelineStage}
+                  winProbability={deal.winProbability ?? 0}
+                  weightedRevenue={computeWeightedRevenue(deal)}
+                  leadsCount={deal.infoRequestsCount ?? undefined}
+                  visitsCount={deal.visitCount ?? undefined}
+                  listingStatus={deal.type === 'VENTE' ? listingStatusToVariant(listings[0]?.status ?? null) : undefined}
+                  occupancyStatus={deal.type === 'GESTION' ? occupancyStatusToVariant(deal.occupancyStatus) : undefined}
+                  maintenanceStatus={deal.type === 'GESTION' ? maintenanceStatusToVariant(deal.maintenanceStatus) : undefined}
+                  offersCount={deal.purchaseOfferStatus && deal.purchaseOfferStatus !== 'AUCUNE' ? 1 : 0}
+                  promiseStatus={
+                    (deal.type === 'VENTE' || deal.type === 'ACQUISITION')
+                      ? purchaseOfferToPromiseVariant(deal.purchaseOfferStatus)
+                      : undefined
+                  }
+                  onDealClick={() => router.push(`/deals/${deal.id}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption">Aucune affaire liée</p>
+          )}
+
+          {deals.length > 3 && (
+            <div className="mt-[16px]">
+              <Button variant="ghost" onClick={() => setSheetAffairesOpen(true)}>
+                Voir tout ({dealsCount})
+              </Button>
+            </div>
+          )}
         </section>
 
         {/* Bloc 5 — Annonce */}
@@ -1898,6 +1978,50 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       <div className="fixed bottom-8 right-8 z-50">
         <IconButtonMega icon={<Sparkles size={24} />} variant="primary" />
       </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          Sheet — Voir tout Affaires (liste exhaustive)
+          ═══════════════════════════════════════════════════════ */}
+      <Sheet
+        isOpen={sheetAffairesOpen}
+        onClose={() => setSheetAffairesOpen(false)}
+        title="Affaires"
+        width="narrow"
+      >
+        <div className="flex flex-col gap-[17px] px-[20px] py-[20px]">
+          {deals.map((deal) => (
+            <ListAffaire
+              key={deal.id}
+              dealType={deal.type as DealType}
+              status={deal.status}
+              reference={deal.reference}
+              clientName={
+                deal.Client
+                  ? `${deal.Client.firstName} ${deal.Client.lastName}`
+                  : undefined
+              }
+              pipelineStage={deal.pipelineStage as PipelineStage}
+              winProbability={deal.winProbability ?? 0}
+              weightedRevenue={computeWeightedRevenue(deal)}
+              leadsCount={deal.infoRequestsCount ?? undefined}
+              visitsCount={deal.visitCount ?? undefined}
+              listingStatus={deal.type === 'VENTE' ? listingStatusToVariant(listings[0]?.status ?? null) : undefined}
+              occupancyStatus={deal.type === 'GESTION' ? occupancyStatusToVariant(deal.occupancyStatus) : undefined}
+              maintenanceStatus={deal.type === 'GESTION' ? maintenanceStatusToVariant(deal.maintenanceStatus) : undefined}
+              offersCount={deal.purchaseOfferStatus && deal.purchaseOfferStatus !== 'AUCUNE' ? 1 : 0}
+              promiseStatus={
+                (deal.type === 'VENTE' || deal.type === 'ACQUISITION')
+                  ? purchaseOfferToPromiseVariant(deal.purchaseOfferStatus)
+                  : undefined
+              }
+              onDealClick={() => {
+                setSheetAffairesOpen(false);
+                router.push(`/deals/${deal.id}`);
+              }}
+            />
+          ))}
+        </div>
+      </Sheet>
 
       {/* ═══════════════════════════════════════════════════════
           Sheet — Voir tout Activités (liste exhaustive)

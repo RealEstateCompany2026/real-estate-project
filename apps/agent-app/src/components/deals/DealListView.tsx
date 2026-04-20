@@ -14,11 +14,18 @@ import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { Button, IconButton } from '@real-estate/ui/button';
 import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
-import type { BadgeVariant } from '@real-estate/ui/badge';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 
 // -- App-level --
 import { createClient } from '@/lib/supabase/client';
+import {
+  formatCurrency,
+  computeWeightedRevenue,
+  listingStatusToVariant,
+  occupancyStatusToVariant,
+  maintenanceStatusToVariant,
+  purchaseOfferToPromiseVariant,
+} from '@/lib/deal-helpers';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,49 +60,6 @@ interface DealListItem {
   // Compteurs
   infoRequestsCount: number;
   visitCount: number;
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function formatCurrency(amount: number | null | undefined): string {
-  if (amount == null) return '\u2014';
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function computeWeightedRevenue(deal: DealListItem): string {
-  if (deal.forecastRevenue == null || deal.winProbability == null) return '\u2014';
-  return formatCurrency((deal.forecastRevenue * deal.winProbability) / 100);
-}
-
-function listingStatusToVariant(status: string | null): BadgeVariant {
-  if (status === 'PUBLIEE') return 'success';
-  if (status === 'EDITEE' || status === 'EN_VALIDATION') return 'warning';
-  return 'disabled'; // NON_CREEE, ARCHIVEE, null
-}
-
-function occupancyStatusToVariant(status: string | null): BadgeVariant {
-  if (status === 'OCCUPE') return 'success';
-  return 'disabled'; // VACANT, null
-}
-
-function maintenanceStatusToVariant(status: string | null): BadgeVariant {
-  if (status === 'AUCUN' || status == null) return 'success';
-  if (status === 'PROGRAMME') return 'warning';
-  if (status === 'URGENT') return 'error';
-  return 'disabled';
-}
-
-function purchaseOfferToPromiseVariant(status: string | null): BadgeVariant {
-  if (status === 'ACCEPTEE') return 'success';
-  if (status === 'EN_ATTENTE' || status === 'ENVOYEE' || status === 'CONTRE_OFFRE') return 'warning';
-  if (status === 'REFUSEE') return 'error';
-  return 'disabled'; // AUCUNE, null
 }
 
 // ---------------------------------------------------------------------------
