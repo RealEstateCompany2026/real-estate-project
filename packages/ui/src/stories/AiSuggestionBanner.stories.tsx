@@ -39,3 +39,19 @@ export const WithoutAction: Story = {
     actionLabel: "Découvrir",
   },
 };
+
+export const Compact: Story = {
+  args: {
+    suggestion: "Bonjour, vous devriez contacter M. Dupont pour finaliser la vente du bien 42 rue de la Paix",
+    variant: "compact",
+    onAction: () => console.log("Compact action clicked"),
+  },
+};
+
+export const CompactLongText: Story = {
+  args: {
+    suggestion: "L'IA a détecté que le client Durand, Jean-Pierre a particulièrement apprécié les biens avec terrasse orientée sud. Je vous recommande de consulter sa fiche.",
+    variant: "compact",
+    onAction: () => console.log("Compact long text clicked"),
+  },
+};

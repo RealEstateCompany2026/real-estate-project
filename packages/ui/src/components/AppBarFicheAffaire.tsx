@@ -2,9 +2,9 @@
 
 import React from "react";
 import { ArrowLeft, Home, Maximize2, MapPin, Tag } from "lucide-react";
-import { Badge, BadgeVariant } from "./Badge";
+import { Badge } from "./Badge";
 import { AiSuggestion } from "./AiSuggestion";
-import { type DealType } from "./deal-types";
+import { type DealType, DEAL_TYPE_LABELS } from "./deal-types";
 
 /**
  * AppBarFicheAffaire - Barre d'en-tête de fiche affaire
@@ -26,18 +26,13 @@ import { type DealType } from "./deal-types";
  *   8. AI suggestions
  */
 
-const DEAL_TYPE_VARIANT: Record<DealType, BadgeVariant> = {
-  VENTE: "success",
-  GESTION: "information",
-  ACQUISITION: "warning",
-  LOCATION: "default",
-};
-
 export interface AppBarFicheAffaireProps {
   /** Identifiant de l'affaire (ex: "MV.789.083.263") */
   dealId: string;
   /** Type d'affaire */
   dealType: DealType;
+  /** Statut de l'affaire (détermine le variant du badge) */
+  status?: string;
   /** Type de bien (ex: "T4", "Studio", "Maison") */
   propertyType: string;
   /** Surface (ex: "84 m²") */
@@ -81,6 +76,7 @@ function IconText({
 export function AppBarFicheAffaire({
   dealId,
   dealType,
+  status,
   propertyType,
   surface,
   city,
@@ -112,7 +108,7 @@ export function AppBarFicheAffaire({
         </h4>
 
         {/* 3. Badge type affaire */}
-        <Badge variant={DEAL_TYPE_VARIANT[dealType]}>{dealType}</Badge>
+        <Badge variant={status === "EN_COURS" ? "default" : "disabled"}>{DEAL_TYPE_LABELS[dealType]}</Badge>
 
         {/* 4. Type de bien */}
         <IconText icon={<Home size={20} style={{ color: iconColor }} />}>

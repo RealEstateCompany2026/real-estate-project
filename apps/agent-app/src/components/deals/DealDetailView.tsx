@@ -34,6 +34,7 @@ import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
 import { ListMandat } from '@real-estate/ui/list-mandat';
+import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
@@ -447,6 +448,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<ActivityFilter>('Tout');
   const [bienFilter, setBienFilter] = useState<'tous' | 'shortlist'>('tous');
+  const [isSheetMandatOpen, setIsSheetMandatOpen] = useState(false);
 
   // ── Fetch ──
   useEffect(() => {
@@ -595,6 +597,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         <AppBarFicheAffaire
           dealId={deal.reference ?? deal.id.slice(0, 8)}
           dealType={currentType}
+          status={deal.status ?? undefined}
           propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
           surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
           city={deal.Property?.addressCity ?? '\u2014'}
@@ -651,6 +654,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 signature: mapMandateWorkflow(mandateStatusKey, 'signature'),
               }}
               aiSuggestions={0}
+              onView={() => setIsSheetMandatOpen(true)}
             />
           )}
 
@@ -1254,6 +1258,19 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           icon={<Sparkles size={24} />}
         />
       </div>
+
+      {/* SheetMandat */}
+      <SheetMandat
+        isOpen={isSheetMandatOpen}
+        onClose={() => setIsSheetMandatOpen(false)}
+        reference={deal.reference ?? '\u2014'}
+        workflow={{
+          edition: mapMandateWorkflow(mandateStatusKey, 'edition'),
+          revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
+          signature: mapMandateWorkflow(mandateStatusKey, 'signature'),
+        }}
+        signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
+      />
     </div>
   );
 }
