@@ -9,7 +9,7 @@ const meta: Meta<typeof CardAffaire> = {
     docs: {
       description: {
         component:
-          "Card affaire immobilière pour vue Kanban — badge type + chips bien/client + KPI probabilité + CA pondéré + zone variable selon dealType. Layout vertical 350px.",
+          "Card affaire immobiliere pour vue Kanban — badge type + chips bien/client + KPI probabilite + CA pondere + zone variable selon dealType. Layout vertical 350px.",
       },
     },
   },
@@ -21,72 +21,74 @@ type Story = StoryObj<typeof CardAffaire>;
 export const Vente: Story = {
   args: {
     dealType: "VENTE",
-    mandateVariant: "success",
     reference: "MV-0042",
+    status: "EN_COURS",
     propertyType: "T3",
     propertySurface: "85 m²",
     propertyCity: "Montpellier",
-    propertyPrice: "320 000 €",
     clientName: "Jean Dupont",
     pipelineStage: "PROMOTION",
     winProbability: 45,
     weightedRevenue: "4 500 €",
-    lastActivityDate: "15 avr. 2026",
     leadsCount: 8,
     visitsCount: 3,
+    offersCount: 2,
     listingStatus: "success",
-    offerStatus: "disabled",
+    promiseStatus: "disabled",
+    aiSuggestions: 3,
   },
 };
 
 export const Acquisition: Story = {
   args: {
     dealType: "ACQUISITION",
-    mandateVariant: "warning",
     reference: "MRA-0018",
+    status: "EN_COURS",
     propertyType: "Maison",
     propertyCity: "Lyon",
     clientName: "Marie Martin",
     pipelineStage: "VISITES",
     winProbability: 60,
     weightedRevenue: "7 200 €",
-    matchedPropertiesCount: 12,
     visitsCount: 5,
-    offerStatus: "disabled",
+    searchStatus: "success",
+    applicationsCount: 3,
+    applicationResultStatus: "disabled",
+    aiSuggestions: 1,
   },
 };
 
 export const Location: Story = {
   args: {
     dealType: "LOCATION",
-    mandateVariant: "success",
     reference: "MRL-0007",
+    status: "EN_COURS",
     clientName: "Pierre Lefèvre",
     pipelineStage: "PROMOTION",
     winProbability: 35,
     weightedRevenue: "840 €",
-    matchedPropertiesCount: 6,
     visitsCount: 2,
-    applicationStatus: "warning",
+    searchStatus: "warning",
+    applicationsCount: 1,
+    applicationResultStatus: "disabled",
+    aiSuggestions: 2,
   },
 };
 
 export const Gestion: Story = {
   args: {
     dealType: "GESTION",
-    mandateVariant: "success",
     reference: "MG-0031",
+    status: "EN_COURS",
     propertyType: "T4",
     propertySurface: "110 m²",
     propertyCity: "Nîmes",
-    propertyPrice: "1 200 €/mois",
     clientName: "Sophie Bernard",
     pipelineStage: "GESTION",
     winProbability: 90,
     weightedRevenue: "2 160 €",
     occupancyStatus: "success",
-    rentStatus: "success",
     maintenanceStatus: "disabled",
-    mandateEndDate: "15 sept. 2027",
+    aiSuggestions: 0,
   },
 };

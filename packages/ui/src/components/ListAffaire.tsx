@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { Home, Maximize2, MapPin, Tag, User, TrendingUp } from "lucide-react";
+import { Home, Maximize2, MapPin, User } from "lucide-react";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
 import { Chip } from "./Chip";
-import { KpiIndicator } from "./KpiIndicator";
+import { AiSuggestion } from "./AiSuggestion";
 import {
   DealType,
   DEAL_TYPE_LABELS,
@@ -14,39 +14,50 @@ import {
 } from "./deal-types";
 
 /**
- * ListAffaire - Ligne de liste affaire immobilière
+ * ListAffaire - Ligne de liste affaire immobiliere
  * Organism du design system RealAgent
  *
- * Affiche une ligne avec :
- * - Section gauche : Badge type + référence + chips bien/client + étape pipeline
- * - Section droite : KPI probabilité + CA pondéré + zone variable selon dealType
+ * Layout horizontal (h=120px) en 5 sections separees par des VerticalDivider :
+ * S1 Identification (~300px) | S2 Statut (~160px) | S3 Commercialisation (~220px)
+ * | S4 Closing (flex-1, absent pour GESTION) | S5 IA (86px)
  *
- * Pattern identique à ListBien : Tailwind `group` + CSS variables, ZERO useState.
+ * Contenu conditionnel par dealType (VENTE, ACQUISITION, LOCATION, GESTION).
+ * Pattern : Tailwind `group` + CSS variables, ZERO useState.
  */
 
 export interface ListAffaireProps {
-  dealType: DealType;
-  mandateVariant?: BadgeVariant;
+  // Section 1 — Identification
   reference: string;
+  clientName?: string;
   propertyType?: string;
   propertySurface?: string;
   propertyCity?: string;
-  propertyPrice?: string;
-  clientName?: string;
+
+  // Section 2 — Statut
+  dealType: DealType;
+  status?: string;
   pipelineStage?: PipelineStage;
-  lastActivityDate?: string;
-  winProbability?: number;
-  weightedRevenue?: string;
+
+  // Section 3 — Commercialisation
   listingStatus?: BadgeVariant;
+  searchStatus?: BadgeVariant;
+  occupancyStatus?: BadgeVariant;
+  maintenanceStatus?: BadgeVariant;
   leadsCount?: number;
   visitsCount?: number;
-  offerStatus?: BadgeVariant;
-  matchedPropertiesCount?: number;
-  applicationStatus?: BadgeVariant;
-  occupancyStatus?: BadgeVariant;
-  rentStatus?: BadgeVariant;
-  maintenanceStatus?: BadgeVariant;
-  mandateEndDate?: string;
+  offersCount?: number;
+  applicationsCount?: number;
+
+  // Section 4 — Closing
+  promiseStatus?: BadgeVariant;
+  applicationResultStatus?: BadgeVariant;
+  weightedRevenue?: string;
+  winProbability?: number;
+
+  // Section 5 — Suggestions IA
+  aiSuggestions?: number;
+
+  // Interaction
   onDealClick?: () => void;
   className?: string;
 }
@@ -58,49 +69,44 @@ function VerticalDivider() {
 }
 
 export function ListAffaire({
-  dealType,
-  mandateVariant = "disabled",
   reference,
+  clientName,
   propertyType,
   propertySurface,
   propertyCity,
-  propertyPrice,
-  clientName,
+  dealType,
+  status,
   pipelineStage,
-  lastActivityDate,
-  winProbability = 0,
-  weightedRevenue,
   listingStatus,
-  leadsCount,
-  visitsCount,
-  offerStatus,
-  matchedPropertiesCount,
-  applicationStatus,
+  searchStatus,
   occupancyStatus,
-  rentStatus,
   maintenanceStatus,
-  mandateEndDate,
+  leadsCount = 0,
+  visitsCount = 0,
+  offersCount = 0,
+  applicationsCount = 0,
+  promiseStatus,
+  applicationResultStatus,
+  weightedRevenue,
+  winProbability = 0,
+  aiSuggestions = 0,
   onDealClick,
   className = "",
 }: ListAffaireProps) {
   const iconColor = "var(--icon-neutral-default)";
+  const dealBadgeVariant: BadgeVariant = status === "EN_COURS" ? "default" : "disabled";
 
-  const renderVariableZone = () => {
+  /* ── Section 3 — Commercialisation ── */
+  const renderCommercialisationSection = () => {
     switch (dealType) {
       case "VENTE":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Annonce</span>
-              <Badge variant={listingStatus ?? "disabled"} />
-            </div>
-            <div className="flex items-center gap-[16px]">
-              <span className="text-sm font-semibold font-roboto text-content-body">{leadsCount ?? 0} leads</span>
-              <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
-            </div>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Promesse</span>
-              <Badge variant={offerStatus ?? "disabled"} />
+            <Badge variant={listingStatus ?? "disabled"}>Annonce</Badge>
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{offersCount} promesses</Chip>
             </div>
           </div>
         );
@@ -108,11 +114,11 @@ export function ListAffaire({
       case "ACQUISITION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <span className="text-sm font-semibold font-roboto text-content-body">{matchedPropertiesCount ?? 0} biens matchés</span>
-            <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Promesse</span>
-              <Badge variant={offerStatus ?? "disabled"} />
+            <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{offersCount} promesses</Chip>
             </div>
           </div>
         );
@@ -120,11 +126,11 @@ export function ListAffaire({
       case "LOCATION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <span className="text-sm font-semibold font-roboto text-content-body">{matchedPropertiesCount ?? 0} biens matchés</span>
-            <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Dossier</span>
-              <Badge variant={applicationStatus ?? "disabled"} />
+            <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
             </div>
           </div>
         );
@@ -133,22 +139,14 @@ export function ListAffaire({
         return (
           <div className="flex flex-col gap-[8px] items-start">
             <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Occupation</span>
-              <Badge variant={occupancyStatus ?? "disabled"} />
+              <Badge variant={occupancyStatus ?? "disabled"}>Occupé</Badge>
+              <Badge variant={maintenanceStatus ?? "disabled"}>Entretien</Badge>
             </div>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Loyer</span>
-              <Badge variant={rentStatus ?? "disabled"} />
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
             </div>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Entretien</span>
-              <Badge variant={maintenanceStatus ?? "disabled"} />
-            </div>
-            {mandateEndDate && (
-              <span className="text-xs font-normal font-roboto text-content-secondary">
-                Échéance {mandateEndDate}
-              </span>
-            )}
           </div>
         );
 
@@ -157,28 +155,67 @@ export function ListAffaire({
     }
   };
 
+  /* ── Section 4 — Closing ── */
+  const renderClosingSection = () => {
+    switch (dealType) {
+      case "VENTE":
+      case "ACQUISITION":
+        return (
+          <div className="flex flex-col gap-[8px] items-start">
+            <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
+            <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+              {weightedRevenue ?? "\u2014"}
+            </span>
+            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
+              {winProbability}%
+            </Badge>
+          </div>
+        );
+
+      case "LOCATION":
+        return (
+          <div className="flex flex-col gap-[8px] items-start">
+            <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
+            <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+              {weightedRevenue ?? "\u2014"}
+            </span>
+            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
+              {winProbability}%
+            </Badge>
+          </div>
+        );
+
+      case "GESTION":
+        return null;
+
+      default:
+        return null;
+    }
+  };
+
+  const showClosingSection = dealType !== "GESTION";
+
   return (
     <div
       className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onDealClick}
     >
-      {/* Section gauche */}
-      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full" style={{ width: "600px" }}>
-        {/* Ligne 1 : Badge type + Référence + Pipeline */}
+      {/* S1 — Identification (~300px) */}
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full" style={{ width: "300px" }}>
+        {/* Ligne 1 : reference + Chip client */}
         <div className="flex items-center gap-[10px]">
-          <Badge variant={mandateVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
-          <span className="text-xs font-normal font-roboto text-content-secondary whitespace-nowrap">
+          <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
             {reference}
           </span>
-          {pipelineStage && (
-            <span className="text-xs font-normal font-roboto text-content-secondary whitespace-nowrap">
-              · {PIPELINE_STAGE_LABELS[pipelineStage]}
-            </span>
+          {clientName && (
+            <Chip size="small" icon={<User size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {clientName}
+            </Chip>
           )}
         </div>
 
-        {/* Ligne 2 : Chips bien */}
-        <div className="flex items-center gap-[12px] flex-wrap">
+        {/* Ligne 2 : Chips type de bien + surface + ville */}
+        <div className="flex items-center gap-[8px] flex-wrap">
           {propertyType && (
             <Chip size="small" icon={<Home size={16} style={{ color: iconColor }} />} iconPosition="left">
               {propertyType}
@@ -194,51 +231,42 @@ export function ListAffaire({
               {propertyCity}
             </Chip>
           )}
-          {propertyPrice && (
-            <Chip size="small" icon={<Tag size={16} style={{ color: iconColor }} />} iconPosition="left">
-              {propertyPrice}
-            </Chip>
-          )}
-        </div>
-
-        {/* Ligne 3 : Chip client + date */}
-        <div className="flex items-center gap-[12px]">
-          {clientName && (
-            <Chip size="small" icon={<User size={16} style={{ color: iconColor }} />} iconPosition="left">
-              {clientName}
-            </Chip>
-          )}
-          {lastActivityDate && (
-            <span className="text-xs font-normal font-roboto text-content-secondary">{lastActivityDate}</span>
-          )}
         </div>
       </div>
 
       <VerticalDivider />
 
-      {/* KPI probabilité */}
-      <KpiIndicator
-        icon={<TrendingUp size={16} style={{ color: iconColor }} />}
-        value={`${winProbability}%`}
-        percentage={winProbability}
-        variant="vertical"
-        className="w-[90px]"
-      />
-
-      <VerticalDivider />
-
-      {/* CA pondéré */}
-      <div className="flex flex-col gap-[4px] px-[20px]" style={{ minWidth: "100px" }}>
-        <span className="text-xs font-normal font-roboto text-content-secondary">CA pondéré</span>
-        <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
-          {weightedRevenue ?? "\u2014"}
-        </span>
+      {/* S2 — Statut (~160px) */}
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full" style={{ width: "160px" }}>
+        <Badge variant={dealBadgeVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
+        {pipelineStage && (
+          <Chip size="small">{PIPELINE_STAGE_LABELS[pipelineStage]}</Chip>
+        )}
       </div>
 
       <VerticalDivider />
 
-      {/* Zone variable */}
-      <div className="flex-1 px-[20px]">{renderVariableZone()}</div>
+      {/* S3 — Commercialisation (~220px) */}
+      <div className="flex flex-col justify-center px-[20px] shrink-0 h-full" style={{ width: "220px" }}>
+        {renderCommercialisationSection()}
+      </div>
+
+      {/* S4 — Closing (flex-1, absent pour GESTION) */}
+      {showClosingSection && (
+        <>
+          <VerticalDivider />
+          <div className="flex-1 flex flex-col justify-center px-[20px] h-full">
+            {renderClosingSection()}
+          </div>
+        </>
+      )}
+
+      <VerticalDivider />
+
+      {/* S5 — Suggestions IA (86px) */}
+      <div className="flex flex-col items-center justify-center shrink-0 w-[86px] h-full">
+        <AiSuggestion count={aiSuggestions} />
+      </div>
     </div>
   );
 }

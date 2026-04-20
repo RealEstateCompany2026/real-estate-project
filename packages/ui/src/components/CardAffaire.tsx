@@ -1,50 +1,62 @@
 "use client";
 
 import React from "react";
-import { Home, Maximize2, MapPin, Tag, User, TrendingUp } from "lucide-react";
+import { Home, Maximize2, MapPin, User } from "lucide-react";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
 import { Chip } from "./Chip";
-import { KpiIndicator } from "./KpiIndicator";
+import { AiSuggestion } from "./AiSuggestion";
 import {
   DealType,
   DEAL_TYPE_LABELS,
   PipelineStage,
+  PIPELINE_STAGE_LABELS,
 } from "./deal-types";
 
 /**
  * CardAffaire - Card affaire pour vue Kanban
  * Organism du design system RealAgent
  *
- * Version verticale (350px) du composant ListAffaire.
- * L'étape pipeline n'est PAS affichée (implicite dans la colonne Kanban).
+ * Layout vertical (w=350px) en 5 sections empilees separees par des HorizontalDivider :
+ * S1 Identification -> S2 Statut -> S3 Commercialisation -> S4 Closing (absent GESTION) -> S5 IA
  *
- * Pattern identique à CardBien : Tailwind `group` + CSS variables, ZERO useState.
+ * Contenu conditionnel par dealType (VENTE, ACQUISITION, LOCATION, GESTION).
+ * Pattern : Tailwind `group` + CSS variables, ZERO useState.
  */
 
 export interface CardAffaireProps {
-  dealType: DealType;
-  mandateVariant?: BadgeVariant;
+  // Section 1 — Identification
   reference: string;
+  clientName?: string;
   propertyType?: string;
   propertySurface?: string;
   propertyCity?: string;
-  propertyPrice?: string;
-  clientName?: string;
+
+  // Section 2 — Statut
+  dealType: DealType;
+  status?: string;
   pipelineStage?: PipelineStage;
-  lastActivityDate?: string;
-  winProbability?: number;
-  weightedRevenue?: string;
+
+  // Section 3 — Commercialisation
   listingStatus?: BadgeVariant;
+  searchStatus?: BadgeVariant;
+  occupancyStatus?: BadgeVariant;
+  maintenanceStatus?: BadgeVariant;
   leadsCount?: number;
   visitsCount?: number;
-  offerStatus?: BadgeVariant;
-  matchedPropertiesCount?: number;
-  applicationStatus?: BadgeVariant;
-  occupancyStatus?: BadgeVariant;
-  rentStatus?: BadgeVariant;
-  maintenanceStatus?: BadgeVariant;
-  mandateEndDate?: string;
+  offersCount?: number;
+  applicationsCount?: number;
+
+  // Section 4 — Closing
+  promiseStatus?: BadgeVariant;
+  applicationResultStatus?: BadgeVariant;
+  weightedRevenue?: string;
+  winProbability?: number;
+
+  // Section 5 — Suggestions IA
+  aiSuggestions?: number;
+
+  // Interaction
   onDealClick?: () => void;
   className?: string;
 }
@@ -55,55 +67,45 @@ function HorizontalDivider() {
   );
 }
 
-function VerticalDivider() {
-  return (
-    <div className="divider h-[84px] w-px bg-[var(--border-divider)] dark:group-hover:bg-[var(--neutral-600)] shrink-0 transition-colors" />
-  );
-}
-
 export function CardAffaire({
-  dealType,
-  mandateVariant = "disabled",
   reference,
+  clientName,
   propertyType,
   propertySurface,
   propertyCity,
-  propertyPrice,
-  clientName,
-  lastActivityDate,
-  winProbability = 0,
-  weightedRevenue,
+  dealType,
+  status,
+  pipelineStage,
   listingStatus,
-  leadsCount,
-  visitsCount,
-  offerStatus,
-  matchedPropertiesCount,
-  applicationStatus,
+  searchStatus,
   occupancyStatus,
-  rentStatus,
   maintenanceStatus,
-  mandateEndDate,
+  leadsCount = 0,
+  visitsCount = 0,
+  offersCount = 0,
+  applicationsCount = 0,
+  promiseStatus,
+  applicationResultStatus,
+  weightedRevenue,
+  winProbability = 0,
+  aiSuggestions = 0,
   onDealClick,
   className = "",
 }: CardAffaireProps) {
   const iconColor = "var(--icon-neutral-default)";
+  const dealBadgeVariant: BadgeVariant = status === "EN_COURS" ? "default" : "disabled";
 
-  const renderVariableZone = () => {
+  /* ── Section 3 — Commercialisation ── */
+  const renderCommercialisationSection = () => {
     switch (dealType) {
       case "VENTE":
         return (
           <div className="flex flex-col gap-[8px] items-start w-full">
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Annonce</span>
-              <Badge variant={listingStatus ?? "disabled"} />
-            </div>
-            <div className="flex items-center gap-[16px]">
-              <span className="text-sm font-semibold font-roboto text-content-body">{leadsCount ?? 0} leads</span>
-              <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
-            </div>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Promesse</span>
-              <Badge variant={offerStatus ?? "disabled"} />
+            <Badge variant={listingStatus ?? "disabled"}>Annonce</Badge>
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{offersCount} promesses</Chip>
             </div>
           </div>
         );
@@ -111,11 +113,11 @@ export function CardAffaire({
       case "ACQUISITION":
         return (
           <div className="flex flex-col gap-[8px] items-start w-full">
-            <span className="text-sm font-semibold font-roboto text-content-body">{matchedPropertiesCount ?? 0} biens matchés</span>
-            <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Promesse</span>
-              <Badge variant={offerStatus ?? "disabled"} />
+            <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{offersCount} promesses</Chip>
             </div>
           </div>
         );
@@ -123,11 +125,11 @@ export function CardAffaire({
       case "LOCATION":
         return (
           <div className="flex flex-col gap-[8px] items-start w-full">
-            <span className="text-sm font-semibold font-roboto text-content-body">{matchedPropertiesCount ?? 0} biens matchés</span>
-            <span className="text-sm font-semibold font-roboto text-content-body">{visitsCount ?? 0} visites</span>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Dossier</span>
-              <Badge variant={applicationStatus ?? "disabled"} />
+            <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
             </div>
           </div>
         );
@@ -136,22 +138,14 @@ export function CardAffaire({
         return (
           <div className="flex flex-col gap-[8px] items-start w-full">
             <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Occupation</span>
-              <Badge variant={occupancyStatus ?? "disabled"} />
+              <Badge variant={occupancyStatus ?? "disabled"}>Occupé</Badge>
+              <Badge variant={maintenanceStatus ?? "disabled"}>Entretien</Badge>
             </div>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Loyer</span>
-              <Badge variant={rentStatus ?? "disabled"} />
+            <div className="flex items-center gap-[8px] flex-wrap">
+              <Chip size="small">{leadsCount} leads</Chip>
+              <Chip size="small">{visitsCount} visites</Chip>
+              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
             </div>
-            <div className="flex items-center gap-[8px]">
-              <span className="text-xs font-normal font-roboto text-content-secondary">Entretien</span>
-              <Badge variant={maintenanceStatus ?? "disabled"} />
-            </div>
-            {mandateEndDate && (
-              <span className="text-xs font-normal font-roboto text-content-secondary">
-                Échéance {mandateEndDate}
-              </span>
-            )}
           </div>
         );
 
@@ -160,21 +154,66 @@ export function CardAffaire({
     }
   };
 
+  /* ── Section 4 — Closing ── */
+  const renderClosingSection = () => {
+    switch (dealType) {
+      case "VENTE":
+      case "ACQUISITION":
+        return (
+          <div className="flex flex-col gap-[8px] items-start w-full">
+            <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
+            <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+              {weightedRevenue ?? "\u2014"}
+            </span>
+            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
+              {winProbability}%
+            </Badge>
+          </div>
+        );
+
+      case "LOCATION":
+        return (
+          <div className="flex flex-col gap-[8px] items-start w-full">
+            <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
+            <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+              {weightedRevenue ?? "\u2014"}
+            </span>
+            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
+              {winProbability}%
+            </Badge>
+          </div>
+        );
+
+      case "GESTION":
+        return null;
+
+      default:
+        return null;
+    }
+  };
+
+  const showClosingSection = dealType !== "GESTION";
+
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex flex-col items-start pb-[20px] w-[350px] cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex flex-col items-start w-[350px] cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
       onClick={onDealClick}
     >
-      {/* Header : Badge type + référence */}
-      <div className="flex flex-col gap-[8px] items-start px-[20px] pt-[20px] w-full">
-        <div className="flex items-center gap-[8px]">
-          <Badge variant={mandateVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
-          <span className="text-xs font-normal font-roboto text-content-secondary whitespace-nowrap">
+      {/* S1 — Identification */}
+      <div className="flex flex-col gap-[8px] items-start px-[20px] py-[16px] w-full">
+        {/* Ligne 1 : reference + Chip client */}
+        <div className="flex items-center gap-[10px]">
+          <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
             {reference}
           </span>
+          {clientName && (
+            <Chip size="small" icon={<User size={16} style={{ color: iconColor }} />} iconPosition="left">
+              {clientName}
+            </Chip>
+          )}
         </div>
 
-        {/* Chips bien */}
+        {/* Ligne 2 : Chips type de bien + surface + ville */}
         <div className="flex flex-wrap gap-[8px] items-center">
           {propertyType && (
             <Chip size="small" icon={<Home size={16} style={{ color: iconColor }} />} iconPosition="left">
@@ -191,54 +230,42 @@ export function CardAffaire({
               {propertyCity}
             </Chip>
           )}
-          {propertyPrice && (
-            <Chip size="small" icon={<Tag size={16} style={{ color: iconColor }} />} iconPosition="left">
-              {propertyPrice}
-            </Chip>
-          )}
-        </div>
-
-        {/* Chip client */}
-        {clientName && (
-          <Chip size="small" icon={<User size={16} style={{ color: iconColor }} />} iconPosition="left">
-            {clientName}
-          </Chip>
-        )}
-
-        {/* Date dernière activité */}
-        {lastActivityDate && (
-          <span className="text-xs font-normal font-roboto text-content-secondary">
-            {lastActivityDate}
-          </span>
-        )}
-      </div>
-
-      <HorizontalDivider />
-
-      {/* KPI : probabilité + CA pondéré */}
-      <div className="flex items-center gap-[16px] px-[20px] py-[16px] w-full">
-        <KpiIndicator
-          icon={<TrendingUp size={16} style={{ color: iconColor }} />}
-          value={`${winProbability}%`}
-          percentage={winProbability}
-          variant="vertical"
-          className="w-[90px]"
-        />
-
-        <VerticalDivider />
-
-        <div className="flex flex-col gap-[4px]">
-          <span className="text-xs font-normal font-roboto text-content-secondary">CA pondéré</span>
-          <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
-            {weightedRevenue ?? "\u2014"}
-          </span>
         </div>
       </div>
 
       <HorizontalDivider />
 
-      {/* Zone variable */}
-      <div className="px-[20px] pt-[16px] w-full">{renderVariableZone()}</div>
+      {/* S2 — Statut */}
+      <div className="flex flex-col gap-[8px] items-start px-[20px] py-[16px] w-full">
+        <Badge variant={dealBadgeVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
+        {pipelineStage && (
+          <Chip size="small">{PIPELINE_STAGE_LABELS[pipelineStage]}</Chip>
+        )}
+      </div>
+
+      <HorizontalDivider />
+
+      {/* S3 — Commercialisation */}
+      <div className="px-[20px] py-[16px] w-full">
+        {renderCommercialisationSection()}
+      </div>
+
+      {/* S4 — Closing (absent pour GESTION) */}
+      {showClosingSection && (
+        <>
+          <HorizontalDivider />
+          <div className="px-[20px] py-[16px] w-full">
+            {renderClosingSection()}
+          </div>
+        </>
+      )}
+
+      <HorizontalDivider />
+
+      {/* S5 — Suggestions IA */}
+      <div className="flex items-center justify-center px-[20px] py-[16px] w-full">
+        <AiSuggestion count={aiSuggestions} />
+      </div>
     </div>
   );
 }
