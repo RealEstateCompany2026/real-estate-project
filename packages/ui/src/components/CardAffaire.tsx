@@ -94,6 +94,11 @@ export function CardAffaire({
 }: CardAffaireProps) {
   const iconColor = "var(--icon-neutral-default)";
   const dealBadgeVariant: BadgeVariant = status === "EN_COURS" ? "default" : "disabled";
+  const probabilityVariant: BadgeVariant =
+    winProbability === 0 ? "disabled" :
+    winProbability > 70 ? "success" :
+    winProbability >= 30 ? "warning" :
+    "error";
 
   /* ── Section 3 — Commercialisation ── */
   const renderCommercialisationSection = () => {
@@ -150,12 +155,12 @@ export function CardAffaire({
       case "VENTE":
       case "ACQUISITION":
         return (
-          <div className="flex flex-row items-center gap-[8px] w-full">
+          <div className="flex flex-row items-center justify-between w-full">
             <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
             <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
               {weightedRevenue ?? "\u2014"}
             </span>
-            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
+            <Badge variant={probabilityVariant}>
               {winProbability}%
             </Badge>
           </div>
@@ -163,12 +168,12 @@ export function CardAffaire({
 
       case "LOCATION":
         return (
-          <div className="flex flex-row items-center gap-[8px] w-full">
+          <div className="flex flex-row items-center justify-between w-full">
             <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
             <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
               {weightedRevenue ?? "\u2014"}
             </span>
-            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
+            <Badge variant={probabilityVariant}>
               {winProbability}%
             </Badge>
           </div>

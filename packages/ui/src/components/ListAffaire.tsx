@@ -95,6 +95,11 @@ export function ListAffaire({
 }: ListAffaireProps) {
   const iconColor = "var(--icon-neutral-default)";
   const dealBadgeVariant: BadgeVariant = status === "EN_COURS" ? "default" : "disabled";
+  const probabilityVariant: BadgeVariant =
+    winProbability === 0 ? "disabled" :
+    winProbability > 70 ? "success" :
+    winProbability >= 30 ? "warning" :
+    "error";
 
   /* ── Section 3 — Commercialisation ── */
   const renderCommercialisationSection = () => {
@@ -162,30 +167,30 @@ export function ListAffaire({
       case "ACQUISITION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <div className="flex flex-row items-center gap-[8px]">
-              <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
+            <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
+            <div className="flex flex-row items-center justify-between w-full">
               <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
                 {weightedRevenue ?? "\u2014"}
               </span>
+              <Badge variant={probabilityVariant}>
+                {winProbability}%
+              </Badge>
             </div>
-            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
-              {winProbability}%
-            </Badge>
           </div>
         );
 
       case "LOCATION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <div className="flex flex-row items-center gap-[8px]">
-              <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
+            <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
+            <div className="flex flex-row items-center justify-between w-full">
               <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
                 {weightedRevenue ?? "\u2014"}
               </span>
+              <Badge variant={probabilityVariant}>
+                {winProbability}%
+              </Badge>
             </div>
-            <Badge variant={winProbability > 0 ? "information" : "disabled"}>
-              {winProbability}%
-            </Badge>
           </div>
         );
 
@@ -201,11 +206,11 @@ export function ListAffaire({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between h-[120px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onDealClick}
     >
       {/* S1 — Identification (~300px) */}
-      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full">
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 min-w-[280px] h-full">
         {/* Ligne 1 : reference + Chip client */}
         <div className="flex items-center gap-[10px]">
           <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
@@ -241,7 +246,7 @@ export function ListAffaire({
       <VerticalDivider />
 
       {/* S2 — Statut (~160px) */}
-      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full">
+      <div className="flex flex-col justify-center items-start gap-[8px] px-[20px] flex-1 h-full">
         <Badge variant={dealBadgeVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
         {pipelineStage && (
           <Chip size="small">{PIPELINE_STAGE_LABELS[pipelineStage]}</Chip>
@@ -251,7 +256,7 @@ export function ListAffaire({
       <VerticalDivider />
 
       {/* S3 — Commercialisation (~220px) */}
-      <div className="flex flex-col justify-center px-[20px] shrink-0 h-full">
+      <div className="flex flex-col justify-center items-start px-[20px] flex-1 h-full">
         {renderCommercialisationSection()}
       </div>
 
