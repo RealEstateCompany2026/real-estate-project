@@ -80,7 +80,7 @@ interface DealRow {
   propertyId: string | null;
   status: string | null;
   trend: string | null;
-  Client: { id: string; firstName: string | null; lastName: string | null; status: string | null } | null;
+  Client: { id: string; firstName: string | null; lastName: string | null; status: string | null; searchCriteriaSummary: string | null } | null;
   Property: { id: string; type: string | null; livingAreaSqm: number | null; addressCity: string | null; desiredSellingPrice: number | null; dpeEnergyClass: string | null } | null;
 
   // Mandat
@@ -554,6 +554,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [bienFilter, setBienFilter] = useState<'tous' | 'shortlist'>('tous');
   const [isSheetMandatOpen, setIsSheetMandatOpen] = useState(false);
   const [isAnnonceSheetOpen, setIsAnnonceSheetOpen] = useState(false);
+  const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
 
   // ── Fetch ──
   useEffect(() => {
@@ -567,7 +568,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         .from('Deal')
         .select(`
           *,
-          Client:clientId (id, firstName, lastName, status),
+          Client:clientId (id, firstName, lastName, status, searchCriteriaSummary),
           Property:propertyId (id, type, livingAreaSqm, addressCity, desiredSellingPrice, dpeEnergyClass)
         `)
         .eq('id', dealId)
@@ -706,6 +707,11 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const mandateStatusKey = currentType === 'GESTION'
     ? (deal.mgmtMandateStatus ?? 'NON_CREE')
     : (deal.saleMandateStatus ?? 'NON_CREE');
+
+  // ── Recherche criteria summary (fallback LOCATION → acquisitionCriteriaSummary) ──
+  const criteriaSummary = currentType === 'ACQUISITION'
+    ? deal.acquisitionCriteriaSummary
+    : (deal.locationCriteriaSummary || deal.acquisitionCriteriaSummary);
 
   // ── Render ──
   return (
@@ -925,28 +931,44 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           <>
             {/* ─────────── Section Recherche ─────────── */}
             <section id="recherche" className="px-5 py-6 flex flex-col gap-4">
-              <h5 className="text-xl font-bold text-content-headings">Recherche</h5>
-              <div className="flex flex-col gap-2 text-sm text-content-body">
-                <div className="flex justify-between">
-                  <span>Critères</span>
-                  <span className="font-semibold">
-                    {deal.acquisitionCriteriaSummary || deal.locationCriteriaSummary || '—'}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h5 className="text-xl font-bold text-content-headings">Recherche</h5>
+                  <Badge variant={criteriaSummary ? 'success' : 'warning'}>
+                    {criteriaSummary ? 'Définis' : 'À définir'}
+                  </Badge>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setIsRechercheSheetOpen(true)}>
+                  Éditer
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                {/* Col 1 — Résumé critères */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-content-secondary">Critères</span>
+                  <span className="text-sm font-semibold text-content-body">
+                    {criteriaSummary || '—'}
                   </span>
                 </div>
-                {currentType === 'ACQUISITION' && (
-                  <div className="flex justify-between">
-                    <span>Budget</span>
-                    <span className="font-semibold">
-                      {formatPrice(deal.acquisitionMinBudget)} — {formatPrice(deal.acquisitionMaxBudget)}
-                    </span>
-                  </div>
-                )}
-                {currentType === 'LOCATION' && (
-                  <div className="flex justify-between">
-                    <span>Loyer max</span>
-                    <span className="font-semibold">{formatPrice(deal.locationMinBudget)}/mois</span>
-                  </div>
-                )}
+
+                {/* Col 2 — Budget */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-content-secondary">Budget</span>
+                  <span className="text-sm font-semibold text-content-body">
+                    {currentType === 'ACQUISITION'
+                      ? `${formatPrice(deal.acquisitionMinBudget)} — ${formatPrice(deal.acquisitionMaxBudget)}`
+                      : `${formatPrice(deal.locationMinBudget || deal.bailMonthlyRent)}/mois`}
+                  </span>
+                </div>
+
+                {/* Col 3 — Critères client */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-content-secondary">Critères client</span>
+                  <span className="text-sm font-semibold text-content-body">
+                    {deal.Client?.searchCriteriaSummary || '—'}
+                  </span>
+                </div>
               </div>
             </section>
 
@@ -1454,6 +1476,66 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 <span className="text-content-caption">Contacts</span>
                 <p className="font-semibold text-content-body">{listing.contactsCount ?? 0}</p>
               </div>
+            </div>
+          </div>
+        </Sheet>
+      )}
+
+      {/* Sheet Recherche */}
+      {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && (
+        <Sheet
+          isOpen={isRechercheSheetOpen}
+          onClose={() => setIsRechercheSheetOpen(false)}
+          title="Critères de recherche"
+          width="wide"
+          footer={
+            <div className="flex gap-3 w-full">
+              <Button variant="secondary" className="flex-1" onClick={() => setIsRechercheSheetOpen(false)}>
+                Annuler
+              </Button>
+              <Button variant="primary" className="flex-1" onClick={() => setIsRechercheSheetOpen(false)}>
+                Enregistrer
+              </Button>
+            </div>
+          }
+        >
+          <div className="p-5 flex flex-col gap-6">
+            {/* Résumé critères */}
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold text-content-body">Résumé des critères</span>
+              <p className="text-sm text-content-body bg-surface-secondary rounded-lg p-3">
+                {criteriaSummary || 'Aucun critère défini'}
+              </p>
+            </div>
+
+            {/* Budget */}
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold text-content-body">Budget</span>
+              {currentType === 'ACQUISITION' ? (
+                <div className="flex gap-4 text-sm text-content-body">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-content-secondary">Min</span>
+                    <span className="font-semibold">{formatPrice(deal.acquisitionMinBudget)}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-content-secondary">Max</span>
+                    <span className="font-semibold">{formatPrice(deal.acquisitionMaxBudget)}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1 text-sm text-content-body">
+                  <span className="text-xs text-content-secondary">Loyer max</span>
+                  <span className="font-semibold">{formatPrice(deal.locationMinBudget || deal.bailMonthlyRent)}/mois</span>
+                </div>
+              )}
+            </div>
+
+            {/* Critères client (référence) */}
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold text-content-body">Critères client (fiche)</span>
+              <p className="text-sm text-content-body bg-surface-secondary rounded-lg p-3">
+                {deal.Client?.searchCriteriaSummary || 'Non renseignés'}
+              </p>
             </div>
           </div>
         </Sheet>
