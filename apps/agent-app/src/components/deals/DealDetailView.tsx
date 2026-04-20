@@ -19,6 +19,11 @@ import {
   ScrollText,
   Wrench,
   PieChart,
+  CheckCheck,
+  Eye,
+  FolderOpen,
+  Banknote,
+  ArrowRight,
 } from 'lucide-react';
 
 // ── DS Components ──
@@ -34,6 +39,7 @@ import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
 import { ListMandat } from '@real-estate/ui/list-mandat';
+import { Sheet } from '@real-estate/ui/sheet';
 import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
@@ -298,31 +304,139 @@ const NOTARIAL_STATUS_VARIANT: Record<string, BadgeVariant> = {
 
 // ── Activity helpers ──
 
-type ActivityFilter = 'Tout' | 'Qualification' | 'Commercial' | 'Juridique';
+// Filtres par type d'affaire — alignés sur le pipeline
+type ActivityFilter = 'all' | 'MANDAT' | 'COMMERCIALISATION' | 'CLOSING' | 'RECHERCHE' | 'VISITES' | 'DOSSIER' | 'OCCUPATION' | 'LOYERS' | 'ENTRETIEN';
 
-function eventTypeToActivityCategory(eventType: string | null): string {
-  switch (eventType) {
-    case 'RDV_COMMERCIAL':
-    case 'RELANCE':
-      return 'Commercial';
-    case 'SIGNATURE_PROMESSE':
-    case 'SIGNATURE_NOTAIRE':
-    case 'SIGNATURE_BAIL':
-      return 'Juridique';
-    case 'VISITE':
-    case 'TACHE':
-    case 'AUTRE':
+interface ActivityLog {
+  id: string;
+  date: string;
+  time: string;
+  author: string;
+  category: string;
+  status: string | null;
+  description: string;
+}
+
+function eventTypeToCategory(eventType: string | null, dealType: DealType): string {
+  switch (dealType) {
+    case 'VENTE':
+      switch (eventType) {
+        case 'RDV_COMMERCIAL':
+        case 'RELANCE':
+          return 'MANDAT';
+        case 'VISITE':
+        case 'TACHE':
+        case 'AUTRE':
+          return 'COMMERCIALISATION';
+        case 'SIGNATURE_PROMESSE':
+        case 'SIGNATURE_NOTAIRE':
+          return 'CLOSING';
+        default:
+          return 'MANDAT';
+      }
+    case 'ACQUISITION':
+      switch (eventType) {
+        case 'RDV_COMMERCIAL':
+        case 'RELANCE':
+        case 'TACHE':
+          return 'RECHERCHE';
+        case 'VISITE':
+          return 'VISITES';
+        case 'SIGNATURE_PROMESSE':
+        case 'SIGNATURE_NOTAIRE':
+          return 'CLOSING';
+        default:
+          return 'RECHERCHE';
+      }
+    case 'LOCATION':
+      switch (eventType) {
+        case 'RDV_COMMERCIAL':
+        case 'RELANCE':
+        case 'TACHE':
+          return 'RECHERCHE';
+        case 'VISITE':
+          return 'VISITES';
+        case 'SIGNATURE_BAIL':
+          return 'DOSSIER';
+        default:
+          return 'RECHERCHE';
+      }
+    case 'GESTION':
+      switch (eventType) {
+        case 'VISITE':
+        case 'RDV_COMMERCIAL':
+          return 'OCCUPATION';
+        case 'RELANCE':
+        case 'TACHE':
+          return 'LOYERS';
+        case 'SIGNATURE_BAIL':
+        case 'AUTRE':
+          return 'ENTRETIEN';
+        default:
+          return 'OCCUPATION';
+      }
     default:
-      return 'Qualification';
+      return 'MANDAT';
   }
 }
 
-function getActivityBadgeVariant(category: string): BadgeVariant {
+function getCategoryBadgeVariant(category: string): BadgeVariant {
   switch (category) {
-    case 'Qualification': return 'success';
-    case 'Commercial': return 'information';
-    case 'Juridique': return 'warning';
-    default: return 'default';
+    case 'MANDAT':
+    case 'RECHERCHE':
+    case 'OCCUPATION':
+      return 'information';
+    case 'COMMERCIALISATION':
+    case 'VISITES':
+    case 'LOYERS':
+      return 'default';
+    case 'CLOSING':
+    case 'DOSSIER':
+    case 'ENTRETIEN':
+      return 'warning';
+    default:
+      return 'default';
+  }
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  MANDAT: 'Mandat',
+  COMMERCIALISATION: 'Commercialisation',
+  CLOSING: 'Closing',
+  RECHERCHE: 'Recherche',
+  VISITES: 'Visites',
+  DOSSIER: 'Dossier',
+  OCCUPATION: 'Occupation',
+  LOYERS: 'Loyers',
+  ENTRETIEN: 'Entretien',
+};
+
+function getFiltersForDealType(dealType: DealType): { id: string; label: string; icon: React.ReactNode }[] {
+  switch (dealType) {
+    case 'VENTE':
+      return [
+        { id: 'MANDAT', label: 'Mandat', icon: <FileSearch size={16} /> },
+        { id: 'COMMERCIALISATION', label: 'Commercialisation', icon: <Tag size={16} /> },
+        { id: 'CLOSING', label: 'Closing', icon: <ScrollText size={16} /> },
+      ];
+    case 'ACQUISITION':
+      return [
+        { id: 'RECHERCHE', label: 'Recherche', icon: <Search size={16} /> },
+        { id: 'VISITES', label: 'Visites', icon: <Eye size={16} /> },
+        { id: 'CLOSING', label: 'Closing', icon: <ScrollText size={16} /> },
+      ];
+    case 'LOCATION':
+      return [
+        { id: 'RECHERCHE', label: 'Recherche', icon: <Search size={16} /> },
+        { id: 'VISITES', label: 'Visites', icon: <Eye size={16} /> },
+        { id: 'DOSSIER', label: 'Dossier', icon: <FolderOpen size={16} /> },
+      ];
+    case 'GESTION':
+      return [
+        { id: 'OCCUPATION', label: 'Occupation', icon: <Home size={16} /> },
+        { id: 'LOYERS', label: 'Loyers', icon: <Banknote size={16} /> },
+        { id: 'ENTRETIEN', label: 'Entretien', icon: <Wrench size={16} /> },
+      ];
   }
 }
 
@@ -446,7 +560,9 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [listing, setListing] = useState<ListingRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<ActivityFilter>('Tout');
+  const [activeFilter, setActiveFilter] = useState<ActivityFilter>('all');
+  const [allActivities, setAllActivities] = useState<ActivityLog[]>([]);
+  const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [bienFilter, setBienFilter] = useState<'tous' | 'shortlist'>('tous');
   const [isSheetMandatOpen, setIsSheetMandatOpen] = useState(false);
 
@@ -487,7 +603,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       const [eventsRes, documentsRes, messagesRes] = await Promise.all([
         supabase
           .from('Event')
-          .select('id, type, status, title, description, eventDate, reportContent')
+          .select('id, type, status, title, description, eventDate, reportContent, agentId, User:agentId(name)')
           .eq('dealId', dealId)
           .order('eventDate', { ascending: false }),
         supabase
@@ -505,6 +621,19 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       setEvents((eventsRes.data ?? []) as EventRow[]);
       setDocuments((documentsRes.data ?? []) as DocumentRow[]);
       setMessages((messagesRes.data ?? []) as MessageRow[]);
+
+      // Map events to ActivityLog with category based on deal type
+      const fetchedType = (normalizedDeal.type as DealType) ?? 'VENTE';
+      const mappedActivities: ActivityLog[] = (eventsRes.data ?? []).map((ev: any) => ({
+        id: ev.id,
+        date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
+        time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
+        author: ev.User?.[0]?.name ?? ev.User?.name ?? 'Système',
+        category: eventTypeToCategory(ev.type, fetchedType),
+        status: ev.status,
+        description: ev.description ?? ev.title ?? '',
+      }));
+      setAllActivities(mappedActivities);
 
       // 5. Listing (if present)
       if (normalizedDeal.listingId) {
@@ -527,9 +656,9 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const noteEvents = events.filter((e) => e.type === 'NOTE');
   const entretienEvents = events.filter((e) => e.type === 'ENTRETIEN');
 
-  const filteredEvents = activeFilter === 'Tout'
-    ? events
-    : events.filter((e) => eventTypeToActivityCategory(e.type) === activeFilter);
+  const filteredActivities = activeFilter === 'all'
+    ? allActivities
+    : allActivities.filter((a) => a.category === activeFilter);
 
   const clientFullName = deal?.Client
     ? `${deal.Client.firstName ?? ''} ${deal.Client.lastName ?? ''}`.trim()
@@ -689,44 +818,62 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Activites (commune) ──                                */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="activite" className="px-5 py-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h5 className="text-xl font-bold text-content-headings">Activit\u00e9s</h5>
-            <Badge variant="default">{events.length}</Badge>
-          </div>
-          <div className="flex gap-2">
-            {(['Tout', 'Qualification', 'Commercial', 'Juridique'] as ActivityFilter[]).map((cat) => (
+        <section id="activite" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5">
+          {/* Header : titre + badge + chips filtre + bouton Voir tout */}
+          <div className="flex items-center justify-between mb-[50px]">
+            <div className="flex items-center gap-[12px]">
+              <div className="flex items-center gap-[4px]">
+                <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+                  Activit\u00e9s
+                </h3>
+                <Badge variant="default">{filteredActivities.length}</Badge>
+              </div>
               <Chip
-                key={cat}
-                variant={activeFilter === cat ? 'filled' : 'outlined'}
-                label={cat}
-                onClick={() => setActiveFilter(cat)}
+                label="Tout"
+                icon={<CheckCheck size={16} />}
+                selected={activeFilter === 'all'}
+                size="medium"
+                fontWeight="semibold"
+                onClick={() => setActiveFilter('all')}
+              />
+              {getFiltersForDealType(currentType).map((f) => (
+                <Chip
+                  key={f.id}
+                  label={f.label}
+                  icon={f.icon}
+                  selected={activeFilter === f.id}
+                  size="medium"
+                  fontWeight="semibold"
+                  onClick={() => setActiveFilter(f.id as ActivityFilter)}
+                />
+              ))}
+            </div>
+            <Button
+              variant="default"
+              onClick={() => setIsActivitySheetOpen(true)}
+            >
+              Voir tout <ArrowRight size={16} />
+            </Button>
+          </div>
+
+          {/* Liste des activit\u00e9s (4 max) */}
+          <div className="flex flex-col">
+            {filteredActivities.slice(0, 4).map((activity) => (
+              <CardLog
+                key={activity.id}
+                date={activity.date}
+                time={activity.time}
+                author={activity.author}
+                category={CATEGORY_LABELS[activity.category] ?? activity.category}
+                description={activity.description}
+                badgeVariant={getCategoryBadgeVariant(activity.category)}
+                className="w-full"
               />
             ))}
+            {filteredActivities.length === 0 && (
+              <p className="text-sm text-content-subtle italic">Aucune activit\u00e9 enregistr\u00e9e</p>
+            )}
           </div>
-          {filteredEvents.slice(0, 4).map((evt) => {
-            const cat = eventTypeToActivityCategory(evt.type);
-            const evtDate = new Date(evt.eventDate);
-            return (
-              <CardLog
-                key={evt.id}
-                date={evtDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                time={evtDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                author={cat}
-                category={evt.type ?? 'AUTRE'}
-                description={evt.description ?? evt.title ?? ''}
-                badgeVariant={getActivityBadgeVariant(cat)}
-              />
-            );
-          })}
-          {filteredEvents.length === 0 && (
-            <p className="text-sm text-content-subtle italic">Aucune activit\u00e9 enregistr\u00e9e</p>
-          )}
-          {events.length > 4 && (
-            <Button variant="ghost" size="sm">
-              Voir tout ({events.length})
-            </Button>
-          )}
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
@@ -1271,6 +1418,29 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         }}
         signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
       />
+
+      {/* Sheet Activit\u00e9s */}
+      <Sheet
+        isOpen={isActivitySheetOpen}
+        onClose={() => setIsActivitySheetOpen(false)}
+        title="Activit\u00e9s"
+        width="narrow"
+      >
+        <div className="flex flex-col px-[20px] py-[20px]">
+          {allActivities.map((activity) => (
+            <CardLog
+              key={activity.id}
+              date={activity.date}
+              time={activity.time}
+              author={activity.author}
+              category={CATEGORY_LABELS[activity.category] ?? activity.category}
+              description={activity.description}
+              badgeVariant={getCategoryBadgeVariant(activity.category)}
+              className="w-full"
+            />
+          ))}
+        </div>
+      </Sheet>
     </div>
   );
 }
