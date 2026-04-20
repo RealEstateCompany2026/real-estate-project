@@ -56,6 +56,7 @@ import { ListCandidatureLocataire } from '@real-estate/ui/list-candidature-locat
 import { ListFinancement } from '@real-estate/ui/list-financement';
 import { ListBien } from '@real-estate/ui/list-bien';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
+import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 import type { DealType } from '@real-estate/ui/deal-types';
 
 // ── App-level ──
@@ -196,6 +197,19 @@ function propertyTypeLabel(t: string | null): string {
     case 'IMMEUBLE': return 'Immeuble';
     default: return 'Bien';
   }
+}
+
+function ProfileField({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="flex gap-[16px] py-[8px]">
+      <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-caption shrink-0 w-[112px]">
+        {label}
+      </span>
+      <span className="text-[16px] leading-[20px] tracking-[0.16px] text-content-body">
+        {value || '-'}
+      </span>
+    </div>
+  );
 }
 
 // ── Mandate workflow mapping ──
@@ -963,99 +977,59 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && (
           <>
             {/* ─────────── Section Recherche ─────────── */}
-            <section id="recherche" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <h5 className="text-xl font-bold text-content-headings">Recherche</h5>
+            <section id="recherche" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5">
+              <div className="flex items-center justify-between mb-[50px]">
+                <div className="flex items-center gap-[4px]">
+                  <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
+                    Recherche
+                  </h3>
                   <Badge variant={deal.searchCity || deal.searchPropertyType ? 'success' : 'warning'}>
                     {deal.searchCity || deal.searchPropertyType ? 'Définis' : 'À définir'}
                   </Badge>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setIsRechercheSheetOpen(true)}>
+                <Button variant="ghost" onClick={() => setIsRechercheSheetOpen(true)}>
                   <Pencil size={16} /> Éditer
                 </Button>
               </div>
 
-              <div className="grid grid-cols-3 gap-6">
+              {/* Grille 3 colonnes — même pattern que Caractéristiques FicheBien */}
+              <div className="grid grid-cols-3 gap-x-[60px] gap-y-[8px]">
+                {/* Headers */}
+                <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Localisation
+                </p>
+                <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Caractéristiques
+                </p>
+                <p className="col-span-1 text-[14px] font-semibold leading-[20px] tracking-[0.14px] text-content-headings mb-[16px]">
+                  Budget
+                </p>
+
                 {/* Col 1 — Localisation */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Localisation</span>
-                  <div className="flex flex-col gap-1 text-sm text-content-body">
-                    {deal.searchCity ? (
-                      <div className="flex justify-between">
-                        <span className="text-content-secondary">Ville</span>
-                        <span className="font-semibold">{deal.searchCity}</span>
-                      </div>
-                    ) : (
-                      <span className="text-content-subtle italic">Non définie</span>
-                    )}
-                  </div>
+                <div>
+                  <ProfileField label="Ville" value={deal.searchCity} />
                 </div>
 
                 {/* Col 2 — Caractéristiques */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Caractéristiques</span>
-                  <div className="flex flex-col gap-1 text-sm text-content-body">
-                    {deal.searchPropertyType && (
-                      <div className="flex justify-between">
-                        <span className="text-content-secondary">Type</span>
-                        <span className="font-semibold">{deal.searchPropertyType}</span>
-                      </div>
-                    )}
-                    {(deal.searchSurfaceMin != null || deal.searchSurfaceMax != null) && (
-                      <div className="flex justify-between">
-                        <span className="text-content-secondary">Surface</span>
-                        <span className="font-semibold">
-                          {deal.searchSurfaceMin ?? '—'} — {deal.searchSurfaceMax ?? '—'} m²
-                        </span>
-                      </div>
-                    )}
-                    {!deal.searchPropertyType && deal.searchSurfaceMin == null && deal.searchSurfaceMax == null && (
-                      <span className="text-content-subtle italic">Non définies</span>
-                    )}
-                  </div>
+                <div>
+                  <ProfileField label="Type de bien" value={deal.searchPropertyType} />
+                  <ProfileField label="Surface min" value={deal.searchSurfaceMin != null ? `${deal.searchSurfaceMin} m²` : null} />
+                  <ProfileField label="Surface max" value={deal.searchSurfaceMax != null ? `${deal.searchSurfaceMax} m²` : null} />
                 </div>
 
                 {/* Col 3 — Budget */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Budget</span>
-                  <div className="flex flex-col gap-1 text-sm text-content-body">
-                    {currentType === 'ACQUISITION' ? (
-                      <>
-                        {(deal.acquisitionMinBudget != null || deal.acquisitionMaxBudget != null) ? (
-                          <div className="flex justify-between">
-                            <span className="text-content-secondary">Fourchette</span>
-                            <span className="font-semibold">
-                              {formatPrice(deal.acquisitionMinBudget)} — {formatPrice(deal.acquisitionMaxBudget)}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-content-subtle italic">Non défini</span>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {(deal.locationMinBudget != null || deal.locationMaxBudget != null) ? (
-                          <>
-                            {deal.locationMinBudget != null && (
-                              <div className="flex justify-between">
-                                <span className="text-content-secondary">Loyer min</span>
-                                <span className="font-semibold">{formatPrice(deal.locationMinBudget)}/mois</span>
-                              </div>
-                            )}
-                            {deal.locationMaxBudget != null && (
-                              <div className="flex justify-between">
-                                <span className="text-content-secondary">Loyer max</span>
-                                <span className="font-semibold">{formatPrice(deal.locationMaxBudget)}/mois</span>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-content-subtle italic">Non défini</span>
-                        )}
-                      </>
-                    )}
-                  </div>
+                <div>
+                  {currentType === 'ACQUISITION' ? (
+                    <>
+                      <ProfileField label="Budget min" value={deal.acquisitionMinBudget != null ? formatPrice(deal.acquisitionMinBudget) : null} />
+                      <ProfileField label="Budget max" value={deal.acquisitionMaxBudget != null ? formatPrice(deal.acquisitionMaxBudget) : null} />
+                    </>
+                  ) : (
+                    <>
+                      <ProfileField label="Loyer min" value={deal.locationMinBudget != null ? `${formatPrice(deal.locationMinBudget)}/mois` : null} />
+                      <ProfileField label="Loyer max" value={deal.locationMaxBudget != null ? `${formatPrice(deal.locationMaxBudget)}/mois` : null} />
+                    </>
+                  )}
                 </div>
               </div>
             </section>
@@ -1595,112 +1569,146 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </div>
           }
         >
-          <div className="flex flex-col">
-            {/* ── Section Zone géographique ── */}
-            <div className="px-5 py-4 flex flex-col gap-3 border-b border-edge-default">
-              <span className="text-sm font-semibold text-content-headings">Zone géographique</span>
-              {rechercheForm.city && (
-                <div className="flex flex-wrap gap-2">
-                  <BadgeCriteria label={rechercheForm.city} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, city: '' }))} />
-                </div>
-              )}
-              <InputFieldOutlined
-                label="Ville, code postal ou région"
-                value={rechercheForm.city}
-                onChange={(v) => setRechercheForm((p) => ({ ...p, city: v }))}
-                placeholder="Ex : Lyon, 75011, Île-de-France"
-              />
-            </div>
-
-            {/* ── Section Caractéristiques ── */}
-            <div className="px-5 py-4 flex flex-col gap-3 border-b border-edge-default">
-              <span className="text-sm font-semibold text-content-headings">Caractéristiques</span>
-              {(rechercheForm.propertyType || rechercheForm.surfaceMin || rechercheForm.surfaceMax) && (
-                <div className="flex flex-wrap gap-2">
-                  {rechercheForm.propertyType && (
-                    <BadgeCriteria label={rechercheForm.propertyType} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, propertyType: '' }))} />
-                  )}
-                  {rechercheForm.surfaceMin && (
-                    <BadgeCriteria label={`≥ ${rechercheForm.surfaceMin} m²`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, surfaceMin: '' }))} />
-                  )}
-                  {rechercheForm.surfaceMax && (
-                    <BadgeCriteria label={`≤ ${rechercheForm.surfaceMax} m²`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, surfaceMax: '' }))} />
-                  )}
-                </div>
-              )}
-              <InputFieldOutlined
-                label="Type de bien"
-                value={rechercheForm.propertyType}
-                onChange={(v) => setRechercheForm((p) => ({ ...p, propertyType: v }))}
-                placeholder="Ex : T2, T3, Maison 4p, Studio"
-              />
-              <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
+            {/* ── Zone géographique ── */}
+            <CollapsibleSection
+              title="Zone géographique"
+              defaultExpanded={true}
+              badge={(() => {
+                const count = [rechercheForm.city].filter(Boolean).length;
+                return <Badge variant={count > 0 ? 'default' : 'disabled'}>{count}</Badge>;
+              })()}
+            >
+              <div className="flex flex-col gap-[16px]">
                 <InputFieldOutlined
-                  label="Surface min (m²)"
-                  value={rechercheForm.surfaceMin}
-                  onChange={(v) => setRechercheForm((p) => ({ ...p, surfaceMin: v }))}
-                  type="number"
-                  placeholder="30"
+                  label="Ville, code postal ou région"
+                  value={rechercheForm.city}
+                  onChange={(v) => setRechercheForm((p) => ({ ...p, city: v }))}
+                  placeholder="Ex : Lyon, 75011, Île-de-France"
                 />
-                <InputFieldOutlined
-                  label="Surface max (m²)"
-                  value={rechercheForm.surfaceMax}
-                  onChange={(v) => setRechercheForm((p) => ({ ...p, surfaceMax: v }))}
-                  type="number"
-                  placeholder="80"
-                />
+                {rechercheForm.city && (
+                  <div className="flex flex-wrap gap-2">
+                    {rechercheForm.city.split(/\s*[\/,]\s*/).map((part, i) => (
+                      <BadgeCriteria key={i} label={part.trim()} variant="default" />
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
+            </CollapsibleSection>
 
-            {/* ── Section Budget ── */}
-            <div className="px-5 py-4 flex flex-col gap-3">
-              <span className="text-sm font-semibold text-content-headings">Budget</span>
-              {(rechercheForm.budgetMin || rechercheForm.budgetMax) && (
-                <div className="flex flex-wrap gap-2">
-                  {rechercheForm.budgetMin && (
-                    <BadgeCriteria label={currentType === 'ACQUISITION' ? `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €` : `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €/mois`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, budgetMin: '' }))} />
-                  )}
-                  {rechercheForm.budgetMax && (
-                    <BadgeCriteria label={currentType === 'ACQUISITION' ? `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €` : `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €/mois`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, budgetMax: '' }))} />
-                  )}
-                </div>
-              )}
-              {currentType === 'ACQUISITION' ? (
-                <div className="grid grid-cols-2 gap-3">
+            {/* ── Caractéristiques ── */}
+            <CollapsibleSection
+              title="Caractéristiques"
+              defaultExpanded={true}
+              badge={(() => {
+                const count = [rechercheForm.propertyType, rechercheForm.surfaceMin, rechercheForm.surfaceMax].filter(Boolean).length;
+                return <Badge variant={count > 0 ? 'default' : 'disabled'}>{count}</Badge>;
+              })()}
+            >
+              <div className="flex flex-col gap-[16px]">
+                <InputFieldOutlined
+                  label="Type de bien"
+                  value={rechercheForm.propertyType}
+                  onChange={(v) => setRechercheForm((p) => ({ ...p, propertyType: v }))}
+                  placeholder="Ex : T2, T3, Maison 4p, Studio"
+                />
+                {rechercheForm.propertyType && (
+                  <div className="flex flex-wrap gap-2">
+                    <BadgeCriteria label={rechercheForm.propertyType} variant="default" />
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-[12px]">
                   <InputFieldOutlined
-                    label="Budget min (€)"
-                    value={rechercheForm.budgetMin}
-                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMin: v }))}
+                    label="Surface min (m²)"
+                    value={rechercheForm.surfaceMin}
+                    onChange={(v) => setRechercheForm((p) => ({ ...p, surfaceMin: v }))}
                     type="number"
-                    placeholder="200 000"
+                    placeholder="30"
                   />
                   <InputFieldOutlined
-                    label="Budget max (€)"
-                    value={rechercheForm.budgetMax}
-                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMax: v }))}
+                    label="Surface max (m²)"
+                    value={rechercheForm.surfaceMax}
+                    onChange={(v) => setRechercheForm((p) => ({ ...p, surfaceMax: v }))}
                     type="number"
-                    placeholder="400 000"
-                  />
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  <InputFieldOutlined
-                    label="Loyer min (€/mois)"
-                    value={rechercheForm.budgetMin}
-                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMin: v }))}
-                    type="number"
-                    placeholder="600"
-                  />
-                  <InputFieldOutlined
-                    label="Loyer max (€/mois)"
-                    value={rechercheForm.budgetMax}
-                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMax: v }))}
-                    type="number"
-                    placeholder="1200"
+                    placeholder="80"
                   />
                 </div>
-              )}
-            </div>
+                {(rechercheForm.surfaceMin || rechercheForm.surfaceMax) && (
+                  <div className="flex flex-wrap gap-2">
+                    {rechercheForm.surfaceMin && <BadgeCriteria label={`≥ ${rechercheForm.surfaceMin} m²`} variant="default" />}
+                    {rechercheForm.surfaceMax && <BadgeCriteria label={`≤ ${rechercheForm.surfaceMax} m²`} variant="default" />}
+                  </div>
+                )}
+              </div>
+            </CollapsibleSection>
+
+            {/* ── Budget ── */}
+            <CollapsibleSection
+              title="Budget"
+              defaultExpanded={true}
+              badge={(() => {
+                const count = [rechercheForm.budgetMin, rechercheForm.budgetMax].filter(Boolean).length;
+                return <Badge variant={count > 0 ? 'default' : 'disabled'}>{count}</Badge>;
+              })()}
+            >
+              <div className="flex flex-col gap-[16px]">
+                {currentType === 'ACQUISITION' ? (
+                  <div className="grid grid-cols-2 gap-[12px]">
+                    <InputFieldOutlined
+                      label="Budget min (€)"
+                      value={rechercheForm.budgetMin}
+                      onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMin: v }))}
+                      type="number"
+                      placeholder="200 000"
+                    />
+                    <InputFieldOutlined
+                      label="Budget max (€)"
+                      value={rechercheForm.budgetMax}
+                      onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMax: v }))}
+                      type="number"
+                      placeholder="400 000"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-[12px]">
+                    <InputFieldOutlined
+                      label="Loyer min (€/mois)"
+                      value={rechercheForm.budgetMin}
+                      onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMin: v }))}
+                      type="number"
+                      placeholder="600"
+                    />
+                    <InputFieldOutlined
+                      label="Loyer max (€/mois)"
+                      value={rechercheForm.budgetMax}
+                      onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMax: v }))}
+                      type="number"
+                      placeholder="1200"
+                    />
+                  </div>
+                )}
+                {(rechercheForm.budgetMin || rechercheForm.budgetMax) && (
+                  <div className="flex flex-wrap gap-2">
+                    {rechercheForm.budgetMin && (
+                      <BadgeCriteria
+                        label={currentType === 'ACQUISITION'
+                          ? `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €`
+                          : `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €/mois`}
+                        variant="default"
+                      />
+                    )}
+                    {rechercheForm.budgetMax && (
+                      <BadgeCriteria
+                        label={currentType === 'ACQUISITION'
+                          ? `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €`
+                          : `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €/mois`}
+                        variant="default"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            </CollapsibleSection>
           </div>
         </Sheet>
       )}
