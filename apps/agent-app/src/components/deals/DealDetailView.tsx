@@ -47,6 +47,7 @@ import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
 import { CardCA } from '@real-estate/ui/card-ca';
 import { ListAnnonce } from '@real-estate/ui/list-annonce';
 import { KpiIndicator } from '@real-estate/ui/kpi-indicator';
+import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { MessageReceived } from '@real-estate/ui/message-received';
 import { MessageSent } from '@real-estate/ui/message-sent';
 import { ListBail } from '@real-estate/ui/list-bail';
@@ -142,10 +143,10 @@ interface MessageRow {
 interface ListingRow {
   id: string;
   status: string | null;
-  platform: string | null;
-  publicationDate: string | null;
-  viewsCount: number | null;
-  contactsCount: number | null;
+  title: string | null;
+  publishedAt: string | null;
+  viewCount: number | null;
+  leadCount: number | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -556,6 +557,13 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isAnnonceSheetOpen, setIsAnnonceSheetOpen] = useState(false);
   const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
 
+  // ── Recherche form state ──
+  const [rechercheForm, setRechercheForm] = useState({
+    criteriaSummary: '',
+    budgetMin: '',
+    budgetMax: '',
+  });
+
   // ── Fetch ──
   useEffect(() => {
     async function load() {
@@ -629,7 +637,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       if (normalizedDeal.listingId) {
         const { data: listingData } = await supabase
           .from('Listing')
-          .select('id, status, platform, publicationDate, viewsCount, contactsCount')
+          .select('id, status, title, publishedAt, viewCount, leadCount')
           .eq('id', normalizedDeal.listingId)
           .single();
         setListing((listingData as ListingRow) ?? null);
@@ -640,6 +648,23 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
     load();
   }, [dealId]);
+
+  // ── Sync recherche form with deal data ──
+  useEffect(() => {
+    if (!deal) return;
+    const ct = (deal.type as DealType) ?? 'VENTE';
+    setRechercheForm({
+      criteriaSummary: ct === 'ACQUISITION'
+        ? (deal.acquisitionCriteriaSummary ?? '')
+        : (deal.locationCriteriaSummary || deal.acquisitionCriteriaSummary || ''),
+      budgetMin: ct === 'ACQUISITION'
+        ? String(deal.acquisitionMinBudget ?? '')
+        : String(deal.locationMinBudget ?? ''),
+      budgetMax: ct === 'ACQUISITION'
+        ? String(deal.acquisitionMaxBudget ?? '')
+        : '',
+    });
+  }, [deal]);
 
   // ── Derived data ──
   const visitEvents = events.filter((e) => e.type === 'VISITE');
@@ -891,13 +916,13 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 <div className="flex gap-4">
                   <KpiIndicator
                     icon={<Inbox size={20} />}
-                    value={String(listing.viewsCount ?? 0)}
-                    percentage={Math.min(100, (listing.viewsCount ?? 0))}
+                    value={String(listing.viewCount ?? 0)}
+                    percentage={Math.min(100, (listing.viewCount ?? 0))}
                   />
                   <KpiIndicator
                     icon={<MessageSquare size={20} />}
-                    value={String(listing.contactsCount ?? 0)}
-                    percentage={Math.min(100, (listing.contactsCount ?? 0) * 10)}
+                    value={String(listing.leadCount ?? 0)}
+                    percentage={Math.min(100, (listing.leadCount ?? 0) * 10)}
                   />
                 </div>
               </>
@@ -1458,23 +1483,31 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           title="Annonce"
           width="wide"
         >
-          <div className="px-[40px] py-[20px] flex flex-col gap-[20px]">
+          <div className="px-5 py-5 flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-content-caption">Plateforme</span>
-                <p className="font-semibold text-content-body">{listing.platform ?? '—'}</p>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-content-secondary">Titre</span>
+                <p className="font-semibold text-content-body">{listing.title ?? '—'}</p>
               </div>
-              <div>
-                <span className="text-content-caption">Statut</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-content-secondary">Statut</span>
                 <p className="font-semibold text-content-body">{listing.status ?? '—'}</p>
               </div>
-              <div>
-                <span className="text-content-caption">Vues</span>
-                <p className="font-semibold text-content-body">{listing.viewsCount ?? 0}</p>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-content-secondary">Date de publication</span>
+                <p className="font-semibold text-content-body">
+                  {listing.publishedAt
+                    ? new Date(listing.publishedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : '—'}
+                </p>
               </div>
-              <div>
-                <span className="text-content-caption">Contacts</span>
-                <p className="font-semibold text-content-body">{listing.contactsCount ?? 0}</p>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-content-secondary">Vues</span>
+                <p className="font-semibold text-content-body">{listing.viewCount ?? 0}</p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-content-secondary">Contacts</span>
+                <p className="font-semibold text-content-body">{listing.leadCount ?? 0}</p>
               </div>
             </div>
           </div>
@@ -1487,7 +1520,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           isOpen={isRechercheSheetOpen}
           onClose={() => setIsRechercheSheetOpen(false)}
           title="Critères de recherche"
-          width="wide"
+          width="narrow"
           footer={
             <div className="flex gap-3 w-full">
               <Button variant="secondary" className="flex-1" onClick={() => setIsRechercheSheetOpen(false)}>
@@ -1499,42 +1532,43 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </div>
           }
         >
-          <div className="p-5 flex flex-col gap-6">
-            {/* Résumé critères */}
-            <div className="flex flex-col gap-1">
-              <span className="text-sm font-semibold text-content-body">Résumé des critères</span>
+          <div className="p-5 flex flex-col gap-[16px]">
+            <InputFieldOutlined
+              label="Résumé des critères"
+              value={rechercheForm.criteriaSummary}
+              onChange={(v) => setRechercheForm((prev) => ({ ...prev, criteriaSummary: v }))}
+              placeholder="Ex : T3 lumineux, proche transports"
+            />
+            {currentType === 'ACQUISITION' ? (
+              <>
+                <InputFieldOutlined
+                  label="Budget min (€)"
+                  value={rechercheForm.budgetMin}
+                  onChange={(v) => setRechercheForm((prev) => ({ ...prev, budgetMin: v }))}
+                  type="number"
+                  placeholder="200 000"
+                />
+                <InputFieldOutlined
+                  label="Budget max (€)"
+                  value={rechercheForm.budgetMax}
+                  onChange={(v) => setRechercheForm((prev) => ({ ...prev, budgetMax: v }))}
+                  type="number"
+                  placeholder="400 000"
+                />
+              </>
+            ) : (
+              <InputFieldOutlined
+                label="Loyer max (€/mois)"
+                value={rechercheForm.budgetMin}
+                onChange={(v) => setRechercheForm((prev) => ({ ...prev, budgetMin: v }))}
+                type="number"
+                placeholder="900"
+              />
+            )}
+            <div className="flex flex-col gap-1 pt-2">
+              <span className="text-xs text-content-secondary">Critères client (fiche)</span>
               <p className="text-sm text-content-body bg-surface-secondary rounded-lg p-3">
-                {criteriaSummary || 'Aucun critère défini'}
-              </p>
-            </div>
-
-            {/* Budget */}
-            <div className="flex flex-col gap-1">
-              <span className="text-sm font-semibold text-content-body">Budget</span>
-              {currentType === 'ACQUISITION' ? (
-                <div className="flex gap-4 text-sm text-content-body">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-content-secondary">Min</span>
-                    <span className="font-semibold">{formatPrice(deal.acquisitionMinBudget)}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-content-secondary">Max</span>
-                    <span className="font-semibold">{formatPrice(deal.acquisitionMaxBudget)}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-1 text-sm text-content-body">
-                  <span className="text-xs text-content-secondary">Loyer max</span>
-                  <span className="font-semibold">{formatPrice(deal.locationMinBudget || deal.bailMonthlyRent)}/mois</span>
-                </div>
-              )}
-            </div>
-
-            {/* Critères client (référence) */}
-            <div className="flex flex-col gap-1">
-              <span className="text-sm font-semibold text-content-body">Critères client (fiche)</span>
-              <p className="text-sm text-content-body bg-surface-secondary rounded-lg p-3">
-                {deal.Client?.searchCriteriaSummary || 'Non renseignés'}
+                {deal?.Client?.searchCriteriaSummary || 'Non renseignés'}
               </p>
             </div>
           </div>
