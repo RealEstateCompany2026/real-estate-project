@@ -163,7 +163,7 @@ function formatDateTime(date: string): string {
 }
 
 function formatPrice(amount: number | null | undefined): string {
-  if (!amount) return '\u2014';
+  if (!amount) return '—';
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'EUR',
@@ -190,19 +190,6 @@ function propertyTypeLabel(t: string | null): string {
 
 // ── Mandate workflow mapping ──
 
-const MANDATE_STATUS_LABELS: Record<string, string> = {
-  NON_CREE: 'Non cr\u00e9\u00e9',
-  EDITE: '\u00c9dit\u00e9',
-  ENVOYE: 'Envoy\u00e9',
-  SIGNE: 'Sign\u00e9',
-};
-
-const MANDATE_STATUS_VARIANT: Record<string, BadgeVariant> = {
-  NON_CREE: 'disabled',
-  EDITE: 'default',
-  ENVOYE: 'information',
-  SIGNE: 'success',
-};
 
 function mapMandateWorkflow(
   status: string | null,
@@ -290,9 +277,9 @@ function mapBailWorkflow(
 
 const NOTARIAL_STATUS_LABELS: Record<string, string> = {
   EN_ATTENTE: 'En attente',
-  RDV_FIXE: 'RDV fix\u00e9',
-  SIGNE: 'Sign\u00e9',
-  ANNULE: 'Annul\u00e9',
+  RDV_FIXE: 'RDV fixé',
+  SIGNE: 'Signé',
+  ANNULE: 'Annulé',
 };
 
 const NOTARIAL_STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -462,9 +449,9 @@ function dbStatusToDsStatus(status: string | null): 'none' | 'success' | 'fail' 
 function attachmentLabel(url: string): string {
   try {
     const u = new URL(url);
-    return u.pathname.split('/').pop() || 'Pi\u00e8ce jointe';
+    return u.pathname.split('/').pop() || 'Pièce jointe';
   } catch {
-    return url.split('/').pop() || 'Pi\u00e8ce jointe';
+    return url.split('/').pop() || 'Pièce jointe';
   }
 }
 
@@ -497,7 +484,7 @@ function isMandateEndingSoon(endDate: string | null): boolean {
 
 const ancresVente = [
   { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
-  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'activite', label: 'Activités', icon: <Activity size={20} /> },
   { id: 'annonce', label: 'Annonce', icon: <Tag size={20} /> },
   { id: 'leads', label: 'Leads', icon: <Inbox size={20} /> },
   { id: 'visites', label: 'Visites', icon: <DoorOpen size={20} /> },
@@ -509,7 +496,7 @@ const ancresVente = [
 
 const ancresAcquisition = [
   { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
-  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'activite', label: 'Activités', icon: <Activity size={20} /> },
   { id: 'recherche', label: 'Recherche', icon: <Search size={20} /> },
   { id: 'biens', label: 'Biens', icon: <Home size={20} /> },
   { id: 'visites', label: 'Visites', icon: <DoorOpen size={20} /> },
@@ -521,7 +508,7 @@ const ancresAcquisition = [
 
 const ancresLocation = [
   { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
-  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'activite', label: 'Activités', icon: <Activity size={20} /> },
   { id: 'recherche', label: 'Recherche', icon: <Search size={20} /> },
   { id: 'biens', label: 'Biens', icon: <Home size={20} /> },
   { id: 'visites', label: 'Visites', icon: <DoorOpen size={20} /> },
@@ -533,7 +520,8 @@ const ancresLocation = [
 
 const ancresGestion = [
   { id: 'mandat', label: 'Mandat', icon: <FileSearch size={20} /> },
-  { id: 'activite', label: 'Activit\u00e9s', icon: <Activity size={20} /> },
+  { id: 'activite', label: 'Activités', icon: <Activity size={20} /> },
+  { id: 'annonce', label: 'Annonce', icon: <Tag size={20} /> },
   { id: 'occupation', label: 'Occupation', icon: <Home size={20} /> },
   { id: 'loyers', label: 'Loyers', icon: <BadgeEuro size={20} /> },
   { id: 'entretien', label: 'Entretien', icon: <Wrench size={20} /> },
@@ -565,6 +553,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [bienFilter, setBienFilter] = useState<'tous' | 'shortlist'>('tous');
   const [isSheetMandatOpen, setIsSheetMandatOpen] = useState(false);
+  const [isAnnonceSheetOpen, setIsAnnonceSheetOpen] = useState(false);
 
   // ── Fetch ──
   useEffect(() => {
@@ -662,7 +651,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
   const clientFullName = deal?.Client
     ? `${deal.Client.firstName ?? ''} ${deal.Client.lastName ?? ''}`.trim()
-    : '\u2014';
+    : '—';
 
   // ── Current type + ancres dynamiques ──
   const currentType = (deal?.type as DealType) ?? 'VENTE';
@@ -728,8 +717,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           dealType={currentType}
           status={deal.status ?? undefined}
           propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-          surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
-          city={deal.Property?.addressCity ?? '\u2014'}
+          surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
+          city={deal.Property?.addressCity ?? '—'}
           price={formatPrice(deal.Property?.desiredSellingPrice)}
           aiSuggestions={0}
           onBack={() => router.push('/deals')}
@@ -739,7 +728,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       {/* ── GraphCourbe ── */}
       <div className="px-5 py-4">
         <GraphCourbe
-          title="Activit\u00e9"
+          title="Activité"
           data={mockGraphData()}
         />
       </div>
@@ -763,20 +752,15 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         <section id="mandat" className="px-5 py-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Mandat</h5>
-            {/* ACQ/LOC : indicateur mandateWaived */}
-            {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived ? (
-              <Chip variant="filled" label="Mandat non n\u00e9cessaire" />
-            ) : (
-              <Badge variant={MANDATE_STATUS_VARIANT[mandateStatusKey] ?? 'disabled'}>
-                {MANDATE_STATUS_LABELS[mandateStatusKey] ?? 'Non cr\u00e9\u00e9'}
-              </Badge>
+            {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived && (
+              <Chip variant="filled" label="Mandat non nécessaire" />
             )}
           </div>
 
           {/* Ne pas afficher le workflow si mandat waived (ACQ/LOC) */}
           {!((currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived) && (
             <ListMandat
-              reference={deal.reference ?? '\u2014'}
+              reference={deal.reference ?? '—'}
               workflow={{
                 edition: mapMandateWorkflow(mandateStatusKey, 'edition'),
                 revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
@@ -791,7 +775,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           {currentType === 'GESTION' && deal.saleMandateEndDate && (
             <div className="flex flex-col gap-2 text-sm text-content-body">
               <div className="flex justify-between">
-                <span>\u00c9ch\u00e9ance mandat</span>
+                <span>Échéance mandat</span>
                 <span className="font-semibold">
                   {new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </span>
@@ -800,7 +784,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           )}
           {currentType === 'GESTION' && isMandateEndingSoon(deal.saleMandateEndDate) && (
             <AiSuggestionBanner
-              suggestion="Le mandat de gestion arrive \u00e0 \u00e9ch\u00e9ance dans moins de 3 mois. Pr\u00e9voir le renouvellement."
+              suggestion="Le mandat de gestion arrive à échéance dans moins de 3 mois. Prévoir le renouvellement."
               variant="compact"
             />
           )}
@@ -824,7 +808,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             <div className="flex items-center gap-[12px]">
               <div className="flex items-center gap-[4px]">
                 <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
-                  Activit\u00e9s
+                  Activités
                 </h3>
                 <Badge variant="default">{filteredActivities.length}</Badge>
               </div>
@@ -856,7 +840,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </Button>
           </div>
 
-          {/* Liste des activit\u00e9s (4 max) */}
+          {/* Liste des activités (4 max) */}
           <div className="flex flex-col">
             {filteredActivities.slice(0, 4).map((activity) => (
               <CardLog
@@ -871,65 +855,67 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               />
             ))}
             {filteredActivities.length === 0 && (
-              <p className="text-sm text-content-subtle italic">Aucune activit\u00e9 enregistr\u00e9e</p>
+              <p className="text-sm text-content-subtle italic">Aucune activité enregistrée</p>
             )}
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        {/* ── Sections VENTE only : Annonce + Leads ──                      */}
+        {/* ── Section Annonce (VENTE + GESTION) ──                          */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {(currentType === 'VENTE' || currentType === 'GESTION') && (
+          <section id="annonce" className="px-5 py-6 flex flex-col gap-4">
+            <h5 className="text-xl font-bold text-content-headings">Annonce</h5>
+            {listing ? (
+              <>
+                <ListAnnonce
+                  city={deal.Property?.addressCity ?? '—'}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : '—'}
+                  dpeGrade={
+                    deal.Property?.dpeEnergyClass &&
+                    ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
+                      ? (deal.Property.dpeEnergyClass as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G')
+                      : undefined
+                  }
+                  ownerName={clientFullName}
+                  workflow={annonceWorkflow}
+                  onView={() => setIsAnnonceSheetOpen(true)}
+                />
+                <div className="flex gap-4">
+                  <KpiIndicator
+                    icon={<Inbox size={20} />}
+                    value={String(listing.viewsCount ?? 0)}
+                    percentage={Math.min(100, (listing.viewsCount ?? 0))}
+                  />
+                  <KpiIndicator
+                    icon={<MessageSquare size={20} />}
+                    value={String(listing.contactsCount ?? 0)}
+                    percentage={Math.min(100, (listing.contactsCount ?? 0) * 10)}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-content-subtle italic">Aucune annonce créée</p>
+            )}
+          </section>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ── Section Leads (VENTE only) ──                                 */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {currentType === 'VENTE' && (
-          <>
-            {/* ─────────── Section Annonce (AFF-V03) ─────────── */}
-            <section id="annonce" className="px-5 py-6 flex flex-col gap-4">
-              <h5 className="text-xl font-bold text-content-headings">Annonce</h5>
-              {listing ? (
-                <>
-                  <ListAnnonce
-                    city={deal.Property?.addressCity ?? '\u2014'}
-                    propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m\u00b2` : '\u2014'}
-                    dpeGrade={
-                      deal.Property?.dpeEnergyClass &&
-                      ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-                        ? (deal.Property.dpeEnergyClass as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G')
-                        : undefined
-                    }
-                    ownerName={clientFullName}
-                    workflow={annonceWorkflow}
-                  />
-                  <div className="flex gap-4">
-                    <KpiIndicator
-                      icon={<Inbox size={20} />}
-                      value={String(listing.viewsCount ?? 0)}
-                      percentage={Math.min(100, (listing.viewsCount ?? 0))}
-                    />
-                    <KpiIndicator
-                      icon={<MessageSquare size={20} />}
-                      value={String(listing.contactsCount ?? 0)}
-                      percentage={Math.min(100, (listing.contactsCount ?? 0) * 10)}
-                    />
-                  </div>
-                </>
-              ) : (
-                <p className="text-sm text-content-subtle italic">Aucune annonce cr\u00e9\u00e9e</p>
-              )}
-            </section>
-
-            {/* ─────────── Section Leads (AFF-V04) ─────────── */}
-            <section id="leads" className="px-5 py-6 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h5 className="text-xl font-bold text-content-headings">Leads</h5>
-                <Badge variant="default">{deal.infoRequestsCount ?? 0}</Badge>
-              </div>
-              <p className="text-sm text-content-subtle italic">
-                {(deal.infoRequestsCount ?? 0) === 0
-                  ? "Aucune demande d\u2019information re\u00e7ue"
-                  : `${deal.infoRequestsCount} demande(s) d\u2019information`}
-              </p>
-            </section>
-          </>
+          <section id="leads" className="px-5 py-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xl font-bold text-content-headings">Leads</h5>
+              <Badge variant="default">{deal.infoRequestsCount ?? 0}</Badge>
+            </div>
+            <p className="text-sm text-content-subtle italic">
+              {(deal.infoRequestsCount ?? 0) === 0
+                ? "Aucune demande d'information reçue"
+                : `${deal.infoRequestsCount} demande(s) d'information`}
+            </p>
+          </section>
         )}
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
@@ -942,16 +928,16 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               <h5 className="text-xl font-bold text-content-headings">Recherche</h5>
               <div className="flex flex-col gap-2 text-sm text-content-body">
                 <div className="flex justify-between">
-                  <span>Crit\u00e8res</span>
+                  <span>Critères</span>
                   <span className="font-semibold">
-                    {deal.acquisitionCriteriaSummary || deal.locationCriteriaSummary || '\u2014'}
+                    {deal.acquisitionCriteriaSummary || deal.locationCriteriaSummary || '—'}
                   </span>
                 </div>
                 {currentType === 'ACQUISITION' && (
                   <div className="flex justify-between">
                     <span>Budget</span>
                     <span className="font-semibold">
-                      {formatPrice(deal.acquisitionMinBudget)} \u2014 {formatPrice(deal.acquisitionMaxBudget)}
+                      {formatPrice(deal.acquisitionMinBudget)} — {formatPrice(deal.acquisitionMaxBudget)}
                     </span>
                   </div>
                 )}
@@ -1011,8 +997,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                   dateTime={formatDateTime(v.eventDate)}
                   contactName={clientFullName}
                   propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
-                  city={deal.Property?.addressCity ?? '\u2014'}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
+                  city={deal.Property?.addressCity ?? '—'}
                   workflow={{
                     programme: mapVisiteRechercheStatus(v.status, 'programme'),
                     cr: mapVisiteRechercheStatus(v.status, 'cr'),
@@ -1021,7 +1007,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               )
             ))}
             {visitEvents.length === 0 && (
-              <p className="text-sm text-content-subtle italic">Aucune visite planifi\u00e9e</p>
+              <p className="text-sm text-content-subtle italic">Aucune visite planifiée</p>
             )}
           </section>
         )}
@@ -1038,7 +1024,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 deal.purchaseOfferStatus ? (
                   <ListPromesse
                     useCase="vente"
-                    contactName="Acqu\u00e9reur"
+                    contactName="Acquéreur"
                     workflow={{
                       recue: mapOfferWorkflow(deal.purchaseOfferStatus, 'recue'),
                       transmise: mapOfferWorkflow(deal.purchaseOfferStatus, 'transmise'),
@@ -1046,7 +1032,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                     }}
                   />
                 ) : (
-                  <p className="text-sm text-content-subtle italic">Aucune offre re\u00e7ue</p>
+                  <p className="text-sm text-content-subtle italic">Aucune offre reçue</p>
                 )
               ) : (
                 /* ACQUISITION : useCase="recherche" */
@@ -1055,15 +1041,15 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                     useCase="recherche"
                     contactName={clientFullName}
                     propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
-                    city={deal.Property?.addressCity ?? '\u2014'}
+                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
+                    city={deal.Property?.addressCity ?? '—'}
                     workflow={{
                       envoyee: mapOfferRechercheWorkflow(deal.purchaseOfferStatus, 'envoyee'),
                       acceptee: mapOfferRechercheWorkflow(deal.purchaseOfferStatus, 'acceptee'),
                     }}
                   />
                 ) : (
-                  <p className="text-sm text-content-subtle italic">Aucune promesse envoy\u00e9e</p>
+                  <p className="text-sm text-content-subtle italic">Aucune promesse envoyée</p>
                 )
               )}
             </section>
@@ -1080,8 +1066,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                   contactName={clientFullName}
                   status={{ label: 'En attente', variant: 'default' }}
                   propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
-                  city={deal.Property?.addressCity ?? '\u2014'}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
+                  city={deal.Property?.addressCity ?? '—'}
                 />
               )}
             </section>
@@ -1092,14 +1078,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               {deal.notarialDeedStatus ? (
                 <ListActeNotarie
                   contactName="Notaire"
-                  dateTime={deal.notarialDeedDate ? formatDateTime(deal.notarialDeedDate) : '\u2014'}
+                  dateTime={deal.notarialDeedDate ? formatDateTime(deal.notarialDeedDate) : '—'}
                   status={{
                     label: NOTARIAL_STATUS_LABELS[deal.notarialDeedStatus] ?? deal.notarialDeedStatus,
                     variant: NOTARIAL_STATUS_VARIANT[deal.notarialDeedStatus] ?? 'default',
                   }}
                 />
               ) : (
-                <p className="text-sm text-content-subtle italic">Aucun acte notari\u00e9 en cours</p>
+                <p className="text-sm text-content-subtle italic">Aucun acte notarié en cours</p>
               )}
             </section>
           </>
@@ -1126,8 +1112,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 <ListBail
                   contactName={clientFullName}
                   propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m\u00b2` : '\u2014'}
-                  city={deal.Property?.addressCity ?? '\u2014'}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
+                  city={deal.Property?.addressCity ?? '—'}
                   workflow={{
                     edition: mapBailWorkflow(deal.bailSignedDate, 'edition'),
                     revision: mapBailWorkflow(deal.bailSignedDate, 'revision'),
@@ -1135,7 +1121,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                   }}
                 />
               ) : (
-                <p className="text-sm text-content-subtle italic">Aucun bail cr\u00e9\u00e9</p>
+                <p className="text-sm text-content-subtle italic">Aucun bail créé</p>
               )}
               {deal.bailMonthlyRent && (
                 <div className="flex flex-col gap-2 text-sm text-content-body">
@@ -1148,7 +1134,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                     <span className="font-semibold">{formatPrice(deal.bailCharges)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>D\u00e9p\u00f4t de garantie</span>
+                    <span>Dépôt de garantie</span>
                     <span className="font-semibold">{formatPrice(deal.bailDepositAmount)}</span>
                   </div>
                 </div>
@@ -1167,7 +1153,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Occupation</h5>
                 <Badge variant={deal.occupancyStatus === 'OCCUPE' ? 'success' : 'disabled'}>
-                  {deal.occupancyStatus === 'OCCUPE' ? 'Occup\u00e9' : 'Vacant'}
+                  {deal.occupancyStatus === 'OCCUPE' ? 'Occupé' : 'Vacant'}
                 </Badge>
               </div>
               {deal.occupancyStatus === 'OCCUPE' && (
@@ -1180,7 +1166,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Loyers</h5>
                 <Badge variant={deal.rentPaymentStatus === 'EN_REGLE' ? 'success' : 'warning'}>
-                  {deal.rentPaymentStatus === 'EN_REGLE' ? 'En r\u00e8gle' : 'En conflit'}
+                  {deal.rentPaymentStatus === 'EN_REGLE' ? 'En règle' : 'En conflit'}
                 </Badge>
               </div>
               {deal.bailMonthlyRent && (
@@ -1194,7 +1180,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                     <span className="font-semibold">{formatPrice(deal.bailCharges)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>D\u00e9p\u00f4t de garantie</span>
+                    <span>Dépôt de garantie</span>
                     <span className="font-semibold">{formatPrice(deal.bailDepositAmount)}</span>
                   </div>
                 </div>
@@ -1211,7 +1197,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                     : 'success'
                 }>
                   {deal.maintenanceStatus === 'URGENT' ? 'Urgent'
-                    : deal.maintenanceStatus === 'PROGRAMME' ? 'Programm\u00e9'
+                    : deal.maintenanceStatus === 'PROGRAMME' ? 'Programmé'
                     : 'Aucun'}
                 </Badge>
               </div>
@@ -1231,7 +1217,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                   );
                 })
               ) : (
-                <p className="text-sm text-content-subtle italic">Aucune intervention signal\u00e9e</p>
+                <p className="text-sm text-content-subtle italic">Aucune intervention signalée</p>
               )}
             </section>
           </>
@@ -1244,17 +1230,17 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           <h5 className="text-xl font-bold text-content-headings">Budget</h5>
           <CardCA
             chiffreAffaire={formatPrice(deal.forecastRevenue)}
-            couts="\u2014"
-            margeBrute="\u2014"
-            tauxMarge={deal.winProbability ? `${deal.winProbability}%` : '\u2014'}
+            couts="—"
+            margeBrute="—"
+            tauxMarge={deal.winProbability ? `${deal.winProbability}%` : '—'}
           />
           <div className="flex flex-col gap-2 text-sm text-content-body">
             <div className="flex justify-between">
-              <span>CA pr\u00e9visionnel</span>
+              <span>CA prévisionnel</span>
               <span className="font-semibold">{formatPrice(deal.forecastRevenue)}</span>
             </div>
             <div className="flex justify-between">
-              <span>CA pond\u00e9r\u00e9</span>
+              <span>CA pondéré</span>
               <span className="font-semibold">
                 {formatPrice(
                   (deal.forecastRevenue ?? 0) * (deal.winProbability ?? 0) / 100,
@@ -1269,7 +1255,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             )}
             {currentType === 'GESTION' && deal.bailMonthlyRent && (
               <div className="flex justify-between">
-                <span>CA annualis\u00e9 (estim\u00e9)</span>
+                <span>CA annualisé (estimé)</span>
                 <span className="font-semibold">
                   {formatPrice(deal.bailMonthlyRent * 12)}
                 </span>
@@ -1410,7 +1396,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       <SheetMandat
         isOpen={isSheetMandatOpen}
         onClose={() => setIsSheetMandatOpen(false)}
-        reference={deal.reference ?? '\u2014'}
+        reference={deal.reference ?? '—'}
         workflow={{
           edition: mapMandateWorkflow(mandateStatusKey, 'edition'),
           revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
@@ -1419,11 +1405,11 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
       />
 
-      {/* Sheet Activit\u00e9s */}
+      {/* Sheet Activités */}
       <Sheet
         isOpen={isActivitySheetOpen}
         onClose={() => setIsActivitySheetOpen(false)}
-        title="Activit\u00e9s"
+        title="Activités"
         width="narrow"
       >
         <div className="flex flex-col px-[20px] py-[20px]">
@@ -1441,6 +1427,37 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           ))}
         </div>
       </Sheet>
+
+      {/* Sheet Annonce */}
+      {listing && (
+        <Sheet
+          isOpen={isAnnonceSheetOpen}
+          onClose={() => setIsAnnonceSheetOpen(false)}
+          title="Annonce"
+          width="wide"
+        >
+          <div className="px-[40px] py-[20px] flex flex-col gap-[20px]">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-content-caption">Plateforme</span>
+                <p className="font-semibold text-content-body">{listing.platform ?? '—'}</p>
+              </div>
+              <div>
+                <span className="text-content-caption">Statut</span>
+                <p className="font-semibold text-content-body">{listing.status ?? '—'}</p>
+              </div>
+              <div>
+                <span className="text-content-caption">Vues</span>
+                <p className="font-semibold text-content-body">{listing.viewsCount ?? 0}</p>
+              </div>
+              <div>
+                <span className="text-content-caption">Contacts</span>
+                <p className="font-semibold text-content-body">{listing.contactsCount ?? 0}</p>
+              </div>
+            </div>
+          </div>
+        </Sheet>
+      )}
     </div>
   );
 }
