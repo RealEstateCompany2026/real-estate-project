@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Home, Maximize2, MapPin, User } from "lucide-react";
+import { Home, Maximize2, MapPin, User, Users, Eye, FileText, FolderOpen } from "lucide-react";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
 import { Chip } from "./Chip";
@@ -104,9 +104,9 @@ export function ListAffaire({
           <div className="flex flex-col gap-[8px] items-start">
             <Badge variant={listingStatus ?? "disabled"}>Annonce</Badge>
             <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{offersCount} promesses</Chip>
+              <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+              <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+              <Chip size="small" icon={<FileText size={16} style={{ color: iconColor }} />} iconPosition="left">{offersCount}</Chip>
             </div>
           </div>
         );
@@ -116,9 +116,9 @@ export function ListAffaire({
           <div className="flex flex-col gap-[8px] items-start">
             <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
             <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{offersCount} promesses</Chip>
+              <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+              <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+              <Chip size="small" icon={<FileText size={16} style={{ color: iconColor }} />} iconPosition="left">{offersCount}</Chip>
             </div>
           </div>
         );
@@ -128,9 +128,9 @@ export function ListAffaire({
           <div className="flex flex-col gap-[8px] items-start">
             <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
             <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
+              <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+              <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+              <Chip size="small" icon={<FolderOpen size={16} style={{ color: iconColor }} />} iconPosition="left">{applicationsCount}</Chip>
             </div>
           </div>
         );
@@ -143,9 +143,9 @@ export function ListAffaire({
               <Badge variant={maintenanceStatus ?? "disabled"}>Entretien</Badge>
             </div>
             <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
+              <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+              <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+              <Chip size="small" icon={<FolderOpen size={16} style={{ color: iconColor }} />} iconPosition="left">{applicationsCount}</Chip>
             </div>
           </div>
         );
@@ -162,10 +162,12 @@ export function ListAffaire({
       case "ACQUISITION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
-            <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
-              {weightedRevenue ?? "\u2014"}
-            </span>
+            <div className="flex flex-row items-center gap-[8px]">
+              <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
+              <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+                {weightedRevenue ?? "\u2014"}
+              </span>
+            </div>
             <Badge variant={winProbability > 0 ? "information" : "disabled"}>
               {winProbability}%
             </Badge>
@@ -175,10 +177,12 @@ export function ListAffaire({
       case "LOCATION":
         return (
           <div className="flex flex-col gap-[8px] items-start">
-            <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
-            <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
-              {weightedRevenue ?? "\u2014"}
-            </span>
+            <div className="flex flex-row items-center gap-[8px]">
+              <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
+              <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
+                {weightedRevenue ?? "\u2014"}
+              </span>
+            </div>
             <Badge variant={winProbability > 0 ? "information" : "disabled"}>
               {winProbability}%
             </Badge>
@@ -197,11 +201,11 @@ export function ListAffaire({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between h-[120px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onDealClick}
     >
       {/* S1 — Identification (~300px) */}
-      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full" style={{ width: "300px" }}>
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full">
         {/* Ligne 1 : reference + Chip client */}
         <div className="flex items-center gap-[10px]">
           <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
@@ -237,7 +241,7 @@ export function ListAffaire({
       <VerticalDivider />
 
       {/* S2 — Statut (~160px) */}
-      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full" style={{ width: "160px" }}>
+      <div className="flex flex-col justify-center gap-[8px] px-[20px] shrink-0 h-full">
         <Badge variant={dealBadgeVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
         {pipelineStage && (
           <Chip size="small">{PIPELINE_STAGE_LABELS[pipelineStage]}</Chip>
@@ -247,7 +251,7 @@ export function ListAffaire({
       <VerticalDivider />
 
       {/* S3 — Commercialisation (~220px) */}
-      <div className="flex flex-col justify-center px-[20px] shrink-0 h-full" style={{ width: "220px" }}>
+      <div className="flex flex-col justify-center px-[20px] shrink-0 h-full">
         {renderCommercialisationSection()}
       </div>
 

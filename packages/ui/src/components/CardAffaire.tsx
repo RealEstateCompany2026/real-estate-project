@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Home, Maximize2, MapPin, User } from "lucide-react";
+import { Home, Maximize2, MapPin, User, Users, Eye, FileText, FolderOpen } from "lucide-react";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
 import { Chip } from "./Chip";
@@ -100,52 +100,42 @@ export function CardAffaire({
     switch (dealType) {
       case "VENTE":
         return (
-          <div className="flex flex-col gap-[8px] items-start w-full">
+          <div className="flex flex-row items-center gap-[8px] flex-wrap w-full">
             <Badge variant={listingStatus ?? "disabled"}>Annonce</Badge>
-            <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{offersCount} promesses</Chip>
-            </div>
+            <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+            <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+            <Chip size="small" icon={<FileText size={16} style={{ color: iconColor }} />} iconPosition="left">{offersCount}</Chip>
           </div>
         );
 
       case "ACQUISITION":
         return (
-          <div className="flex flex-col gap-[8px] items-start w-full">
+          <div className="flex flex-row items-center gap-[8px] flex-wrap w-full">
             <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
-            <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{offersCount} promesses</Chip>
-            </div>
+            <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+            <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+            <Chip size="small" icon={<FileText size={16} style={{ color: iconColor }} />} iconPosition="left">{offersCount}</Chip>
           </div>
         );
 
       case "LOCATION":
         return (
-          <div className="flex flex-col gap-[8px] items-start w-full">
+          <div className="flex flex-row items-center gap-[8px] flex-wrap w-full">
             <Badge variant={searchStatus ?? "disabled"}>Recherche</Badge>
-            <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
-            </div>
+            <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+            <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+            <Chip size="small" icon={<FolderOpen size={16} style={{ color: iconColor }} />} iconPosition="left">{applicationsCount}</Chip>
           </div>
         );
 
       case "GESTION":
         return (
-          <div className="flex flex-col gap-[8px] items-start w-full">
-            <div className="flex items-center gap-[8px]">
-              <Badge variant={occupancyStatus ?? "disabled"}>Occupé</Badge>
-              <Badge variant={maintenanceStatus ?? "disabled"}>Entretien</Badge>
-            </div>
-            <div className="flex items-center gap-[8px] flex-wrap">
-              <Chip size="small">{leadsCount} leads</Chip>
-              <Chip size="small">{visitsCount} visites</Chip>
-              <Chip size="small">{applicationsCount} dossiers déposés</Chip>
-            </div>
+          <div className="flex flex-row items-center gap-[8px] flex-wrap w-full">
+            <Badge variant={occupancyStatus ?? "disabled"}>Occupé</Badge>
+            <Badge variant={maintenanceStatus ?? "disabled"}>Entretien</Badge>
+            <Chip size="small" icon={<Users size={16} style={{ color: iconColor }} />} iconPosition="left">{leadsCount}</Chip>
+            <Chip size="small" icon={<Eye size={16} style={{ color: iconColor }} />} iconPosition="left">{visitsCount}</Chip>
+            <Chip size="small" icon={<FolderOpen size={16} style={{ color: iconColor }} />} iconPosition="left">{applicationsCount}</Chip>
           </div>
         );
 
@@ -160,7 +150,7 @@ export function CardAffaire({
       case "VENTE":
       case "ACQUISITION":
         return (
-          <div className="flex flex-col gap-[8px] items-start w-full">
+          <div className="flex flex-row items-center gap-[8px] w-full">
             <Badge variant={promiseStatus ?? "disabled"}>Promesse</Badge>
             <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
               {weightedRevenue ?? "\u2014"}
@@ -173,7 +163,7 @@ export function CardAffaire({
 
       case "LOCATION":
         return (
-          <div className="flex flex-col gap-[8px] items-start w-full">
+          <div className="flex flex-row items-center gap-[8px] w-full">
             <Badge variant={applicationResultStatus ?? "disabled"}>Dossier</Badge>
             <span className="text-base font-semibold font-roboto text-content-body whitespace-nowrap">
               {weightedRevenue ?? "\u2014"}
@@ -236,7 +226,7 @@ export function CardAffaire({
       <HorizontalDivider />
 
       {/* S2 — Statut */}
-      <div className="flex flex-col gap-[8px] items-start px-[20px] py-[16px] w-full">
+      <div className="flex flex-row items-center gap-[8px] px-[20px] py-[16px] w-full">
         <Badge variant={dealBadgeVariant}>{DEAL_TYPE_LABELS[dealType]}</Badge>
         {pipelineStage && (
           <Chip size="small">{PIPELINE_STAGE_LABELS[pipelineStage]}</Chip>
