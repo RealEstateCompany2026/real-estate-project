@@ -24,6 +24,7 @@ import {
   FolderOpen,
   Banknote,
   ArrowRight,
+  Pencil,
 } from 'lucide-react';
 
 // ── DS Components ──
@@ -54,6 +55,7 @@ import { ListBail } from '@real-estate/ui/list-bail';
 import { ListCandidatureLocataire } from '@real-estate/ui/list-candidature-locataire';
 import { ListFinancement } from '@real-estate/ui/list-financement';
 import { ListBien } from '@real-estate/ui/list-bien';
+import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
 import type { DealType } from '@real-estate/ui/deal-types';
 
 // ── App-level ──
@@ -104,6 +106,13 @@ interface DealRow {
   bailSignedDate: string | null;
   bailStartDate: string | null;
   bailEndDate: string | null;
+
+  // Search criteria (structured)
+  searchCity: string | null;
+  searchPropertyType: string | null;
+  searchSurfaceMin: number | null;
+  searchSurfaceMax: number | null;
+  locationMaxBudget: number | null;
 
   // Gestion
   occupancyStatus: string | null;
@@ -559,7 +568,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
   // ── Recherche form state ──
   const [rechercheForm, setRechercheForm] = useState({
-    criteriaSummary: '',
+    city: '',
+    propertyType: '',
+    surfaceMin: '',
+    surfaceMax: '',
     budgetMin: '',
     budgetMax: '',
   });
@@ -654,15 +666,16 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     if (!deal) return;
     const ct = (deal.type as DealType) ?? 'VENTE';
     setRechercheForm({
-      criteriaSummary: ct === 'ACQUISITION'
-        ? (deal.acquisitionCriteriaSummary ?? '')
-        : (deal.locationCriteriaSummary || deal.acquisitionCriteriaSummary || ''),
+      city: deal.searchCity ?? '',
+      propertyType: deal.searchPropertyType ?? '',
+      surfaceMin: deal.searchSurfaceMin != null ? String(deal.searchSurfaceMin) : '',
+      surfaceMax: deal.searchSurfaceMax != null ? String(deal.searchSurfaceMax) : '',
       budgetMin: ct === 'ACQUISITION'
-        ? String(deal.acquisitionMinBudget ?? '')
-        : String(deal.locationMinBudget ?? ''),
+        ? (deal.acquisitionMinBudget != null ? String(deal.acquisitionMinBudget) : '')
+        : (deal.locationMinBudget != null ? String(deal.locationMinBudget) : ''),
       budgetMax: ct === 'ACQUISITION'
-        ? String(deal.acquisitionMaxBudget ?? '')
-        : '',
+        ? (deal.acquisitionMaxBudget != null ? String(deal.acquisitionMaxBudget) : '')
+        : (deal.locationMaxBudget != null ? String(deal.locationMaxBudget) : ''),
     });
   }, [deal]);
 
@@ -732,11 +745,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const mandateStatusKey = currentType === 'GESTION'
     ? (deal.mgmtMandateStatus ?? 'NON_CREE')
     : (deal.saleMandateStatus ?? 'NON_CREE');
-
-  // ── Recherche criteria summary (fallback LOCATION → acquisitionCriteriaSummary) ──
-  const criteriaSummary = currentType === 'ACQUISITION'
-    ? deal.acquisitionCriteriaSummary
-    : (deal.locationCriteriaSummary || deal.acquisitionCriteriaSummary);
 
   // ── Render ──
   return (
@@ -895,7 +903,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Annonce (VENTE + GESTION) ──                          */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {(currentType === 'VENTE' || currentType === 'GESTION') && (
-          <section id="annonce" className="px-5 py-6 flex flex-col gap-4">
+          <section id="annonce" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
             <h5 className="text-xl font-bold text-content-headings">Annonce</h5>
             {listing ? (
               <>
@@ -936,7 +944,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Leads (VENTE only) ──                                 */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {currentType === 'VENTE' && (
-          <section id="leads" className="px-5 py-6 flex flex-col gap-4">
+          <section id="leads" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
             <div className="flex items-center justify-between">
               <h5 className="text-xl font-bold text-content-headings">Leads</h5>
               <Badge variant="default">{deal.infoRequestsCount ?? 0}</Badge>
@@ -955,50 +963,105 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && (
           <>
             {/* ─────────── Section Recherche ─────────── */}
-            <section id="recherche" className="px-5 py-6 flex flex-col gap-4">
+            <section id="recherche" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h5 className="text-xl font-bold text-content-headings">Recherche</h5>
-                  <Badge variant={criteriaSummary ? 'success' : 'warning'}>
-                    {criteriaSummary ? 'Définis' : 'À définir'}
+                  <Badge variant={deal.searchCity || deal.searchPropertyType ? 'success' : 'warning'}>
+                    {deal.searchCity || deal.searchPropertyType ? 'Définis' : 'À définir'}
                   </Badge>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setIsRechercheSheetOpen(true)}>
-                  Éditer
+                  <Pencil size={16} /> Éditer
                 </Button>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                {/* Col 1 — Résumé critères */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-content-secondary">Critères</span>
-                  <span className="text-sm font-semibold text-content-body">
-                    {criteriaSummary || '—'}
-                  </span>
+              <div className="grid grid-cols-3 gap-6">
+                {/* Col 1 — Localisation */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Localisation</span>
+                  <div className="flex flex-col gap-1 text-sm text-content-body">
+                    {deal.searchCity ? (
+                      <div className="flex justify-between">
+                        <span className="text-content-secondary">Ville</span>
+                        <span className="font-semibold">{deal.searchCity}</span>
+                      </div>
+                    ) : (
+                      <span className="text-content-subtle italic">Non définie</span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Col 2 — Budget */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-content-secondary">Budget</span>
-                  <span className="text-sm font-semibold text-content-body">
-                    {currentType === 'ACQUISITION'
-                      ? `${formatPrice(deal.acquisitionMinBudget)} — ${formatPrice(deal.acquisitionMaxBudget)}`
-                      : `${formatPrice(deal.locationMinBudget || deal.bailMonthlyRent)}/mois`}
-                  </span>
+                {/* Col 2 — Caractéristiques */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Caractéristiques</span>
+                  <div className="flex flex-col gap-1 text-sm text-content-body">
+                    {deal.searchPropertyType && (
+                      <div className="flex justify-between">
+                        <span className="text-content-secondary">Type</span>
+                        <span className="font-semibold">{deal.searchPropertyType}</span>
+                      </div>
+                    )}
+                    {(deal.searchSurfaceMin != null || deal.searchSurfaceMax != null) && (
+                      <div className="flex justify-between">
+                        <span className="text-content-secondary">Surface</span>
+                        <span className="font-semibold">
+                          {deal.searchSurfaceMin ?? '—'} — {deal.searchSurfaceMax ?? '—'} m²
+                        </span>
+                      </div>
+                    )}
+                    {!deal.searchPropertyType && deal.searchSurfaceMin == null && deal.searchSurfaceMax == null && (
+                      <span className="text-content-subtle italic">Non définies</span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Col 3 — Critères client */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-content-secondary">Critères client</span>
-                  <span className="text-sm font-semibold text-content-body">
-                    {deal.Client?.searchCriteriaSummary || '—'}
-                  </span>
+                {/* Col 3 — Budget */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Budget</span>
+                  <div className="flex flex-col gap-1 text-sm text-content-body">
+                    {currentType === 'ACQUISITION' ? (
+                      <>
+                        {(deal.acquisitionMinBudget != null || deal.acquisitionMaxBudget != null) ? (
+                          <div className="flex justify-between">
+                            <span className="text-content-secondary">Fourchette</span>
+                            <span className="font-semibold">
+                              {formatPrice(deal.acquisitionMinBudget)} — {formatPrice(deal.acquisitionMaxBudget)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-content-subtle italic">Non défini</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {(deal.locationMinBudget != null || deal.locationMaxBudget != null) ? (
+                          <>
+                            {deal.locationMinBudget != null && (
+                              <div className="flex justify-between">
+                                <span className="text-content-secondary">Loyer min</span>
+                                <span className="font-semibold">{formatPrice(deal.locationMinBudget)}/mois</span>
+                              </div>
+                            )}
+                            {deal.locationMaxBudget != null && (
+                              <div className="flex justify-between">
+                                <span className="text-content-secondary">Loyer max</span>
+                                <span className="font-semibold">{formatPrice(deal.locationMaxBudget)}/mois</span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-content-subtle italic">Non défini</span>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>
 
             {/* ─────────── Section Biens matches ─────────── */}
-            <section id="biens" className="px-5 py-6 flex flex-col gap-4">
+            <section id="biens" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Biens</h5>
                 <Badge variant="default">0</Badge>
@@ -1019,7 +1082,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Visites (VENTE + ACQUISITION + LOCATION) ──           */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {currentType !== 'GESTION' && (
-          <section id="visites" className="px-5 py-6 flex flex-col gap-4">
+          <section id="visites" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
             <div className="flex items-center justify-between">
               <h5 className="text-xl font-bold text-content-headings">Visites</h5>
               <Badge variant="default">{visitEvents.length}</Badge>
@@ -1065,7 +1128,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {(currentType === 'VENTE' || currentType === 'ACQUISITION') && (
           <>
             {/* ─────────── Section Promesses ─────────── */}
-            <section id="promesse" className="px-5 py-6 flex flex-col gap-4">
+            <section id="promesse" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Promesses</h5>
               {currentType === 'VENTE' ? (
                 deal.purchaseOfferStatus ? (
@@ -1102,7 +1165,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Financement ─────────── */}
-            <section id="finance" className="px-5 py-6 flex flex-col gap-4">
+            <section id="finance" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Financement</h5>
               {currentType === 'VENTE' ? (
                 <p className="text-sm text-content-subtle italic">Aucun dossier de financement</p>
@@ -1120,7 +1183,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Notaire ─────────── */}
-            <section id="notaire" className="px-5 py-6 flex flex-col gap-4">
+            <section id="notaire" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
               {deal.notarialDeedStatus ? (
                 <ListActeNotarie
@@ -1144,7 +1207,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {currentType === 'LOCATION' && (
           <>
             {/* ─────────── Section Dossiers candidature ─────────── */}
-            <section id="dossiers" className="px-5 py-6 flex flex-col gap-4">
+            <section id="dossiers" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Dossiers candidature</h5>
               {/* Placeholder — pas de table dediee pour les dossiers actuellement */}
               <p className="text-sm text-content-subtle italic">
@@ -1153,7 +1216,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Bail ─────────── */}
-            <section id="bail" className="px-5 py-6 flex flex-col gap-4">
+            <section id="bail" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Bail</h5>
               {deal.bailType ? (
                 <ListBail
@@ -1196,7 +1259,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {currentType === 'GESTION' && (
           <>
             {/* ─────────── Section Occupation ─────────── */}
-            <section id="occupation" className="px-5 py-6 flex flex-col gap-4">
+            <section id="occupation" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Occupation</h5>
                 <Badge variant={deal.occupancyStatus === 'OCCUPE' ? 'success' : 'disabled'}>
@@ -1209,7 +1272,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Loyers ─────────── */}
-            <section id="loyers" className="px-5 py-6 flex flex-col gap-4">
+            <section id="loyers" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Loyers</h5>
                 <Badge variant={deal.rentPaymentStatus === 'EN_REGLE' ? 'success' : 'warning'}>
@@ -1235,7 +1298,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Entretien ─────────── */}
-            <section id="entretien" className="px-5 py-6 flex flex-col gap-4">
+            <section id="entretien" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Entretien</h5>
                 <Badge variant={
@@ -1273,7 +1336,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Budget (commune, adaptee par variant) ──              */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="ca" className="px-5 py-6 flex flex-col gap-4">
+        <section id="ca" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
           <h5 className="text-xl font-bold text-content-headings">Budget</h5>
           <CardCA
             chiffreAffaire={formatPrice(deal.forecastRevenue)}
@@ -1348,7 +1411,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Messages (commune) ──                                 */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="messages" className="px-5 py-6 flex flex-col gap-4">
+        <section id="messages" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
           <div className="flex items-center justify-between">
             <h5 className="text-xl font-bold text-content-headings">Messages</h5>
             <Badge variant="default">{messages.length}</Badge>
@@ -1532,44 +1595,111 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </div>
           }
         >
-          <div className="p-5 flex flex-col gap-[16px]">
-            <InputFieldOutlined
-              label="Résumé des critères"
-              value={rechercheForm.criteriaSummary}
-              onChange={(v) => setRechercheForm((prev) => ({ ...prev, criteriaSummary: v }))}
-              placeholder="Ex : T3 lumineux, proche transports"
-            />
-            {currentType === 'ACQUISITION' ? (
-              <>
-                <InputFieldOutlined
-                  label="Budget min (€)"
-                  value={rechercheForm.budgetMin}
-                  onChange={(v) => setRechercheForm((prev) => ({ ...prev, budgetMin: v }))}
-                  type="number"
-                  placeholder="200 000"
-                />
-                <InputFieldOutlined
-                  label="Budget max (€)"
-                  value={rechercheForm.budgetMax}
-                  onChange={(v) => setRechercheForm((prev) => ({ ...prev, budgetMax: v }))}
-                  type="number"
-                  placeholder="400 000"
-                />
-              </>
-            ) : (
+          <div className="flex flex-col">
+            {/* ── Section Zone géographique ── */}
+            <div className="px-5 py-4 flex flex-col gap-3 border-b border-edge-default">
+              <span className="text-sm font-semibold text-content-headings">Zone géographique</span>
+              {rechercheForm.city && (
+                <div className="flex flex-wrap gap-2">
+                  <BadgeCriteria label={rechercheForm.city} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, city: '' }))} />
+                </div>
+              )}
               <InputFieldOutlined
-                label="Loyer max (€/mois)"
-                value={rechercheForm.budgetMin}
-                onChange={(v) => setRechercheForm((prev) => ({ ...prev, budgetMin: v }))}
-                type="number"
-                placeholder="900"
+                label="Ville, code postal ou région"
+                value={rechercheForm.city}
+                onChange={(v) => setRechercheForm((p) => ({ ...p, city: v }))}
+                placeholder="Ex : Lyon, 75011, Île-de-France"
               />
-            )}
-            <div className="flex flex-col gap-1 pt-2">
-              <span className="text-xs text-content-secondary">Critères client (fiche)</span>
-              <p className="text-sm text-content-body bg-surface-secondary rounded-lg p-3">
-                {deal?.Client?.searchCriteriaSummary || 'Non renseignés'}
-              </p>
+            </div>
+
+            {/* ── Section Caractéristiques ── */}
+            <div className="px-5 py-4 flex flex-col gap-3 border-b border-edge-default">
+              <span className="text-sm font-semibold text-content-headings">Caractéristiques</span>
+              {(rechercheForm.propertyType || rechercheForm.surfaceMin || rechercheForm.surfaceMax) && (
+                <div className="flex flex-wrap gap-2">
+                  {rechercheForm.propertyType && (
+                    <BadgeCriteria label={rechercheForm.propertyType} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, propertyType: '' }))} />
+                  )}
+                  {rechercheForm.surfaceMin && (
+                    <BadgeCriteria label={`≥ ${rechercheForm.surfaceMin} m²`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, surfaceMin: '' }))} />
+                  )}
+                  {rechercheForm.surfaceMax && (
+                    <BadgeCriteria label={`≤ ${rechercheForm.surfaceMax} m²`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, surfaceMax: '' }))} />
+                  )}
+                </div>
+              )}
+              <InputFieldOutlined
+                label="Type de bien"
+                value={rechercheForm.propertyType}
+                onChange={(v) => setRechercheForm((p) => ({ ...p, propertyType: v }))}
+                placeholder="Ex : T2, T3, Maison 4p, Studio"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <InputFieldOutlined
+                  label="Surface min (m²)"
+                  value={rechercheForm.surfaceMin}
+                  onChange={(v) => setRechercheForm((p) => ({ ...p, surfaceMin: v }))}
+                  type="number"
+                  placeholder="30"
+                />
+                <InputFieldOutlined
+                  label="Surface max (m²)"
+                  value={rechercheForm.surfaceMax}
+                  onChange={(v) => setRechercheForm((p) => ({ ...p, surfaceMax: v }))}
+                  type="number"
+                  placeholder="80"
+                />
+              </div>
+            </div>
+
+            {/* ── Section Budget ── */}
+            <div className="px-5 py-4 flex flex-col gap-3">
+              <span className="text-sm font-semibold text-content-headings">Budget</span>
+              {(rechercheForm.budgetMin || rechercheForm.budgetMax) && (
+                <div className="flex flex-wrap gap-2">
+                  {rechercheForm.budgetMin && (
+                    <BadgeCriteria label={currentType === 'ACQUISITION' ? `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €` : `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €/mois`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, budgetMin: '' }))} />
+                  )}
+                  {rechercheForm.budgetMax && (
+                    <BadgeCriteria label={currentType === 'ACQUISITION' ? `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €` : `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €/mois`} variant="default" onRemove={() => setRechercheForm((p) => ({ ...p, budgetMax: '' }))} />
+                  )}
+                </div>
+              )}
+              {currentType === 'ACQUISITION' ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <InputFieldOutlined
+                    label="Budget min (€)"
+                    value={rechercheForm.budgetMin}
+                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMin: v }))}
+                    type="number"
+                    placeholder="200 000"
+                  />
+                  <InputFieldOutlined
+                    label="Budget max (€)"
+                    value={rechercheForm.budgetMax}
+                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMax: v }))}
+                    type="number"
+                    placeholder="400 000"
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <InputFieldOutlined
+                    label="Loyer min (€/mois)"
+                    value={rechercheForm.budgetMin}
+                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMin: v }))}
+                    type="number"
+                    placeholder="600"
+                  />
+                  <InputFieldOutlined
+                    label="Loyer max (€/mois)"
+                    value={rechercheForm.budgetMax}
+                    onChange={(v) => setRechercheForm((p) => ({ ...p, budgetMax: v }))}
+                    type="number"
+                    placeholder="1200"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </Sheet>
