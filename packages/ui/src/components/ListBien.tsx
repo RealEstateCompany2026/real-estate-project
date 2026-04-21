@@ -111,7 +111,7 @@ export function ListBien({
       {/* Section image + infos du bien */}
       <div className="flex items-center shrink-0 h-[120px]">
         {/* Image du bien */}
-        <div className="h-[120px] w-[160px] shrink-0 overflow-hidden rounded-l-2xl">
+        <div className="h-[120px] w-[160px] shrink-0 overflow-hidden rounded-l-lg">
           {imageUrl ? (
             <img
               src={imageUrl}
