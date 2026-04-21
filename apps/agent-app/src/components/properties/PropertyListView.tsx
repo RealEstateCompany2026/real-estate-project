@@ -68,7 +68,8 @@ interface PropertyWithKpis extends PropertyDisplayItem {
   aiSuggestions: number;
   suggestions: Array<{ text: string; actionLabel: string }>;
   recentActivities: Array<{ date: string; time: string; author: string; category: string; description: string; badgeVariant?: 'default' | 'success' | 'warning' | 'error' | 'information' | 'disabled' }>;
-  // Raw numeric data for robust filtering (avoids parsing formatted strings)
+  // Raw data for robust filtering (avoids parsing formatted strings)
+  operationTypes: string[] | null;
   rawLivingAreaSqm: number | null;
   rawDesiredSellingPrice: number | null;
   rawAddressCity: string | null;
@@ -94,15 +95,35 @@ function mockKpis(): PropertyKpis {
 }
 
 // ---------------------------------------------------------------------------
+// Badge label mapping
+// ---------------------------------------------------------------------------
+
+/** Maps property status + operationType to a display label for the Badge (CAPS) */
+function propertyBadgeLabel(status: string, opType: string): string {
+  if (status === 'OFF_MARKET') return 'OFF MARKET';
+  if (status === 'VENDU') return 'VENDU';
+  if (status === 'LOUE') return 'LOUÉ';
+  if (status === 'EN_VIAGER') return 'EN VIAGER';
+  switch (opType) {
+    case 'VENTE': return 'À VENDRE';
+    case 'LOCATION': return 'À LOUER';
+    case 'GESTION': return 'SOUS GESTION';
+    case 'VIAGER': return 'EN VIAGER';
+    case 'CESSION': return 'CESSION';
+    default: return opType;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Filter chips config
 // ---------------------------------------------------------------------------
 
 const CATEGORY_FILTERS = [
-  { label: 'tous', value: 'ALL' as const },
-  { label: 'off market', value: 'OFF_MARKET' as const },
-  { label: 'à vendre', value: 'A_VENDRE' as const },
-  { label: 'à louer', value: 'A_LOUER' as const },
-  { label: 'sous gestion', value: 'SOUS_GESTION' as const },
+  { label: 'Tous', value: 'ALL' as const },
+  { label: 'Off market', value: 'OFF_MARKET' as const },
+  { label: 'À vendre', value: 'A_VENDRE' as const },
+  { label: 'À louer', value: 'A_LOUER' as const },
+  { label: 'Sous Gestion', value: 'SOUS_GESTION' as const },
 ];
 
 // ---------------------------------------------------------------------------
@@ -197,14 +218,14 @@ export function PropertyListView() {
       });
 
       const enriched: PropertyWithKpis[] = ((data ?? []) as unknown as PropertyRow[]).map((p) => {
-        const operationType = p.operationTypes?.[0] ?? 'VENTE';
+        const rawOpType = p.operationTypes?.[0] ?? 'VENTE';
         const displayItem: PropertyDisplayItem = {
           id: p.id,
           city: p.addressCity ?? '—',
           propertyType: PROPERTY_TYPE_LABELS[p.type as keyof typeof PROPERTY_TYPE_LABELS] ?? p.type,
           surface: p.livingAreaSqm ? `${p.livingAreaSqm}m²` : '—',
           dpeGrade: p.dpeEnergyClass ?? undefined,
-          operationType,
+          operationType: propertyBadgeLabel(p.status, rawOpType),
           price: formatPrice(p.desiredSellingPrice ?? p.estimatedMarketValue),
           hasCarnet: p.hasMaintenanceLog ?? false,
           status: p.status,
@@ -213,6 +234,7 @@ export function PropertyListView() {
 
         return {
           ...displayItem,
+          operationTypes: p.operationTypes,
           rawLivingAreaSqm: p.livingAreaSqm,
           rawDesiredSellingPrice: p.desiredSellingPrice ?? p.estimatedMarketValue,
           rawAddressCity: p.addressCity,
@@ -240,8 +262,7 @@ export function PropertyListView() {
     // Category macro filter
     if (categoryFilter !== 'ALL') {
       if (categoryFilter === 'SOUS_GESTION') {
-        // TODO: filter by operationTypes includes 'GESTION'
-        return true;
+        if (!p.operationTypes?.includes('GESTION')) return false;
       } else if (categoryFilter === 'OFF_MARKET') {
         if (p.status !== 'OFF_MARKET') return false;
       } else {
