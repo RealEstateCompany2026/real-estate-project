@@ -59,8 +59,6 @@ import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
 import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
-import { Switch } from '@real-estate/ui/switch';
-
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 
@@ -795,20 +793,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           aiSuggestions={0}
           onBack={() => router.push('/deals')}
         />
-      </div>
-
-      {/* ── Badge + Switch activation ── */}
-      <div className="flex items-center gap-3 px-6 py-3">
-        <Badge variant={deal.pipelineStage === 'MANDAT' ? 'default' : 'success'}>
-          {DEAL_TYPE_LABELS[(deal.type as DealType) ?? 'VENTE']}
-        </Badge>
-        <Switch
-          checked={deal.pipelineStage !== 'MANDAT'}
-          onChange={(checked) => handleToggleActivation(checked)}
-          disabled={deal.pipelineStage !== 'MANDAT' && deal.pipelineStage !== 'COMMERCIALISATION' && deal.pipelineStage !== 'RECHERCHE'}
-          ariaLabel="Affaire activée"
-        />
-        <span className="text-sm text-content-body">Affaire activée</span>
       </div>
 
       {/* ── GraphCourbe ── */}

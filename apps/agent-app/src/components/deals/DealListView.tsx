@@ -14,7 +14,10 @@ import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { Button, IconButton } from '@real-estate/ui/button';
 import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
+import { Badge } from '@real-estate/ui/badge';
+import { Switch } from '@real-estate/ui/switch';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
+import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
 
 // -- App-level --
 import { createClient } from '@/lib/supabase/client';
@@ -270,6 +273,24 @@ export function DealListView() {
     setSheetOpen(true);
   }, []);
 
+  const handleToggleActivation = useCallback(async (activated: boolean) => {
+    if (!selectedDeal) return;
+    const supabase = createClient();
+    const nextStage = activated
+      ? (selectedDeal.type === 'ACQUISITION' || selectedDeal.type === 'LOCATION' ? 'RECHERCHE' : 'COMMERCIALISATION')
+      : 'MANDAT';
+    const { error } = await supabase
+      .from('Deal')
+      .update({ pipelineStage: nextStage })
+      .eq('id', selectedDeal.id);
+    if (!error) {
+      // Update local state
+      setSelectedDeal((prev) => prev ? { ...prev, pipelineStage: nextStage as any } : prev);
+      // Also update the deals list
+      setDeals((prev) => prev.map((d) => d.id === selectedDeal.id ? { ...d, pipelineStage: nextStage as any } : d));
+    }
+  }, [selectedDeal]);
+
   const handleRemoveFilter = useCallback((criterionId: string) => {
     setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
     setPage(0);
@@ -464,6 +485,26 @@ export function DealListView() {
       >
         {selectedDeal && (
           <div className="flex flex-col gap-[20px] p-[16px]">
+            {/* Statut activation */}
+            <div className="flex items-center justify-between">
+              <Badge variant={selectedDeal.pipelineStage === 'MANDAT' ? 'default' : 'success'}>
+                {DEAL_TYPE_LABELS[selectedDeal.type as DealType] ?? selectedDeal.type}
+              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-content-secondary">Affaire activée</span>
+                <Switch
+                  checked={selectedDeal.pipelineStage !== 'MANDAT'}
+                  onChange={(checked) => handleToggleActivation(checked)}
+                  disabled={
+                    selectedDeal.pipelineStage !== 'MANDAT' &&
+                    selectedDeal.pipelineStage !== 'COMMERCIALISATION' &&
+                    selectedDeal.pipelineStage !== 'RECHERCHE'
+                  }
+                  ariaLabel="Activer l'affaire"
+                />
+              </div>
+            </div>
+
             {/* Reference + Type */}
             <div className="flex flex-col gap-[8px]">
               <span className="text-sm text-neutral-400">R\u00e9f\u00e9rence</span>
