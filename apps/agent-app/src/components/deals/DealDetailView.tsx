@@ -222,8 +222,10 @@ function mapMandateWorkflow(
   const order = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
   const stepMap: Record<string, number> = { edition: 1, revision: 2, signature: 4 };
   const idx = order.indexOf(status ?? 'NON_CREE');
-  return idx >= stepMap[step] ? 'success' : 'disabled';
+  return idx >= stepMap[step] ? 'success' : 'warning';
 }
+
+const MANDATE_ORDER_DETAIL = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
 
 // ── Visite workflow mapping ──
 
@@ -714,34 +716,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     }
   }, [deal?.id, deal?.type]);
 
-  // ── Toggle mandate revision (EDITE ↔ REVISE) ──
-  const handleToggleRevision = useCallback(async (revised: boolean) => {
-    if (!deal) return;
-    const supabase = createClient();
-    const field = deal.type === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
-    const nextStatus = revised ? 'REVISE' : 'EDITE';
-    const { error: updateError } = await supabase
-      .from('Deal')
-      .update({ [field]: nextStatus })
-      .eq('id', deal.id);
-    if (!updateError) {
-      setDeal((prev) => prev ? { ...prev, [field]: nextStatus } : prev);
-    }
-  }, [deal?.id, deal?.type]);
-
-  // ── Send mandate for signature ──
-  const handleSendForSignature = useCallback(async () => {
-    if (!deal) return;
-    const supabase = createClient();
-    const field = deal.type === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
-    const { error: updateError } = await supabase
-      .from('Deal')
-      .update({ [field]: 'ENVOYE' })
-      .eq('id', deal.id);
-    if (!updateError) {
-      setDeal((prev) => prev ? { ...prev, [field]: 'ENVOYE' } : prev);
-    }
-  }, [deal?.id, deal?.type]);
 
   const filteredActivities = activeFilter === 'all'
     ? allActivities
@@ -1530,11 +1504,28 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         dealType={deal.type as DealType}
         mandateStatus={mandateStatusKey}
         pipelineStage={deal.pipelineStage ?? undefined}
-        signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
+        isAutoManaged={!deal.mandateWaived}
+        onToggleAutoManaged={(auto) => {
+          const supabase = createClient();
+          supabase.from('Deal').update({ mandateWaived: !auto }).eq('id', deal.id).then(({ error: updateError }) => {
+            if (!updateError) {
+              setDeal((prev) => prev ? { ...prev, mandateWaived: !auto } : prev);
+            }
+          });
+        }}
+        editionDate={
+          MANDATE_ORDER_DETAIL.indexOf(mandateStatusKey) >= 1
+            ? undefined
+            : undefined
+        }
+        signatureDate={
+          deal.saleMandateEndDate
+            ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+            : undefined
+        }
         onViewMandate={() => {/* TODO: ouvrir éditeur mandat */}}
-        onToggleRevision={handleToggleRevision}
+        onWriteClient={() => {/* TODO: ouvrir messagerie */}}
         onToggleActivation={handleToggleActivation}
-        onSendForSignature={handleSendForSignature}
       />
 
       {/* Sheet Activités */}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ArrowRight } from "lucide-react";
 import { Sheet } from "./Sheet";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
@@ -21,17 +22,17 @@ function mandateTitle(dealType: DealType): string {
 
 const MANDATE_ORDER = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
 
-function mandateBadgeVariant(currentStatus: string, requiredStatus: string): BadgeVariant {
-  const currentIdx = MANDATE_ORDER.indexOf(currentStatus);
+function stepBadgeVariant(mandateStatus: string, requiredStatus: string): BadgeVariant {
+  const currentIdx = MANDATE_ORDER.indexOf(mandateStatus);
   const requiredIdx = MANDATE_ORDER.indexOf(requiredStatus);
-  if (currentIdx < 0 || requiredIdx < 0) return 'disabled';
-  return currentIdx >= requiredIdx ? 'success' : 'disabled';
+  if (currentIdx < 0 || requiredIdx < 0) return 'warning';
+  return currentIdx >= requiredIdx ? 'success' : 'warning';
 }
 
 export interface SheetMandatProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Référence du mandat (ex: "MV-0019") */
+  /** Référence du mandat (ex: "MV.789.083.263") */
   reference: string;
   /** Type de l'affaire */
   dealType: DealType;
@@ -39,15 +40,17 @@ export interface SheetMandatProps {
   mandateStatus: string;
   /** Étape pipeline courante */
   pipelineStage?: string;
+  /** Mode gestion automatisée vs manuelle */
+  isAutoManaged: boolean;
+  onToggleAutoManaged?: (auto: boolean) => void;
   /** Dates optionnelles */
   editionDate?: string;
   revisionDate?: string;
   signatureDate?: string;
   /** Callbacks */
   onViewMandate?: () => void;
-  onToggleRevision?: (revised: boolean) => void;
+  onWriteClient?: () => void;
   onToggleActivation?: (activated: boolean) => void;
-  onSendForSignature?: () => void;
   className?: string;
 }
 
@@ -58,112 +61,146 @@ export function SheetMandat({
   dealType,
   mandateStatus,
   pipelineStage,
+  isAutoManaged,
+  onToggleAutoManaged,
   editionDate,
   revisionDate,
   signatureDate,
   onViewMandate,
-  onToggleRevision,
+  onWriteClient,
   onToggleActivation,
-  onSendForSignature,
   className,
 }: SheetMandatProps) {
   return (
     <Sheet
       isOpen={isOpen}
       onClose={onClose}
-      title={`Mandat ${reference}`}
+      title={reference}
       width="narrow"
       className={className}
     >
-      {/* Bloc Titre */}
-      <div className="px-[20px] py-[16px] flex items-center justify-between">
-        <span className="text-base font-semibold font-roboto text-content-body">
-          {mandateTitle(dealType)}
-        </span>
-        <Badge variant={pipelineStage === 'MANDAT' ? 'default' : 'success'}>
-          {DEAL_TYPE_LABELS[dealType]}
-        </Badge>
+      <div className="flex flex-col gap-[16px] py-[16px]">
+        {/* Bloc 1 — Type de mandat */}
+        <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold font-roboto text-content-body uppercase tracking-[0.5px]">
+              Type de mandat
+            </span>
+            <Badge variant={pipelineStage === 'MANDAT' ? 'default' : 'success'}>
+              {DEAL_TYPE_LABELS[dealType]?.toUpperCase()}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Bloc 2 — Gestion automatisée */}
+        <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+          <div className="flex items-center justify-between mb-[8px]">
+            <span className={`text-base font-semibold font-roboto ${isAutoManaged ? 'text-content-brand' : 'text-content-body'}`}>
+              Gestion automatisée
+            </span>
+            <Switch
+              checked={isAutoManaged}
+              onChange={(checked) => onToggleAutoManaged?.(checked)}
+              ariaLabel="Gestion automatisée"
+            />
+          </div>
+          <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+            {isAutoManaged
+              ? "L'application gère pour vous l'édition automatique du mandat et le workflow de signature auprès du client."
+              : "Vous validez manuellement l'activation de l'affaire, et gérez les contrats en dehors de l'application"}
+          </p>
+        </div>
+
+        {/* Mode Manuel — Bloc 3 : Activation */}
+        {!isAutoManaged && (
+          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+            <div className="flex items-center justify-between mb-[8px]">
+              <span className="text-base font-semibold font-roboto text-content-body">
+                Activation du mandat
+              </span>
+              <Switch
+                checked={pipelineStage !== 'MANDAT'}
+                onChange={(checked) => onToggleActivation?.(checked)}
+                disabled={
+                  !pipelineStage ||
+                  (pipelineStage !== 'MANDAT' && pipelineStage !== 'COMMERCIALISATION' && pipelineStage !== 'RECHERCHE')
+                }
+                ariaLabel="Activer le mandat"
+              />
+            </div>
+            <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+              En activant le mandat, l&apos;application enclenchera les premières actions du pipeline de gestion de l&apos;affaire
+            </p>
+          </div>
+        )}
+
+        {/* Mode Auto — Bloc 3 : Édition */}
+        {isAutoManaged && (
+          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+            <div className="flex items-center justify-between mb-[8px]">
+              <span className="text-base font-semibold font-roboto text-content-body">
+                Édition du mandat
+              </span>
+              <Badge variant={stepBadgeVariant(mandateStatus, 'EDITE')}>ÉDITION</Badge>
+            </div>
+            <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+              {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE')
+                ? (editionDate ?? 'Édité')
+                : 'Informations manquantes pour l\'édition du mandat'}
+            </p>
+          </div>
+        )}
+
+        {/* Mode Auto — Bloc 4 : Révision */}
+        {isAutoManaged && (
+          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+            <div className="flex items-center justify-between mb-[8px]">
+              <span className="text-base font-semibold font-roboto text-content-body">
+                Révision du mandat
+              </span>
+              <Badge variant={stepBadgeVariant(mandateStatus, 'REVISE')}>RÉVISION</Badge>
+            </div>
+            <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+              {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('REVISE')
+                ? (revisionDate ?? 'Révisé')
+                : 'En attente de révision'}
+            </p>
+          </div>
+        )}
+
+        {/* Mode Auto — Bloc 5 : Signature */}
+        {isAutoManaged && (
+          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+            <div className="flex items-center justify-between mb-[8px]">
+              <span className="text-base font-semibold font-roboto text-content-body">
+                Signature du mandat
+              </span>
+              <Badge variant={stepBadgeVariant(mandateStatus, 'SIGNE')}>SIGNATURE</Badge>
+            </div>
+            <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+              {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('SIGNE')
+                ? (signatureDate ? `Signé le ${signatureDate}` : 'Signé')
+                : MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('ENVOYE')
+                  ? (signatureDate ? `Envoyé pour signature le ${signatureDate}` : 'Envoyé pour signature')
+                  : 'En attente de signature'}
+            </p>
+          </div>
+        )}
       </div>
 
-      <div className="w-full h-px bg-[var(--border-divider)]" />
-
-      {/* Ligne 1 — Éditer */}
-      <div className="px-[20px] py-[16px] flex items-center justify-between">
-        <div className="flex items-center gap-[12px]">
-          <span className="text-sm font-semibold font-roboto text-content-body">Éditer</span>
-          <Badge variant={mandateBadgeVariant(mandateStatus, 'EDITE')}>ÉDITION</Badge>
-        </div>
-        <Button variant="ghost" size="default" onClick={onViewMandate}>
-          Voir le mandat
+      {/* Footer area — buttons */}
+      <div className="flex gap-[12px] px-[20px] py-[20px] mt-auto">
+        {isAutoManaged && MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE') && (
+          <Button variant="primary" className="flex-1" onClick={onViewMandate}>
+            Voir le mandat
+            <ArrowRight size={20} />
+          </Button>
+        )}
+        <Button variant="ghost" className="flex-1" onClick={onWriteClient}>
+          Écrire au client
+          <ArrowRight size={20} />
         </Button>
       </div>
-
-      {editionDate && (
-        <div className="px-[20px] pb-[8px]">
-          <span className="text-xs font-normal font-roboto text-content-secondary">{editionDate}</span>
-        </div>
-      )}
-
-      <div className="w-full h-px bg-[var(--border-divider)]" />
-
-      {/* Ligne 2 — Réviser */}
-      <div className="px-[20px] py-[16px] flex items-center justify-between">
-        <div className="flex items-center gap-[12px]">
-          <span className="text-sm font-semibold font-roboto text-content-body">Réviser</span>
-          <Badge variant={mandateBadgeVariant(mandateStatus, 'REVISE')}>RÉVISION</Badge>
-        </div>
-        <div className="flex items-center gap-[8px]">
-          <span className="text-xs text-content-secondary">
-            {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('REVISE') ? 'Révisé' : 'Non révisé'}
-          </span>
-          <Switch
-            checked={MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('REVISE')}
-            onChange={(checked) => onToggleRevision?.(checked)}
-            disabled={mandateStatus !== 'EDITE' && mandateStatus !== 'REVISE'}
-            ariaLabel="Réviser le mandat"
-          />
-        </div>
-      </div>
-
-      {revisionDate && (
-        <div className="px-[20px] pb-[8px]">
-          <span className="text-xs font-normal font-roboto text-content-secondary">{revisionDate}</span>
-        </div>
-      )}
-
-      <div className="w-full h-px bg-[var(--border-divider)]" />
-
-      {/* Ligne 3 — Activer */}
-      <div className="px-[20px] py-[16px] flex items-center justify-between">
-        <div className="flex items-center gap-[12px]">
-          <span className="text-sm font-semibold font-roboto text-content-body">Activer</span>
-        </div>
-        <div className="flex items-center gap-[12px]">
-          <Switch
-            checked={pipelineStage !== 'MANDAT'}
-            onChange={(checked) => onToggleActivation?.(checked)}
-            disabled={
-              !pipelineStage ||
-              (pipelineStage !== 'MANDAT' && pipelineStage !== 'COMMERCIALISATION' && pipelineStage !== 'RECHERCHE')
-            }
-            ariaLabel="Activer l'affaire"
-          />
-          <Button
-            variant="default"
-            size="default"
-            onClick={onSendForSignature}
-            disabled={MANDATE_ORDER.indexOf(mandateStatus) < MANDATE_ORDER.indexOf('REVISE')}
-          >
-            Envoyer pour Signature
-          </Button>
-        </div>
-      </div>
-
-      {signatureDate && (
-        <div className="px-[20px] pb-[8px]">
-          <span className="text-xs font-normal font-roboto text-content-secondary">Signé le {signatureDate}</span>
-        </div>
-      )}
     </Sheet>
   );
 }
