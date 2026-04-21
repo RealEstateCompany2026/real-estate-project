@@ -5,6 +5,7 @@ import { Sheet } from "./Sheet";
 import { Badge } from "./Badge";
 import type { BadgeVariant } from "./Badge";
 import { Button } from "./Button";
+import { Switch } from "./Switch";
 import { FileText } from "lucide-react";
 
 export interface SheetMandatProps {
@@ -28,6 +29,10 @@ export interface SheetMandatProps {
   onSend?: () => void;
   /** Callback bouton Document */
   onDocument?: () => void;
+  /** Étape pipeline courante */
+  pipelineStage?: string;
+  /** Callback toggle activation (MANDAT ↔ stage 2) */
+  onToggleActivation?: (activated: boolean) => void;
   className?: string;
 }
 
@@ -42,6 +47,8 @@ export function SheetMandat({
   onEdit,
   onSend,
   onDocument,
+  pipelineStage,
+  onToggleActivation,
   className,
 }: SheetMandatProps) {
   return (
@@ -62,6 +69,22 @@ export function SheetMandat({
         </div>
       }
     >
+      {/* Badge + Switch activation */}
+      {pipelineStage && onToggleActivation && (
+        <div className="flex items-center gap-3 px-[20px] py-[16px]">
+          <Badge variant={pipelineStage === 'MANDAT' ? 'default' : 'success'}>
+            Statut
+          </Badge>
+          <Switch
+            checked={pipelineStage !== 'MANDAT'}
+            onChange={(checked) => onToggleActivation(checked)}
+            disabled={pipelineStage !== 'MANDAT' && pipelineStage !== 'COMMERCIALISATION' && pipelineStage !== 'RECHERCHE'}
+            ariaLabel="Affaire activée"
+          />
+          <span className="text-sm text-content-body">Affaire activée</span>
+        </div>
+      )}
+
       {/* Bouton Document */}
       <div className="px-[20px] py-[16px]">
         <Button variant="ghost" onClick={onDocument} className="w-full justify-start">

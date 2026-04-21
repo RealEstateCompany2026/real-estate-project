@@ -4,7 +4,7 @@ import React from "react";
 import { ArrowLeft, Home, Maximize2, MapPin, Tag } from "lucide-react";
 import { Badge } from "./Badge";
 import { AiSuggestion } from "./AiSuggestion";
-import { type DealType, DEAL_TYPE_LABELS } from "./deal-types";
+import { type DealType, DEAL_TYPE_LABELS, type PipelineStage } from "./deal-types";
 
 /**
  * AppBarFicheAffaire - Barre d'en-tête de fiche affaire
@@ -33,6 +33,8 @@ export interface AppBarFicheAffaireProps {
   dealType: DealType;
   /** Statut de l'affaire (détermine le variant du badge) */
   status?: string;
+  /** Étape pipeline (détermine le variant du badge type affaire) */
+  pipelineStage?: PipelineStage;
   /** Type de bien (ex: "T4", "Studio", "Maison") */
   propertyType: string;
   /** Surface (ex: "84 m²") */
@@ -77,6 +79,7 @@ export function AppBarFicheAffaire({
   dealId,
   dealType,
   status,
+  pipelineStage,
   propertyType,
   surface,
   city,
@@ -108,7 +111,7 @@ export function AppBarFicheAffaire({
         </h4>
 
         {/* 3. Badge type affaire */}
-        <Badge variant={status === "EN_COURS" ? "default" : "disabled"}>{DEAL_TYPE_LABELS[dealType]}</Badge>
+        <Badge variant={pipelineStage === 'MANDAT' ? 'default' : 'success'}>{DEAL_TYPE_LABELS[dealType]}</Badge>
 
         {/* 4. Type de bien */}
         <IconText icon={<Home size={20} style={{ color: iconColor }} />}>

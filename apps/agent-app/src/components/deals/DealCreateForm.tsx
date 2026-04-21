@@ -260,7 +260,9 @@ export function DealCreateForm() {
       const reference = `${pfx}-${String(lastNum + 1).padStart(4, '0')}`;
 
       // 2. Determiner le pipeline initial
-      const pipelineStage = mandateWaived ? 'PROMOTION' : 'MANDAT';
+      const pipelineStage = mandateWaived
+        ? (dealType === 'ACQUISITION' || dealType === 'LOCATION' ? 'RECHERCHE' : 'COMMERCIALISATION')
+        : 'MANDAT';
       const winProbability = mandateWaived ? 40 : 15;
 
       // 3. INSERT Deal

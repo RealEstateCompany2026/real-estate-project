@@ -94,7 +94,7 @@ export function ListAffaire({
   className = "",
 }: ListAffaireProps) {
   const iconColor = "var(--icon-neutral-default)";
-  const dealBadgeVariant: BadgeVariant = status === "EN_COURS" ? "default" : "disabled";
+  const dealBadgeVariant: BadgeVariant = pipelineStage === 'MANDAT' ? 'default' : 'success';
   const probabilityVariant: BadgeVariant =
     winProbability === 0 ? "disabled" :
     winProbability > 70 ? "success" :

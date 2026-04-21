@@ -127,7 +127,8 @@ const DEAL_FILTER_CRITERIA: FilterCriterionDef[] = [
     config: {
       options: [
         { value: 'MANDAT', label: 'Mandat' },
-        { value: 'PROMOTION', label: 'Promotion' },
+        { value: 'COMMERCIALISATION', label: 'Commercialisation' },
+        { value: 'RECHERCHE', label: 'Recherche' },
         { value: 'VISITES', label: 'Visites' },
         { value: 'CLOSING', label: 'Closing' },
         { value: 'GESTION', label: 'Gestion' },

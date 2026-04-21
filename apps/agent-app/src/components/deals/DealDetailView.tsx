@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles,
@@ -57,7 +57,9 @@ import { ListFinancement } from '@real-estate/ui/list-financement';
 import { ListBien } from '@real-estate/ui/list-bien';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
 import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
-import type { DealType } from '@real-estate/ui/deal-types';
+import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
+import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
+import { Switch } from '@real-estate/ui/switch';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -698,6 +700,22 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const noteEvents = events.filter((e) => e.type === 'NOTE');
   const entretienEvents = events.filter((e) => e.type === 'ENTRETIEN');
 
+  // ── Toggle deal activation (MANDAT ↔ stage 2) ──
+  const handleToggleActivation = useCallback(async (activated: boolean) => {
+    if (!deal) return;
+    const supabase = createClient();
+    const nextStage = activated
+      ? (deal.type === 'ACQUISITION' || deal.type === 'LOCATION' ? 'RECHERCHE' : 'COMMERCIALISATION')
+      : 'MANDAT';
+    const { error: updateError } = await supabase
+      .from('Deal')
+      .update({ pipelineStage: nextStage })
+      .eq('id', deal.id);
+    if (!updateError) {
+      setDeal((prev) => prev ? { ...prev, pipelineStage: nextStage } : prev);
+    }
+  }, [deal?.id, deal?.type]);
+
   const filteredActivities = activeFilter === 'all'
     ? allActivities
     : allActivities.filter((a) => a.category === activeFilter);
@@ -769,6 +787,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           dealId={deal.reference ?? deal.id.slice(0, 8)}
           dealType={currentType}
           status={deal.status ?? undefined}
+          pipelineStage={deal.pipelineStage as PipelineStage ?? undefined}
           propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
           surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
           city={deal.Property?.addressCity ?? '—'}
@@ -776,6 +795,20 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           aiSuggestions={0}
           onBack={() => router.push('/deals')}
         />
+      </div>
+
+      {/* ── Badge + Switch activation ── */}
+      <div className="flex items-center gap-3 px-6 py-3">
+        <Badge variant={deal.pipelineStage === 'MANDAT' ? 'default' : 'success'}>
+          {DEAL_TYPE_LABELS[(deal.type as DealType) ?? 'VENTE']}
+        </Badge>
+        <Switch
+          checked={deal.pipelineStage !== 'MANDAT'}
+          onChange={(checked) => handleToggleActivation(checked)}
+          disabled={deal.pipelineStage !== 'MANDAT' && deal.pipelineStage !== 'COMMERCIALISATION' && deal.pipelineStage !== 'RECHERCHE'}
+          ariaLabel="Affaire activée"
+        />
+        <span className="text-sm text-content-body">Affaire activée</span>
       </div>
 
       {/* ── GraphCourbe ── */}
@@ -1487,6 +1520,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           signature: mapMandateWorkflow(mandateStatusKey, 'signature'),
         }}
         signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
+        pipelineStage={deal.pipelineStage ?? undefined}
+        onToggleActivation={handleToggleActivation}
       />
 
       {/* Sheet Activités */}

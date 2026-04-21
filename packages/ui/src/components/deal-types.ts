@@ -14,7 +14,8 @@ export const DEAL_TYPE_LABELS: Record<DealType, string> = {
 
 export type PipelineStage =
   | 'MANDAT'
-  | 'PROMOTION'
+  | 'COMMERCIALISATION'
+  | 'RECHERCHE'
   | 'VISITES'
   | 'CLOSING'
   | 'GESTION'
@@ -22,7 +23,8 @@ export type PipelineStage =
 
 export const PIPELINE_STAGE_LABELS: Record<PipelineStage, string> = {
   MANDAT: 'Mandat',
-  PROMOTION: 'Promotion',
+  COMMERCIALISATION: 'Commercialisation',
+  RECHERCHE: 'Recherche',
   VISITES: 'Visites',
   CLOSING: 'Closing',
   GESTION: 'Gestion',
