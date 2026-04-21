@@ -40,7 +40,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
       <div className="flex items-center gap-[8px]">
         {/* Type de bien */}
         <div className="flex items-center">
-          <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
+          <div className="flex items-center p-3 rounded-lg text-icon-neutral-default">
             <Building size={20} />
           </div>
           <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
@@ -50,7 +50,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
 
         {/* Surface */}
         <div className="flex items-center">
-          <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
+          <div className="flex items-center p-3 rounded-lg text-icon-neutral-default">
             <Square size={20} />
           </div>
           <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
@@ -60,7 +60,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
 
         {/* Orientation */}
         <div className="flex items-center">
-          <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
+          <div className="flex items-center p-3 rounded-lg text-icon-neutral-default">
             <Compass size={20} />
           </div>
           <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
@@ -70,7 +70,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
 
         {/* Année */}
         <div className="flex items-center">
-          <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
+          <div className="flex items-center p-3 rounded-lg text-icon-neutral-default">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path
                 d="M10 18.3333C14.6024 18.3333 18.3333 14.6024 18.3333 10C18.3333 5.39763 14.6024 1.66667 10 1.66667C5.39763 1.66667 1.66667 5.39763 1.66667 10C1.66667 14.6024 5.39763 18.3333 10 18.3333Z"
@@ -95,7 +95,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
 
         {/* Ville */}
         <div className="flex items-center">
-          <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
+          <div className="flex items-center p-3 rounded-lg text-icon-neutral-default">
             <MapPin size={20} />
           </div>
           <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">
@@ -105,7 +105,7 @@ export const AppBarAnnonce: React.FC<AppBarAnnonceProps> = ({
 
         {/* Prix */}
         <div className="flex items-center">
-          <div className="flex items-center p-3 rounded-2xl text-icon-neutral-default">
+          <div className="flex items-center p-3 rounded-lg text-icon-neutral-default">
             <Tag size={20} />
           </div>
           <div className="flex items-center px-[10px] py-2 text-content-headings font-bold">

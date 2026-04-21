@@ -92,7 +92,7 @@ export function SheetBienDetails({
 
       {/* Position 2: Map */}
       <div
-        className="w-full h-[115px] rounded-2xl flex items-center justify-center border border-edge-default bg-surface-neutral-default"
+        className="w-full h-[115px] rounded-lg flex items-center justify-center border border-edge-default bg-surface-neutral-default"
       />
 
       {/* Section 3 — KPIs inline */}

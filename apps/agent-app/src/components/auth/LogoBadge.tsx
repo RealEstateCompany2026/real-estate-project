@@ -11,7 +11,7 @@ const variantStyles: Record<LogoBadgeVariant, string> = {
 export function LogoBadge({ variant = 'default' }: { variant?: LogoBadgeVariant }) {
   return (
     <div
-      className={`w-16 h-16 rounded-2xl flex items-center justify-center ${variantStyles[variant]}`}
+      className={`w-16 h-16 rounded-lg flex items-center justify-center ${variantStyles[variant]}`}
     >
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path

@@ -191,7 +191,7 @@ export function CardAffaire({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex flex-col items-start w-[350px] cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex flex-col items-start w-[350px] cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
       onClick={onDealClick}
     >
       {/* S1 — Identification */}

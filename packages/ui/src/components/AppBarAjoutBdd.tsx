@@ -51,7 +51,7 @@ export function AppBarAjoutBdd({
           type="button"
           aria-label="Ajouter une base de données"
           onClick={onAdd}
-          className="flex items-center justify-center p-[12px] rounded-2xl transition-colors hover:bg-[var(--surface-neutral-action)]"
+          className="flex items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)]"
         >
           <Plus size={20} style={{ color: iconColor }} />
         </button>
@@ -61,7 +61,7 @@ export function AppBarAjoutBdd({
           type="button"
           aria-label="Rechercher"
           onClick={onSearch}
-          className="flex items-center justify-center p-[12px] rounded-2xl transition-colors hover:bg-[var(--surface-neutral-action)]"
+          className="flex items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)]"
         >
           <Search size={20} style={{ color: iconColor }} />
         </button>

@@ -148,7 +148,7 @@ export default function OnboardingTourPage() {
   return (
     <div className="flex flex-col items-center text-center">
       {/* Icon */}
-      <div className={`w-20 h-20 rounded-2xl flex items-center justify-center ${slide.color}`}>
+      <div className={`w-20 h-20 rounded-lg flex items-center justify-center ${slide.color}`}>
         <Icon className="w-10 h-10" />
       </div>
 

@@ -70,7 +70,7 @@ export function InlineMessage({
   return (
     <div
       className={`
-        flex items-start gap-3 px-4 py-3 rounded-2xl
+        flex items-start gap-3 px-4 py-3 rounded-lg
         border
         ${colors.bg}
         ${colors.border}

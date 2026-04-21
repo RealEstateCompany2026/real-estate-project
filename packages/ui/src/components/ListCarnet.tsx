@@ -90,7 +90,7 @@ export function ListCarnet({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between h-[70px] pl-[33px] pr-[37px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[70px] pl-[33px] pr-[37px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
       {/* Gauche : infos du bien + propriétaire */}

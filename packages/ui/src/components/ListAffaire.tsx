@@ -206,7 +206,7 @@ export function ListAffaire({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center h-[120px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onDealClick}
     >
       {/* S1 — Identification (~300px) */}

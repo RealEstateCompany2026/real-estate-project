@@ -97,7 +97,7 @@ export function AppBarFicheDocument({
         <button
           type="button"
           onClick={onBack}
-          className="p-[12px] rounded-2xl transition-colors hover:opacity-70 text-content-body"
+          className="p-[12px] rounded-lg transition-colors hover:opacity-70 text-content-body"
         >
           <ArrowLeft size={20} />
         </button>

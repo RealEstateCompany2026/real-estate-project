@@ -119,7 +119,7 @@ export function AppBarMessagerie({
         type="button"
         onClick={onClose}
         aria-label="Fermer"
-        className="p-[12px] rounded-2xl transition-colors hover:opacity-70 text-content-body"
+        className="p-[12px] rounded-lg transition-colors hover:opacity-70 text-content-body"
       >
         <X size={20} />
       </button>

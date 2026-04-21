@@ -78,7 +78,7 @@ export function AppBarCategory({
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex gap-[8px] items-center justify-center p-[12px] rounded-2xl transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
+            className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
           >
             <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
               {filterLabel}
@@ -112,7 +112,7 @@ export function AppBarCategory({
           type="button"
           aria-label="Ajouter"
           onClick={onAdd}
-          className="flex items-center justify-center p-[12px] rounded-2xl transition-colors hover:bg-[var(--surface-neutral-action)]"
+          className="flex items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)]"
         >
           <Plus size={20} style={{ color: iconColor }} />
         </button>
@@ -122,7 +122,7 @@ export function AppBarCategory({
           type="button"
           aria-label="Rechercher"
           onClick={onSearch}
-          className="flex items-center justify-center p-[12px] rounded-2xl transition-colors hover:bg-[var(--surface-neutral-action)]"
+          className="flex items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)]"
         >
           <Search size={20} style={{ color: iconColor }} />
         </button>

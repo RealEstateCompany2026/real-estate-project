@@ -18,7 +18,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
         {/* Logo + tagline overlay */}
         <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/90 backdrop-blur flex items-center justify-center mb-4 shadow-lg">
+          <div className="w-16 h-16 rounded-lg bg-white/90 backdrop-blur flex items-center justify-center mb-4 shadow-lg">
             <svg
               width="32"
               height="32"

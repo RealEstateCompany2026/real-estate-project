@@ -74,7 +74,7 @@ export function ListClient({
 }: ListClientProps) {
   return (
     <div
-      className={`group w-full bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
+      className={`group w-full bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between cursor-pointer transition-colors overflow-hidden ${className}`.trim()}
       onClick={onClick}
     >
       {/* Section nom du client — 425px fixe */}

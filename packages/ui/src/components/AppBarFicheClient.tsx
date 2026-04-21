@@ -50,7 +50,7 @@ export const AppBarFicheClient: React.FC<AppBarFicheClientProps> = ({
         {/* Bouton retour */}
         <button
           onClick={onBack}
-          className="p-3 rounded-2xl transition-colors hover:opacity-70 text-content-body"
+          className="p-3 rounded-lg transition-colors hover:opacity-70 text-content-body"
         >
           <ArrowLeft size={20} />
         </button>

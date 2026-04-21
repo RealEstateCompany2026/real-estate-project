@@ -81,7 +81,7 @@ export function SheetMandat({
     >
       <div className="flex flex-col gap-[16px] py-[16px]">
         {/* Bloc 1 — Type de mandat */}
-        <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+        <div className="mx-[20px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold font-roboto text-content-body uppercase tracking-[0.5px]">
               Type de mandat
@@ -93,7 +93,7 @@ export function SheetMandat({
         </div>
 
         {/* Bloc 2 — Gestion automatisée */}
-        <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+        <div className="mx-[20px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
           <div className="flex items-center justify-between mb-[8px]">
             <span className={`text-base font-semibold font-roboto ${isAutoManaged ? 'text-content-brand' : 'text-content-body'}`}>
               Gestion automatisée
@@ -113,7 +113,7 @@ export function SheetMandat({
 
         {/* Mode Manuel — Bloc 3 : Activation */}
         {!isAutoManaged && (
-          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+          <div className="mx-[20px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
             <div className="flex items-center justify-between mb-[8px]">
               <span className="text-base font-semibold font-roboto text-content-body">
                 Activation du mandat
@@ -136,7 +136,7 @@ export function SheetMandat({
 
         {/* Mode Auto — Bloc 3 : Édition */}
         {isAutoManaged && (
-          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+          <div className="mx-[20px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
             <div className="flex items-center justify-between mb-[8px]">
               <span className="text-base font-semibold font-roboto text-content-body">
                 Édition du mandat
@@ -153,7 +153,7 @@ export function SheetMandat({
 
         {/* Mode Auto — Bloc 4 : Révision */}
         {isAutoManaged && (
-          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+          <div className="mx-[20px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
             <div className="flex items-center justify-between mb-[8px]">
               <span className="text-base font-semibold font-roboto text-content-body">
                 Révision du mandat
@@ -170,7 +170,7 @@ export function SheetMandat({
 
         {/* Mode Auto — Bloc 5 : Signature */}
         {isAutoManaged && (
-          <div className="mx-[20px] rounded-2xl border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+          <div className="mx-[20px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
             <div className="flex items-center justify-between mb-[8px]">
               <span className="text-base font-semibold font-roboto text-content-body">
                 Signature du mandat

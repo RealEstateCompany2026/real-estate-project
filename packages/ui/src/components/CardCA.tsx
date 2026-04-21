@@ -46,7 +46,7 @@ export const CardCA: React.FC<CardCAProps> = ({
   );
 
   return (
-    <div className="rounded-2xl px-5 py-3 bg-surface-neutral-default border border-edge-default">
+    <div className="rounded-lg px-5 py-3 bg-surface-neutral-default border border-edge-default">
       <div className="flex items-start justify-between w-full">
         <MetricColumn label="Chiffre d'Affaire" value={chiffreAffaire} />
         <VerticalDivider />

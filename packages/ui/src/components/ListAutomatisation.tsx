@@ -92,7 +92,7 @@ function IconButton({
         e.stopPropagation();
         onClick?.();
       }}
-      className="flex items-center justify-center p-[12px] rounded-2xl hover:bg-[var(--surface-neutral-action)] transition-colors"
+      className="flex items-center justify-center p-[12px] rounded-lg hover:bg-[var(--surface-neutral-action)] transition-colors"
     >
       {icon}
     </button>
@@ -114,7 +114,7 @@ export function ListAutomatisation({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex items-center justify-between h-[70px] px-[10px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[70px] px-[10px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
       {/* Gauche : nom + tags */}

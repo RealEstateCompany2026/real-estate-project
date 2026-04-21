@@ -72,7 +72,7 @@ export function CardClient({
 }: CardClientProps) {
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-2xl flex flex-col gap-[22px] items-center pb-[24px] w-[350px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex flex-col gap-[22px] items-center pb-[24px] w-[350px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
       {/* Header: nom du client */}

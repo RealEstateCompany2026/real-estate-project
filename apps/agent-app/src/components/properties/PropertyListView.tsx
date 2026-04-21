@@ -323,7 +323,7 @@ export function PropertyListView() {
     return (
       <div className="space-y-3 p-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-[120px] bg-surface-neutral-action-hover rounded-2xl animate-pulse" />
+          <div key={i} className="h-[120px] bg-surface-neutral-action-hover rounded-lg animate-pulse" />
         ))}
       </div>
     );

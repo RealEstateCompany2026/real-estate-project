@@ -1381,7 +1381,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between bg-surface-neutral-default border border-edge-default rounded-2xl px-5 py-3"
+                  className="flex items-center justify-between bg-surface-neutral-default border border-edge-default rounded-lg px-5 py-3"
                 >
                   <span className="text-sm font-semibold text-content-body">
                     {doc.title ?? doc.type ?? 'Document'}
