@@ -219,8 +219,8 @@ function mapMandateWorkflow(
   status: string | null,
   step: 'edition' | 'revision' | 'signature',
 ): BadgeVariant {
-  const order = ['NON_CREE', 'EDITE', 'ENVOYE', 'SIGNE'];
-  const stepMap: Record<string, number> = { edition: 1, revision: 2, signature: 3 };
+  const order = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
+  const stepMap: Record<string, number> = { edition: 1, revision: 2, signature: 4 };
   const idx = order.indexOf(status ?? 'NON_CREE');
   return idx >= stepMap[step] ? 'success' : 'disabled';
 }
@@ -711,6 +711,35 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       .eq('id', deal.id);
     if (!updateError) {
       setDeal((prev) => prev ? { ...prev, pipelineStage: nextStage } : prev);
+    }
+  }, [deal?.id, deal?.type]);
+
+  // ── Toggle mandate revision (EDITE ↔ REVISE) ──
+  const handleToggleRevision = useCallback(async (revised: boolean) => {
+    if (!deal) return;
+    const supabase = createClient();
+    const field = deal.type === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+    const nextStatus = revised ? 'REVISE' : 'EDITE';
+    const { error: updateError } = await supabase
+      .from('Deal')
+      .update({ [field]: nextStatus })
+      .eq('id', deal.id);
+    if (!updateError) {
+      setDeal((prev) => prev ? { ...prev, [field]: nextStatus } : prev);
+    }
+  }, [deal?.id, deal?.type]);
+
+  // ── Send mandate for signature ──
+  const handleSendForSignature = useCallback(async () => {
+    if (!deal) return;
+    const supabase = createClient();
+    const field = deal.type === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+    const { error: updateError } = await supabase
+      .from('Deal')
+      .update({ [field]: 'ENVOYE' })
+      .eq('id', deal.id);
+    if (!updateError) {
+      setDeal((prev) => prev ? { ...prev, [field]: 'ENVOYE' } : prev);
     }
   }, [deal?.id, deal?.type]);
 
@@ -1498,14 +1527,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         isOpen={isSheetMandatOpen}
         onClose={() => setIsSheetMandatOpen(false)}
         reference={deal.reference ?? '—'}
-        workflow={{
-          edition: mapMandateWorkflow(mandateStatusKey, 'edition'),
-          revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
-          signature: mapMandateWorkflow(mandateStatusKey, 'signature'),
-        }}
-        signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
+        dealType={deal.type as DealType}
+        mandateStatus={mandateStatusKey}
         pipelineStage={deal.pipelineStage ?? undefined}
+        signatureDate={deal.saleMandateEndDate ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR') : undefined}
+        onViewMandate={() => {/* TODO: ouvrir éditeur mandat */}}
+        onToggleRevision={handleToggleRevision}
         onToggleActivation={handleToggleActivation}
+        onSendForSignature={handleSendForSignature}
       />
 
       {/* Sheet Activités */}
