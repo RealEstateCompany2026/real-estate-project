@@ -39,6 +39,7 @@ interface PropertyRow {
   address: string;
   addressCity: string | null;
   livingAreaSqm: number | null;
+  landAreaSqm: number | null;
   numberOfRooms: number | null;
   desiredSellingPrice: number | null;
   estimatedMarketValue: number | null;
@@ -187,7 +188,7 @@ export function PropertyListView() {
       const { data } = await supabase
         .from('Property')
         .select(
-          'id, type, status, address, addressCity, livingAreaSqm, numberOfRooms, desiredSellingPrice, estimatedMarketValue, dpeEnergyClass, completionScore, hasMaintenanceLog, operationTypes, internalRef, createdAt'
+          'id, type, status, address, addressCity, livingAreaSqm, landAreaSqm, numberOfRooms, desiredSellingPrice, estimatedMarketValue, dpeEnergyClass, completionScore, hasMaintenanceLog, operationTypes, internalRef, createdAt'
         )
         .order('createdAt', { ascending: false });
 
@@ -223,7 +224,7 @@ export function PropertyListView() {
           id: p.id,
           city: p.addressCity ?? '—',
           propertyType: PROPERTY_TYPE_LABELS[p.type as keyof typeof PROPERTY_TYPE_LABELS] ?? p.type,
-          surface: p.livingAreaSqm ? `${p.livingAreaSqm}m²` : '—',
+          surface: p.livingAreaSqm ? `${p.livingAreaSqm}m²` : p.landAreaSqm ? `${p.landAreaSqm}m² (terrain)` : '—',
           dpeGrade: p.dpeEnergyClass ?? undefined,
           operationType: propertyBadgeLabel(p.status, rawOpType),
           price: formatPrice(p.desiredSellingPrice ?? p.estimatedMarketValue),

@@ -97,6 +97,11 @@ interface DealSectionItem {
   lastActivityDate: string | null;
   infoRequestsCount: number | null;
   visitCount: number | null;
+  // Search criteria (ACQUISITION / LOCATION)
+  searchCity: string | null;
+  searchPropertyType: string | null;
+  searchSurfaceMin: number | null;
+  searchSurfaceMax: number | null;
   Property: {
     type: string;
     livingAreaSqm: number | null;
@@ -501,6 +506,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           saleMandateStatus, mgmtMandateStatus,
           occupancyStatus, maintenanceStatus, purchaseOfferStatus,
           lastActivityDate, infoRequestsCount, visitCount,
+          searchCity, searchPropertyType, searchSurfaceMin, searchSurfaceMax,
           Property(type, livingAreaSqm, addressCity, desiredSellingPrice, listingStatus)
         `).eq('clientId', clientId).order('lastActivityDate', { ascending: false }),
         supabase
@@ -961,9 +967,15 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                   dealType={deal.type as DealType}
                   status={deal.status}
                   reference={deal.reference}
-                  propertyType={deal.Property?.type}
-                  propertySurface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
-                  propertyCity={deal.Property?.addressCity ?? undefined}
+                  propertyType={deal.Property?.type ?? deal.searchPropertyType ?? undefined}
+                  propertySurface={
+                    deal.Property?.livingAreaSqm
+                      ? `${deal.Property.livingAreaSqm} m²`
+                      : deal.searchSurfaceMin
+                        ? `${deal.searchSurfaceMin}–${deal.searchSurfaceMax ?? '?'} m²`
+                        : undefined
+                  }
+                  propertyCity={deal.Property?.addressCity ?? deal.searchCity ?? undefined}
                   pipelineStage={deal.pipelineStage as PipelineStage}
                   winProbability={deal.winProbability ?? 0}
                   weightedRevenue={computeWeightedRevenue(deal)}
@@ -1132,9 +1144,15 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               dealType={deal.type as DealType}
               status={deal.status}
               reference={deal.reference}
-              propertyType={deal.Property?.type}
-              propertySurface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
-              propertyCity={deal.Property?.addressCity ?? undefined}
+              propertyType={deal.Property?.type ?? deal.searchPropertyType ?? undefined}
+              propertySurface={
+                deal.Property?.livingAreaSqm
+                  ? `${deal.Property.livingAreaSqm} m²`
+                  : deal.searchSurfaceMin
+                    ? `${deal.searchSurfaceMin}–${deal.searchSurfaceMax ?? '?'} m²`
+                    : undefined
+              }
+              propertyCity={deal.Property?.addressCity ?? deal.searchCity ?? undefined}
               pipelineStage={deal.pipelineStage as PipelineStage}
               winProbability={deal.winProbability ?? 0}
               weightedRevenue={computeWeightedRevenue(deal)}

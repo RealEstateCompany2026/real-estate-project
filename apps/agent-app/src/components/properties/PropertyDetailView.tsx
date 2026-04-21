@@ -117,6 +117,11 @@ interface DealSectionItem {
   lastActivityDate: string | null;
   infoRequestsCount: number | null;
   visitCount: number | null;
+  // Search criteria (ACQUISITION / LOCATION)
+  searchCity: string | null;
+  searchPropertyType: string | null;
+  searchSurfaceMin: number | null;
+  searchSurfaceMax: number | null;
   Client: { firstName: string; lastName: string } | null;
 }
 
@@ -505,6 +510,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           saleMandateStatus, mgmtMandateStatus,
           occupancyStatus, maintenanceStatus, purchaseOfferStatus,
           lastActivityDate, infoRequestsCount, visitCount,
+          searchCity, searchPropertyType, searchSurfaceMin, searchSurfaceMax,
           Client(firstName, lastName)
         `).eq('propertyId', propertyId).order('lastActivityDate', { ascending: false }),
         supabase.from('Listing').select('id, status, title, description, descriptionSource, alurCompliant, slug, publishedAt, contactFormEnabled, viewCount, leadCount').eq('propertyId', propertyId),
@@ -1560,6 +1566,13 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
                   dealType={deal.type as DealType}
                   status={deal.status}
                   reference={deal.reference}
+                  propertyType={deal.searchPropertyType ?? undefined}
+                  propertySurface={
+                    deal.searchSurfaceMin
+                      ? `${deal.searchSurfaceMin}–${deal.searchSurfaceMax ?? '?'} m²`
+                      : undefined
+                  }
+                  propertyCity={deal.searchCity ?? undefined}
                   clientName={
                     deal.Client
                       ? `${deal.Client.firstName} ${deal.Client.lastName}`
@@ -1995,6 +2008,13 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
               dealType={deal.type as DealType}
               status={deal.status}
               reference={deal.reference}
+              propertyType={deal.searchPropertyType ?? undefined}
+              propertySurface={
+                deal.searchSurfaceMin
+                  ? `${deal.searchSurfaceMin}–${deal.searchSurfaceMax ?? '?'} m²`
+                  : undefined
+              }
+              propertyCity={deal.searchCity ?? undefined}
               clientName={
                 deal.Client
                   ? `${deal.Client.firstName} ${deal.Client.lastName}`

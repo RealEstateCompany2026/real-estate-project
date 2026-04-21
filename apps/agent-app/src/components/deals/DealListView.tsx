@@ -48,6 +48,11 @@ interface DealListItem {
   occupancyStatus: string | null;
   maintenanceStatus: string | null;
   purchaseOfferStatus: string | null;
+  // Search criteria (ACQUISITION / LOCATION)
+  searchCity: string | null;
+  searchPropertyType: string | null;
+  searchSurfaceMin: number | null;
+  searchSurfaceMax: number | null;
   // Jointures
   Client: { firstName: string; lastName: string } | null;
   Property: {
@@ -194,6 +199,7 @@ export function DealListView() {
           occupancyStatus, maintenanceStatus, purchaseOfferStatus,
           lastActivityDate, createdAt,
           infoRequestsCount, visitCount,
+          searchCity, searchPropertyType, searchSurfaceMin, searchSurfaceMax,
           Client(firstName, lastName),
           Property(type, livingAreaSqm, addressCity, desiredSellingPrice, listingStatus)
         `
@@ -378,13 +384,15 @@ export function DealListView() {
             dealType={deal.type as DealType}
             status={deal.status}
             reference={deal.reference}
-            propertyType={deal.Property?.type}
+            propertyType={deal.Property?.type ?? deal.searchPropertyType ?? undefined}
             propertySurface={
               deal.Property?.livingAreaSqm
                 ? `${deal.Property.livingAreaSqm} m\u00b2`
-                : undefined
+                : deal.searchSurfaceMin
+                  ? `${deal.searchSurfaceMin}\u2013${deal.searchSurfaceMax ?? '?'} m\u00b2`
+                  : undefined
             }
-            propertyCity={deal.Property?.addressCity ?? undefined}
+            propertyCity={deal.Property?.addressCity ?? deal.searchCity ?? undefined}
             clientName={
               deal.Client
                 ? `${deal.Client.firstName} ${deal.Client.lastName}`
