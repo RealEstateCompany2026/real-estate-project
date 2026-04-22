@@ -146,7 +146,7 @@ export function ListPromesse({
           {dpeGrade && <IconDpe type={dpeGrade} size="small" />}
           {lastPerson && (
             <>
-              {blocks.length > 0 && <Dot />}
+              {blocks.length > 0 && !dpeGrade && <Dot />}
               <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
                 {lastPerson}
               </span>
