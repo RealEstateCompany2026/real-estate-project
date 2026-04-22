@@ -40,6 +40,7 @@ import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
 import { ListMandat } from '@real-estate/ui/list-mandat';
+import type { DpeType } from '@real-estate/ui/icon-dpe';
 import { Sheet } from '@real-estate/ui/sheet';
 import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
@@ -61,6 +62,7 @@ import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
+import { PROPERTY_TYPE_LABELS } from '@/types/property';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -834,6 +836,35 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           {!((currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived) && (
             <ListMandat
               reference={deal.reference ?? '—'}
+              city={
+                (currentType === 'VENTE' || currentType === 'GESTION')
+                  ? (deal.Property?.addressCity ?? undefined)
+                  : (deal.searchCity ?? undefined)
+              }
+              propertyType={
+                (currentType === 'VENTE' || currentType === 'GESTION')
+                  ? (deal.Property?.type ? PROPERTY_TYPE_LABELS[deal.Property.type as keyof typeof PROPERTY_TYPE_LABELS] ?? deal.Property.type : undefined)
+                  : (deal.searchPropertyType ?? undefined)
+              }
+              surface={
+                (currentType === 'VENTE' || currentType === 'GESTION')
+                  ? (deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : undefined)
+                  : (deal.searchSurfaceMin && deal.searchSurfaceMax
+                      ? `${deal.searchSurfaceMin}–${deal.searchSurfaceMax}m²`
+                      : deal.searchSurfaceMin ? `≥${deal.searchSurfaceMin}m²`
+                      : deal.searchSurfaceMax ? `≤${deal.searchSurfaceMax}m²`
+                      : undefined)
+              }
+              dpeGrade={
+                (currentType === 'VENTE' || currentType === 'GESTION')
+                  ? (deal.Property?.dpeEnergyClass as DpeType ?? undefined)
+                  : undefined
+              }
+              clientName={
+                deal.Client
+                  ? `${deal.Client.firstName ?? ''} ${(deal.Client.lastName ?? '').toUpperCase()}`.trim() || undefined
+                  : undefined
+              }
               workflow={{
                 edition: mapMandateWorkflow(mandateStatusKey, 'edition'),
                 revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
