@@ -444,6 +444,18 @@ enum MandateStatus {
   RESILIE
 }
 
+enum MandateExclusivityType {
+  SIMPLE
+  EXCLUSIF
+  SEMI_EXCLUSIF
+}
+
+enum MandateCommissionPayer {
+  VENDEUR
+  ACQUEREUR
+  PARTAGE
+}
+
 enum MappingEntityType {
   CLIENT
   PROPERTY
@@ -1376,6 +1388,14 @@ model Deal {
 
   // Mandat de gestion
   mgmtMandateStatus MandateStatus?
+
+  // Champs communs mandat
+  mandateExclusivityType  MandateExclusivityType?
+  mandateStartDate        DateTime?
+  mandateDurationMonths   Int?
+  mandateCommissionRate   Float?
+  mandateCommissionPayer  MandateCommissionPayer?
+  mandateFixedFee         Float?
 
   // Pipeline commercial
   infoRequestsCount   Int?

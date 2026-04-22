@@ -8,6 +8,7 @@ import { Switch } from "./Switch";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import { CollapsibleSection } from "./CollapsibleSection";
+import { ArrowRight } from "lucide-react";
 import { DealType, DEAL_TYPE_LABELS } from "./deal-types";
 
 // ── Types ──────────────────────────────────────────────
@@ -37,6 +38,10 @@ export interface SheetMandatEditProps {
   onSave: (updates: Record<string, Record<string, string>>) => void;
   isRevision?: boolean;
   onToggleRevision?: (v: boolean) => void;
+  /** Mode du footer: 'edit' pour complétion, 'review' pour vue mandat */
+  footerMode?: 'edit' | 'review';
+  /** Callback pour envoyer le mandat (mode review) */
+  onSendMandate?: () => void;
   className?: string;
 }
 
@@ -50,6 +55,8 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
   onSave,
   isRevision = false,
   onToggleRevision,
+  footerMode = 'edit',
+  onSendMandate,
   className,
 }) => {
   // Local state for field edits, keyed by entity then field
@@ -117,7 +124,19 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
     </div>
   ) : undefined;
 
-  const footer = (
+  const footer = footerMode === 'review' ? (
+    <>
+      <Button
+        variant="primary"
+        className="flex-1"
+        onClick={onSendMandate}
+        disabled={!isRevision}
+      >
+        Envoyer le mandat
+        <ArrowRight size={20} />
+      </Button>
+    </>
+  ) : (
     <>
       <Button variant="primary" className="flex-1" onClick={handleSave}>
         Enregistrer

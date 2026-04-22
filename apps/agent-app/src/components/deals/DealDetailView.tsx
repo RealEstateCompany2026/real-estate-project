@@ -61,7 +61,7 @@ import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
 import { SheetMandatEdit } from '@real-estate/ui/sheet-mandat-edit';
-import type { EligibilitySection } from '@real-estate/ui/sheet-mandat-edit';
+import type { EligibilitySection, EligibilityField } from '@real-estate/ui/sheet-mandat-edit';
 import { checkMandateEligibility } from '@/lib/checkMandateEligibility';
 import type { MissingField } from '@/lib/checkMandateEligibility';
 // ── App-level ──
@@ -98,6 +98,12 @@ interface DealRow {
   mandateWaived: boolean;
   mgmtMandateStatus: string | null;
   saleMandateEndDate: string | null;
+  mandateExclusivityType: string | null;
+  mandateStartDate: string | null;
+  mandateDurationMonths: number | null;
+  mandateCommissionRate: number | null;
+  mandateCommissionPayer: string | null;
+  mandateFixedFee: number | null;
 
   // Acquisition
   acquisitionMinBudget: number | null;
@@ -609,6 +615,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isAnnonceSheetOpen, setIsAnnonceSheetOpen] = useState(false);
   const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
   const [isSheetMandatEditOpen, setIsSheetMandatEditOpen] = useState(false);
+  const [isSheetMandatViewOpen, setIsSheetMandatViewOpen] = useState(false);
+  const [isRevision, setIsRevision] = useState(false);
   const [organization, setOrganization] = useState<{
     name: string | null; address: string | null; siret: string | null;
     rcpInsuranceRef: string | null; rcpExpiryDate: string | null;
@@ -861,6 +869,106 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     setIsSheetMandatEditOpen(false);
     window.location.reload();
   }, [deal]);
+
+  // ── Build full mandate sections (for "Voir le mandat") ──
+  const buildFullMandateSections = useCallback((): EligibilitySection[] => {
+    if (!deal) return [];
+    const sections: EligibilitySection[] = [];
+
+    // Section Client
+    const clientFields: EligibilityField[] = [];
+    if (deal.Client) {
+      clientFields.push({ entity: 'client', field: 'firstName', label: 'Prénom', value: deal.Client.firstName, type: 'text' });
+      clientFields.push({ entity: 'client', field: 'lastName', label: 'Nom', value: deal.Client.lastName, type: 'text' });
+      clientFields.push({ entity: 'client', field: 'address', label: 'Adresse', value: deal.Client.address, type: 'text' });
+    }
+    sections.push({
+      title: 'Client',
+      status: clientFields.every(f => !!f.value) ? 'valid' : 'invalid',
+      fields: clientFields,
+    });
+
+    // Section Bien (VENTE/GESTION) ou Critères de recherche (ACQUISITION/LOCATION)
+    if (currentType === 'VENTE' || currentType === 'GESTION') {
+      const bienFields: EligibilityField[] = [];
+      if (deal.Property) {
+        bienFields.push({ entity: 'property', field: 'type', label: 'Type de bien', value: deal.Property.type, type: 'select', options: Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => ({ value: v, label: l })) });
+        bienFields.push({ entity: 'property', field: 'livingAreaSqm', label: 'Surface habitable (m²)', value: deal.Property.livingAreaSqm != null ? String(deal.Property.livingAreaSqm) : null, type: 'number' });
+        bienFields.push({ entity: 'property', field: 'address', label: 'Adresse', value: deal.Property.address, type: 'text' });
+        bienFields.push({ entity: 'property', field: 'addressCity', label: 'Ville', value: deal.Property.addressCity, type: 'text' });
+      }
+      sections.push({
+        title: 'Bien',
+        status: bienFields.every(f => !!f.value) ? 'valid' : 'invalid',
+        fields: bienFields,
+      });
+    } else {
+      // ACQUISITION / LOCATION — Critères de recherche
+      const rechercheFields: EligibilityField[] = [
+        { entity: 'deal', field: 'searchCity', label: 'Ville recherchée', value: deal.searchCity, type: 'text' },
+        { entity: 'deal', field: 'searchPropertyType', label: 'Type de bien', value: deal.searchPropertyType, type: 'text' },
+        { entity: 'deal', field: 'searchSurfaceMin', label: 'Surface min (m²)', value: deal.searchSurfaceMin != null ? String(deal.searchSurfaceMin) : null, type: 'number' },
+        { entity: 'deal', field: 'searchSurfaceMax', label: 'Surface max (m²)', value: deal.searchSurfaceMax != null ? String(deal.searchSurfaceMax) : null, type: 'number' },
+      ];
+      if (currentType === 'ACQUISITION') {
+        rechercheFields.push({ entity: 'deal', field: 'acquisitionMinBudget', label: 'Budget min (€)', value: deal.acquisitionMinBudget != null ? String(deal.acquisitionMinBudget) : null, type: 'number' });
+        rechercheFields.push({ entity: 'deal', field: 'acquisitionMaxBudget', label: 'Budget max (€)', value: deal.acquisitionMaxBudget != null ? String(deal.acquisitionMaxBudget) : null, type: 'number' });
+      } else {
+        rechercheFields.push({ entity: 'deal', field: 'locationMinBudget', label: 'Budget location (€)', value: deal.locationMinBudget != null ? String(deal.locationMinBudget) : null, type: 'number' });
+      }
+      sections.push({
+        title: 'Critères de recherche',
+        status: rechercheFields.every(f => !!f.value) ? 'valid' : 'invalid',
+        fields: rechercheFields,
+      });
+    }
+
+    // Section Prix
+    const prixFields: EligibilityField[] = [];
+    if (currentType === 'VENTE' || currentType === 'GESTION') {
+      prixFields.push({ entity: 'property', field: 'desiredSellingPrice', label: 'Prix de vente souhaité (€)', value: deal.Property?.desiredSellingPrice != null ? String(deal.Property.desiredSellingPrice) : null, type: 'number' });
+    }
+    sections.push({
+      title: 'Prix',
+      status: prixFields.every(f => !!f.value) ? 'valid' : 'invalid',
+      fields: prixFields,
+    });
+
+    // Section Honoraires
+    const honorairesFields: EligibilityField[] = [
+      { entity: 'deal', field: 'mandateCommissionRate', label: 'Taux de commission (%)', value: deal.mandateCommissionRate != null ? String(deal.mandateCommissionRate) : null, type: 'number' },
+      { entity: 'deal', field: 'mandateCommissionPayer', label: 'À la charge de', value: deal.mandateCommissionPayer, type: 'select', options: [{ value: 'VENDEUR', label: 'Vendeur' }, { value: 'ACQUEREUR', label: 'Acquéreur' }, { value: 'PARTAGE', label: 'Partagé' }] },
+      { entity: 'deal', field: 'mandateFixedFee', label: 'Honoraires fixes (€)', value: deal.mandateFixedFee != null ? String(deal.mandateFixedFee) : null, type: 'number' },
+    ];
+    sections.push({
+      title: 'Honoraires',
+      status: honorairesFields.every(f => !!f.value) ? 'valid' : 'invalid',
+      fields: honorairesFields,
+    });
+
+    // Section Exclusivité
+    const exclusiviteFields: EligibilityField[] = [
+      { entity: 'deal', field: 'mandateExclusivityType', label: 'Exclusivité', value: deal.mandateExclusivityType, type: 'select', options: [{ value: 'SIMPLE', label: 'Simple' }, { value: 'EXCLUSIF', label: 'Exclusif' }, { value: 'SEMI_EXCLUSIF', label: 'Semi-exclusif' }] },
+    ];
+    sections.push({
+      title: 'Exclusivité',
+      status: exclusiviteFields.every(f => !!f.value) ? 'valid' : 'invalid',
+      fields: exclusiviteFields,
+    });
+
+    // Section Durée
+    const dureeFields: EligibilityField[] = [
+      { entity: 'deal', field: 'mandateStartDate', label: 'Date de début', value: deal.mandateStartDate ? deal.mandateStartDate.split('T')[0] : null, type: 'date' },
+      { entity: 'deal', field: 'mandateDurationMonths', label: 'Durée (mois)', value: deal.mandateDurationMonths != null ? String(deal.mandateDurationMonths) : null, type: 'number' },
+    ];
+    sections.push({
+      title: 'Durée',
+      status: dureeFields.every(f => !!f.value) ? 'valid' : 'invalid',
+      fields: dureeFields,
+    });
+
+    return sections;
+  }, [deal, currentType]);
 
   // ── Loading ──
   if (isLoading) {
@@ -1723,7 +1831,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         }
         onViewMandate={() => {
           setIsSheetMandatOpen(false);
-          setIsSheetMandatEditOpen(true);
+          setIsSheetMandatViewOpen(true);
         }}
         onWriteClient={() => {/* TODO: ouvrir messagerie */}}
         onToggleActivation={handleToggleActivation}
@@ -1749,6 +1857,25 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         dealType={currentType}
         sections={buildEligibilitySections()}
         onSave={handleMandatEditSave}
+      />
+
+      {/* SheetMandatEdit — Voir le mandat (contenu complet) */}
+      <SheetMandatEdit
+        isOpen={isSheetMandatViewOpen}
+        onClose={() => setIsSheetMandatViewOpen(false)}
+        dealType={currentType}
+        sections={buildFullMandateSections()}
+        onSave={handleMandatEditSave}
+        isRevision={isRevision}
+        onToggleRevision={setIsRevision}
+        footerMode="review"
+        onSendMandate={async () => {
+          if (!deal) return;
+          const supabase = createClient();
+          const statusField = currentType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+          await supabase.from('Deal').update({ [statusField]: 'ENVOYE' }).eq('id', deal.id);
+          window.location.reload();
+        }}
       />
 
       {/* Sheet Activités */}
