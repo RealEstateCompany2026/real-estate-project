@@ -37,7 +37,7 @@ export interface SheetMandatEditProps {
   reference: string;
   dealType: DealType;
   sections: EligibilitySection[];
-  onSave: (updates: Record<string, Record<string, string>>) => void;
+  onSave: (updates: Record<string, Record<string, string | number | null>>) => void;
   isRevision?: boolean;
   onToggleRevision?: (v: boolean) => void;
   /** Mode du footer: 'edit' pour complétion, 'review' pour vue mandat */
@@ -146,13 +146,13 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
             // Build section-specific save handler
             const handleSectionSave = () => {
               const initial2 = buildInitialValues(sections);
-              const changed: Record<string, Record<string, string>> = {};
+              const changed: Record<string, Record<string, string | number | null>> = {};
               for (const f of section.fields) {
                 const current = localValues[f.entity]?.[f.field] ?? "";
                 const orig = initial2[f.entity]?.[f.field] ?? "";
                 if (current !== orig) {
                   if (!changed[f.entity]) changed[f.entity] = {};
-                  changed[f.entity][f.field] = current;
+                  changed[f.entity][f.field] = coerceFieldValue(current, f.type);
                 }
               }
               onSave(changed);
@@ -230,6 +230,19 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
 };
 
 // ── Helpers ────────────────────────────────────────────
+
+/** Coerce string value to the appropriate JS type based on field type */
+function coerceFieldValue(
+  value: string,
+  fieldType: FieldType,
+): string | number | null {
+  if (value === '') return null;
+  if (fieldType === 'number') {
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
+  }
+  return value;
+}
 
 function buildInitialValues(
   sections: EligibilitySection[],

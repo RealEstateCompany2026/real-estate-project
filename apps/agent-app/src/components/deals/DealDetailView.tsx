@@ -839,7 +839,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       });
   }, [eligibility.missingFields, currentType]);
 
-  const handleMandatEditSave = useCallback(async (updates: Record<string, Record<string, string>>) => {
+  const handleMandatEditSave = useCallback(async (updates: Record<string, Record<string, string | number | null>>) => {
     if (!deal) return;
     const supabase = createClient();
     const promises: PromiseLike<any>[] = [];
