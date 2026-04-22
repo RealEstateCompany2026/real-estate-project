@@ -323,21 +323,20 @@ function mapBailWorkflow(
   return 'success'; // bail signe = tout valide
 }
 
-// ── Notarial status mapping ──
+// ── Notarial workflow mapping (RDV / SIGNATURE) ──
 
-const NOTARIAL_STATUS_LABELS: Record<string, string> = {
-  EN_ATTENTE: 'En attente',
-  RDV_FIXE: 'RDV fixé',
-  SIGNE: 'Signé',
-  ANNULE: 'Annulé',
-};
-
-const NOTARIAL_STATUS_VARIANT: Record<string, BadgeVariant> = {
-  EN_ATTENTE: 'default',
-  RDV_FIXE: 'information',
-  SIGNE: 'success',
-  ANNULE: 'error',
-};
+function mapNotarialWorkflow(
+  status: string | null,
+  step: 'rdv' | 'signature',
+): BadgeVariant {
+  if (!status) return 'disabled';
+  const statusUpper = status.toUpperCase();
+  if (step === 'rdv') {
+    return (statusUpper === 'RDV_FIXE' || statusUpper === 'SIGNE') ? 'success' : 'disabled';
+  }
+  // signature
+  return statusUpper === 'SIGNE' ? 'success' : 'disabled';
+}
 
 // ── Activity helpers ──
 
@@ -1251,18 +1250,19 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             {/* ─────────── Section Notaire ─────────── */}
             <section id="notaire" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
-              {deal.notarialDeedStatus ? (
-                <ListActeNotarie
-                  contactName="Notaire"
-                  dateTime={deal.notarialDeedDate ? formatDateTime(deal.notarialDeedDate) : '—'}
-                  status={{
-                    label: NOTARIAL_STATUS_LABELS[deal.notarialDeedStatus] ?? deal.notarialDeedStatus,
-                    variant: NOTARIAL_STATUS_VARIANT[deal.notarialDeedStatus] ?? 'default',
-                  }}
-                />
-              ) : (
-                <p className="text-sm text-content-subtle italic">Aucun acte notarié en cours</p>
-              )}
+              <ListActeNotarie
+                sellerName={currentType === 'VENTE' ? clientFullName : 'Vendeur'}
+                buyerName={currentType === 'VENTE' ? 'Acquéreur' : clientFullName}
+                city={deal.Property?.addressCity ?? undefined}
+                propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
+                dateTime={deal.notarialDeedDate ? formatDateTime(deal.notarialDeedDate) : undefined}
+                workflow={{
+                  rdv: mapNotarialWorkflow(deal.notarialDeedStatus, 'rdv'),
+                  signature: mapNotarialWorkflow(deal.notarialDeedStatus, 'signature'),
+                }}
+              />
             </section>
           </>
         )}
