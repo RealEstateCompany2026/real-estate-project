@@ -279,30 +279,23 @@ function mapVisiteRechercheStatus(
   }
 }
 
-// ── Offer workflow mapping ──
+// ── Offer workflow mapping (ÉDITION / ACCORD) ──
 
-function mapOfferWorkflow(
+function mapPromesseWorkflow(
   status: string | null,
-  step: 'recue' | 'transmise' | 'accord',
+  step: 'edition' | 'accord',
 ): BadgeVariant {
-  const order = ['RECUE', 'TRANSMISE', 'ACCEPTEE'];
-  const stepMap: Record<string, number> = { recue: 0, transmise: 1, accord: 2 };
+  const order = ['EDITION', 'ACCORD'];
+  const stepMap: Record<string, number> = { edition: 0, accord: 1 };
   const idx = order.indexOf(status ?? '');
   if (idx < 0) return 'disabled';
   return idx >= stepMap[step] ? 'success' : 'disabled';
 }
 
-// ── Offer recherche workflow mapping ──
-
-function mapOfferRechercheWorkflow(
-  status: string | null,
-  step: 'envoyee' | 'acceptee',
-): BadgeVariant {
-  const order = ['ENVOYEE', 'ACCEPTEE'];
-  const stepMap: Record<string, number> = { envoyee: 0, acceptee: 1 };
-  const idx = order.indexOf(status ?? '');
-  if (idx < 0) return 'disabled';
-  return idx >= stepMap[step] ? 'success' : 'disabled';
+/** Format a number as euros (e.g. 320000 → "320 000 €") */
+function formatEuros(value: number | null | undefined): string | undefined {
+  if (value == null) return undefined;
+  return `${value.toLocaleString('fr-FR')} €`;
 }
 
 // ── Bail workflow mapping ──
@@ -1169,28 +1162,36 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 deal.purchaseOfferStatus ? (
                   <ListPromesse
                     useCase="vente"
-                    contactName="Acquéreur"
+                    buyerName="Acquéreur"
+                    sellerName={clientFullName}
+                    city={deal.Property?.addressCity ?? undefined}
+                    propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                    dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
+                    amount={formatEuros(deal.finalSalePrice ?? deal.Property?.desiredSellingPrice)}
                     workflow={{
-                      recue: mapOfferWorkflow(deal.purchaseOfferStatus, 'recue'),
-                      transmise: mapOfferWorkflow(deal.purchaseOfferStatus, 'transmise'),
-                      accord: mapOfferWorkflow(deal.purchaseOfferStatus, 'accord'),
+                      edition: mapPromesseWorkflow(deal.purchaseOfferStatus, 'edition'),
+                      accord: mapPromesseWorkflow(deal.purchaseOfferStatus, 'accord'),
                     }}
                   />
                 ) : (
                   <p className="text-sm text-content-subtle italic">Aucune offre reçue</p>
                 )
               ) : (
-                /* ACQUISITION : useCase="recherche" */
+                /* ACQUISITION */
                 deal.purchaseOfferStatus ? (
                   <ListPromesse
-                    useCase="recherche"
-                    contactName={clientFullName}
-                    propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
-                    city={deal.Property?.addressCity ?? '—'}
+                    useCase="acquisition"
+                    buyerName={clientFullName}
+                    sellerName="Vendeur"
+                    city={deal.Property?.addressCity ?? undefined}
+                    propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                    surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                    dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
+                    amount={formatEuros(deal.finalSalePrice ?? deal.Property?.desiredSellingPrice)}
                     workflow={{
-                      envoyee: mapOfferRechercheWorkflow(deal.purchaseOfferStatus, 'envoyee'),
-                      acceptee: mapOfferRechercheWorkflow(deal.purchaseOfferStatus, 'acceptee'),
+                      edition: mapPromesseWorkflow(deal.purchaseOfferStatus, 'edition'),
+                      accord: mapPromesseWorkflow(deal.purchaseOfferStatus, 'accord'),
                     }}
                   />
                 ) : (

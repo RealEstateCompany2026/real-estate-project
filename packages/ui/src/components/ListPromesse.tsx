@@ -1,46 +1,59 @@
 "use client";
 
 import React from "react";
-import { UserCircle, Home, Maximize2, MapPin, ArrowRight } from "lucide-react";
+import { ArrowRight, Tag } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
 import { Button } from "./Button";
 import { AiSuggestion } from "./AiSuggestion";
+import { Chip } from "./Chip";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
- * ListPromesse - Ligne de liste promesse de vente/achat
+ * ListPromesse - Ligne de liste promesse / offre d'achat
  * Organism du design system RealAgent
  *
- * Ligne simple (70px) avec 2 variantes Figma (prop useCase) :
+ * Ligne (100px) avec 2 variantes (prop useCase) :
  *
- * Variante "vente" (vente d'un bien — côté vendeur) :
- *   - Gauche : nom acquéreur
- *   - Droite : REÇUE + TRANSMISE + ACCORD + "Voir la promesse" + AI
+ * Variante "vente" (côté vendeur) :
+ *   - Ligne 1 : "Offre d'achat"
+ *   - Ligne 2 : acquéreur • ville • type • surface • DPE • vendeur
+ *   - Droite : Chip montant + ÉDITION + ACCORD + Voir + AI
  *
- * Variante "recherche" (recherche d'un bien — côté acquéreur) :
- *   - Gauche : nom contact + type + surface + ville
- *   - Droite : ENVOYÉE + ACCEPTÉE + "Voir la promesse" + AI
+ * Variante "acquisition" (côté acquéreur) :
+ *   - Ligne 1 : "Promesse de vente"
+ *   - Ligne 2 : vendeur • ville • type • surface • DPE • acquéreur
+ *   - Droite : Chip montant + ÉDITION + ACCORD + Voir + AI
  *
- * Figma : "List . promesse" — h=70px, px=20, py=13, justify-between
+ * Figma : "List . promesse" — h=100px, px=20, justify-between
  */
 
-export interface PromesseWorkflowVente {
-  recue: BadgeVariant;
-  transmise: BadgeVariant;
+export interface PromesseWorkflow {
+  edition: BadgeVariant;
   accord: BadgeVariant;
 }
 
-export interface PromesseWorkflowRecherche {
-  envoyee: BadgeVariant;
-  acceptee: BadgeVariant;
-}
-
-/** Props communes */
-interface ListPromesseBaseProps {
-  /** Nom du contact */
-  contactName: string;
+export interface ListPromesseProps {
+  /** Variante d'affaire */
+  useCase: "vente" | "acquisition";
+  /** Nom de l'acquéreur */
+  buyerName?: string;
+  /** Nom du vendeur */
+  sellerName?: string;
+  /** Ville / commune du bien */
+  city?: string;
+  /** Type du bien (T3, Maison, etc.) */
+  propertyType?: string;
+  /** Surface du bien (ex: "85m²") */
+  surface?: string;
+  /** Note DPE du bien (A-G) — masqué si absent */
+  dpeGrade?: DpeType;
+  /** Montant de l'offre / promesse en euros (ex: "320 000 €") */
+  amount?: string;
+  /** Statuts des 2 étapes du workflow */
+  workflow: PromesseWorkflow;
   /** Nombre de suggestions IA */
   aiSuggestions?: number;
-  /** Callback au clic sur "Voir la promesse" */
+  /** Callback au clic sur "Voir" */
   onView?: () => void;
   /** Callback au clic sur la ligne */
   onClick?: () => void;
@@ -48,108 +61,115 @@ interface ListPromesseBaseProps {
   className?: string;
 }
 
-/** Variant Vente : contact | REÇUE + TRANSMISE + ACCORD */
-export interface ListPromesseVenteProps extends ListPromesseBaseProps {
-  useCase: "vente";
-  workflow: PromesseWorkflowVente;
-  propertyType?: never;
-  surface?: never;
-  city?: never;
-}
-
-/** Variant Recherche : contact + infos bien | ENVOYÉE + ACCEPTÉE */
-export interface ListPromesseRechercheProps extends ListPromesseBaseProps {
-  useCase: "recherche";
-  workflow: PromesseWorkflowRecherche;
-  /** Type de bien (T3, Maison, etc.) */
-  propertyType: string;
-  /** Surface (ex: "120m²") */
-  surface: string;
-  /** Ville / commune */
-  city: string;
-}
-
-export type ListPromesseProps = ListPromesseVenteProps | ListPromesseRechercheProps;
-
 /**
- * Icon+Text atom
+ * Dot separator — rond 5px entre les blocs texte de la ligne 2
  */
-function IconText({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function Dot() {
   return (
-    <div className="inline-flex gap-[4px] items-center shrink-0">
-      <div className="shrink-0 size-[20px] flex items-center justify-center">
-        {icon}
-      </div>
-      <span className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
-        {children}
-      </span>
-    </div>
+    <span className="size-[5px] rounded-full bg-content-body shrink-0" />
   );
 }
 
-export function ListPromesse(props: ListPromesseProps) {
-  const {
-    contactName,
-    useCase,
-    workflow,
-    aiSuggestions = 0,
-    onView,
-    onClick,
-    className = "",
-  } = props;
+export function ListPromesse({
+  useCase,
+  buyerName,
+  sellerName,
+  city,
+  propertyType,
+  surface,
+  dpeGrade,
+  amount,
+  workflow,
+  aiSuggestions = 0,
+  onView,
+  onClick,
+  className = "",
+}: ListPromesseProps) {
+  const title = useCase === "vente" ? "Offre d'achat" : "Promesse de vente";
 
-  const iconColor = "var(--icon-neutral-default)";
+  /* Ligne 2 : ordre des personnes inversé selon le useCase */
+  const firstPerson = useCase === "vente" ? buyerName : sellerName;
+  const lastPerson = useCase === "vente" ? sellerName : buyerName;
+
+  /* Collecte des blocs texte de la ligne 2 pour gérer les dots */
+  const blocks: React.ReactNode[] = [];
+
+  if (firstPerson) {
+    blocks.push(
+      <span key="p1" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {firstPerson}
+      </span>
+    );
+  }
+  if (city) {
+    blocks.push(
+      <span key="city" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {city}
+      </span>
+    );
+  }
+  if (propertyType) {
+    blocks.push(
+      <span key="type" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {propertyType}
+      </span>
+    );
+  }
+  if (surface) {
+    blocks.push(
+      <span key="surface" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {surface}
+      </span>
+    );
+  }
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[70px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
-      {/* Gauche : contact + (infos bien si recherche) */}
-      <div className="flex gap-[24px] items-center shrink-0">
-        <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
-          {contactName}
-        </IconText>
-        {useCase === "recherche" && (
-          <>
-            <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
-              {props.propertyType}
-            </IconText>
-            <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
-              {props.surface}
-            </IconText>
-            <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
-              {props.city}
-            </IconText>
-          </>
-        )}
-      </div>
+      {/* Gauche : titre + infos */}
+      <div className="flex flex-col justify-center shrink-0">
+        {/* Ligne 1 — Titre : 20/24 semibold, px=10 py=6 */}
+        <span className="text-[20px] font-semibold font-roboto text-content-body leading-[24px] px-[10px] py-[6px]">
+          {title}
+        </span>
 
-      {/* Droite : workflow badges + bouton + AI suggestions */}
-      <div className="flex gap-[24px] items-center shrink-0">
-        <div className="flex gap-[24px] items-center">
-          {useCase === "vente" ? (
+        {/* Ligne 2 — Blocs texte xsm séparés par dots */}
+        <div className="flex items-center">
+          {blocks.map((block, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <Dot />}
+              {block}
+            </React.Fragment>
+          ))}
+          {dpeGrade && <IconDpe type={dpeGrade} size="small" />}
+          {lastPerson && (
             <>
-              <Badge variant={(workflow as PromesseWorkflowVente).recue}>REÇUE</Badge>
-              <Badge variant={(workflow as PromesseWorkflowVente).transmise}>TRANSMISE</Badge>
-              <Badge variant={(workflow as PromesseWorkflowVente).accord}>ACCORD</Badge>
-            </>
-          ) : (
-            <>
-              <Badge variant={(workflow as PromesseWorkflowRecherche).envoyee}>ENVOYÉE</Badge>
-              <Badge variant={(workflow as PromesseWorkflowRecherche).acceptee}>ACCEPTÉE</Badge>
+              {blocks.length > 0 && <Dot />}
+              <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+                {lastPerson}
+              </span>
             </>
           )}
         </div>
+      </div>
+
+      {/* Droite : chip montant + workflow badges + bouton + AI suggestions */}
+      <div className="flex gap-[24px] items-center shrink-0">
+        {amount && (
+          <Chip icon={<Tag size={20} />} size="medium">
+            {amount}
+          </Chip>
+        )}
+
+        <div className="flex gap-[24px] items-center">
+          <Badge variant={workflow.edition}>ÉDITION</Badge>
+          <Badge variant={workflow.accord}>ACCORD</Badge>
+        </div>
 
         <Button variant="ghost" size="default" onClick={onView}>
-          Voir la promesse
+          Voir
           <ArrowRight size={20} />
         </Button>
 
