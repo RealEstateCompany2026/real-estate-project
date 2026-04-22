@@ -1056,9 +1056,20 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                   <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
                     Recherche
                   </h3>
-                  <Badge variant={deal.searchCity || deal.searchPropertyType ? 'success' : 'warning'}>
-                    {deal.searchCity || deal.searchPropertyType ? 'Définis' : 'À définir'}
-                  </Badge>
+                  {(() => {
+                    const fields = [
+                      deal.searchCity,
+                      deal.searchPropertyType,
+                      deal.searchSurfaceMin,
+                      deal.searchSurfaceMax,
+                      currentType === 'ACQUISITION' ? deal.acquisitionMinBudget : deal.locationMinBudget,
+                      currentType === 'ACQUISITION' ? deal.acquisitionMaxBudget : deal.locationMaxBudget,
+                    ];
+                    const count = fields.filter(v => v != null && v !== '').length;
+                    const total = fields.length;
+                    const mandatoryOk = Boolean(deal.searchCity) && Boolean(deal.searchPropertyType);
+                    return <Badge variant={mandatoryOk ? 'success' : 'error'}>{count}/{total}</Badge>;
+                  })()}
                 </div>
                 <Button variant="ghost" onClick={() => setIsRechercheSheetOpen(true)}>
                   <Pencil size={16} /> Éditer
@@ -1710,7 +1721,15 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 {rechercheForm.city && (
                   <div className="flex flex-wrap gap-2">
                     {rechercheForm.city.split(/\s*[\/,]\s*/).map((part, i) => (
-                      <BadgeCriteria key={i} label={part.trim()} variant="default" />
+                      <BadgeCriteria
+                        key={i}
+                        label={part.trim()}
+                        variant="ghost"
+                        onRemove={() => {
+                          const parts = rechercheForm.city.split(/\s*[\/,]\s*/).filter((_, idx) => idx !== i);
+                          setRechercheForm((p) => ({ ...p, city: parts.join(', ') }));
+                        }}
+                      />
                     ))}
                   </div>
                 )}
@@ -1735,7 +1754,11 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 />
                 {rechercheForm.propertyType && (
                   <div className="flex flex-wrap gap-2">
-                    <BadgeCriteria label={rechercheForm.propertyType} variant="default" />
+                    <BadgeCriteria
+                      label={rechercheForm.propertyType}
+                      variant="ghost"
+                      onRemove={() => setRechercheForm((p) => ({ ...p, propertyType: '' }))}
+                    />
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-[12px]">
@@ -1756,8 +1779,20 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 </div>
                 {(rechercheForm.surfaceMin || rechercheForm.surfaceMax) && (
                   <div className="flex flex-wrap gap-2">
-                    {rechercheForm.surfaceMin && <BadgeCriteria label={`≥ ${rechercheForm.surfaceMin} m²`} variant="default" />}
-                    {rechercheForm.surfaceMax && <BadgeCriteria label={`≤ ${rechercheForm.surfaceMax} m²`} variant="default" />}
+                    {rechercheForm.surfaceMin && (
+                      <BadgeCriteria
+                        label={`≥ ${rechercheForm.surfaceMin} m²`}
+                        variant="ghost"
+                        onRemove={() => setRechercheForm((p) => ({ ...p, surfaceMin: '' }))}
+                      />
+                    )}
+                    {rechercheForm.surfaceMax && (
+                      <BadgeCriteria
+                        label={`≤ ${rechercheForm.surfaceMax} m²`}
+                        variant="ghost"
+                        onRemove={() => setRechercheForm((p) => ({ ...p, surfaceMax: '' }))}
+                      />
+                    )}
                   </div>
                 )}
               </div>
@@ -1815,7 +1850,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                         label={currentType === 'ACQUISITION'
                           ? `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €`
                           : `≥ ${Number(rechercheForm.budgetMin).toLocaleString('fr-FR')} €/mois`}
-                        variant="default"
+                        variant="ghost"
+                        onRemove={() => setRechercheForm((p) => ({ ...p, budgetMin: '' }))}
                       />
                     )}
                     {rechercheForm.budgetMax && (
@@ -1823,7 +1859,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                         label={currentType === 'ACQUISITION'
                           ? `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €`
                           : `≤ ${Number(rechercheForm.budgetMax).toLocaleString('fr-FR')} €/mois`}
-                        variant="default"
+                        variant="ghost"
+                        onRemove={() => setRechercheForm((p) => ({ ...p, budgetMax: '' }))}
                       />
                     )}
                   </div>

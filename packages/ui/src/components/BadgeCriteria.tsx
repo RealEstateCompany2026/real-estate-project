@@ -14,7 +14,7 @@ import { CircleX } from "lucide-react";
  *   "default light/dark"  → default  (surface-neutral-action bg)
  */
 
-export type BadgeCriteriaVariant = "outlined" | "default";
+export type BadgeCriteriaVariant = "outlined" | "default" | "ghost";
 
 export interface BadgeCriteriaProps {
   variant?: BadgeCriteriaVariant;
@@ -29,15 +29,21 @@ export function BadgeCriteria({
   onRemove,
   className = "",
 }: BadgeCriteriaProps) {
-  const isOutlined = variant === "outlined";
+  const containerVariantClass =
+    variant === "outlined"
+      ? "border border-solid border-edge-neutral-default bg-transparent"
+      : variant === "ghost"
+        ? "bg-transparent"
+        : "bg-surface-neutral-action";
+
+  const textVariantClass =
+    variant === "default" ? "text-content-body" : "text-content-caption";
 
   return (
     <div
       className={`
         relative inline-flex items-center rounded-[16px] px-[6px] ${className}
-        ${isOutlined
-          ? "border border-solid border-edge-neutral-default bg-transparent"
-          : "bg-surface-neutral-action"}
+        ${containerVariantClass}
       `.trim()}
     >
       {/* Content container */}
@@ -46,7 +52,7 @@ export function BadgeCriteria({
         <p
           className={`
             text-sm leading-[16px] tracking-[0.14px] whitespace-nowrap font-bold font-roboto
-            ${isOutlined ? "text-content-caption" : "text-content-body"}
+            ${textVariantClass}
           `.trim()}
         >
           {label}
@@ -61,7 +67,7 @@ export function BadgeCriteria({
           >
             <CircleX
               size={18}
-              className={isOutlined ? "text-content-caption" : "text-content-body"}
+              className={textVariantClass}
             />
           </button>
         )}
