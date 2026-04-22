@@ -1294,10 +1294,12 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               <h5 className="text-xl font-bold text-content-headings">Bail</h5>
               {deal.bailType ? (
                 <ListBail
-                  contactName={clientFullName}
-                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
-                  city={deal.Property?.addressCity ?? '—'}
+                  reference={formatIdAsReference(deal.id)}
+                  tenantName={clientFullName}
+                  city={deal.Property?.addressCity ?? undefined}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                  dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
                   workflow={{
                     edition: mapBailWorkflow(deal.bailSignedDate, 'edition'),
                     revision: mapBailWorkflow(deal.bailSignedDate, 'revision'),

@@ -9,7 +9,7 @@ const meta: Meta<typeof ListBail> = {
     docs: {
       description: {
         component:
-          "Ligne de liste bail — contact + type + surface + ville + 3 workflow badges (édition/révision/signature) + bouton voir le bail + AI.",
+          "Ligne de liste bail — titre avec référence + infos bien (locataire, ville, type, surface, DPE) + badges ÉDITION/RÉVISION/SIGNATURE + bouton Voir + suggestions IA.",
       },
     },
   },
@@ -18,90 +18,91 @@ const meta: Meta<typeof ListBail> = {
 export default meta;
 type Story = StoryObj<typeof ListBail>;
 
+/** Bail signé — toutes étapes complétées */
 export const ToutValide: Story = {
   args: {
-    contactName: "Nathalie DUFLOT",
+    reference: "000.000.042",
+    tenantName: "Nathalie DUFLOT",
+    city: "Carcassonne",
     propertyType: "T3",
     surface: "120m²",
-    city: "Carcassonne",
-    workflow: {
-      edition: "success",
-      revision: "success",
-      signature: "success",
-    },
+    dpeGrade: "C",
+    workflow: { edition: "success", revision: "success", signature: "success" },
     aiSuggestions: 0,
   },
 };
 
+/** Bail en cours de révision */
 export const EnCours: Story = {
   args: {
-    contactName: "Pierre MARTIN",
+    reference: "000.000.018",
+    tenantName: "Pierre MARTIN",
+    city: "Toulouse",
     propertyType: "T2",
     surface: "65m²",
-    city: "Toulouse",
-    workflow: {
-      edition: "success",
-      revision: "warning",
-      signature: "disabled",
-    },
+    dpeGrade: "B",
+    workflow: { edition: "success", revision: "warning", signature: "disabled" },
     aiSuggestions: 1,
   },
 };
 
+/** Bail à éditer */
 export const AEditer: Story = {
   args: {
-    contactName: "Jean DUPONT",
+    reference: "000.000.007",
+    tenantName: "Jean DUPONT",
+    city: "Montpellier",
     propertyType: "T4",
     surface: "95m²",
-    city: "Montpellier",
-    workflow: {
-      edition: "warning",
-      revision: "disabled",
-      signature: "disabled",
-    },
+    dpeGrade: "D",
+    workflow: { edition: "warning", revision: "disabled", signature: "disabled" },
     aiSuggestions: 0,
   },
 };
 
-export const Erreur: Story = {
+/** Sans DPE ni référence */
+export const SansDpeNiRef: Story = {
   args: {
-    contactName: "Marie LEFEVRE",
+    tenantName: "Marie LEFEVRE",
+    city: "Lyon",
     propertyType: "Studio",
     surface: "30m²",
-    city: "Lyon",
-    workflow: {
-      edition: "success",
-      revision: "error",
-      signature: "disabled",
-    },
+    workflow: { edition: "success", revision: "success", signature: "disabled" },
     aiSuggestions: 2,
   },
 };
 
+/** Plusieurs lignes empilées */
 export const MultipleRows: Story = {
   render: () => (
     <div className="flex flex-col gap-[8px]">
       <ListBail
-        contactName="Nathalie DUFLOT"
+        reference="000.000.042"
+        tenantName="Nathalie DUFLOT"
+        city="Carcassonne"
         propertyType="T3"
         surface="120m²"
-        city="Carcassonne"
+        dpeGrade="C"
         workflow={{ edition: "success", revision: "success", signature: "success" }}
         aiSuggestions={0}
       />
       <ListBail
-        contactName="Pierre MARTIN"
+        reference="000.000.018"
+        tenantName="Pierre MARTIN"
+        city="Toulouse"
         propertyType="T2"
         surface="65m²"
-        city="Toulouse"
+        dpeGrade="B"
         workflow={{ edition: "success", revision: "warning", signature: "disabled" }}
         aiSuggestions={1}
       />
       <ListBail
-        contactName="Jean DUPONT"
+        reference="000.000.007"
+        tenantName="Jean DUPONT"
+        city="Montpellier"
         propertyType="T4"
         surface="95m²"
-        city="Montpellier"
+        dpeGrade="D"
         workflow={{ edition: "warning", revision: "disabled", signature: "disabled" }}
         aiSuggestions={0}
       />

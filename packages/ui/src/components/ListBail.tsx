@@ -1,22 +1,22 @@
 "use client";
 
 import React from "react";
-import { UserCircle, Home, Maximize2, MapPin, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
 import { Button } from "./Button";
 import { AiSuggestion } from "./AiSuggestion";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
  * ListBail - Ligne de liste bail
  * Organism du design system RealAgent
  *
- * Ligne simple (70px) — une seule variante (light/dark auto via tokens).
+ * Ligne (100px) — variante unique (LOCATION) :
+ *   - Ligne 1 : "Bail n°{reference}"
+ *   - Ligne 2 : locataire • ville • type • surface • DPE
+ *   - Droite : ÉDITION + RÉVISION + SIGNATURE + Voir + AI
  *
- * Layout :
- *   - Gauche : nom contact + type logement + surface + ville
- *   - Droite : 3 workflow badges (édition, révision, signature) + "Voir le bail >" + AI
- *
- * Figma : "List . bail" — h=70px, px=20, py=13, justify-between
+ * Figma : "List . bail" — h=100px, px=20, justify-between
  */
 
 export interface BailWorkflow {
@@ -26,19 +26,23 @@ export interface BailWorkflow {
 }
 
 export interface ListBailProps {
-  /** Nom du contact locataire */
-  contactName: string;
-  /** Type de logement (ex: "T3") */
-  propertyType: string;
-  /** Surface (ex: "120m²") */
-  surface: string;
-  /** Ville (ex: "Carcassonne") */
-  city: string;
+  /** Référence du bail (ex: "000.000.042") */
+  reference?: string;
+  /** Nom du locataire */
+  tenantName?: string;
+  /** Ville / commune du bien */
+  city?: string;
+  /** Type du bien (T3, Maison, etc.) */
+  propertyType?: string;
+  /** Surface du bien (ex: "65m²") */
+  surface?: string;
+  /** Note DPE du bien (A-G) — masqué si absent */
+  dpeGrade?: DpeType;
   /** Workflow du bail (édition / révision / signature) */
   workflow: BailWorkflow;
   /** Nombre de suggestions IA */
   aiSuggestions?: number;
-  /** Callback au clic sur "Voir le bail" */
+  /** Callback au clic sur "Voir" */
   onView?: () => void;
   /** Callback au clic sur la ligne */
   onClick?: () => void;
@@ -47,69 +51,95 @@ export interface ListBailProps {
 }
 
 /**
- * Icon+Text atom
+ * Dot separator — rond 5px entre les blocs texte de la ligne 2
  */
-function IconText({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function Dot() {
   return (
-    <div className="inline-flex gap-[4px] items-center shrink-0">
-      <div className="shrink-0 size-[20px] flex items-center justify-center">
-        {icon}
-      </div>
-      <span className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
-        {children}
-      </span>
-    </div>
+    <span className="size-[5px] rounded-full bg-content-body shrink-0" />
   );
 }
 
 export function ListBail({
-  contactName,
+  reference,
+  tenantName,
+  city,
   propertyType,
   surface,
-  city,
+  dpeGrade,
   workflow,
   aiSuggestions = 0,
   onView,
   onClick,
   className = "",
 }: ListBailProps) {
-  const iconColor = "var(--icon-neutral-default)";
+  const title = reference ? `Bail n°${reference}` : "Bail";
+
+  /* Collecte des blocs texte de la ligne 2 pour gérer les dots */
+  const blocks: React.ReactNode[] = [];
+
+  if (tenantName) {
+    blocks.push(
+      <span key="tenant" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {tenantName}
+      </span>
+    );
+  }
+  if (city) {
+    blocks.push(
+      <span key="city" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {city}
+      </span>
+    );
+  }
+  if (propertyType) {
+    blocks.push(
+      <span key="type" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {propertyType}
+      </span>
+    );
+  }
+  if (surface) {
+    blocks.push(
+      <span key="surface" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {surface}
+      </span>
+    );
+  }
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[70px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
-      {/* Gauche : contact + type + surface + ville */}
-      <div className="flex gap-[24px] items-center shrink-0">
-        <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
-          {contactName}
-        </IconText>
-        <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
-          {propertyType}
-        </IconText>
-        <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
-          {surface}
-        </IconText>
-        <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
-          {city}
-        </IconText>
+      {/* Gauche : titre + infos */}
+      <div className="flex flex-col justify-center shrink-0">
+        {/* Ligne 1 — Titre : 20/24 semibold, px=10 py=6 */}
+        <span className="text-[20px] font-semibold font-roboto text-content-body leading-[24px] px-[10px] py-[6px]">
+          {title}
+        </span>
+
+        {/* Ligne 2 — Blocs texte xsm séparés par dots */}
+        <div className="flex items-center">
+          {blocks.map((block, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <Dot />}
+              {block}
+            </React.Fragment>
+          ))}
+          {dpeGrade && <IconDpe type={dpeGrade} size="small" />}
+        </div>
       </div>
 
-      {/* Droite : workflow badges + bouton + AI */}
+      {/* Droite : workflow badges + bouton + AI suggestions */}
       <div className="flex gap-[24px] items-center shrink-0">
-        <Badge variant={workflow.edition}>ÉDITION</Badge>
-        <Badge variant={workflow.revision}>RÉVISION</Badge>
-        <Badge variant={workflow.signature}>SIGNATURE</Badge>
+        <div className="flex gap-[24px] items-center">
+          <Badge variant={workflow.edition}>ÉDITION</Badge>
+          <Badge variant={workflow.revision}>RÉVISION</Badge>
+          <Badge variant={workflow.signature}>SIGNATURE</Badge>
+        </div>
 
         <Button variant="ghost" size="default" onClick={onView}>
-          Voir le bail
+          Voir
           <ArrowRight size={20} />
         </Button>
 
