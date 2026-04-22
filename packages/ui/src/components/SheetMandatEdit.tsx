@@ -9,7 +9,7 @@ import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { ArrowRight } from "lucide-react";
-import { DealType, DEAL_TYPE_LABELS } from "./deal-types";
+import { DealType } from "./deal-types";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -33,6 +33,8 @@ export interface EligibilitySection {
 export interface SheetMandatEditProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Référence du mandat (ex: "MRA.000.000.004") */
+  reference: string;
   dealType: DealType;
   sections: EligibilitySection[];
   onSave: (updates: Record<string, Record<string, string>>) => void;
@@ -50,7 +52,8 @@ export interface SheetMandatEditProps {
 export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
   isOpen,
   onClose,
-  dealType,
+  reference,
+  dealType: _dealType,
   sections,
   onSave,
   isRevision = false,
@@ -88,41 +91,7 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
     [],
   );
 
-  const handleSave = useCallback(() => {
-    // Build a diff: only include values that actually changed
-    const initial = buildInitialValues(sections);
-    const changed: Record<string, Record<string, string>> = {};
-
-    for (const entity of Object.keys(localValues)) {
-      for (const field of Object.keys(localValues[entity])) {
-        const current = localValues[entity][field];
-        const original = initial[entity]?.[field] ?? "";
-        if (current !== original) {
-          if (!changed[entity]) changed[entity] = {};
-          changed[entity][field] = current;
-        }
-      }
-    }
-
-    onSave(changed);
-  }, [localValues, sections, onSave]);
-
   // ── Render helpers ─────────────────────────────────
-
-  const headerAfterTitle = (
-    <Badge variant="information">{DEAL_TYPE_LABELS[dealType]}</Badge>
-  );
-
-  const headerActions = onToggleRevision ? (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-content-caption">Révision</span>
-      <Switch
-        checked={isRevision}
-        onChange={onToggleRevision}
-        ariaLabel="Mode révision"
-      />
-    </div>
-  ) : undefined;
 
   const footer = footerMode === 'review' ? (
     <>
@@ -136,95 +105,124 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
         <ArrowRight size={20} />
       </Button>
     </>
-  ) : (
-    <>
-      <Button variant="primary" className="flex-1" onClick={handleSave}>
-        Enregistrer
-      </Button>
-      <Button variant="ghost" className="flex-1" onClick={onClose}>
-        Annuler
-      </Button>
-    </>
-  );
+  ) : null;
 
   return (
     <Sheet
       isOpen={isOpen}
       onClose={onClose}
-      title="Édition du mandat"
-      headerAfterTitle={headerAfterTitle}
-      headerActions={headerActions}
+      title={reference}
       footer={footer}
       className={className}
     >
       <div className="py-[16px]">
-        {/* Revision banner */}
-        {isRevision && (
-          <div className="rounded-lg bg-surface-branded-subtle mx-[20px] p-[12px] mb-[12px]">
-            <p className="text-sm text-content-branded-strong">
-              Mode révision — Les modifications entraîneront une nouvelle version
-              du mandat
-            </p>
+        {/* Bloc 1 — Révision */}
+        {onToggleRevision && (
+          <div className="mx-[20px] mb-[12px] rounded-lg border border-[var(--border-divider)] bg-surface-neutral-default p-[16px]">
+            <div className="flex items-center justify-between">
+              <span className="text-base font-semibold font-roboto text-content-body">
+                Révision
+              </span>
+              <Switch
+                checked={isRevision}
+                onChange={onToggleRevision}
+                ariaLabel="Mode révision"
+              />
+            </div>
           </div>
         )}
 
         {/* Sections */}
         <div className="flex flex-col gap-[12px] mx-[20px]">
-          {sections.map((section) => (
-            <CollapsibleSection
-              key={section.title}
-              title={section.title}
-              badge={
-                <Badge
-                  variant={section.status === "valid" ? "success" : "error"}
-                >
-                  {section.status === "valid" ? "VALIDE" : "INVALIDE"}
-                </Badge>
-              }
-              defaultExpanded={section.status === "invalid"}
-            >
-              <div className="flex flex-col gap-[12px]">
-                {section.fields.map((f) => {
-                  const currentValue =
-                    localValues[f.entity]?.[f.field] ?? "";
+          {sections.map((section) => {
+            // Check if this section has changes
+            const initial = buildInitialValues(sections);
+            const sectionHasChanges = section.fields.some((f) => {
+              const current = localValues[f.entity]?.[f.field] ?? "";
+              const orig = initial[f.entity]?.[f.field] ?? "";
+              return current !== orig;
+            });
 
-                  if (f.type === "select" && f.options) {
+            // Build section-specific save handler
+            const handleSectionSave = () => {
+              const initial2 = buildInitialValues(sections);
+              const changed: Record<string, Record<string, string>> = {};
+              for (const f of section.fields) {
+                const current = localValues[f.entity]?.[f.field] ?? "";
+                const orig = initial2[f.entity]?.[f.field] ?? "";
+                if (current !== orig) {
+                  if (!changed[f.entity]) changed[f.entity] = {};
+                  changed[f.entity][f.field] = current;
+                }
+              }
+              onSave(changed);
+            };
+
+            return (
+              <CollapsibleSection
+                key={section.title}
+                title={section.title}
+                badge={
+                  <Badge
+                    variant={section.status === "valid" ? "success" : "error"}
+                  >
+                    {section.status === "valid" ? "VALIDE" : "INVALIDE"}
+                  </Badge>
+                }
+                defaultExpanded={section.status === "invalid"}
+              >
+                <div className="flex flex-col gap-[12px]">
+                  {section.fields.map((f) => {
+                    const currentValue =
+                      localValues[f.entity]?.[f.field] ?? "";
+
+                    if (f.type === "select" && f.options) {
+                      return (
+                        <SelectField
+                          key={`${f.entity}.${f.field}`}
+                          label={f.label}
+                          value={currentValue}
+                          onChange={(v) =>
+                            handleFieldChange(f.entity, f.field, v)
+                          }
+                          options={f.options}
+                          placeholder="Selectionner..."
+                        />
+                      );
+                    }
+
                     return (
-                      <SelectField
+                      <InputField
                         key={`${f.entity}.${f.field}`}
                         label={f.label}
                         value={currentValue}
                         onChange={(v) =>
                           handleFieldChange(f.entity, f.field, v)
                         }
-                        options={f.options}
-                        placeholder="Selectionner..."
+                        type={
+                          f.type === "number"
+                            ? "number"
+                            : f.type === "date"
+                              ? "date"
+                              : "text"
+                        }
+                        placeholder={f.label}
                       />
                     );
-                  }
-
-                  return (
-                    <InputField
-                      key={`${f.entity}.${f.field}`}
-                      label={f.label}
-                      value={currentValue}
-                      onChange={(v) =>
-                        handleFieldChange(f.entity, f.field, v)
-                      }
-                      type={
-                        f.type === "number"
-                          ? "number"
-                          : f.type === "date"
-                            ? "date"
-                            : "text"
-                      }
-                      placeholder={f.label}
-                    />
-                  );
-                })}
-              </div>
-            </CollapsibleSection>
-          ))}
+                  })}
+                  {sectionHasChanges && (
+                    <Button
+                      variant="primary"
+                      className="mt-[4px]"
+                      onClick={handleSectionSave}
+                    >
+                      Enregistrer
+                    </Button>
+                  )}
+                </div>
+              </CollapsibleSection>
+            );
+          })}
         </div>
       </div>
     </Sheet>

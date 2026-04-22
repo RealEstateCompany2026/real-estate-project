@@ -1854,6 +1854,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       <SheetMandatEdit
         isOpen={isSheetMandatEditOpen}
         onClose={() => setIsSheetMandatEditOpen(false)}
+        reference={deal.reference ?? formatIdAsReference(deal.id)}
         dealType={currentType}
         sections={buildEligibilitySections()}
         onSave={handleMandatEditSave}
@@ -1863,6 +1864,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       <SheetMandatEdit
         isOpen={isSheetMandatViewOpen}
         onClose={() => setIsSheetMandatViewOpen(false)}
+        reference={deal.reference ?? formatIdAsReference(deal.id)}
         dealType={currentType}
         sections={buildFullMandateSections()}
         onSave={handleMandatEditSave}
