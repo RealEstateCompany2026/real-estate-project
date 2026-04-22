@@ -176,6 +176,21 @@ function formatDateTime(date: string): string {
   });
 }
 
+function formatDateOnly(date: string): string {
+  return new Date(date).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function formatTimeOnly(date: string): string {
+  return new Date(date).toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function formatPrice(amount: number | null | undefined): string {
   if (!amount) return '—';
   return new Intl.NumberFormat('fr-FR', {
@@ -1115,33 +1130,26 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               <Badge variant="default">{visitEvents.length}</Badge>
             </div>
             {visitEvents.map((v) => (
-              currentType === 'VENTE' ? (
-                <ListVisite
-                  key={v.id}
-                  useCase="vente"
-                  dateTime={formatDateTime(v.eventDate)}
-                  contactName={clientFullName}
-                  workflow={{
-                    calendrier: mapVisiteStatus(v.status, 'calendrier'),
-                    odj: mapVisiteStatus(v.status, 'odj'),
-                    cr: mapVisiteStatus(v.status, 'cr'),
-                  }}
-                />
-              ) : (
-                <ListVisite
-                  key={v.id}
-                  useCase="recherche"
-                  dateTime={formatDateTime(v.eventDate)}
-                  contactName={clientFullName}
-                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
-                  city={deal.Property?.addressCity ?? '—'}
-                  workflow={{
-                    programme: mapVisiteRechercheStatus(v.status, 'programme'),
-                    cr: mapVisiteRechercheStatus(v.status, 'cr'),
-                  }}
-                />
-              )
+              <ListVisite
+                key={v.id}
+                date={formatDateOnly(v.eventDate)}
+                time={formatTimeOnly(v.eventDate)}
+                city={deal.Property?.addressCity ?? undefined}
+                propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : undefined}
+                dpeGrade={
+                  deal.Property?.dpeEnergyClass &&
+                  ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
+                    ? (deal.Property.dpeEnergyClass as DpeType)
+                    : undefined
+                }
+                clientName={clientFullName}
+                workflow={{
+                  cal: mapVisiteStatus(v.status, 'calendrier'),
+                  odj: mapVisiteStatus(v.status, 'odj'),
+                  cr: mapVisiteStatus(v.status, 'cr'),
+                }}
+              />
             ))}
             {visitEvents.length === 0 && (
               <p className="text-sm text-content-subtle italic">Aucune visite planifiée</p>

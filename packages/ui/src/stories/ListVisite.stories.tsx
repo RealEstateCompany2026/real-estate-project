@@ -9,7 +9,7 @@ const meta: Meta<typeof ListVisite> = {
     docs: {
       description: {
         component:
-          "Ligne de liste visite — 2 variantes : Vente (date + contact + 3 badges workflow) et Recherche (date + contact + infos bien + 2 badges workflow).",
+          "Ligne de liste visite — titre + infos visite (date, heure, ville, type, surface, DPE, client) + 3 badges workflow (CAL, ODJ, CR) + bouton Voir + suggestions IA.",
       },
     },
   },
@@ -18,78 +18,101 @@ const meta: Meta<typeof ListVisite> = {
 export default meta;
 type Story = StoryObj<typeof ListVisite>;
 
-export const Vente: Story = {
+/** Visite planifiée avec infos bien complètes */
+export const Default: Story = {
   args: {
-    useCase: "vente",
-    dateTime: "12 fév. 2026 à 14h00",
-    contactName: "Nathalie DUFLOT",
-    workflow: { calendrier: "success", odj: "success", cr: "disabled" },
+    date: "12 fév. 2026",
+    time: "14h00",
+    city: "Montpellier",
+    propertyType: "T3",
+    surface: "85m²",
+    dpeGrade: "B",
+    clientName: "Nathalie DUFLOT",
+    workflow: { cal: "success", odj: "success", cr: "disabled" },
     aiSuggestions: 0,
   },
 };
 
-export const VenteComplete: Story = {
+/** Visite terminée — toutes étapes complétées */
+export const Complete: Story = {
   args: {
-    useCase: "vente",
-    dateTime: "5 janv. 2026 à 10h00",
-    contactName: "Pierre MARTIN",
-    workflow: { calendrier: "success", odj: "success", cr: "success" },
+    date: "5 janv. 2026",
+    time: "10h00",
+    city: "Lyon",
+    propertyType: "Maison",
+    surface: "200m²",
+    dpeGrade: "A",
+    clientName: "Pierre MARTIN",
+    workflow: { cal: "success", odj: "success", cr: "success" },
     aiSuggestions: 2,
   },
 };
 
-export const Recherche: Story = {
+/** Visite en cours de planification */
+export const EarlyStage: Story = {
   args: {
-    useCase: "recherche",
-    dateTime: "12 fév. 2026 à 14h00",
-    contactName: "Nathalie DUFLOT",
-    propertyType: "T3",
-    surface: "120m²",
+    date: "3 mars 2026",
+    time: "16h30",
     city: "Carcassonne",
-    workflow: { programme: "success", cr: "disabled" },
-    aiSuggestions: 0,
-  },
-};
-
-export const RechercheComplete: Story = {
-  args: {
-    useCase: "recherche",
-    dateTime: "3 mars 2026 à 16h30",
-    contactName: "Jean DUPONT",
-    propertyType: "Maison",
-    surface: "200m²",
-    city: "Montpellier",
-    workflow: { programme: "success", cr: "success" },
+    propertyType: "T2",
+    surface: "45m²",
+    dpeGrade: "D",
+    clientName: "Jean DUPONT",
+    workflow: { cal: "warning", odj: "disabled", cr: "disabled" },
     aiSuggestions: 1,
   },
 };
 
+/** Visite sans DPE */
+export const SansDpe: Story = {
+  args: {
+    date: "20 avr. 2026",
+    time: "09h00",
+    city: "Paris",
+    propertyType: "Studio",
+    surface: "25m²",
+    clientName: "Sophie BERNARD",
+    workflow: { cal: "success", odj: "warning", cr: "disabled" },
+    aiSuggestions: 0,
+  },
+};
+
+/** Plusieurs lignes empilées */
 export const MultipleRows: Story = {
   render: () => (
     <div className="flex flex-col gap-[8px]">
       <ListVisite
-        useCase="vente"
-        dateTime="12 fév. 2026 à 14h00"
-        contactName="Nathalie DUFLOT"
-        workflow={{ calendrier: "success", odj: "success", cr: "disabled" }}
+        date="12 fév. 2026"
+        time="14h00"
+        city="Montpellier"
+        propertyType="T3"
+        surface="85m²"
+        dpeGrade="B"
+        clientName="Nathalie DUFLOT"
+        workflow={{ cal: "success", odj: "success", cr: "disabled" }}
         aiSuggestions={0}
       />
       <ListVisite
-        useCase="vente"
-        dateTime="5 janv. 2026 à 10h00"
-        contactName="Pierre MARTIN"
-        workflow={{ calendrier: "success", odj: "success", cr: "success" }}
+        date="5 janv. 2026"
+        time="10h00"
+        city="Lyon"
+        propertyType="Maison"
+        surface="200m²"
+        dpeGrade="A"
+        clientName="Pierre MARTIN"
+        workflow={{ cal: "success", odj: "success", cr: "success" }}
         aiSuggestions={2}
       />
       <ListVisite
-        useCase="recherche"
-        dateTime="12 fév. 2026 à 14h00"
-        contactName="Nathalie DUFLOT"
-        propertyType="T3"
-        surface="120m²"
+        date="3 mars 2026"
+        time="16h30"
         city="Carcassonne"
-        workflow={{ programme: "success", cr: "disabled" }}
-        aiSuggestions={0}
+        propertyType="T2"
+        surface="45m²"
+        dpeGrade="D"
+        clientName="Jean DUPONT"
+        workflow={{ cal: "warning", odj: "disabled", cr: "disabled" }}
+        aiSuggestions={1}
       />
     </div>
   ),
