@@ -63,6 +63,7 @@ import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import { PROPERTY_TYPE_LABELS } from '@/types/property';
+import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -787,7 +788,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       {/* ── AppBarFicheAffaire (sticky) ── */}
       <div className="sticky top-0 z-30">
         <AppBarFicheAffaire
-          dealId={deal.reference ?? deal.id.slice(0, 8)}
+          dealId={deal.reference ?? formatIdAsReference(deal.id)}
           dealType={currentType}
           status={deal.status ?? undefined}
           pipelineStage={deal.pipelineStage as PipelineStage ?? undefined}
@@ -973,7 +974,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             {listing ? (
               <>
                 <ListAnnonce
-                  reference={listing.id.replace(/[^a-f0-9]/gi, '').slice(0, 9).replace(/(.{3})(.{3})(.{3})/, '$1.$2.$3')}
+                  reference={formatIdAsReference(listing.id)}
                   city={deal.Property?.addressCity ?? undefined}
                   propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
                   surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : undefined}

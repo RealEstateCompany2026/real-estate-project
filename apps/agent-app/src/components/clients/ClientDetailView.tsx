@@ -28,6 +28,7 @@ import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
+import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 import type { Client, ClientStatus } from '@/types/client';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import {
@@ -1046,7 +1047,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             {properties.map((p) => (
               <ListCarnet
                 key={`carnet-${p.id}`}
-                reference={p.id.slice(0, 8).toUpperCase()}
+                reference={formatIdAsReference(p.id)}
                 city={p.city}
                 propertyType={p.propertyType}
                 surface={p.surface}

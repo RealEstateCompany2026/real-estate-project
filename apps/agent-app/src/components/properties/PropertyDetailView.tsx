@@ -49,6 +49,7 @@ import {
   POOL_TYPE_LABELS, VIEW_TYPE_LABELS,
 } from '@/types/property';
 import { formatPrice } from '@/lib/utils/format';
+import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 
 // ---------------------------------------------------------------------------
 // Constants — Labels pour enums DPE
@@ -1621,7 +1622,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             {listings.map((l) => (
               <ListAnnonce
                 key={l.id}
-                reference={l.id.replace(/[^a-f0-9]/gi, '').slice(0, 9).replace(/(.{3})(.{3})(.{3})/, '$1.$2.$3')}
+                reference={formatIdAsReference(l.id)}
                 city={property.addressCity ?? undefined}
                 propertyType={PROPERTY_TYPE_LABELS[property.type]}
                 surface={property.livingAreaSqm ? `${property.livingAreaSqm}m²` : undefined}
@@ -1888,7 +1889,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             <Badge variant="default">{false ? 1 : 0}</Badge>
           </div>
           <ListCarnet
-            reference={property.id.slice(0, 8).toUpperCase()}
+            reference={formatIdAsReference(property.id)}
             city={property.addressCity ?? '—'}
             propertyType={PROPERTY_TYPE_LABELS[property.type]}
             surface={property.livingAreaSqm ? `${property.livingAreaSqm}m²` : '—'}
