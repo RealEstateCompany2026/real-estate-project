@@ -83,12 +83,71 @@ export function SheetMandat({
   onToggleActivation,
   className,
 }: SheetMandatProps) {
+  // Compute footer buttons based on state
+  const mandateIdx = MANDATE_ORDER.indexOf(mandateStatus);
+  const editeIdx = MANDATE_ORDER.indexOf('EDITE');
+
+  let footerContent: React.ReactNode;
+
+  if (isAutoManaged && mandateIdx >= editeIdx) {
+    // Mandat édité → Voir le mandat + Écrire au client
+    footerContent = (
+      <>
+        <Button variant="primary" className="flex-1" onClick={onViewMandate}>
+          Voir le mandat
+          <ArrowRight size={20} />
+        </Button>
+        <Button variant="ghost" className="flex-1" onClick={onWriteClient}>
+          Écrire au client
+          <ArrowRight size={20} />
+        </Button>
+      </>
+    );
+  } else if (isAutoManaged && isEligible) {
+    // Éligible mais pas encore édité → Générer le mandat + Écrire au client
+    footerContent = (
+      <>
+        <Button variant="primary" className="flex-1" onClick={onGenerateMandate}>
+          Générer le mandat
+          <ArrowRight size={20} />
+        </Button>
+        <Button variant="ghost" className="flex-1" onClick={onWriteClient}>
+          Écrire au client
+          <ArrowRight size={20} />
+        </Button>
+      </>
+    );
+  } else if (isAutoManaged && !isEligible && onEditMissingFields) {
+    // Non éligible → Compléter + Écrire au client
+    footerContent = (
+      <>
+        <Button variant="primary" className="flex-1" onClick={onEditMissingFields}>
+          Compléter les informations
+          <ArrowRight size={20} />
+        </Button>
+        <Button variant="ghost" className="flex-1" onClick={onWriteClient}>
+          Écrire au client
+          <ArrowRight size={20} />
+        </Button>
+      </>
+    );
+  } else {
+    // Mode manuel ou autre → juste Écrire au client
+    footerContent = (
+      <Button variant="ghost" className="flex-1" onClick={onWriteClient}>
+        Écrire au client
+        <ArrowRight size={20} />
+      </Button>
+    );
+  }
+
   return (
     <Sheet
       isOpen={isOpen}
       onClose={onClose}
       title={reference}
       width="narrow"
+      footer={footerContent}
       className={className}
     >
       <div className="flex flex-col gap-[16px] py-[16px]">
@@ -178,15 +237,6 @@ export function SheetMandat({
                         </span>
                       )}
                     </p>
-                    {onGenerateMandate && (
-                      <Button
-                        variant="primary"
-                        className="mt-[8px]"
-                        onClick={onGenerateMandate}
-                      >
-                        Générer le mandat
-                      </Button>
-                    )}
                   </>
                 )
                 : (
@@ -199,14 +249,6 @@ export function SheetMandat({
                         </span>
                       )}
                     </p>
-                    {onEditMissingFields && (
-                      <button
-                        onClick={onEditMissingFields}
-                        className="mt-[8px] text-sm font-semibold text-content-branded-strong hover:underline cursor-pointer"
-                      >
-                        Compléter les informations manquantes
-                      </button>
-                    )}
                   </>
                 )
             }
@@ -250,19 +292,6 @@ export function SheetMandat({
         )}
       </div>
 
-      {/* Footer area — buttons */}
-      <div className="flex gap-[12px] px-[20px] py-[20px] mt-auto">
-        {isAutoManaged && MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE') && (
-          <Button variant="primary" className="flex-1" onClick={onViewMandate}>
-            Voir le mandat
-            <ArrowRight size={20} />
-          </Button>
-        )}
-        <Button variant="ghost" className="flex-1" onClick={onWriteClient}>
-          Écrire au client
-          <ArrowRight size={20} />
-        </Button>
-      </div>
     </Sheet>
   );
 }

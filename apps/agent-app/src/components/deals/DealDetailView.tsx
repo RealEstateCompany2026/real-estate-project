@@ -1721,7 +1721,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             ? new Date(deal.saleMandateEndDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
             : undefined
         }
-        onViewMandate={() => {/* TODO: ouvrir éditeur mandat */}}
+        onViewMandate={() => {
+          setIsSheetMandatOpen(false);
+          setIsSheetMandatEditOpen(true);
+        }}
         onWriteClient={() => {/* TODO: ouvrir messagerie */}}
         onToggleActivation={handleToggleActivation}
         onEditMissingFields={() => {
