@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MapPin, Home, Maximize2, UserCircle, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Badge } from "./Badge";
 import { AiSuggestion } from "./AiSuggestion";
 import { IconDpe, DpeType } from "./IconDpe";
@@ -10,11 +10,13 @@ import { IconDpe, DpeType } from "./IconDpe";
  * ListCarnet - Ligne de liste carnet d'entretien
  * Organism du design system RealAgent
  *
- * Ligne simple (100px) sans image ni KPIs :
- * - Gauche : titre "Carnet d'entretien n° {reference}" + chips (ville, type, surface, DPE, propriétaire)
- * - Droite : badge statut (ACTIVÉ/DORMANT), date, AI suggestions
+ * Ligne (100px) sans image ni KPIs :
+ * - Gauche :
+ *   - Ligne 1 : bloc titre "Carnet d'entretien n° {reference}" — 20/24 semibold, px=10 py=6
+ *   - Ligne 2 : blocs texte xsm (ville • type • surface • DPE • propriétaire) — 12/14 semibold, px=10 py=8, séparés par dots 5px
+ * - Droite : badge statut, date, AI suggestions
  *
- * Figma : "List . carnet" — h=100px, px=33/37, py=25, justify-between
+ * Figma : "List . carnet" — h=100px, justify-between
  * Variantes : light / dark
  */
 
@@ -39,7 +41,7 @@ export interface ListCarnetProps {
   surface: string;
   /** Note DPE (A-G) */
   dpeGrade?: DpeType;
-  /** Nom du propriétaire (ex: "RASTAPOPULOS, Roberto") */
+  /** Nom du propriétaire (ex: "Roberto RASTAPOPULOS") */
   ownerName: string;
   /** Statut du carnet */
   status?: CarnetStatus;
@@ -54,24 +56,11 @@ export interface ListCarnetProps {
 }
 
 /**
- * Icon+Text atom
+ * Dot separator — rond 5px entre les blocs texte de la ligne 2
  */
-function IconText({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function Dot() {
   return (
-    <div className="inline-flex gap-[4px] items-center shrink-0">
-      <div className="shrink-0 size-[20px] flex items-center justify-center">
-        {icon}
-      </div>
-      <span className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
-        {children}
-      </span>
-    </div>
+    <span className="size-[5px] rounded-full bg-content-body shrink-0" />
   );
 }
 
@@ -88,43 +77,56 @@ export function ListCarnet({
   onClick,
   className = "",
 }: ListCarnetProps) {
-  const iconColor = "var(--icon-neutral-default)";
   const statusConfig = STATUS_MAP[status];
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] pl-[33px] pr-[37px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
       {/* Gauche : titre + infos du bien + propriétaire */}
-      <div className="flex flex-col gap-[8px] justify-center shrink-0">
-        <span className="text-lg font-semibold font-roboto text-content-body leading-[24px]">
+      <div className="flex flex-col justify-center shrink-0">
+        {/* Ligne 1 — Titre : 20/24 semibold, px=10 py=6 */}
+        <span className="text-[20px] font-semibold font-roboto text-content-body leading-[24px] px-[10px] py-[6px]">
           Carnet d&apos;entretien n° {reference}
         </span>
-        <div className="flex gap-[24px] items-center">
-          <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
+
+        {/* Ligne 2 — Blocs texte xsm séparés par dots, gap=0 */}
+        <div className="flex items-center">
+          <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
             {city}
-          </IconText>
-          <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
+          </span>
+          <Dot />
+          <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
             {propertyType}
-          </IconText>
-          <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
+          </span>
+          <Dot />
+          <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
             {surface}
-          </IconText>
-          {dpeGrade && <IconDpe type={dpeGrade} />}
-          <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
+          </span>
+          {dpeGrade && (
+            <>
+              <IconDpe type={dpeGrade} />
+            </>
+          )}
+          <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
             {ownerName}
-          </IconText>
+          </span>
         </div>
       </div>
 
       {/* Droite : statut + date + AI suggestions */}
-      <div className="flex gap-[24px] items-center shrink-0">
+      <div className="flex gap-[24px] items-center shrink-0 pr-[37px]">
         <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
         {date && (
-          <IconText icon={<Calendar size={20} style={{ color: iconColor }} />}>
-            {date}
-          </IconText>
+          <div className="inline-flex gap-[4px] items-center shrink-0">
+            <div className="shrink-0 size-[20px] flex items-center justify-center">
+              <Calendar size={20} style={{ color: "var(--icon-neutral-default)" }} />
+            </div>
+            <span className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
+              {date}
+            </span>
+          </div>
         )}
         <AiSuggestion count={aiSuggestions} />
       </div>
