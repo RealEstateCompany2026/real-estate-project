@@ -1275,10 +1275,18 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             {/* ─────────── Section Dossiers candidature ─────────── */}
             <section id="dossiers" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Dossiers candidature</h5>
-              {/* Placeholder — pas de table dediee pour les dossiers actuellement */}
-              <p className="text-sm text-content-subtle italic">
-                Aucun dossier de candidature
-              </p>
+              {/* Placeholder — pas de table dédiée pour les dossiers actuellement */}
+              <ListCandidatureLocataire
+                tenantName={clientFullName}
+                city={deal.Property?.addressCity ?? undefined}
+                propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
+                workflow={{
+                  dossier: 'disabled' as const,
+                  accord: 'disabled' as const,
+                }}
+              />
             </section>
 
             {/* ─────────── Section Bail ─────────── */}

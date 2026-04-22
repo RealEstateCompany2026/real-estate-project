@@ -9,7 +9,7 @@ const meta: Meta<typeof ListCandidatureLocataire> = {
     docs: {
       description: {
         component:
-          "Ligne de liste candidature locataire — contact + type + surface + ville + badges dossier/décision + bouton voir le dossier + AI.",
+          "Ligne de liste candidature locataire — titre + infos bien (locataire, ville, type, surface, DPE) + badges DOSSIER/ACCORD + bouton Voir + suggestions IA.",
       },
     },
   },
@@ -18,96 +18,86 @@ const meta: Meta<typeof ListCandidatureLocataire> = {
 export default meta;
 type Story = StoryObj<typeof ListCandidatureLocataire>;
 
+/** Candidature acceptée */
 export const Accepte: Story = {
   args: {
-    contactName: "Nathalie DUFLOT",
+    tenantName: "Nathalie DUFLOT",
+    city: "Carcassonne",
     propertyType: "T3",
     surface: "120m²",
-    city: "Carcassonne",
-    status: {
-      dossier: { label: "COMPLET", variant: "success" },
-      decision: { label: "ACCEPTÉ", variant: "success" },
-    },
+    dpeGrade: "C",
+    workflow: { dossier: "success", accord: "success" },
     aiSuggestions: 0,
   },
 };
 
-export const EnAttente: Story = {
+/** Candidature en cours d'examen */
+export const EnCours: Story = {
   args: {
-    contactName: "Pierre MARTIN",
+    tenantName: "Pierre MARTIN",
+    city: "Toulouse",
     propertyType: "T2",
     surface: "65m²",
-    city: "Toulouse",
-    status: {
-      dossier: { label: "COMPLET", variant: "success" },
-      decision: { label: "EN ATTENTE", variant: "warning" },
-    },
+    dpeGrade: "B",
+    workflow: { dossier: "success", accord: "disabled" },
     aiSuggestions: 2,
   },
 };
 
+/** Dossier incomplet */
 export const DossierIncomplet: Story = {
   args: {
-    contactName: "Jean DUPONT",
+    tenantName: "Jean DUPONT",
+    city: "Montpellier",
     propertyType: "T4",
     surface: "95m²",
-    city: "Montpellier",
-    status: {
-      dossier: { label: "INCOMPLET", variant: "error" },
-      decision: { label: "EN ATTENTE", variant: "disabled" },
-    },
+    dpeGrade: "D",
+    workflow: { dossier: "warning", accord: "disabled" },
     aiSuggestions: 0,
   },
 };
 
-export const Refuse: Story = {
+/** Sans DPE */
+export const SansDpe: Story = {
   args: {
-    contactName: "Marie LEFEVRE",
+    tenantName: "Marie LEFEVRE",
+    city: "Lyon",
     propertyType: "Studio",
     surface: "30m²",
-    city: "Lyon",
-    status: {
-      dossier: { label: "COMPLET", variant: "success" },
-      decision: { label: "REFUSÉ", variant: "error" },
-    },
-    aiSuggestions: 0,
+    workflow: { dossier: "success", accord: "warning" },
+    aiSuggestions: 1,
   },
 };
 
+/** Plusieurs lignes empilées */
 export const MultipleRows: Story = {
   render: () => (
     <div className="flex flex-col gap-[8px]">
       <ListCandidatureLocataire
-        contactName="Nathalie DUFLOT"
+        tenantName="Nathalie DUFLOT"
+        city="Carcassonne"
         propertyType="T3"
         surface="120m²"
-        city="Carcassonne"
-        status={{
-          dossier: { label: "COMPLET", variant: "success" },
-          decision: { label: "ACCEPTÉ", variant: "success" },
-        }}
+        dpeGrade="C"
+        workflow={{ dossier: "success", accord: "success" }}
         aiSuggestions={0}
       />
       <ListCandidatureLocataire
-        contactName="Pierre MARTIN"
+        tenantName="Pierre MARTIN"
+        city="Toulouse"
         propertyType="T2"
         surface="65m²"
-        city="Toulouse"
-        status={{
-          dossier: { label: "COMPLET", variant: "success" },
-          decision: { label: "EN ATTENTE", variant: "warning" },
-        }}
+        dpeGrade="B"
+        workflow={{ dossier: "success", accord: "disabled" }}
         aiSuggestions={2}
       />
       <ListCandidatureLocataire
-        contactName="Jean DUPONT"
+        tenantName="Jean DUPONT"
+        city="Montpellier"
         propertyType="T4"
         surface="95m²"
-        city="Montpellier"
-        status={{
-          dossier: { label: "INCOMPLET", variant: "error" },
-          decision: { label: "EN ATTENTE", variant: "disabled" },
-        }}
+        dpeGrade="D"
+        workflow={{ dossier: "warning", accord: "disabled" }}
         aiSuggestions={0}
       />
     </div>
