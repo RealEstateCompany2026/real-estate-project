@@ -10,11 +10,11 @@ import { IconDpe, DpeType } from "./IconDpe";
  * ListCarnet - Ligne de liste carnet d'entretien
  * Organism du design system RealAgent
  *
- * Ligne simple (70px) sans image ni KPIs :
- * - Gauche : ville, type, surface, DPE, propriétaire
+ * Ligne simple (100px) sans image ni KPIs :
+ * - Gauche : titre "Carnet d'entretien n° {reference}" + chips (ville, type, surface, DPE, propriétaire)
  * - Droite : badge statut (ACTIVÉ/DORMANT), date, AI suggestions
  *
- * Figma : "List . carnet" — h=70px, px=33/37, py=25, justify-between
+ * Figma : "List . carnet" — h=100px, px=33/37, py=25, justify-between
  * Variantes : light / dark
  */
 
@@ -29,6 +29,8 @@ const STATUS_MAP: Record<CarnetStatus, { label: string; variant: "success" | "wa
 };
 
 export interface ListCarnetProps {
+  /** Numéro du carnet d'entretien (ex: "CE-0042") */
+  reference: string;
   /** Ville / commune */
   city: string;
   /** Type de bien (T3, Maison, etc.) */
@@ -74,6 +76,7 @@ function IconText({
 }
 
 export function ListCarnet({
+  reference,
   city,
   propertyType,
   surface,
@@ -90,24 +93,29 @@ export function ListCarnet({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[70px] pl-[33px] pr-[37px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] pl-[33px] pr-[37px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
-      {/* Gauche : infos du bien + propriétaire */}
-      <div className="flex gap-[24px] items-center shrink-0">
-        <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
-          {city}
-        </IconText>
-        <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
-          {propertyType}
-        </IconText>
-        <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
-          {surface}
-        </IconText>
-        {dpeGrade && <IconDpe type={dpeGrade} />}
-        <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
-          {ownerName}
-        </IconText>
+      {/* Gauche : titre + infos du bien + propriétaire */}
+      <div className="flex flex-col gap-[8px] justify-center shrink-0">
+        <span className="text-lg font-semibold font-roboto text-content-body leading-[24px]">
+          Carnet d&apos;entretien n° {reference}
+        </span>
+        <div className="flex gap-[24px] items-center">
+          <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
+            {city}
+          </IconText>
+          <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
+            {propertyType}
+          </IconText>
+          <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
+            {surface}
+          </IconText>
+          {dpeGrade && <IconDpe type={dpeGrade} />}
+          <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
+            {ownerName}
+          </IconText>
+        </div>
       </div>
 
       {/* Droite : statut + date + AI suggestions */}

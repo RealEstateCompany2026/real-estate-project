@@ -20,6 +20,7 @@ type Story = StoryObj<typeof ListCarnet>;
 
 export const Default: Story = {
   args: {
+    reference: "CE-0042",
     city: "Montpellier",
     propertyType: "T3",
     surface: "120m²",
@@ -33,6 +34,7 @@ export const Default: Story = {
 
 export const Dormant: Story = {
   args: {
+    reference: "CE-0018",
     city: "Lyon",
     propertyType: "Maison",
     surface: "200m²",
@@ -46,6 +48,7 @@ export const Dormant: Story = {
 
 export const Pending: Story = {
   args: {
+    reference: "CE-0007",
     city: "Paris",
     propertyType: "T2",
     surface: "45m²",
@@ -61,6 +64,7 @@ export const MultipleRows: Story = {
   render: () => (
     <div className="flex flex-col gap-[8px]">
       <ListCarnet
+        reference="CE-0042"
         city="Montpellier"
         propertyType="T3"
         surface="120m²"
@@ -71,6 +75,7 @@ export const MultipleRows: Story = {
         aiSuggestions={1}
       />
       <ListCarnet
+        reference="CE-0018"
         city="Lyon"
         propertyType="Maison"
         surface="200m²"
@@ -81,6 +86,7 @@ export const MultipleRows: Story = {
         aiSuggestions={0}
       />
       <ListCarnet
+        reference="CE-0007"
         city="Paris"
         propertyType="T2"
         surface="45m²"

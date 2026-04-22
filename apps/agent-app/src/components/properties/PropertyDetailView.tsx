@@ -1887,6 +1887,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             <Badge variant="default">{false ? 1 : 0}</Badge>
           </div>
           <ListCarnet
+            reference={property.id.slice(0, 8).toUpperCase()}
             city={property.addressCity ?? '—'}
             propertyType={PROPERTY_TYPE_LABELS[property.type]}
             surface={property.livingAreaSqm ? `${property.livingAreaSqm}m²` : '—'}

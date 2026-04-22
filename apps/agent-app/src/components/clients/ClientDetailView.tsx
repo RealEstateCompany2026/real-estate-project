@@ -1046,6 +1046,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             {properties.map((p) => (
               <ListCarnet
                 key={`carnet-${p.id}`}
+                reference={p.id.slice(0, 8).toUpperCase()}
                 city={p.city}
                 propertyType={p.propertyType}
                 surface={p.surface}
