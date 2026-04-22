@@ -51,6 +51,10 @@ export interface SheetMandatProps {
   onEditMissingFields?: () => void;
   /** Ratio de complétion pour l'éligibilité (ex: "4/12") */
   eligibilityRatio?: string;
+  /** Éligibilité pour l'édition automatique du mandat */
+  isEligible?: boolean;
+  /** Callback pour générer le mandat quand éligible */
+  onGenerateMandate?: () => void;
   /** Callbacks */
   onViewMandate?: () => void;
   onWriteClient?: () => void;
@@ -69,6 +73,8 @@ export function SheetMandat({
   onToggleAutoManaged,
   onEditMissingFields,
   eligibilityRatio,
+  isEligible,
+  onGenerateMandate,
   editionDate,
   revisionDate,
   signatureDate,
@@ -147,7 +153,13 @@ export function SheetMandat({
               <span className="text-base font-semibold font-roboto text-content-body">
                 Édition du mandat
               </span>
-              <Badge variant={stepBadgeVariant(mandateStatus, 'EDITE')}>ÉDITION</Badge>
+              <Badge variant={
+                MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE')
+                  ? 'success'
+                  : isEligible
+                    ? 'information'
+                    : 'warning'
+              }>ÉDITION</Badge>
             </div>
             {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE')
               ? (
@@ -155,26 +167,48 @@ export function SheetMandat({
                   {editionDate ?? 'Édité'}
                 </p>
               )
-              : (
-                <>
-                  <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
-                    {`Informations manquantes pour l'édition du mandat`}
-                    {eligibilityRatio && (
-                      <span className="ml-[4px] text-content-caption">
-                        ({eligibilityRatio} complétés)
-                      </span>
+              : isEligible
+                ? (
+                  <>
+                    <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+                      Toutes les informations sont complétées. Le mandat peut être généré.
+                      {eligibilityRatio && (
+                        <span className="ml-[4px] text-content-caption">
+                          ({eligibilityRatio} complétés)
+                        </span>
+                      )}
+                    </p>
+                    {onGenerateMandate && (
+                      <Button
+                        variant="primary"
+                        className="mt-[8px]"
+                        onClick={onGenerateMandate}
+                      >
+                        Générer le mandat
+                      </Button>
                     )}
-                  </p>
-                  {onEditMissingFields && (
-                    <button
-                      onClick={onEditMissingFields}
-                      className="mt-[8px] text-sm font-semibold text-content-branded-strong hover:underline cursor-pointer"
-                    >
-                      Compléter les informations manquantes
-                    </button>
-                  )}
-                </>
-              )
+                  </>
+                )
+                : (
+                  <>
+                    <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+                      {`Informations manquantes pour l'édition du mandat`}
+                      {eligibilityRatio && (
+                        <span className="ml-[4px] text-content-caption">
+                          ({eligibilityRatio} complétés)
+                        </span>
+                      )}
+                    </p>
+                    {onEditMissingFields && (
+                      <button
+                        onClick={onEditMissingFields}
+                        className="mt-[8px] text-sm font-semibold text-content-branded-strong hover:underline cursor-pointer"
+                      >
+                        Compléter les informations manquantes
+                      </button>
+                    )}
+                  </>
+                )
             }
           </div>
         )}

@@ -1729,6 +1729,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           setIsSheetMandatEditOpen(true);
         }}
         eligibilityRatio={eligibilityRatio}
+        isEligible={eligibility.isEligible}
+        onGenerateMandate={async () => {
+          if (!deal) return;
+          const supabase = createClient();
+          const statusField = currentType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+          await supabase.from('Deal').update({ [statusField]: 'EDITE' }).eq('id', deal.id);
+          window.location.reload();
+        }}
       />
 
       {/* SheetMandatEdit — Compléter les informations manquantes */}
