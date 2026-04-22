@@ -9,7 +9,7 @@ const meta: Meta<typeof ListAnnonce> = {
     docs: {
       description: {
         component:
-          "Ligne de liste annonce immobilière — infos bien + propriétaire + 3 badges workflow (édition, révision, publication) + bouton Voir + suggestions IA.",
+          "Ligne de liste annonce immobilière — titre + infos bien + propriétaire + 3 badges workflow + bouton Voir + suggestions IA.",
       },
     },
   },
@@ -20,11 +20,12 @@ type Story = StoryObj<typeof ListAnnonce>;
 
 export const Default: Story = {
   args: {
+    reference: "000.000.001",
     city: "Montpellier",
     propertyType: "T3",
     surface: "120m²",
     dpeGrade: "A",
-    ownerName: "RASTAPOPULOS, Roberto",
+    ownerName: "Roberto RASTAPOPULOS",
     workflow: { edition: "success", revision: "success", publication: "warning" },
     aiSuggestions: 1,
   },
@@ -32,11 +33,12 @@ export const Default: Story = {
 
 export const AllDone: Story = {
   args: {
+    reference: "000.000.002",
     city: "Lyon",
     propertyType: "Maison",
     surface: "200m²",
     dpeGrade: "B",
-    ownerName: "DUPONT, Marie",
+    ownerName: "Marie DUPONT",
     workflow: { edition: "success", revision: "success", publication: "success" },
     aiSuggestions: 0,
   },
@@ -44,11 +46,12 @@ export const AllDone: Story = {
 
 export const EarlyStage: Story = {
   args: {
+    reference: "000.000.003",
     city: "Paris",
     propertyType: "T2",
     surface: "45m²",
     dpeGrade: "D",
-    ownerName: "MARTIN, Jean",
+    ownerName: "Jean MARTIN",
     workflow: { edition: "warning", revision: "disabled", publication: "disabled" },
     aiSuggestions: 3,
   },
@@ -58,29 +61,32 @@ export const MultipleRows: Story = {
   render: () => (
     <div className="flex flex-col gap-[8px]">
       <ListAnnonce
+        reference="000.000.001"
         city="Montpellier"
         propertyType="T3"
         surface="120m²"
         dpeGrade="A"
-        ownerName="RASTAPOPULOS, Roberto"
+        ownerName="Roberto RASTAPOPULOS"
         workflow={{ edition: "success", revision: "success", publication: "warning" }}
         aiSuggestions={1}
       />
       <ListAnnonce
+        reference="000.000.002"
         city="Lyon"
         propertyType="Maison"
         surface="200m²"
         dpeGrade="B"
-        ownerName="DUPONT, Marie"
+        ownerName="Marie DUPONT"
         workflow={{ edition: "success", revision: "success", publication: "success" }}
         aiSuggestions={0}
       />
       <ListAnnonce
+        reference="000.000.003"
         city="Paris"
         propertyType="T2"
         surface="45m²"
         dpeGrade="D"
-        ownerName="MARTIN, Jean"
+        ownerName="Jean MARTIN"
         workflow={{ edition: "warning", revision: "disabled", publication: "disabled" }}
         aiSuggestions={3}
       />

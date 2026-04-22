@@ -973,13 +973,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             {listing ? (
               <>
                 <ListAnnonce
-                  city={deal.Property?.addressCity ?? '—'}
+                  reference={listing.id.replace(/[^a-f0-9]/gi, '').slice(0, 9).replace(/(.{3})(.{3})(.{3})/, '$1.$2.$3')}
+                  city={deal.Property?.addressCity ?? undefined}
                   propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : '—'}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : undefined}
                   dpeGrade={
                     deal.Property?.dpeEnergyClass &&
                     ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-                      ? (deal.Property.dpeEnergyClass as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G')
+                      ? (deal.Property.dpeEnergyClass as DpeType)
                       : undefined
                   }
                   ownerName={clientFullName}

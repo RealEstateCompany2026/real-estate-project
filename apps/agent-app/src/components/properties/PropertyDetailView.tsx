@@ -1621,9 +1621,10 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             {listings.map((l) => (
               <ListAnnonce
                 key={l.id}
-                city={property.addressCity ?? '—'}
+                reference={l.id.replace(/[^a-f0-9]/gi, '').slice(0, 9).replace(/(.{3})(.{3})(.{3})/, '$1.$2.$3')}
+                city={property.addressCity ?? undefined}
                 propertyType={PROPERTY_TYPE_LABELS[property.type]}
-                surface={property.livingAreaSqm ? `${property.livingAreaSqm}m²` : '—'}
+                surface={property.livingAreaSqm ? `${property.livingAreaSqm}m²` : undefined}
                 dpeGrade={property.dpeEnergyClass ?? undefined}
                 ownerName={ownerName}
                 workflow={listingStatusToWorkflow(l.status)}
