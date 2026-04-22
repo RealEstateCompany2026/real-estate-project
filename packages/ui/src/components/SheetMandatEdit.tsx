@@ -69,7 +69,7 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
 
   // Rebuild local values when sections change (new open)
   const sectionsKey = useMemo(
-    () => JSON.stringify(sections.map((s) => s.fields.map((f) => `${f.entity}.${f.field}`))),
+    () => JSON.stringify(sections.map((s) => s.fields.map((f) => `${f.entity}.${f.field}.${f.value}`))),
     [sections],
   );
 

@@ -844,6 +844,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     const supabase = createClient();
     const promises: PromiseLike<any>[] = [];
 
+    // TODO: filter Organization update by ID when multi-org support is added
     if (updates.organization && Object.keys(updates.organization).length > 0) {
       promises.push(
         supabase.from('Organization').update(updates.organization).not('id', 'is', null).select()
@@ -866,8 +867,39 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     }
 
     await Promise.all(promises);
-    setIsSheetMandatEditOpen(false);
-    window.location.reload();
+
+    // Re-fetch deal + organization data after save
+    try {
+      const { data: freshDeal } = await supabase
+        .from('Deal')
+        .select(`
+          *,
+          Client:clientId (id, firstName, lastName, status, searchCriteriaSummary, address),
+          Property:propertyId (id, type, livingAreaSqm, addressCity, desiredSellingPrice, dpeEnergyClass, address, numberOfRooms)
+        `)
+        .eq('id', deal.id)
+        .single();
+
+      if (freshDeal) {
+        const normalizedDeal: DealRow = {
+          ...freshDeal,
+          Client: Array.isArray(freshDeal.Client) ? freshDeal.Client[0] ?? null : freshDeal.Client,
+          Property: Array.isArray(freshDeal.Property) ? freshDeal.Property[0] ?? null : freshDeal.Property,
+        };
+        setDeal(normalizedDeal);
+      }
+
+      const { data: orgData } = await supabase
+        .from('Organization')
+        .select('name, address, siret, rcpInsuranceRef, rcpExpiryDate, carteTNumber, carteGNumber')
+        .limit(1)
+        .single();
+      if (orgData) {
+        setOrganization(orgData);
+      }
+    } catch (err) {
+      console.error('[handleMandatEditSave] re-fetch failed:', err);
+    }
   }, [deal]);
 
   // ── Build full mandate sections (for "Voir le mandat") ──
