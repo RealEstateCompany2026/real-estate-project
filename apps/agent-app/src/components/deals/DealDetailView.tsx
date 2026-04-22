@@ -298,6 +298,19 @@ function formatEuros(value: number | null | undefined): string | undefined {
   return `${value.toLocaleString('fr-FR')} €`;
 }
 
+// ── Financement workflow mapping (DOSSIER / FINANCÉ) ──
+
+function mapFinancementWorkflow(
+  status: string | null,
+  step: 'dossier' | 'finance',
+): BadgeVariant {
+  const order = ['DOSSIER', 'FINANCE'];
+  const stepMap: Record<string, number> = { dossier: 0, finance: 1 };
+  const idx = order.indexOf(status ?? '');
+  if (idx < 0) return 'disabled';
+  return idx >= stepMap[step] ? 'success' : 'disabled';
+}
+
 // ── Bail workflow mapping ──
 
 function mapBailWorkflow(
@@ -1204,16 +1217,33 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             <section id="finance" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <h5 className="text-xl font-bold text-content-headings">Financement</h5>
               {currentType === 'VENTE' ? (
-                <p className="text-sm text-content-subtle italic">Aucun dossier de financement</p>
-              ) : (
-                /* ACQUISITION : useCase="recherche" */
                 <ListFinancement
-                  useCase="recherche"
-                  contactName={clientFullName}
-                  status={{ label: 'En attente', variant: 'default' }}
-                  propertyType={propertyTypeLabel(deal.Property?.type ?? null)}
-                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : '—'}
-                  city={deal.Property?.addressCity ?? '—'}
+                  useCase="vente"
+                  sellerName={clientFullName}
+                  buyerName="Acquéreur"
+                  city={deal.Property?.addressCity ?? undefined}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                  dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
+                  workflow={{
+                    dossier: mapFinancementWorkflow(deal.purchaseOfferStatus, 'dossier'),
+                    finance: mapFinancementWorkflow(deal.purchaseOfferStatus, 'finance'),
+                  }}
+                />
+              ) : (
+                /* ACQUISITION */
+                <ListFinancement
+                  useCase="acquisition"
+                  buyerName={clientFullName}
+                  sellerName="Vendeur"
+                  city={deal.Property?.addressCity ?? undefined}
+                  propertyType={propertyTypeLabel(deal.Property?.type ?? null) || undefined}
+                  surface={deal.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : undefined}
+                  dpeGrade={deal.Property?.dpeEnergyClass as DpeType | undefined}
+                  workflow={{
+                    dossier: mapFinancementWorkflow(deal.purchaseOfferStatus, 'dossier'),
+                    finance: mapFinancementWorkflow(deal.purchaseOfferStatus, 'finance'),
+                  }}
                 />
               )}
             </section>

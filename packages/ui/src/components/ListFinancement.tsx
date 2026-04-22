@@ -1,39 +1,56 @@
 "use client";
 
 import React from "react";
-import { UserCircle, Home, Maximize2, MapPin, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Badge, BadgeVariant } from "./Badge";
 import { Button } from "./Button";
 import { AiSuggestion } from "./AiSuggestion";
+import { IconDpe, DpeType } from "./IconDpe";
 
 /**
  * ListFinancement - Ligne de liste dossier de financement
  * Organism du design system RealAgent
  *
- * Suivi du dossier de financement de l'acquéreur, affiché dans :
- *   - L'affaire Vente (côté vendeur) : on voit l'acquéreur + statut dossier
- *   - L'affaire Recherche (côté acquéreur) : on voit les infos du bien + statut dossier
+ * Ligne (100px) avec 2 variantes (prop useCase) :
  *
- * Variante "vente" :
- *   - Gauche : nom acquéreur
- *   - Droite : badge statut (INCOMPLET, COMPLET, VALIDÉ…) + "Voir les notes" + AI
+ * Variante "vente" (côté vendeur) :
+ *   - Ligne 1 : "Financement"
+ *   - Ligne 2 : vendeur • ville • type • surface • DPE • acquéreur
+ *   - Droite : DOSSIER + FINANCÉ + Voir + AI
  *
- * Variante "recherche" :
- *   - Gauche : nom contact + type + surface + ville
- *   - Droite : badge statut + "Voir les notes" + AI
+ * Variante "acquisition" (côté acquéreur) :
+ *   - Ligne 1 : "Financement"
+ *   - Ligne 2 : acquéreur • ville • type • surface • DPE • vendeur
+ *   - Droite : DOSSIER + FINANCÉ + Voir + AI
  *
- * Figma : "List . financement" — h=70px, px=20, py=13, justify-between
+ * Figma : "List . financement" — h=100px, px=20, justify-between
  */
 
-/** Props communes */
-interface ListFinancementBaseProps {
-  /** Nom du contact */
-  contactName: string;
-  /** Statut du dossier de financement */
-  status: { label: string; variant: BadgeVariant };
+export interface FinancementWorkflow {
+  dossier: BadgeVariant;
+  finance: BadgeVariant;
+}
+
+export interface ListFinancementProps {
+  /** Variante d'affaire */
+  useCase: "vente" | "acquisition";
+  /** Nom de l'acquéreur */
+  buyerName?: string;
+  /** Nom du vendeur / propriétaire */
+  sellerName?: string;
+  /** Ville / commune du bien */
+  city?: string;
+  /** Type du bien (T3, Maison, etc.) */
+  propertyType?: string;
+  /** Surface du bien (ex: "85m²") */
+  surface?: string;
+  /** Note DPE du bien (A-G) — masqué si absent */
+  dpeGrade?: DpeType;
+  /** Statuts des 2 étapes du workflow */
+  workflow: FinancementWorkflow;
   /** Nombre de suggestions IA */
   aiSuggestions?: number;
-  /** Callback au clic sur "Voir les notes" */
+  /** Callback au clic sur "Voir" */
   onView?: () => void;
   /** Callback au clic sur la ligne */
   onClick?: () => void;
@@ -41,93 +58,106 @@ interface ListFinancementBaseProps {
   className?: string;
 }
 
-/** Variant Vente : contact seul */
-export interface ListFinancementVenteProps extends ListFinancementBaseProps {
-  useCase: "vente";
-  propertyType?: never;
-  surface?: never;
-  city?: never;
-}
-
-/** Variant Recherche : contact + infos bien */
-export interface ListFinancementRechercheProps extends ListFinancementBaseProps {
-  useCase: "recherche";
-  /** Type de bien (T3, Maison, etc.) */
-  propertyType: string;
-  /** Surface (ex: "120m²") */
-  surface: string;
-  /** Ville / commune */
-  city: string;
-}
-
-export type ListFinancementProps = ListFinancementVenteProps | ListFinancementRechercheProps;
-
 /**
- * Icon+Text atom
+ * Dot separator — rond 5px entre les blocs texte de la ligne 2
  */
-function IconText({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function Dot() {
   return (
-    <div className="inline-flex gap-[4px] items-center shrink-0">
-      <div className="shrink-0 size-[20px] flex items-center justify-center">
-        {icon}
-      </div>
-      <span className="text-base font-semibold font-roboto text-content-body tracking-[0.16px] leading-[20px] whitespace-nowrap">
-        {children}
-      </span>
-    </div>
+    <span className="size-[5px] rounded-full bg-content-body shrink-0" />
   );
 }
 
-export function ListFinancement(props: ListFinancementProps) {
-  const {
-    contactName,
-    useCase,
-    status,
-    aiSuggestions = 0,
-    onView,
-    onClick,
-    className = "",
-  } = props;
+export function ListFinancement({
+  useCase,
+  buyerName,
+  sellerName,
+  city,
+  propertyType,
+  surface,
+  dpeGrade,
+  workflow,
+  aiSuggestions = 0,
+  onView,
+  onClick,
+  className = "",
+}: ListFinancementProps) {
+  /* Ligne 2 : ordre des personnes inversé selon le useCase */
+  const firstPerson = useCase === "vente" ? sellerName : buyerName;
+  const lastPerson = useCase === "vente" ? buyerName : sellerName;
 
-  const iconColor = "var(--icon-neutral-default)";
+  /* Collecte des blocs texte de la ligne 2 pour gérer les dots */
+  const blocks: React.ReactNode[] = [];
+
+  if (firstPerson) {
+    blocks.push(
+      <span key="p1" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {firstPerson}
+      </span>
+    );
+  }
+  if (city) {
+    blocks.push(
+      <span key="city" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {city}
+      </span>
+    );
+  }
+  if (propertyType) {
+    blocks.push(
+      <span key="type" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {propertyType}
+      </span>
+    );
+  }
+  if (surface) {
+    blocks.push(
+      <span key="surface" className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+        {surface}
+      </span>
+    );
+  }
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[70px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
-      {/* Gauche : contact + (infos bien si recherche) */}
-      <div className="flex gap-[24px] items-center shrink-0">
-        <IconText icon={<UserCircle size={20} style={{ color: iconColor }} />}>
-          {contactName}
-        </IconText>
-        {useCase === "recherche" && (
-          <>
-            <IconText icon={<Home size={20} style={{ color: iconColor }} />}>
-              {props.propertyType}
-            </IconText>
-            <IconText icon={<Maximize2 size={20} style={{ color: iconColor }} />}>
-              {props.surface}
-            </IconText>
-            <IconText icon={<MapPin size={20} style={{ color: iconColor }} />}>
-              {props.city}
-            </IconText>
-          </>
-        )}
+      {/* Gauche : titre + infos */}
+      <div className="flex flex-col justify-center shrink-0">
+        {/* Ligne 1 — Titre : 20/24 semibold, px=10 py=6 */}
+        <span className="text-[20px] font-semibold font-roboto text-content-body leading-[24px] px-[10px] py-[6px]">
+          Financement
+        </span>
+
+        {/* Ligne 2 — Blocs texte xsm séparés par dots */}
+        <div className="flex items-center">
+          {blocks.map((block, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <Dot />}
+              {block}
+            </React.Fragment>
+          ))}
+          {dpeGrade && <IconDpe type={dpeGrade} size="small" />}
+          {lastPerson && (
+            <>
+              {blocks.length > 0 && !dpeGrade && <Dot />}
+              <span className="text-[12px] font-semibold font-roboto text-content-body leading-[14px] px-[10px] py-[8px] whitespace-nowrap">
+                {lastPerson}
+              </span>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Droite : badge statut + bouton + AI suggestions */}
+      {/* Droite : workflow badges + bouton + AI suggestions */}
       <div className="flex gap-[24px] items-center shrink-0">
-        <Badge variant={status.variant}>{status.label}</Badge>
+        <div className="flex gap-[24px] items-center">
+          <Badge variant={workflow.dossier}>DOSSIER</Badge>
+          <Badge variant={workflow.finance}>FINANCÉ</Badge>
+        </div>
 
         <Button variant="ghost" size="default" onClick={onView}>
-          Voir les notes
+          Voir
           <ArrowRight size={20} />
         </Button>
 
