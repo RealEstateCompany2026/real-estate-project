@@ -81,7 +81,7 @@ export function ListCarnet({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[100px] px-[20px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
       {/* Gauche : titre + infos du bien + propriétaire */}
@@ -116,7 +116,7 @@ export function ListCarnet({
       </div>
 
       {/* Droite : statut + date + AI suggestions */}
-      <div className="flex gap-[24px] items-center shrink-0 pr-[37px]">
+      <div className="flex gap-[24px] items-center shrink-0">
         <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
         {date && (
           <div className="inline-flex gap-[4px] items-center shrink-0">
