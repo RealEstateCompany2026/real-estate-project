@@ -21,7 +21,7 @@ type Story = StoryObj<typeof CardAffaire>;
 export const Vente: Story = {
   args: {
     dealType: "VENTE",
-    reference: "MV-0042",
+    reference: "MV.000.000.042",
     status: "EN_COURS",
     propertyType: "T3",
     propertySurface: "85 m²",
@@ -42,7 +42,7 @@ export const Vente: Story = {
 export const Acquisition: Story = {
   args: {
     dealType: "ACQUISITION",
-    reference: "MRA-0018",
+    reference: "MRA.000.000.018",
     status: "EN_COURS",
     propertyType: "Maison",
     propertyCity: "Lyon",
@@ -61,7 +61,7 @@ export const Acquisition: Story = {
 export const Location: Story = {
   args: {
     dealType: "LOCATION",
-    reference: "MRL-0007",
+    reference: "MRL.000.000.007",
     status: "EN_COURS",
     clientName: "Pierre Lefèvre",
     pipelineStage: "COMMERCIALISATION",
@@ -78,7 +78,7 @@ export const Location: Story = {
 export const Gestion: Story = {
   args: {
     dealType: "GESTION",
-    reference: "MG-0031",
+    reference: "MG.000.000.031",
     status: "EN_COURS",
     propertyType: "T4",
     propertySurface: "110 m²",

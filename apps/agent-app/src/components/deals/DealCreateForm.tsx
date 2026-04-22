@@ -18,6 +18,7 @@ import type { DealType } from '@real-estate/ui/deal-types';
 
 // -- App-level --
 import { createClient } from '@/lib/supabase/client';
+import { formatMandateReference } from '@/lib/utils/formatMandateReference';
 
 // ---------------------------------------------------------------------------
 // Types locaux
@@ -250,14 +251,14 @@ export function DealCreateForm() {
       const { data: lastDeal } = await supabase
         .from('Deal')
         .select('reference')
-        .ilike('reference', `${pfx}-%`)
+        .ilike('reference', `${pfx}.%`)
         .order('reference', { ascending: false })
         .limit(1);
 
       const lastNum = lastDeal?.[0]?.reference
-        ? parseInt(lastDeal[0].reference.split('-').pop() ?? '0', 10)
+        ? parseInt(lastDeal[0].reference.replace(`${pfx}.`, '').replace(/\./g, ''), 10)
         : 0;
-      const reference = `${pfx}-${String(lastNum + 1).padStart(4, '0')}`;
+      const reference = formatMandateReference(pfx, lastNum + 1);
 
       // 2. Determiner le pipeline initial
       const pipelineStage = mandateWaived

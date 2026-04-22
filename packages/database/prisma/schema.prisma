@@ -1340,7 +1340,8 @@ model PropertyMedia {
 // ── Deal ──────────────────────────────────────────────────────────────────────
 
 model Deal {
-  id String @id
+  id        String  @id
+  reference String? @unique
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])

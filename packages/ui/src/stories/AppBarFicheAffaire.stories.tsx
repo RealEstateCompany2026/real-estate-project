@@ -32,7 +32,7 @@ export const Vente: Story = {
 
 export const Bail: Story = {
   args: {
-    dealId: "MB.456.123.789",
+    dealId: "MG.456.123.789",
     dealType: "BAIL",
     propertyType: "T2",
     surface: "45 m²",
@@ -44,7 +44,7 @@ export const Bail: Story = {
 
 export const Acquisition: Story = {
   args: {
-    dealId: "MA.321.654.987",
+    dealId: "MRA.321.654.987",
     dealType: "ACQUISITION",
     propertyType: "Maison",
     surface: "120 m²",
@@ -56,7 +56,7 @@ export const Acquisition: Story = {
 
 export const Location: Story = {
   args: {
-    dealId: "ML.111.222.333",
+    dealId: "MRL.111.222.333",
     dealType: "LOCATION",
     propertyType: "Studio",
     surface: "25 m²",
