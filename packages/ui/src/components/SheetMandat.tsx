@@ -47,6 +47,10 @@ export interface SheetMandatProps {
   editionDate?: string;
   revisionDate?: string;
   signatureDate?: string;
+  /** Callback pour ouvrir l'éditeur de champs manquants */
+  onEditMissingFields?: () => void;
+  /** Ratio de complétion pour l'éligibilité (ex: "4/12") */
+  eligibilityRatio?: string;
   /** Callbacks */
   onViewMandate?: () => void;
   onWriteClient?: () => void;
@@ -63,6 +67,8 @@ export function SheetMandat({
   pipelineStage,
   isAutoManaged,
   onToggleAutoManaged,
+  onEditMissingFields,
+  eligibilityRatio,
   editionDate,
   revisionDate,
   signatureDate,
@@ -143,11 +149,33 @@ export function SheetMandat({
               </span>
               <Badge variant={stepBadgeVariant(mandateStatus, 'EDITE')}>ÉDITION</Badge>
             </div>
-            <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
-              {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE')
-                ? (editionDate ?? 'Édité')
-                : 'Informations manquantes pour l\'édition du mandat'}
-            </p>
+            {MANDATE_ORDER.indexOf(mandateStatus) >= MANDATE_ORDER.indexOf('EDITE')
+              ? (
+                <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+                  {editionDate ?? 'Édité'}
+                </p>
+              )
+              : (
+                <>
+                  <p className="text-sm font-normal font-roboto text-content-secondary leading-[20px]">
+                    {`Informations manquantes pour l'édition du mandat`}
+                    {eligibilityRatio && (
+                      <span className="ml-[4px] text-content-caption">
+                        ({eligibilityRatio} complétés)
+                      </span>
+                    )}
+                  </p>
+                  {onEditMissingFields && (
+                    <button
+                      onClick={onEditMissingFields}
+                      className="mt-[8px] text-sm font-semibold text-content-branded-strong hover:underline cursor-pointer"
+                    >
+                      Compléter les informations manquantes
+                    </button>
+                  )}
+                </>
+              )
+            }
           </div>
         )}
 

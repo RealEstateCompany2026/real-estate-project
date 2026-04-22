@@ -49,6 +49,7 @@
         "./sheet": "./src/components/Sheet.tsx",
         "./sheet-client-details": "./src/components/SheetClientDetails.tsx",
         "./sheet-mandat": "./src/components/SheetMandat.tsx",
+        "./sheet-mandat-edit": "./src/components/SheetMandatEdit.tsx",
         "./sheet-bien-details": "./src/components/SheetBienDetails.tsx",
         "./tooltip": "./src/components/Tooltip.tsx",
         "./app-bar-category": "./src/components/AppBarCategory.tsx",

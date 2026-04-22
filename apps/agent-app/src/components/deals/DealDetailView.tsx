@@ -60,6 +60,10 @@ import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
 import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import { DEAL_TYPE_LABELS } from '@real-estate/ui/deal-types';
+import { SheetMandatEdit } from '@real-estate/ui/sheet-mandat-edit';
+import type { EligibilitySection } from '@real-estate/ui/sheet-mandat-edit';
+import { checkMandateEligibility } from '@/lib/checkMandateEligibility';
+import type { MissingField } from '@/lib/checkMandateEligibility';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import { PROPERTY_TYPE_LABELS } from '@/types/property';
@@ -87,8 +91,8 @@ interface DealRow {
   propertyId: string | null;
   status: string | null;
   trend: string | null;
-  Client: { id: string; firstName: string | null; lastName: string | null; status: string | null; searchCriteriaSummary: string | null } | null;
-  Property: { id: string; type: string | null; livingAreaSqm: number | null; addressCity: string | null; desiredSellingPrice: number | null; dpeEnergyClass: string | null } | null;
+  Client: { id: string; firstName: string | null; lastName: string | null; status: string | null; searchCriteriaSummary: string | null; address: string | null } | null;
+  Property: { id: string; type: string | null; livingAreaSqm: number | null; addressCity: string | null; desiredSellingPrice: number | null; dpeEnergyClass: string | null; address: string | null; numberOfRooms: number | null } | null;
 
   // Mandat
   mandateWaived: boolean;
@@ -604,6 +608,12 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isSheetMandatOpen, setIsSheetMandatOpen] = useState(false);
   const [isAnnonceSheetOpen, setIsAnnonceSheetOpen] = useState(false);
   const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
+  const [isSheetMandatEditOpen, setIsSheetMandatEditOpen] = useState(false);
+  const [organization, setOrganization] = useState<{
+    name: string | null; address: string | null; siret: string | null;
+    rcpInsuranceRef: string | null; rcpExpiryDate: string | null;
+    carteTNumber: string | null; carteGNumber: string | null;
+  } | null>(null);
 
   // ── Recherche form state ──
   const [rechercheForm, setRechercheForm] = useState({
@@ -627,8 +637,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         .from('Deal')
         .select(`
           *,
-          Client:clientId (id, firstName, lastName, status, searchCriteriaSummary),
-          Property:propertyId (id, type, livingAreaSqm, addressCity, desiredSellingPrice, dpeEnergyClass)
+          Client:clientId (id, firstName, lastName, status, searchCriteriaSummary, address),
+          Property:propertyId (id, type, livingAreaSqm, addressCity, desiredSellingPrice, dpeEnergyClass, address, numberOfRooms)
         `)
         .eq('id', dealId)
         .single();
@@ -693,6 +703,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           .single();
         setListing((listingData as ListingRow) ?? null);
       }
+
+      // 6. Organization (for mandate eligibility)
+      const { data: orgData } = await supabase
+        .from('Organization')
+        .select('name, address, siret, rcpInsuranceRef, rcpExpiryDate, carteTNumber, carteGNumber')
+        .limit(1)
+        .single();
+      setOrganization(orgData);
 
       setIsLoading(false);
     }
@@ -801,6 +819,93 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const mandateStatusKey = currentType === 'GESTION'
     ? (deal.mgmtMandateStatus ?? 'NON_CREE')
     : (deal.saleMandateStatus ?? 'NON_CREE');
+
+  // ── Mandate eligibility ──
+  const eligibility = checkMandateEligibility(
+    {
+      type: currentType,
+      clientId: deal.clientId,
+      propertyId: deal.propertyId,
+      searchCity: deal.searchCity,
+      searchPropertyType: deal.searchPropertyType,
+      searchSurfaceMin: deal.searchSurfaceMin,
+      searchSurfaceMax: deal.searchSurfaceMax,
+      acquisitionMinBudget: deal.acquisitionMinBudget,
+      acquisitionMaxBudget: deal.acquisitionMaxBudget,
+      locationMinBudget: deal.locationMinBudget,
+    },
+    deal.Client ? { firstName: deal.Client.firstName, lastName: deal.Client.lastName, address: deal.Client.address } : null,
+    deal.Property ? { type: deal.Property.type, address: deal.Property.address, addressCity: deal.Property.addressCity, livingAreaSqm: deal.Property.livingAreaSqm, numberOfRooms: deal.Property.numberOfRooms, desiredSellingPrice: deal.Property.desiredSellingPrice } : null,
+    organization,
+  );
+
+  const eligibilityRatio = `${eligibility.filledCount}/${eligibility.totalCount}`;
+
+  // Build EligibilitySection[] for SheetMandatEdit from missingFields
+  const buildEligibilitySections = useCallback((): EligibilitySection[] => {
+    const sectionMap: Record<string, { fields: MissingField[]; allFields: MissingField[] }> = {};
+    const sectionOrder = ['Agence', 'Client', 'Bien', 'Recherche'];
+
+    // Group all checked fields by section
+    for (const mf of eligibility.missingFields) {
+      if (!sectionMap[mf.section]) sectionMap[mf.section] = { fields: [], allFields: [] };
+      sectionMap[mf.section].fields.push(mf);
+    }
+
+    return sectionOrder
+      .filter((s) => {
+        // Show section if it has missing fields OR if we know it should exist for this deal type
+        const hasMissing = !!sectionMap[s]?.fields.length;
+        if (s === 'Bien') return currentType === 'VENTE' || currentType === 'GESTION';
+        if (s === 'Recherche') return currentType === 'ACQUISITION' || currentType === 'LOCATION';
+        return hasMissing || s === 'Agence' || s === 'Client';
+      })
+      .map((s) => {
+        const missing = sectionMap[s]?.fields ?? [];
+        return {
+          title: s,
+          status: missing.length === 0 ? 'valid' as const : 'invalid' as const,
+          fields: missing.map((mf) => ({
+            entity: mf.entity,
+            field: mf.field,
+            label: mf.label,
+            value: null as string | null,
+            type: mf.type as 'text' | 'number' | 'date' | 'select',
+          })),
+        };
+      });
+  }, [eligibility.missingFields, currentType]);
+
+  const handleMandatEditSave = useCallback(async (updates: Record<string, Record<string, string>>) => {
+    const supabase = createClient();
+    const promises: PromiseLike<any>[] = [];
+
+    if (updates.organization && Object.keys(updates.organization).length > 0) {
+      promises.push(
+        supabase.from('Organization').update(updates.organization).not('id', 'is', null).select()
+      );
+    }
+    if (updates.client && Object.keys(updates.client).length > 0 && deal.Client?.id) {
+      promises.push(
+        supabase.from('Client').update(updates.client).eq('id', deal.Client.id).select()
+      );
+    }
+    if (updates.property && Object.keys(updates.property).length > 0 && deal.Property?.id) {
+      promises.push(
+        supabase.from('Property').update(updates.property).eq('id', deal.Property.id).select()
+      );
+    }
+    if (updates.deal && Object.keys(updates.deal).length > 0) {
+      promises.push(
+        supabase.from('Deal').update(updates.deal).eq('id', deal.id).select()
+      );
+    }
+
+    await Promise.all(promises);
+    setIsSheetMandatEditOpen(false);
+    // Reload data
+    window.location.reload();
+  }, [deal]);
 
   // ── Render ──
   return (
@@ -1619,6 +1724,20 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         onViewMandate={() => {/* TODO: ouvrir éditeur mandat */}}
         onWriteClient={() => {/* TODO: ouvrir messagerie */}}
         onToggleActivation={handleToggleActivation}
+        onEditMissingFields={() => {
+          setIsSheetMandatOpen(false);
+          setIsSheetMandatEditOpen(true);
+        }}
+        eligibilityRatio={eligibilityRatio}
+      />
+
+      {/* SheetMandatEdit — Compléter les informations manquantes */}
+      <SheetMandatEdit
+        isOpen={isSheetMandatEditOpen}
+        onClose={() => setIsSheetMandatEditOpen(false)}
+        dealType={currentType}
+        sections={buildEligibilitySections()}
+        onSave={handleMandatEditSave}
       />
 
       {/* Sheet Activités */}

@@ -438,6 +438,7 @@ enum MandateSignalType {
 enum MandateStatus {
   NON_CREE
   EDITE
+  REVISE
   ENVOYE
   SIGNE
   RESILIE
