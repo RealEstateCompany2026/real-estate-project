@@ -106,7 +106,9 @@
         "./card-ca": "./src/components/CardCA.tsx",
         "./list-bail": "./src/components/ListBail.tsx",
         "./list-candidature-locataire": "./src/components/ListCandidatureLocataire.tsx",
-        "./message-edit": "./src/components/MessageEdit.tsx"
+        "./message-edit": "./src/components/MessageEdit.tsx",
+        "./sheet-agenda-bien": "./src/components/SheetAgendaBien.tsx",
+        "./sheet-visite": "./src/components/SheetVisite.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
