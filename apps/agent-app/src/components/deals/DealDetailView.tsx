@@ -44,6 +44,7 @@ import type { DpeType } from '@real-estate/ui/icon-dpe';
 import { Sheet } from '@real-estate/ui/sheet';
 import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
+import { SheetVisite } from '@real-estate/ui/sheet-visite';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
 import { CardCA } from '@real-estate/ui/card-ca';
@@ -142,6 +143,10 @@ interface EventRow {
   description: string | null;
   eventDate: string;
   reportContent: string | null;
+  odjContent: string | null;
+  odjStatus: string | null;
+  odjSentAt: string | null;
+  clientId: string | null;
 }
 
 interface DocumentRow {
@@ -616,6 +621,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
   const [isSheetMandatEditOpen, setIsSheetMandatEditOpen] = useState(false);
   const [isSheetMandatViewOpen, setIsSheetMandatViewOpen] = useState(false);
+  const [isSheetVisiteOpen, setIsSheetVisiteOpen] = useState(false);
+  const [selectedVisiteEvent, setSelectedVisiteEvent] = useState<EventRow | null>(null);
   const [isRevision, setIsRevision] = useState(false);
   const [organization, setOrganization] = useState<{
     name: string | null; address: string | null; siret: string | null;
@@ -680,7 +687,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       const [eventsRes, documentsRes, messagesRes] = await Promise.all([
         supabase
           .from('Event')
-          .select('id, type, status, title, description, eventDate, reportContent, agentId, User:agentId(name)')
+          .select('id, type, status, title, description, eventDate, reportContent, odjContent, odjStatus, odjSentAt, clientId, agentId, User:agentId(name)')
           .eq('dealId', dealId)
           .order('eventDate', { ascending: false }),
         supabase
@@ -933,6 +940,17 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       console.error('[handleMandatEditSave] re-fetch failed:', err);
     }
   }, [deal]);
+
+  // ── Visite handlers ──
+  const handleOpenVisite = useCallback((event: EventRow) => {
+    setSelectedVisiteEvent(event);
+    setIsSheetVisiteOpen(true);
+  }, []);
+
+  const handleCloseVisite = useCallback(() => {
+    setIsSheetVisiteOpen(false);
+    setSelectedVisiteEvent(null);
+  }, []);
 
   // ── Build full mandate sections (for "Voir le mandat") ──
   const buildFullMandateSections = useCallback((): EligibilitySection[] => {
@@ -1447,6 +1465,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                   odj: mapVisiteStatus(v.status, 'odj'),
                   cr: mapVisiteStatus(v.status, 'cr'),
                 }}
+                onClick={() => handleOpenVisite(v)}
+                onView={() => handleOpenVisite(v)}
               />
             ))}
             {visitEvents.length === 0 && (
@@ -2221,6 +2241,45 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </CollapsibleSection>
           </div>
         </Sheet>
+      )}
+
+      {/* Sheet Visite */}
+      {selectedVisiteEvent && (
+        <SheetVisite
+          isOpen={isSheetVisiteOpen}
+          onClose={handleCloseVisite}
+          visitStatus={
+            (selectedVisiteEvent.status === 'PROGRAMME' ||
+             selectedVisiteEvent.status === 'CONFIRME' ||
+             selectedVisiteEvent.status === 'TERMINE' ||
+             selectedVisiteEvent.status === 'ANNULE')
+              ? selectedVisiteEvent.status
+              : 'PROGRAMME'
+          }
+          propertyLabel={
+            deal?.Property
+              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
+              : null
+          }
+          invites={
+            selectedVisiteEvent.clientId && clientFullName
+              ? [{ id: selectedVisiteEvent.clientId, name: clientFullName, calStatus: mapVisiteStatus(selectedVisiteEvent.status, 'calendrier') }]
+              : []
+          }
+          selectedSlotLabel={
+            selectedVisiteEvent.eventDate
+              ? `${formatDateOnly(selectedVisiteEvent.eventDate)} à ${formatTimeOnly(selectedVisiteEvent.eventDate)}`
+              : null
+          }
+          odjStatus={
+            selectedVisiteEvent.odjStatus === 'EDITE' ||
+            selectedVisiteEvent.odjStatus === 'REVISE' ||
+            selectedVisiteEvent.odjStatus === 'ENVOYE'
+              ? selectedVisiteEvent.odjStatus
+              : null
+          }
+          guideStatus={null}
+        />
       )}
     </div>
   );
