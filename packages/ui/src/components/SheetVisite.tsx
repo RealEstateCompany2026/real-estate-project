@@ -4,8 +4,8 @@ import React from "react";
 import { Sheet } from "./Sheet";
 import { Badge, BadgeVariant } from "./Badge";
 import { Button } from "./Button";
-import { CollapsibleSection } from "./CollapsibleSection";
-import { Plus, ArrowRight } from "lucide-react";
+import { Plus, ArrowRight, Search, Pencil, Calendar } from "lucide-react";
+import { IconDpe, DpeType } from "./IconDpe";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -23,9 +23,12 @@ export interface SheetVisiteProps {
   onClose: () => void;
   /** Statut global de la visite */
   visitStatus: "PROGRAMME" | "CONFIRME" | "TERMINE" | "ANNULE";
-  /** Label du bien visite (null si pas encore selectionne) */
-  propertyLabel?: string | null;
-  /** Callback pour rechercher/selectionner un bien */
+  // Property info — structured fields
+  propertyAddress?: string | null;
+  propertyCity?: string | null;
+  propertyType?: string | null;
+  propertySurface?: string | null;
+  propertyDpeGrade?: DpeType | null;
   onSelectProperty?: () => void;
   /** Liste des invites */
   invites: VisiteInvite[];
@@ -48,22 +51,15 @@ export interface SheetVisiteProps {
 
 // ── Helpers ──────────────────────────────────────────────
 
+function Dot() {
+  return <span className="size-[5px] rounded-full bg-content-body shrink-0" />;
+}
+
 const visitStatusToBadgeVariant: Record<SheetVisiteProps["visitStatus"], BadgeVariant> = {
   PROGRAMME: "warning",
   CONFIRME: "success",
   TERMINE: "information",
   ANNULE: "error",
-};
-
-const odjStatusToBadgeVariant: Record<string, BadgeVariant> = {
-  EDITE: "warning",
-  REVISE: "information",
-  ENVOYE: "success",
-};
-
-const guideStatusToBadgeVariant: Record<string, BadgeVariant> = {
-  ENVOYE: "warning",
-  COMPLET: "success",
 };
 
 // ── Component ──────────────────────────────────────────
@@ -72,7 +68,11 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
   isOpen,
   onClose,
   visitStatus,
-  propertyLabel,
+  propertyAddress,
+  propertyCity,
+  propertyType,
+  propertySurface,
+  propertyDpeGrade,
   onSelectProperty,
   invites,
   onAddInvite,
@@ -84,6 +84,36 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
   onViewGuide,
   className,
 }) => {
+  const hasProperty = !!(propertyAddress || propertyCity || propertyType);
+
+  // ── ODJ badge logic ──
+  const odjEditionVariant: BadgeVariant =
+    odjStatus === "EDITE" ? "warning" :
+    odjStatus === "REVISE" || odjStatus === "ENVOYE" ? "success" : "disabled";
+
+  const odjRevisionVariant: BadgeVariant =
+    odjStatus === "REVISE" ? "information" :
+    odjStatus === "ENVOYE" ? "success" : "disabled";
+
+  const odjEnvoiVariant: BadgeVariant =
+    odjStatus === "ENVOYE" ? "success" : "disabled";
+
+  // ── Guide badge logic ──
+  const guideEnvoiVariant: BadgeVariant =
+    guideStatus === "ENVOYE" || guideStatus === "COMPLET" ? "success" : "disabled";
+
+  const guideCompletionVariant: BadgeVariant =
+    guideStatus === "COMPLET" ? "success" : guideStatus === "ENVOYE" ? "warning" : "disabled";
+
+  const guideCompletionLabel =
+    guideStatus === "COMPLET" ? "COMPLET" : "INCOMPLET";
+
+  // Build line 2 fragments for property section
+  const propertyLine2Parts: React.ReactNode[] = [];
+  if (propertyCity) propertyLine2Parts.push(propertyCity);
+  if (propertyType) propertyLine2Parts.push(propertyType);
+  if (propertySurface) propertyLine2Parts.push(propertySurface);
+
   return (
     <Sheet
       isOpen={isOpen}
@@ -98,42 +128,62 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
     >
       <div className="py-[16px]">
         <div className="flex flex-col gap-[12px] mx-[20px]">
+
           {/* Section 1 — Bien visite */}
-          <CollapsibleSection title="Bien visité" defaultExpanded={true}>
-            <div className="flex flex-col gap-[8px]">
-              {propertyLabel ? (
-                <span className="text-sm font-roboto text-content-body">
-                  {propertyLabel}
-                </span>
-              ) : (
-                <Button variant="ghost" onClick={onSelectProperty}>
-                  Rechercher un bien
-                </Button>
-              )}
-
-              {selectedSlotLabel && (
-                <div className="flex items-center gap-[8px]">
-                  <span className="px-[12px] py-[4px] rounded-full text-xs font-roboto bg-surface-branded-subtle text-content-branded-strong">
-                    {selectedSlotLabel}
-                  </span>
-                </div>
-              )}
-
-              {propertyLabel && (
-                <Button variant="ghost" onClick={onOpenAgenda}>
-                  Voir l'agenda
-                </Button>
-              )}
+          <div className="rounded-lg border border-edge-default p-[16px]">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold font-roboto text-content-strong">
+                Bien visité
+              </span>
+              <button
+                type="button"
+                onClick={onSelectProperty}
+                className="p-[4px] rounded hover:bg-surface-neutral-action text-content-body"
+              >
+                {hasProperty ? <Pencil size={16} /> : <Search size={16} />}
+              </button>
             </div>
-          </CollapsibleSection>
+            {hasProperty && (
+              <div className="flex flex-col gap-[4px] mt-[8px]">
+                {propertyAddress && (
+                  <span className="text-sm font-roboto text-content-body truncate">
+                    {propertyAddress}
+                  </span>
+                )}
+                {propertyLine2Parts.length > 0 && (
+                  <div className="flex items-center gap-[6px] text-xs font-semibold font-roboto text-content-body">
+                    {propertyLine2Parts.map((part, i) => (
+                      <React.Fragment key={i}>
+                        {i > 0 && <Dot />}
+                        <span>{part}</span>
+                      </React.Fragment>
+                    ))}
+                    {propertyDpeGrade && (
+                      <>
+                        <IconDpe type={propertyDpeGrade} size="small" />
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Section 2 — Invitations */}
-          <CollapsibleSection
-            title="Invitations"
-            badge={String(invites.length)}
-            defaultExpanded={true}
-          >
-            <div className="flex flex-col">
+          <div className="rounded-lg border border-edge-default p-[16px]">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold font-roboto text-content-strong">
+                Invitations
+              </span>
+              <button
+                type="button"
+                onClick={onAddInvite}
+                className="p-[4px] rounded hover:bg-surface-neutral-action text-content-body"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+            <div className="flex flex-col mt-[8px]">
               {invites.map((invite) => (
                 <div
                   key={invite.id}
@@ -145,56 +195,91 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
                   <Badge variant={invite.calStatus}>CAL</Badge>
                 </div>
               ))}
-              <Button variant="ghost" onClick={onAddInvite} className="mt-[8px]">
-                <Plus size={20} />
-                Ajouter un invité
-              </Button>
+              <div className="mt-[8px]">
+                <Button variant="ghost" onClick={onOpenAgenda}>
+                  {selectedSlotLabel ? (
+                    <>
+                      <Calendar size={16} />
+                      {selectedSlotLabel}
+                    </>
+                  ) : (
+                    "Voir l'agenda du bien"
+                  )}
+                </Button>
+              </div>
             </div>
-          </CollapsibleSection>
+          </div>
 
           {/* Section 3 — Ordre du Jour */}
-          <CollapsibleSection
-            title="Ordre du Jour"
-            badge={
-              odjStatus ? (
-                <Badge variant={odjStatusToBadgeVariant[odjStatus]}>
-                  {odjStatus}
+          <div className="rounded-lg border border-edge-default p-[16px]">
+            <span className="text-sm font-semibold font-roboto text-content-strong">
+              Ordre du Jour
+            </span>
+            <div className="flex flex-col mt-[8px]">
+              <div className="flex items-center justify-between py-[8px]">
+                <span className="text-sm font-roboto text-content-body">
+                  Édition
+                </span>
+                <Badge variant={odjEditionVariant}>
+                  ÉDITÉ
                 </Badge>
-              ) : (
-                <Badge variant="disabled">&mdash;</Badge>
-              )
-            }
-            defaultExpanded={false}
-          >
-            {odjStatus && (
-              <Button variant="ghost" onClick={onViewOdj}>
-                Voir l'Ordre du jour
-                <ArrowRight size={20} />
-              </Button>
-            )}
-          </CollapsibleSection>
+              </div>
+              <div className="flex items-center justify-between py-[8px]">
+                <span className="text-sm font-roboto text-content-body">
+                  Révision
+                </span>
+                <Badge variant={odjRevisionVariant}>
+                  RÉVISÉ
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between py-[8px]">
+                <span className="text-sm font-roboto text-content-body">
+                  Envoi
+                </span>
+                <Badge variant={odjEnvoiVariant}>
+                  ENVOYÉ
+                </Badge>
+              </div>
+              <div className="mt-[8px]">
+                <Button variant="ghost" onClick={onViewOdj}>
+                  Voir l'Ordre du jour
+                  <ArrowRight size={16} />
+                </Button>
+              </div>
+            </div>
+          </div>
 
           {/* Section 4 — Guide de visite */}
-          <CollapsibleSection
-            title="Guide de visite"
-            badge={
-              guideStatus ? (
-                <Badge variant={guideStatusToBadgeVariant[guideStatus]}>
-                  {guideStatus}
+          <div className="rounded-lg border border-edge-default p-[16px]">
+            <span className="text-sm font-semibold font-roboto text-content-strong">
+              Guide de visite
+            </span>
+            <div className="flex flex-col mt-[8px]">
+              <div className="flex items-center justify-between py-[8px]">
+                <span className="text-sm font-roboto text-content-body">
+                  Envoi
+                </span>
+                <Badge variant={guideEnvoiVariant}>
+                  ENVOYÉ
                 </Badge>
-              ) : (
-                <Badge variant="disabled">&mdash;</Badge>
-              )
-            }
-            defaultExpanded={false}
-          >
-            {guideStatus && (
-              <Button variant="ghost" onClick={onViewGuide}>
-                Voir l'Avis
-                <ArrowRight size={20} />
-              </Button>
-            )}
-          </CollapsibleSection>
+              </div>
+              <div className="flex items-center justify-between py-[8px]">
+                <span className="text-sm font-roboto text-content-body">
+                  Complétion
+                </span>
+                <Badge variant={guideCompletionVariant}>
+                  {guideCompletionLabel}
+                </Badge>
+              </div>
+              <div className="mt-[8px]">
+                <Button variant="ghost" onClick={onViewGuide}>
+                  Voir l'Avis
+                  <ArrowRight size={16} />
+                </Button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </Sheet>
