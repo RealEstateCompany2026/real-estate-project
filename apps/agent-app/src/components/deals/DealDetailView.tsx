@@ -265,36 +265,27 @@ const MANDATE_ORDER_DETAIL = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
 
 // ── Visite workflow mapping ──
 
-function mapVisiteStatus(
-  status: string | null,
-  step: 'calendrier' | 'odj' | 'cr',
-): BadgeVariant {
-  switch (step) {
-    case 'calendrier':
-      return status === 'ANNULE' || status === 'NO_SHOW' ? 'error' : 'success';
-    case 'odj':
-      return status === 'CONFIRME' || status === 'TERMINE' ? 'success' : 'disabled';
-    case 'cr':
-      return status === 'TERMINE' ? 'success' : 'disabled';
-    default:
-      return 'disabled';
-  }
-}
+function mapVisiteWorkflow(event: EventRow): { cal: BadgeVariant; odj: BadgeVariant; cr: BadgeVariant } {
+  const cal: BadgeVariant = event.status === 'ANNULE' || event.status === 'NO_SHOW' ? 'error' : 'success';
 
-// ── Visite recherche workflow mapping ──
-
-function mapVisiteRechercheStatus(
-  status: string | null,
-  step: 'programme' | 'cr',
-): BadgeVariant {
-  switch (step) {
-    case 'programme':
-      return status === 'ANNULE' || status === 'NO_SHOW' ? 'error' : 'success';
-    case 'cr':
-      return status === 'TERMINE' ? 'success' : 'disabled';
+  let odj: BadgeVariant;
+  switch (event.odjStatus) {
+    case 'ENVOYE':
+      odj = 'success';
+      break;
+    case 'REVISE':
+      odj = 'information';
+      break;
+    case 'EDITE':
+      odj = 'warning';
+      break;
     default:
-      return 'disabled';
+      odj = 'disabled';
   }
+
+  const cr: BadgeVariant = event.status === 'TERMINE' ? 'success' : 'disabled';
+
+  return { cal, odj, cr };
 }
 
 // ── Agenda bien — default days generator ──
@@ -1737,11 +1728,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                     : undefined
                 }
                 clientName={clientFullName}
-                workflow={{
-                  cal: mapVisiteStatus(v.status, 'calendrier'),
-                  odj: mapVisiteStatus(v.status, 'odj'),
-                  cr: mapVisiteStatus(v.status, 'cr'),
-                }}
+                workflow={mapVisiteWorkflow(v)}
                 onClick={() => handleOpenVisite(v)}
                 onView={() => handleOpenVisite(v)}
               />
@@ -2541,7 +2528,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           }
           invites={
             selectedVisiteEvent.clientId && clientFullName
-              ? [{ id: selectedVisiteEvent.clientId, name: clientFullName, calStatus: mapVisiteStatus(selectedVisiteEvent.status, 'calendrier') }]
+              ? [{ id: selectedVisiteEvent.clientId, name: clientFullName, calStatus: mapVisiteWorkflow(selectedVisiteEvent).cal }]
               : []
           }
           selectedSlotLabel={

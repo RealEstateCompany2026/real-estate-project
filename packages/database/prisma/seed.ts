@@ -1,4 +1,4 @@
-import { PrismaClient, ClientStatus, ClientGender, MaritalStatus, DealType, DealStatus, PropertyType, PropertyStatus } from '@prisma/client'
+import { PrismaClient, ClientStatus, ClientGender, MaritalStatus, DealType, DealStatus, PropertyType, PropertyStatus, EventType, EventStatus, OdjStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -215,7 +215,7 @@ async function main() {
     });
 
     // Acquisition . Recherche de bien
-    await prisma.deal.create({
+    const dealAcquisition = await prisma.deal.create({
         data: {
             clientId: clientAcquereur.id,
             type: DealType.ACQUISITION,
@@ -234,6 +234,75 @@ async function main() {
             clientId: clientLocataire.id,
             type: DealType.LOCATION,
             status: DealStatus.LOCATION_RECHERCHE,
+        }
+    });
+
+    // CREATE EVENTS (Visites)
+    console.log('Creating Visit Events...')
+
+    // Visite 1 — Programmée, ODJ en cours d'édition
+    await prisma.event.create({
+        data: {
+            type: EventType.VISITE,
+            title: 'Visite T4 Toulouse - Sophie Durand',
+            eventDate: new Date('2026-04-28T10:00:00'),
+            status: EventStatus.PROGRAMME,
+            agentId: agentUser.id,
+            dealId: dealAcquisition.id,
+            clientId: clientAcquereur.id,
+            propertyId: propT4.id,
+            odjContent: 'Bienvenue pour la visite du T4 Place du Capitole.\n\nPoints à aborder :\n- Superficie et distribution des pièces\n- État général et travaux éventuels\n- Charges de copropriété',
+            odjStatus: OdjStatus.EDITE,
+        }
+    });
+
+    // Visite 2 — Confirmée, ODJ envoyé
+    await prisma.event.create({
+        data: {
+            type: EventType.VISITE,
+            title: 'Visite Studio Paris - Sophie Durand',
+            eventDate: new Date('2026-04-25T14:30:00'),
+            status: EventStatus.CONFIRME,
+            agentId: agentUser.id,
+            dealId: dealAcquisition.id,
+            clientId: clientAcquereur.id,
+            propertyId: propStudio.id,
+            odjContent: 'Visite du studio Rue de la Pompe.\n\nÀ vérifier : luminosité, bruit, état cuisine/salle de bain.',
+            odjStatus: OdjStatus.ENVOYE,
+            odjSentAt: new Date('2026-04-23T12:00:00'),
+        }
+    });
+
+    // Visite 3 — Terminée, avec guide de visite rempli
+    const visiteTerminee = await prisma.event.create({
+        data: {
+            type: EventType.VISITE,
+            title: 'Visite Maison Bordeaux - Sophie Durand',
+            eventDate: new Date('2026-04-20T09:00:00'),
+            status: EventStatus.TERMINE,
+            agentId: agentUser.id,
+            dealId: dealAcquisition.id,
+            clientId: clientAcquereur.id,
+            propertyId: propMaison.id,
+            odjContent: 'Visite de la maison de ville.\n\nPoints clés : jardin, garage, proximité écoles.',
+            odjStatus: OdjStatus.ENVOYE,
+            odjSentAt: new Date('2026-04-18T16:00:00'),
+        }
+    });
+
+    await prisma.visitGuideResponse.create({
+        data: {
+            eventId: visiteTerminee.id,
+            clientId: clientAcquereur.id,
+            responses: {
+                criterion_1: 'OUI',
+                criterion_2: 'OUI',
+                criterion_3: 'PEUT_ETRE',
+                criterion_4: 'NON',
+                criterion_5: 'PEUT_ETRE',
+            },
+            commentaire: 'Belle maison, mais le quartier est un peu bruyant le matin. À revoir.',
+            submittedAt: new Date('2026-04-20T10:30:00'),
         }
     });
 
