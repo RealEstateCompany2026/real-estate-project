@@ -209,7 +209,7 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
             ) : hasProperty ? (
               <div className="flex flex-col gap-[4px] mt-[8px]">
                 {propertyAddress && (
-                  <span className="text-sm font-roboto text-content-body truncate">
+                  <span className="text-base font-semibold font-roboto text-content-body truncate">
                     {propertyAddress}
                   </span>
                 )}

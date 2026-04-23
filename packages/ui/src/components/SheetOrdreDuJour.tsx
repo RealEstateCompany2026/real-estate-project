@@ -129,7 +129,7 @@ export const SheetOrdreDuJour: React.FC<SheetOrdreDuJourProps> = ({
         })()}
 
         {/* Section 2 — Panneau de contrôle */}
-        <div className="mx-[20px] mb-[12px] rounded-lg border border-edge-default p-[16px]">
+        <div className="mx-[20px] mt-[30px] mb-[12px] rounded-lg border border-edge-default p-[16px]">
           {/* Ligne 1 — Édition + Badge */}
           <div className="flex items-center justify-between py-[8px]">
             <span className="text-base font-roboto text-content-body">
