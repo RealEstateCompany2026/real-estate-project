@@ -98,41 +98,36 @@ export const SheetGuideDeVisite: React.FC<SheetGuideDeVisiteProps> = ({
       className={className}
     >
       <div className="py-[16px]">
-        {/* Section 1 — Infos bien + client */}
-        <div className="px-[20px] py-[12px]">
-          {/* Ligne 1 — Adresse */}
-          {propertyAddress && (
-            <p className="text-xs font-semibold font-roboto text-content-body truncate">
-              {propertyAddress}
-            </p>
-          )}
-          {/* Ligne 2 — Type • Surface + DPE */}
-          {(propertyType || propertySurface) && (
-            <div className="flex items-center gap-[6px] text-xs font-semibold font-roboto text-content-body mt-[4px]">
-              {[propertyType, propertySurface]
-                .filter(Boolean)
-                .map((part, i) => (
+        {/* Section 1 — Infos bien + client (inline) */}
+        {(() => {
+          const parts: React.ReactNode[] = [];
+          if (propertyAddress) parts.push(<span key="addr" className="truncate max-w-[200px]">{propertyAddress}</span>);
+          if (propertyType) parts.push(<span key="type">{propertyType}</span>);
+          if (propertySurface) {
+            parts.push(
+              <React.Fragment key="surface">
+                <span>{propertySurface}</span>
+                {propertyDpeGrade && <IconDpe type={propertyDpeGrade} size="small" />}
+              </React.Fragment>
+            );
+          } else if (propertyDpeGrade) {
+            parts.push(<IconDpe key="dpe" type={propertyDpeGrade} size="small" />);
+          }
+          if (clientName) parts.push(<span key="client">{clientName}</span>);
+          if (visitDateLabel) parts.push(<span key="date">{visitDateLabel}</span>);
+          return (
+            <div className="px-[20px] py-[12px]">
+              <div className="flex items-center gap-[6px] flex-wrap text-xs font-semibold font-roboto text-content-body">
+                {parts.map((part, i) => (
                   <React.Fragment key={i}>
                     {i > 0 && <Dot />}
-                    <span>{part}</span>
+                    {part}
                   </React.Fragment>
                 ))}
-              {propertyDpeGrade && (
-                <IconDpe type={propertyDpeGrade} size="small" />
-              )}
+              </div>
             </div>
-          )}
-          {/* Ligne 3 — Nom du client */}
-          <p className="text-xs font-semibold font-roboto text-content-body mt-[4px]">
-            {clientName}
-          </p>
-          {/* Ligne 4 — Date/heure de visite */}
-          {visitDateLabel && (
-            <p className="text-xs font-semibold font-roboto text-content-body mt-[4px]">
-              {visitDateLabel}
-            </p>
-          )}
-        </div>
+          );
+        })()}
 
         {/* Sections critères — Div bordés individuels */}
         <div className="mx-[20px] mt-[30px] flex flex-col gap-[12px]">

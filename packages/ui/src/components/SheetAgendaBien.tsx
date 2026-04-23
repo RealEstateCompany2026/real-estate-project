@@ -38,10 +38,18 @@ export interface ClientSlotRequest {
 export interface SheetAgendaBienProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Label du bien (adresse + ville + type + surface) */
-  propertyLabel: string;
-  /** Note DPE du bien (optionnel) */
-  dpeGrade?: DpeType;
+  /** Adresse du bien */
+  propertyAddress?: string | null;
+  /** Type du bien (ex: T3, Maison) */
+  propertyType?: string | null;
+  /** Surface habitable formatée (ex: "94 m²") */
+  propertySurface?: string | null;
+  /** Classe DPE énergie */
+  propertyDpeGrade?: DpeType | null;
+  /** Date/heure de visite actuelle pré-formatée, si déjà attribuée */
+  currentVisitDateLabel?: string | null;
+  /** Nom du client visiteur */
+  clientName?: string | null;
   /** Jours affiches dans l'agenda */
   days: AgendaDay[];
   /** Callback quand l'agent selectionne un creneau */
@@ -59,13 +67,23 @@ export interface SheetAgendaBienProps {
   className?: string;
 }
 
+// ── Helpers ────────────────────────────────────────────
+
+function Dot() {
+  return <span className="size-[5px] rounded-full bg-content-body shrink-0" />;
+}
+
 // ── Component ──────────────────────────────────────────
 
 export const SheetAgendaBien: React.FC<SheetAgendaBienProps> = ({
   isOpen,
   onClose,
-  propertyLabel,
-  dpeGrade,
+  propertyAddress,
+  propertyType,
+  propertySurface,
+  propertyDpeGrade,
+  currentVisitDateLabel,
+  clientName,
   days,
   onSlotSelect,
   onProposeSlot,
@@ -94,17 +112,47 @@ export const SheetAgendaBien: React.FC<SheetAgendaBienProps> = ({
       footer={footer}
       className={className}
     >
-      {/* Bloc info bien */}
-      <div className="px-[20px] py-[12px]">
-        <span className="text-sm font-roboto text-content-body">
-          {propertyLabel}
-        </span>
-        {dpeGrade && (
-          <span className="inline-flex ml-2 align-middle">
-            <IconDpe type={dpeGrade} size="small" />
+      {/* Section 1 — Infos bien + client (inline) */}
+      {(() => {
+        const parts: React.ReactNode[] = [];
+        if (propertyAddress) parts.push(<span key="addr" className="truncate max-w-[200px]">{propertyAddress}</span>);
+        if (propertyType) parts.push(<span key="type">{propertyType}</span>);
+        if (propertySurface) {
+          parts.push(
+            <React.Fragment key="surface">
+              <span>{propertySurface}</span>
+              {propertyDpeGrade && <IconDpe type={propertyDpeGrade} size="small" />}
+            </React.Fragment>
+          );
+        } else if (propertyDpeGrade) {
+          parts.push(<IconDpe key="dpe" type={propertyDpeGrade} size="small" />);
+        }
+        if (clientName) parts.push(<span key="client">{clientName}</span>);
+        return (
+          <div className="px-[20px] py-[12px]">
+            <div className="flex items-center gap-[6px] flex-wrap text-xs font-semibold font-roboto text-content-body">
+              {parts.map((part, i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <Dot />}
+                  {part}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Section Visite le — si créneau déjà attribué */}
+      {currentVisitDateLabel && (
+        <div className="mx-[20px] mb-[12px] rounded-lg border border-edge-default p-[16px]">
+          <span className="text-base font-semibold font-roboto text-content-body">
+            Visite le
           </span>
-        )}
-      </div>
+          <p className="text-base font-roboto text-content-body mt-[4px]">
+            {currentVisitDateLabel}
+          </p>
+        </div>
+      )}
 
       {/* Bandeau alerte demande client */}
       {clientRequest && (

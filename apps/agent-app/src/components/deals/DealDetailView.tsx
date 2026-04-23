@@ -2767,16 +2767,20 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         <SheetAgendaBien
           isOpen={isSheetAgendaOpen}
           onClose={handleCloseAgenda}
-          propertyLabel={
-            deal?.Property
-              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
-              : ''
-          }
-          dpeGrade={
+          propertyAddress={deal?.Property?.address ?? null}
+          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
+          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
+          propertyDpeGrade={
             deal?.Property?.dpeEnergyClass &&
             ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-              ? (deal.Property.dpeEnergyClass as any)
-              : undefined
+              ? (deal.Property.dpeEnergyClass as DpeType)
+              : null
+          }
+          clientName={clientFullName}
+          currentVisitDateLabel={
+            selectedVisiteEvent?.eventDate
+              ? `${formatDateOnly(selectedVisiteEvent.eventDate)} à ${formatTimeOnly(selectedVisiteEvent.eventDate)}`
+              : null
           }
           days={agendaDays}
           onSlotSelect={handleAgendaSlotSelect}

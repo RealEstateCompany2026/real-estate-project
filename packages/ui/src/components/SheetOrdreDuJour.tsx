@@ -98,35 +98,35 @@ export const SheetOrdreDuJour: React.FC<SheetOrdreDuJourProps> = ({
       className={className}
     >
       <div className="py-[16px]">
-        {/* Section 1 — Infos bien + client */}
-        <div className="px-[20px] py-[12px]">
-          {/* Ligne 1 — Adresse */}
-          {propertyAddress && (
-            <p className="text-sm font-roboto text-content-body truncate">
-              {propertyAddress}
-            </p>
-          )}
-          {/* Ligne 2 — Ville • Type • Surface + DPE */}
-          {(propertyCity || propertyType || propertySurface) && (
-            <div className="flex items-center gap-[6px] text-xs font-semibold font-roboto text-content-body mt-[4px]">
-              {[propertyCity, propertyType, propertySurface]
-                .filter(Boolean)
-                .map((part, i) => (
+        {/* Section 1 — Infos bien + client (inline) */}
+        {(() => {
+          const parts: React.ReactNode[] = [];
+          if (propertyAddress) parts.push(<span key="addr" className="truncate max-w-[200px]">{propertyAddress}</span>);
+          if (propertyType) parts.push(<span key="type">{propertyType}</span>);
+          if (propertySurface) {
+            parts.push(
+              <React.Fragment key="surface">
+                <span>{propertySurface}</span>
+                {propertyDpeGrade && <IconDpe type={propertyDpeGrade} size="small" />}
+              </React.Fragment>
+            );
+          } else if (propertyDpeGrade) {
+            parts.push(<IconDpe key="dpe" type={propertyDpeGrade} size="small" />);
+          }
+          if (clientName) parts.push(<span key="client">{clientName}</span>);
+          return (
+            <div className="px-[20px] py-[12px]">
+              <div className="flex items-center gap-[6px] flex-wrap text-xs font-semibold font-roboto text-content-body">
+                {parts.map((part, i) => (
                   <React.Fragment key={i}>
                     {i > 0 && <Dot />}
-                    <span>{part}</span>
+                    {part}
                   </React.Fragment>
                 ))}
-              {propertyDpeGrade && (
-                <IconDpe type={propertyDpeGrade} size="small" />
-              )}
+              </div>
             </div>
-          )}
-          {/* Ligne 3 — Nom du client */}
-          <p className="text-sm font-roboto text-content-body mt-[4px]">
-            {clientName}
-          </p>
-        </div>
+          );
+        })()}
 
         {/* Section 2 — Panneau de contrôle */}
         <div className="mx-[20px] mb-[12px] rounded-lg border border-edge-default p-[16px]">
