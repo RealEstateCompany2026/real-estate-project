@@ -687,6 +687,12 @@ enum ReportStatus {
   ENVOYE_AU_CLIENT
 }
 
+enum OdjStatus {
+  EDITE
+  REVISE
+  ENVOYE
+}
+
 enum SegmentTransitionTrigger {
   ENGAGEMENT_SIGNAL
   PLAYBOOK_STEP
@@ -1063,6 +1069,7 @@ model Client {
   leads                   Lead[]
   emailPreferences        EmailPreference[]
   segmentTransitions      SegmentTransition[]
+  visitGuideResponses     VisitGuideResponse[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1204,6 +1211,7 @@ model Property {
   propertyShareLinks              PropertyShareLink[]
   propertyMedia                   PropertyMedia[]
   listings                        Listing[]                      @relation("ListingProperty")
+  availabilityExceptions          PropertyAvailabilityException[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -1328,6 +1336,31 @@ model PropertyShareLink {
   isActive       Boolean? @default(true)
 
   createdAt DateTime? @default(now())
+}
+
+model PropertyAvailabilityException {
+  id         String   @id @default(uuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  date       DateTime
+  startTime  String
+  endTime    String
+  reason     String?
+  closedBy   String?
+  createdAt  DateTime @default(now())
+}
+
+model VisitGuideResponse {
+  id          String    @id @default(uuid())
+  eventId     String
+  event       Event     @relation(fields: [eventId], references: [id])
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  responses   Json
+  commentaire String?
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
 }
 
 model PropertyMedia {
@@ -1777,6 +1810,14 @@ model Event {
   taskCompleted   Boolean?  @default(false)
   taskCompletedAt DateTime?
   recurrenceRule  String?
+
+  // Ordre du Jour (contenu rattache a un Event VISITE)
+  odjContent  String?
+  odjStatus   OdjStatus?
+  odjSentAt   DateTime?
+
+  // Relation vers les reponses au guide de visite
+  visitGuideResponses VisitGuideResponse[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
