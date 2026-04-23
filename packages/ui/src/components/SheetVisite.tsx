@@ -87,24 +87,31 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
   const hasProperty = !!(propertyAddress || propertyCity || propertyType);
 
   // ── ODJ badge logic ──
+  // Chaque étape : warning = à faire (infinitif), success = fait (participe passé)
   const odjEditionVariant: BadgeVariant =
-    odjStatus === "EDITE" ? "warning" :
-    odjStatus === "REVISE" || odjStatus === "ENVOYE" ? "success" : "disabled";
+    odjStatus === "EDITE" || odjStatus === "REVISE" || odjStatus === "ENVOYE" ? "success" : "warning";
+  const odjEditionLabel =
+    odjStatus === "EDITE" || odjStatus === "REVISE" || odjStatus === "ENVOYE" ? "ÉDITÉ" : "ÉDITER";
 
   const odjRevisionVariant: BadgeVariant =
-    odjStatus === "REVISE" ? "information" :
-    odjStatus === "ENVOYE" ? "success" : "disabled";
+    odjStatus === "REVISE" || odjStatus === "ENVOYE" ? "success" : "warning";
+  const odjRevisionLabel =
+    odjStatus === "REVISE" || odjStatus === "ENVOYE" ? "RÉVISÉ" : "RÉVISER";
 
   const odjEnvoiVariant: BadgeVariant =
-    odjStatus === "ENVOYE" ? "success" : "disabled";
+    odjStatus === "ENVOYE" ? "success" : "warning";
+  const odjEnvoiLabel =
+    odjStatus === "ENVOYE" ? "ENVOYÉ" : "ENVOYER";
 
   // ── Guide badge logic ──
+  // disabled = pas encore fait, success = fait
   const guideEnvoiVariant: BadgeVariant =
     guideStatus === "ENVOYE" || guideStatus === "COMPLET" ? "success" : "disabled";
+  const guideEnvoiLabel =
+    guideStatus === "ENVOYE" || guideStatus === "COMPLET" ? "ENVOYÉ" : "ENVOYER";
 
   const guideCompletionVariant: BadgeVariant =
-    guideStatus === "COMPLET" ? "success" : guideStatus === "ENVOYE" ? "warning" : "disabled";
-
+    guideStatus === "COMPLET" ? "success" : "disabled";
   const guideCompletionLabel =
     guideStatus === "COMPLET" ? "COMPLET" : "INCOMPLET";
 
@@ -172,7 +179,7 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
           {/* Section 2 — Invitations */}
           <div className="rounded-lg border border-edge-default p-[16px]">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold font-roboto text-content-strong">
+              <span className="text-base font-semibold font-roboto text-content-strong">
                 Invitations
               </span>
               <button
@@ -189,14 +196,14 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
                   key={invite.id}
                   className="flex items-center justify-between py-[8px]"
                 >
-                  <span className="text-sm font-roboto text-content-body">
+                  <span className="text-base font-roboto text-content-body">
                     {invite.name}
                   </span>
                   <Badge variant={invite.calStatus}>CAL</Badge>
                 </div>
               ))}
               <div className="mt-[8px]">
-                <Button variant="ghost" onClick={onOpenAgenda}>
+                <Button variant="outline" onClick={onOpenAgenda} className="w-full">
                   {selectedSlotLabel ? (
                     <>
                       <Calendar size={16} />
@@ -212,36 +219,36 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
 
           {/* Section 3 — Ordre du Jour */}
           <div className="rounded-lg border border-edge-default p-[16px]">
-            <span className="text-sm font-semibold font-roboto text-content-strong">
+            <span className="text-base font-semibold font-roboto text-content-strong">
               Ordre du Jour
             </span>
             <div className="flex flex-col mt-[8px]">
               <div className="flex items-center justify-between py-[8px]">
-                <span className="text-sm font-roboto text-content-body">
+                <span className="text-base font-roboto text-content-body">
                   Édition
                 </span>
                 <Badge variant={odjEditionVariant}>
-                  ÉDITÉ
+                  {odjEditionLabel}
                 </Badge>
               </div>
               <div className="flex items-center justify-between py-[8px]">
-                <span className="text-sm font-roboto text-content-body">
+                <span className="text-base font-roboto text-content-body">
                   Révision
                 </span>
                 <Badge variant={odjRevisionVariant}>
-                  RÉVISÉ
+                  {odjRevisionLabel}
                 </Badge>
               </div>
               <div className="flex items-center justify-between py-[8px]">
-                <span className="text-sm font-roboto text-content-body">
+                <span className="text-base font-roboto text-content-body">
                   Envoi
                 </span>
                 <Badge variant={odjEnvoiVariant}>
-                  ENVOYÉ
+                  {odjEnvoiLabel}
                 </Badge>
               </div>
               <div className="mt-[8px]">
-                <Button variant="ghost" onClick={onViewOdj}>
+                <Button variant="outline" onClick={onViewOdj} className="w-full">
                   Voir l'Ordre du jour
                   <ArrowRight size={16} />
                 </Button>
@@ -251,20 +258,20 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
 
           {/* Section 4 — Guide de visite */}
           <div className="rounded-lg border border-edge-default p-[16px]">
-            <span className="text-sm font-semibold font-roboto text-content-strong">
+            <span className="text-base font-semibold font-roboto text-content-strong">
               Guide de visite
             </span>
             <div className="flex flex-col mt-[8px]">
               <div className="flex items-center justify-between py-[8px]">
-                <span className="text-sm font-roboto text-content-body">
+                <span className="text-base font-roboto text-content-body">
                   Envoi
                 </span>
                 <Badge variant={guideEnvoiVariant}>
-                  ENVOYÉ
+                  {guideEnvoiLabel}
                 </Badge>
               </div>
               <div className="flex items-center justify-between py-[8px]">
-                <span className="text-sm font-roboto text-content-body">
+                <span className="text-base font-roboto text-content-body">
                   Complétion
                 </span>
                 <Badge variant={guideCompletionVariant}>
@@ -272,7 +279,7 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
                 </Badge>
               </div>
               <div className="mt-[8px]">
-                <Button variant="ghost" onClick={onViewGuide}>
+                <Button variant="outline" onClick={onViewGuide} className="w-full">
                   Voir l'Avis
                   <ArrowRight size={16} />
                 </Button>
