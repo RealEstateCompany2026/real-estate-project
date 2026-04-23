@@ -2714,10 +2714,15 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         <SheetOrdreDuJour
           isOpen={isSheetOdjOpen}
           onClose={handleCloseOdj}
-          propertyLabel={
-            deal?.Property
-              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
-              : ''
+          propertyAddress={deal?.Property?.address ?? null}
+          propertyCity={deal?.Property?.addressCity ?? null}
+          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
+          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
+          propertyDpeGrade={
+            deal?.Property?.dpeEnergyClass &&
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
+              ? (deal.Property.dpeEnergyClass as DpeType)
+              : null
           }
           clientName={clientFullName}
           content={odjContent}
@@ -2727,7 +2732,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             selectedVisiteEvent.odjStatus === 'REVISE' ||
             selectedVisiteEvent.odjStatus === 'ENVOYE'
               ? selectedVisiteEvent.odjStatus
-              : 'EDITE'
+              : null
           }
           isRevision={odjIsRevision}
           onToggleRevision={handleOdjToggleRevision}
