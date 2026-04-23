@@ -3,7 +3,7 @@
 import React from "react";
 import { Sheet } from "./Sheet";
 import { Badge, BadgeVariant } from "./Badge";
-import { Button } from "./Button";
+import { Button, IconButton } from "./Button";
 import { Plus, ArrowRight, Search, Pencil, Calendar } from "lucide-react";
 import { IconDpe, DpeType } from "./IconDpe";
 
@@ -46,6 +46,22 @@ export interface SheetVisiteProps {
   guideStatus?: "ENVOYE" | "COMPLET" | null;
   /** Callback pour voir le guide de visite */
   onViewGuide?: () => void;
+  // -- Mode édition bien --
+  isEditingProperty?: boolean;
+  onToggleEditProperty?: () => void;
+  propertySearchQuery?: string;
+  onPropertySearchChange?: (query: string) => void;
+  propertySearchResults?: Array<{ id: string; label: string }>;
+  onPropertySelect?: (propertyId: string) => void;
+  onSaveProperty?: () => void;
+  // -- Mode ajout invité --
+  isAddingInvite?: boolean;
+  onToggleAddInvite?: () => void;
+  clientSearchQuery?: string;
+  onClientSearchChange?: (query: string) => void;
+  clientSearchResults?: Array<{ id: string; label: string }>;
+  onClientSelect?: (clientId: string) => void;
+  onSaveInvite?: () => void;
   className?: string;
 }
 
@@ -82,6 +98,20 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
   onViewOdj,
   guideStatus,
   onViewGuide,
+  isEditingProperty,
+  onToggleEditProperty,
+  propertySearchQuery,
+  onPropertySearchChange,
+  propertySearchResults,
+  onPropertySelect,
+  onSaveProperty,
+  isAddingInvite,
+  onToggleAddInvite,
+  clientSearchQuery,
+  onClientSearchChange,
+  clientSearchResults,
+  onClientSelect,
+  onSaveInvite,
   className,
 }) => {
   const hasProperty = !!(propertyAddress || propertyCity || propertyType);
@@ -136,21 +166,47 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
       <div className="py-[16px]">
         <div className="flex flex-col gap-[12px] mx-[20px]">
 
-          {/* Section 1 — Bien visite */}
+          {/* Section 1 — Bien visité */}
           <div className="rounded-lg border border-edge-default p-[16px]">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold font-roboto text-content-strong">
+              <span className="text-base font-semibold font-roboto text-content-strong">
                 Bien visité
               </span>
-              <button
-                type="button"
-                onClick={onSelectProperty}
-                className="p-[4px] rounded hover:bg-surface-neutral-action text-content-body"
-              >
-                {hasProperty ? <Pencil size={16} /> : <Search size={16} />}
-              </button>
+              <IconButton
+                onClick={onToggleEditProperty ?? onSelectProperty}
+                icon={isEditingProperty ? <Search size={20} /> : hasProperty ? <Pencil size={20} /> : <Search size={20} />}
+              />
             </div>
-            {hasProperty && (
+            {(isEditingProperty || (!hasProperty && onToggleEditProperty)) ? (
+              <div className="flex flex-col gap-[8px] mt-[8px]">
+                <label className="text-xs font-semibold font-roboto text-content-subtle uppercase tracking-wider">
+                  Adresse du bien
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-[12px] py-[10px] rounded-lg border border-edge-default bg-surface-neutral-default text-base font-roboto text-content-body placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)]"
+                  value={propertySearchQuery ?? ""}
+                  onChange={(e) => onPropertySearchChange?.(e.target.value)}
+                  placeholder="Rechercher une adresse..."
+                />
+                {propertySearchResults && propertySearchResults.length > 0 && (
+                  <div className="rounded-lg border border-edge-default bg-surface-neutral-default mt-[4px] max-h-[160px] overflow-y-auto">
+                    {propertySearchResults.map((r) => (
+                      <div
+                        key={r.id}
+                        className="px-[12px] py-[8px] text-sm font-roboto text-content-body cursor-pointer hover:bg-surface-neutral-action"
+                        onClick={() => onPropertySelect?.(r.id)}
+                      >
+                        {r.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Button variant="primary" className="w-full" onClick={onSaveProperty}>
+                  Enregistrer
+                </Button>
+              </div>
+            ) : hasProperty ? (
               <div className="flex flex-col gap-[4px] mt-[8px]">
                 {propertyAddress && (
                   <span className="text-sm font-roboto text-content-body truncate">
@@ -173,7 +229,7 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Section 2 — Invitations */}
@@ -182,13 +238,7 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
               <span className="text-base font-semibold font-roboto text-content-strong">
                 Invitations
               </span>
-              <button
-                type="button"
-                onClick={onAddInvite}
-                className="p-[4px] rounded hover:bg-surface-neutral-action text-content-body"
-              >
-                <Plus size={16} />
-              </button>
+              <IconButton onClick={onToggleAddInvite ?? onAddInvite} icon={<Plus size={20} />} />
             </div>
             <div className="flex flex-col mt-[8px]">
               {invites.map((invite) => (
@@ -202,6 +252,36 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
                   <Badge variant={invite.calStatus}>CAL</Badge>
                 </div>
               ))}
+              {isAddingInvite && (
+                <div className="flex flex-col gap-[8px] mt-[8px]">
+                  <label className="text-xs font-semibold font-roboto text-content-subtle uppercase tracking-wider">
+                    Nom du client
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-[12px] py-[10px] rounded-lg border border-edge-default bg-surface-neutral-default text-base font-roboto text-content-body placeholder:text-content-subtle focus:outline-none focus:ring-2 focus:ring-[var(--border-branded-default)]"
+                    value={clientSearchQuery ?? ""}
+                    onChange={(e) => onClientSearchChange?.(e.target.value)}
+                    placeholder="Rechercher un client..."
+                  />
+                  {clientSearchResults && clientSearchResults.length > 0 && (
+                    <div className="rounded-lg border border-edge-default bg-surface-neutral-default mt-[4px] max-h-[160px] overflow-y-auto">
+                      {clientSearchResults.map((r) => (
+                        <div
+                          key={r.id}
+                          className="px-[12px] py-[8px] text-sm font-roboto text-content-body cursor-pointer hover:bg-surface-neutral-action"
+                          onClick={() => onClientSelect?.(r.id)}
+                        >
+                          {r.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <Button variant="primary" className="w-full" onClick={onSaveInvite}>
+                    Enregistrer
+                  </Button>
+                </div>
+              )}
               <div className="mt-[8px]">
                 <Button variant="outline" onClick={onOpenAgenda} className="w-full">
                   {selectedSlotLabel ? (

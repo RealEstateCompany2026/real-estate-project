@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles,
@@ -183,6 +183,11 @@ interface ListingRow {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Échappe les caractères spéciaux ILIKE (%, _, \) pour éviter les wildcards involontaires. */
+function escapeIlike(str: string): string {
+  return str.replace(/[%_\\]/g, '\\$&');
+}
 
 function formatDateTime(date: string): string {
   return new Date(date).toLocaleDateString('fr-FR', {
@@ -673,6 +678,17 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isSheetAgendaOpen, setIsSheetAgendaOpen] = useState(false);
   const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([]);
   const [selectedAgendaSlot, setSelectedAgendaSlot] = useState<{ date: string; startTime: string } | null>(null);
+  // Visite — property edit & invite add
+  const [isEditingProperty, setIsEditingProperty] = useState(false);
+  const [propertySearchQuery, setPropertySearchQuery] = useState('');
+  const [propertySearchResults, setPropertySearchResults] = useState<Array<{ id: string; label: string }>>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
+  const [isAddingInvite, setIsAddingInvite] = useState(false);
+  const [clientSearchQuery, setClientSearchQuery] = useState('');
+  const [clientSearchResults, setClientSearchResults] = useState<Array<{ id: string; label: string }>>([]);
+  const [selectedInviteClientId, setSelectedInviteClientId] = useState<string | null>(null);
+  const propertySearchAbort = useRef<AbortController | null>(null);
+  const clientSearchAbort = useRef<AbortController | null>(null);
   const [organization, setOrganization] = useState<{
     name: string | null; address: string | null; siret: string | null;
     rcpInsuranceRef: string | null; rcpExpiryDate: string | null;
@@ -1202,22 +1218,140 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     );
   }, []);
 
-  const handleProposeSlot = useCallback(async () => {
-    if (!selectedAgendaSlot || !selectedVisiteEvent) return;
+  // ── Property search autocomplete ──
+  const handlePropertySearchChange = useCallback(async (query: string) => {
+    setPropertySearchQuery(query);
+    setSelectedPropertyId(null);
+    if (query.length < 3) {
+      setPropertySearchResults([]);
+      return;
+    }
+    propertySearchAbort.current?.abort();
+    const controller = new AbortController();
+    propertySearchAbort.current = controller;
     const supabase = createClient();
-    // Update the Event with the selected date/time
-    const newDate = new Date(`${selectedAgendaSlot.date}T${selectedAgendaSlot.startTime}:00`);
-    await supabase
-      .from('Event')
-      .update({ eventDate: newDate.toISOString(), status: 'PROGRAMME' })
-      .eq('id', selectedVisiteEvent.id);
+    const { data } = await supabase
+      .from('Property')
+      .select('id, address')
+      .ilike('address', `%${escapeIlike(query)}%`)
+      .limit(10)
+      .abortSignal(controller.signal);
+    if (controller.signal.aborted) return;
+    setPropertySearchResults(
+      (data ?? []).map((p: { id: string; address: string | null }) => ({ id: p.id, label: p.address ?? '' }))
+    );
+  }, []);
+
+  const handlePropertySelect = useCallback((propertyId: string) => {
+    setSelectedPropertyId(propertyId);
+    const match = propertySearchResults.find((r) => r.id === propertyId);
+    if (match) setPropertySearchQuery(match.label);
+    setPropertySearchResults([]);
+  }, [propertySearchResults]);
+
+  const handleSaveProperty = useCallback(async () => {
+    if (!selectedPropertyId || !deal?.id) return;
+    const supabase = createClient();
+    await supabase.from('Deal').update({ propertyId: selectedPropertyId }).eq('id', deal.id);
+    // Fetch the selected property to update local state
+    const { data: prop } = await supabase
+      .from('Property')
+      .select('id, address, addressCity, type, livingAreaSqm, dpeEnergyClass, desiredSellingPrice, numberOfRooms')
+      .eq('id', selectedPropertyId)
+      .single();
+    if (prop) {
+      setDeal((prev) => prev ? {
+        ...prev,
+        propertyId: selectedPropertyId,
+        Property: {
+          id: prop.id,
+          address: prop.address ?? null,
+          addressCity: prop.addressCity ?? null,
+          type: prop.type ?? null,
+          livingAreaSqm: prop.livingAreaSqm ?? null,
+          dpeEnergyClass: prop.dpeEnergyClass ?? null,
+          desiredSellingPrice: prop.desiredSellingPrice ?? null,
+          numberOfRooms: prop.numberOfRooms ?? null,
+        },
+      } : prev);
+    }
+    setIsEditingProperty(false);
+    setPropertySearchQuery('');
+    setPropertySearchResults([]);
+    setSelectedPropertyId(null);
+  }, [selectedPropertyId, deal?.id]);
+
+  // ── Client search autocomplete ──
+  const handleClientSearchChange = useCallback(async (query: string) => {
+    setClientSearchQuery(query);
+    setSelectedInviteClientId(null);
+    if (query.length < 2) {
+      setClientSearchResults([]);
+      return;
+    }
+    clientSearchAbort.current?.abort();
+    const controller = new AbortController();
+    clientSearchAbort.current = controller;
+    const supabase = createClient();
+    const escaped = escapeIlike(query);
+    const { data } = await supabase
+      .from('Client')
+      .select('id, firstName, lastName')
+      .or(`firstName.ilike.%${escaped}%,lastName.ilike.%${escaped}%`)
+      .limit(10)
+      .abortSignal(controller.signal);
+    if (controller.signal.aborted) return;
+    setClientSearchResults(
+      (data ?? []).map((c: { id: string; firstName: string | null; lastName: string | null }) => ({
+        id: c.id,
+        label: `${c.firstName ?? ''} ${c.lastName ?? ''}`.trim(),
+      }))
+    );
+  }, []);
+
+  const handleClientSelect = useCallback((clientId: string) => {
+    setSelectedInviteClientId(clientId);
+    const match = clientSearchResults.find((r) => r.id === clientId);
+    if (match) setClientSearchQuery(match.label);
+    setClientSearchResults([]);
+  }, [clientSearchResults]);
+
+  const handleSaveInvite = useCallback(async () => {
+    if (!selectedInviteClientId || !selectedVisiteEvent) return;
+    const supabase = createClient();
+    // Niveau 3B — persist Event.clientId
+    await supabase.from('Event').update({ clientId: selectedInviteClientId }).eq('id', selectedVisiteEvent.id);
     // Update local state
     setSelectedVisiteEvent((prev) =>
-      prev ? { ...prev, eventDate: newDate.toISOString(), status: 'PROGRAMME' } : prev
+      prev ? { ...prev, clientId: selectedInviteClientId } : prev
     );
     setEvents((prev) =>
       prev.map((e) =>
-        e.id === selectedVisiteEvent.id ? { ...e, eventDate: newDate.toISOString(), status: 'PROGRAMME' } : e
+        e.id === selectedVisiteEvent.id ? { ...e, clientId: selectedInviteClientId } : e
+      )
+    );
+    setIsAddingInvite(false);
+    setClientSearchQuery('');
+    setClientSearchResults([]);
+    setSelectedInviteClientId(null);
+  }, [selectedInviteClientId, selectedVisiteEvent]);
+
+  const handleProposeSlot = useCallback(async () => {
+    if (!selectedAgendaSlot || !selectedVisiteEvent) return;
+    const supabase = createClient();
+    // Stocker la date/heure telle quelle (sans conversion UTC)
+    const eventDateStr = `${selectedAgendaSlot.date}T${selectedAgendaSlot.startTime}:00`;
+    await supabase
+      .from('Event')
+      .update({ eventDate: eventDateStr, status: 'PROGRAMME' })
+      .eq('id', selectedVisiteEvent.id);
+    // Update local state
+    setSelectedVisiteEvent((prev) =>
+      prev ? { ...prev, eventDate: eventDateStr, status: 'PROGRAMME' } : prev
+    );
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === selectedVisiteEvent.id ? { ...e, eventDate: eventDateStr, status: 'PROGRAMME' } : e
       )
     );
     setIsSheetAgendaOpen(false);
@@ -2535,9 +2669,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               : null
           }
           invites={
-            selectedVisiteEvent.clientId && clientFullName
-              ? [{ id: selectedVisiteEvent.clientId, name: clientFullName, calStatus: mapVisiteWorkflow(selectedVisiteEvent).cal }]
-              : []
+            (() => {
+              const inviteClientId = selectedVisiteEvent.clientId || deal?.Client?.id;
+              const inviteClientName = clientFullName !== '—' ? clientFullName : null;
+              if (inviteClientId && inviteClientName) {
+                return [{ id: inviteClientId, name: inviteClientName, calStatus: mapVisiteWorkflow(selectedVisiteEvent).cal }];
+              }
+              return [];
+            })()
           }
           selectedSlotLabel={
             selectedVisiteEvent.eventDate
@@ -2555,6 +2694,20 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           onViewOdj={handleOpenOdj}
           onViewGuide={handleOpenGuide}
           onOpenAgenda={handleOpenAgenda}
+          isEditingProperty={isEditingProperty}
+          onToggleEditProperty={() => setIsEditingProperty((v) => !v)}
+          propertySearchQuery={propertySearchQuery}
+          onPropertySearchChange={handlePropertySearchChange}
+          propertySearchResults={propertySearchResults}
+          onPropertySelect={handlePropertySelect}
+          onSaveProperty={handleSaveProperty}
+          isAddingInvite={isAddingInvite}
+          onToggleAddInvite={() => setIsAddingInvite((v) => !v)}
+          clientSearchQuery={clientSearchQuery}
+          onClientSearchChange={handleClientSearchChange}
+          clientSearchResults={clientSearchResults}
+          onClientSelect={handleClientSelect}
+          onSaveInvite={handleSaveInvite}
         />
 
         {/* Sheet Ordre du Jour */}
