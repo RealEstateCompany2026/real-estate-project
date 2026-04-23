@@ -47,6 +47,7 @@ import { ListVisite } from '@real-estate/ui/list-visite';
 import { SheetVisite } from '@real-estate/ui/sheet-visite';
 import { SheetOrdreDuJour } from '@real-estate/ui/sheet-ordre-du-jour';
 import { SheetGuideDeVisite, VisitCriterion } from '@real-estate/ui/sheet-guide-de-visite';
+import { SheetAgendaBien, AgendaDay, TimeSlot } from '@real-estate/ui/sheet-agenda-bien';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
 import { CardCA } from '@real-estate/ui/card-ca';
@@ -294,6 +295,49 @@ function mapVisiteRechercheStatus(
     default:
       return 'disabled';
   }
+}
+
+// ── Agenda bien — default days generator ──
+
+/**
+ * Génère les 5 prochains jours ouvrés avec créneaux de 30min (9h-19h).
+ * Exclut samedi et dimanche.
+ */
+function generateDefaultAgendaDays(): AgendaDay[] {
+  const days: AgendaDay[] = [];
+  const now = new Date();
+  let current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dayLabels = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const monthLabels = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+  while (days.length < 5) {
+    const dow = current.getDay();
+    if (dow !== 0 && dow !== 6) {
+      // Weekday
+      const slots: TimeSlot[] = [];
+      for (let h = 9; h < 19; h++) {
+        for (const m of [0, 30]) {
+          const startH = String(h).padStart(2, '0');
+          const startM = String(m).padStart(2, '0');
+          const endM = m === 30 ? '00' : '30';
+          const endH = m === 30 ? String(h + 1).padStart(2, '0') : startH;
+          slots.push({
+            startTime: `${startH}:${startM}`,
+            endTime: `${endH}:${endM}`,
+            status: 'available',
+          });
+        }
+      }
+      const dateISO = current.toISOString().split('T')[0];
+      days.push({
+        label: `${dayLabels[dow]} ${current.getDate()} ${monthLabels[current.getMonth()]}`,
+        date: dateISO,
+        slots,
+      });
+    }
+    current = new Date(current.getTime() + 86400000);
+  }
+  return days;
 }
 
 // ── Offer workflow mapping (ÉDITION / ACCORD) ──
@@ -634,6 +678,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [visitGuideCriteria, setVisitGuideCriteria] = useState<VisitCriterion[]>([]);
   const [visitGuideCommentaire, setVisitGuideCommentaire] = useState<string | null>(null);
   const [visitGuideSubmittedAt, setVisitGuideSubmittedAt] = useState<string | null>(null);
+  // Agenda bien
+  const [isSheetAgendaOpen, setIsSheetAgendaOpen] = useState(false);
+  const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([]);
+  const [selectedAgendaSlot, setSelectedAgendaSlot] = useState<{ date: string; startTime: string } | null>(null);
   const [organization, setOrganization] = useState<{
     name: string | null; address: string | null; siret: string | null;
     rcpInsuranceRef: string | null; rcpExpiryDate: string | null;
@@ -1070,6 +1118,116 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const handleCloseGuide = useCallback(() => {
     setIsSheetGuideOpen(false);
   }, []);
+
+  // ── Agenda bien handlers ──
+  const handleOpenAgenda = useCallback(async () => {
+    if (!deal?.Property?.id) return;
+    const supabase = createClient();
+    const propertyId = deal.Property.id;
+
+    // 1. Generate default days (5 weekdays, 30min slots, all available)
+    const defaultDays = generateDefaultAgendaDays();
+
+    // 2. Fetch closed slots (exceptions) from Supabase
+    const startDate = defaultDays[0]?.date;
+    const endDate = defaultDays[defaultDays.length - 1]?.date;
+    const { data: exceptions } = await supabase
+      .from('PropertyAvailabilityException')
+      .select('date, startTime, endTime')
+      .eq('propertyId', propertyId)
+      .gte('date', `${startDate}T00:00:00`)
+      .lte('date', `${endDate}T23:59:59`);
+
+    // 3. Fetch existing VISITE events for this property in the date range
+    const { data: existingVisits } = await supabase
+      .from('Event')
+      .select('eventDate')
+      .eq('propertyId', propertyId)
+      .eq('type', 'VISITE')
+      .in('status', ['PROGRAMME', 'CONFIRME'])
+      .gte('eventDate', `${startDate}T00:00:00`)
+      .lte('eventDate', `${endDate}T23:59:59`);
+
+    // 4. Mark closed slots and occupied slots
+    const closedSet = new Set<string>();
+    if (exceptions) {
+      for (const ex of exceptions) {
+        const exDate = new Date(ex.date).toISOString().split('T')[0];
+        closedSet.add(`${exDate}_${ex.startTime}`);
+      }
+    }
+
+    const occupiedSet = new Set<string>();
+    if (existingVisits) {
+      for (const visit of existingVisits) {
+        const visitDate = new Date(visit.eventDate);
+        const vDate = visitDate.toISOString().split('T')[0];
+        const vTime = `${String(visitDate.getHours()).padStart(2, '0')}:${String(visitDate.getMinutes()).padStart(2, '0')}`;
+        occupiedSet.add(`${vDate}_${vTime}`);
+      }
+    }
+
+    // 5. Apply statuses to slots
+    const enrichedDays = defaultDays.map((day) => ({
+      ...day,
+      slots: day.slots.map((slot) => {
+        const key = `${day.date}_${slot.startTime}`;
+        if (closedSet.has(key) || occupiedSet.has(key)) {
+          return { ...slot, status: 'occupied' as const };
+        }
+        return slot;
+      }),
+    }));
+
+    setAgendaDays(enrichedDays);
+    setSelectedAgendaSlot(null);
+    setIsSheetAgendaOpen(true);
+  }, [deal]);
+
+  const handleCloseAgenda = useCallback(() => {
+    setIsSheetAgendaOpen(false);
+    setSelectedAgendaSlot(null);
+  }, []);
+
+  const handleAgendaSlotSelect = useCallback((date: string, startTime: string) => {
+    setSelectedAgendaSlot({ date, startTime });
+    // Also update the visual state in agendaDays
+    setAgendaDays((prev) =>
+      prev.map((day) => ({
+        ...day,
+        slots: day.slots.map((slot) => ({
+          ...slot,
+          status:
+            day.date === date && slot.startTime === startTime
+              ? 'selected' as const
+              : slot.status === 'selected'
+                ? 'available' as const
+                : slot.status,
+        })),
+      }))
+    );
+  }, []);
+
+  const handleProposeSlot = useCallback(async () => {
+    if (!selectedAgendaSlot || !selectedVisiteEvent) return;
+    const supabase = createClient();
+    // Update the Event with the selected date/time
+    const newDate = new Date(`${selectedAgendaSlot.date}T${selectedAgendaSlot.startTime}:00`);
+    await supabase
+      .from('Event')
+      .update({ eventDate: newDate.toISOString(), status: 'PROGRAMME' })
+      .eq('id', selectedVisiteEvent.id);
+    // Update local state
+    setSelectedVisiteEvent((prev) =>
+      prev ? { ...prev, eventDate: newDate.toISOString(), status: 'PROGRAMME' } : prev
+    );
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === selectedVisiteEvent.id ? { ...e, eventDate: newDate.toISOString(), status: 'PROGRAMME' } : e
+      )
+    );
+    setIsSheetAgendaOpen(false);
+  }, [selectedAgendaSlot, selectedVisiteEvent]);
 
   // ── Build full mandate sections (for "Voir le mandat") ──
   const buildFullMandateSections = useCallback((): EligibilitySection[] => {
@@ -2401,6 +2559,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           guideStatus={visitGuideSubmittedAt ? 'COMPLET' : null}
           onViewOdj={handleOpenOdj}
           onViewGuide={handleOpenGuide}
+          onOpenAgenda={handleOpenAgenda}
         />
 
         {/* Sheet Ordre du Jour */}
@@ -2440,6 +2599,27 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           criteria={visitGuideCriteria}
           commentaire={visitGuideCommentaire}
           submittedAt={visitGuideSubmittedAt}
+        />
+
+        {/* Sheet Agenda du bien */}
+        <SheetAgendaBien
+          isOpen={isSheetAgendaOpen}
+          onClose={handleCloseAgenda}
+          propertyLabel={
+            deal?.Property
+              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
+              : ''
+          }
+          dpeGrade={
+            deal?.Property?.dpeEnergyClass &&
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
+              ? (deal.Property.dpeEnergyClass as any)
+              : undefined
+          }
+          days={agendaDays}
+          onSlotSelect={handleAgendaSlotSelect}
+          onProposeSlot={handleProposeSlot}
+          selectedSlot={selectedAgendaSlot}
         />
         </>
       )}
