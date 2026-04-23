@@ -2756,6 +2756,11 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           clientName={clientFullName}
           criteria={visitGuideCriteria}
           commentaire={visitGuideCommentaire}
+          visitDateLabel={
+            selectedVisiteEvent?.eventDate
+              ? `${formatDateOnly(selectedVisiteEvent.eventDate)} à ${formatTimeOnly(selectedVisiteEvent.eventDate)}`
+              : null
+          }
         />
 
         {/* Sheet Agenda du bien */}

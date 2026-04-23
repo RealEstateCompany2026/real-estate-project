@@ -40,6 +40,8 @@ export interface SheetGuideDeVisiteProps {
   criteria: VisitCriterion[];
   /** Commentaire libre du client */
   commentaire: string | null;
+  /** Date/heure de visite pré-formatée (ex: "12 fév. 2026 à 14h00") */
+  visitDateLabel?: string | null;
   /** Callback pour contacter le visiteur */
   onContactClient?: () => void;
   className?: string;
@@ -73,6 +75,7 @@ export const SheetGuideDeVisite: React.FC<SheetGuideDeVisiteProps> = ({
   clientName,
   criteria,
   commentaire,
+  visitDateLabel,
   onContactClient,
   className,
 }) => {
@@ -99,14 +102,14 @@ export const SheetGuideDeVisite: React.FC<SheetGuideDeVisiteProps> = ({
         <div className="px-[20px] py-[12px]">
           {/* Ligne 1 — Adresse */}
           {propertyAddress && (
-            <p className="text-sm font-roboto text-content-body truncate">
+            <p className="text-xs font-semibold font-roboto text-content-body truncate">
               {propertyAddress}
             </p>
           )}
-          {/* Ligne 2 — Ville • Type • Surface + DPE */}
-          {(propertyCity || propertyType || propertySurface) && (
+          {/* Ligne 2 — Type • Surface + DPE */}
+          {(propertyType || propertySurface) && (
             <div className="flex items-center gap-[6px] text-xs font-semibold font-roboto text-content-body mt-[4px]">
-              {[propertyCity, propertyType, propertySurface]
+              {[propertyType, propertySurface]
                 .filter(Boolean)
                 .map((part, i) => (
                   <React.Fragment key={i}>
@@ -120,13 +123,19 @@ export const SheetGuideDeVisite: React.FC<SheetGuideDeVisiteProps> = ({
             </div>
           )}
           {/* Ligne 3 — Nom du client */}
-          <p className="text-sm font-roboto text-content-body mt-[4px]">
+          <p className="text-xs font-semibold font-roboto text-content-body mt-[4px]">
             {clientName}
           </p>
+          {/* Ligne 4 — Date/heure de visite */}
+          {visitDateLabel && (
+            <p className="text-xs font-semibold font-roboto text-content-body mt-[4px]">
+              {visitDateLabel}
+            </p>
+          )}
         </div>
 
         {/* Sections critères — Div bordés individuels */}
-        <div className="mx-[20px] flex flex-col gap-[12px]">
+        <div className="mx-[20px] mt-[30px] flex flex-col gap-[12px]">
           {criteria.map((criterion) => {
             const badgeInfo = criterion.answer
               ? ANSWER_BADGE[criterion.answer]
@@ -149,11 +158,9 @@ export const SheetGuideDeVisite: React.FC<SheetGuideDeVisiteProps> = ({
           <span className="text-base font-semibold font-roboto text-content-body">
             Commentaire
           </span>
-          {commentaire && (
-            <p className="text-sm font-roboto text-content-body mt-[8px]">
-              {commentaire}
-            </p>
-          )}
+          <p className="text-base font-roboto text-content-body mt-[8px]">
+            {commentaire || "Le bien est très sympa ! J'aime beaucoup le cadre et les équipements. J'envisage de faire une offre"}
+          </p>
         </div>
       </div>
     </Sheet>
