@@ -1946,10 +1946,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           if (!deal) return;
           const supabase = createClient();
           const statusField = currentType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
-          // Guard: don't regress from ENVOYE or SIGNE
-          const currentMandateStatus = (deal as any)[statusField] ?? 'NON_CREE';
-          const MANDATE_ORDER = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
-          if (MANDATE_ORDER.indexOf(currentMandateStatus) > MANDATE_ORDER.indexOf('REVISE')) return;
           const newStatus = checked ? 'REVISE' : 'EDITE';
           const { error: updateError } = await supabase
             .from('Deal')
