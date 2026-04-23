@@ -144,7 +144,7 @@ export const SheetAgendaBien: React.FC<SheetAgendaBienProps> = ({
 
       {/* Section Visite le — si créneau déjà attribué */}
       {currentVisitDateLabel && (
-        <div className="mx-[20px] mb-[12px] rounded-lg border border-edge-default p-[16px]">
+        <div className="mx-[20px] mt-[30px] rounded-lg border border-edge-default p-[16px]">
           <span className="text-base font-semibold font-roboto text-content-body">
             Visite le
           </span>
@@ -171,6 +171,13 @@ export const SheetAgendaBien: React.FC<SheetAgendaBienProps> = ({
           </div>
         </div>
       )}
+
+      {/* Titre créneaux */}
+      <div className="mx-[20px] mt-[30px] mb-[12px]">
+        <span className="text-base font-semibold font-roboto text-content-strong">
+          Créneaux disponibles
+        </span>
+      </div>
 
       {/* Liste des jours */}
       <div className="flex flex-col gap-[12px] mx-[20px]">
