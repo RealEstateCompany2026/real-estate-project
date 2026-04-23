@@ -45,6 +45,8 @@ import { Sheet } from '@real-estate/ui/sheet';
 import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
 import { SheetVisite } from '@real-estate/ui/sheet-visite';
+import { SheetOrdreDuJour } from '@real-estate/ui/sheet-ordre-du-jour';
+import { SheetGuideDeVisite, VisitCriterion } from '@real-estate/ui/sheet-guide-de-visite';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
 import { CardCA } from '@real-estate/ui/card-ca';
@@ -624,6 +626,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isSheetVisiteOpen, setIsSheetVisiteOpen] = useState(false);
   const [selectedVisiteEvent, setSelectedVisiteEvent] = useState<EventRow | null>(null);
   const [isRevision, setIsRevision] = useState(false);
+  // Sub-sheets visite
+  const [isSheetOdjOpen, setIsSheetOdjOpen] = useState(false);
+  const [isSheetGuideOpen, setIsSheetGuideOpen] = useState(false);
+  const [odjContent, setOdjContent] = useState('');
+  const [odjIsRevision, setOdjIsRevision] = useState(false);
+  const [visitGuideCriteria, setVisitGuideCriteria] = useState<VisitCriterion[]>([]);
+  const [visitGuideCommentaire, setVisitGuideCommentaire] = useState<string | null>(null);
+  const [visitGuideSubmittedAt, setVisitGuideSubmittedAt] = useState<string | null>(null);
   const [organization, setOrganization] = useState<{
     name: string | null; address: string | null; siret: string | null;
     rcpInsuranceRef: string | null; rcpExpiryDate: string | null;
@@ -950,6 +960,115 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const handleCloseVisite = useCallback(() => {
     setIsSheetVisiteOpen(false);
     setSelectedVisiteEvent(null);
+  }, []);
+
+  // ── ODJ handlers ──
+  const handleOpenOdj = useCallback(async () => {
+    if (!selectedVisiteEvent) return;
+    // Init local state from event data
+    setOdjContent(selectedVisiteEvent.odjContent ?? '');
+    setOdjIsRevision(selectedVisiteEvent.odjStatus === 'REVISE' || selectedVisiteEvent.odjStatus === 'ENVOYE');
+    setIsSheetOdjOpen(true);
+  }, [selectedVisiteEvent]);
+
+  const handleCloseOdj = useCallback(() => {
+    setIsSheetOdjOpen(false);
+  }, []);
+
+  const handleOdjContentChange = useCallback((content: string) => {
+    setOdjContent(content);
+  }, []);
+
+  const handleOdjToggleRevision = useCallback(async (checked: boolean) => {
+    if (!selectedVisiteEvent) return;
+    const supabase = createClient();
+    const newStatus = checked ? 'REVISE' : 'EDITE';
+    // Persist to Supabase
+    await supabase
+      .from('Event')
+      .update({ odjContent, odjStatus: newStatus })
+      .eq('id', selectedVisiteEvent.id);
+    setOdjIsRevision(checked);
+    // Update local event data
+    setSelectedVisiteEvent((prev) =>
+      prev ? { ...prev, odjContent, odjStatus: newStatus } : prev
+    );
+    // Update events list
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === selectedVisiteEvent.id ? { ...e, odjContent, odjStatus: newStatus } : e
+      )
+    );
+  }, [selectedVisiteEvent, odjContent]);
+
+  const handleSendOdj = useCallback(async () => {
+    if (!selectedVisiteEvent) return;
+    const supabase = createClient();
+    const now = new Date().toISOString();
+    await supabase
+      .from('Event')
+      .update({ odjContent, odjStatus: 'ENVOYE', odjSentAt: now })
+      .eq('id', selectedVisiteEvent.id);
+    // Update local state
+    setSelectedVisiteEvent((prev) =>
+      prev ? { ...prev, odjContent, odjStatus: 'ENVOYE', odjSentAt: now } : prev
+    );
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === selectedVisiteEvent.id ? { ...e, odjContent, odjStatus: 'ENVOYE', odjSentAt: now } : e
+      )
+    );
+    setIsSheetOdjOpen(false);
+  }, [selectedVisiteEvent, odjContent]);
+
+  // ── Guide de visite handlers ──
+  const handleOpenGuide = useCallback(async () => {
+    if (!selectedVisiteEvent) return;
+    const supabase = createClient();
+    // Fetch VisitGuideResponse from Supabase
+    const { data } = await supabase
+      .from('VisitGuideResponse')
+      .select('responses, commentaire, submittedAt')
+      .eq('eventId', selectedVisiteEvent.id)
+      .maybeSingle();
+
+    if (data) {
+      // Parse JSON responses into VisitCriterion[]
+      const responses = (data.responses ?? {}) as Record<string, string>;
+      const criteriaLabels: Record<string, string> = {
+        criterion_1: 'Localisation',
+        criterion_2: 'Qualité du bien',
+        criterion_3: 'Équipements',
+        criterion_4: 'Critère',
+        criterion_5: 'Souhaite faire une offre',
+      };
+      const criteria: VisitCriterion[] = Object.entries(criteriaLabels).map(([id, label]) => ({
+        id,
+        label,
+        answer: (responses[id] === 'OUI' || responses[id] === 'NON' || responses[id] === 'PEUT_ETRE')
+          ? responses[id] as 'OUI' | 'NON' | 'PEUT_ETRE'
+          : null,
+      }));
+      setVisitGuideCriteria(criteria);
+      setVisitGuideCommentaire(data.commentaire ?? null);
+      setVisitGuideSubmittedAt(data.submittedAt ?? null);
+    } else {
+      // No response yet — show empty criteria
+      setVisitGuideCriteria([
+        { id: 'criterion_1', label: 'Localisation', answer: null },
+        { id: 'criterion_2', label: 'Qualité du bien', answer: null },
+        { id: 'criterion_3', label: 'Équipements', answer: null },
+        { id: 'criterion_4', label: 'Critère', answer: null },
+        { id: 'criterion_5', label: 'Souhaite faire une offre', answer: null },
+      ]);
+      setVisitGuideCommentaire(null);
+      setVisitGuideSubmittedAt(null);
+    }
+    setIsSheetGuideOpen(true);
+  }, [selectedVisiteEvent]);
+
+  const handleCloseGuide = useCallback(() => {
+    setIsSheetGuideOpen(false);
   }, []);
 
   // ── Build full mandate sections (for "Voir le mandat") ──
@@ -2245,6 +2364,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
       {/* Sheet Visite */}
       {selectedVisiteEvent && (
+        <>
         <SheetVisite
           isOpen={isSheetVisiteOpen}
           onClose={handleCloseVisite}
@@ -2278,8 +2398,50 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               ? selectedVisiteEvent.odjStatus
               : null
           }
-          guideStatus={null}
+          guideStatus={visitGuideSubmittedAt ? 'COMPLET' : null}
+          onViewOdj={handleOpenOdj}
+          onViewGuide={handleOpenGuide}
         />
+
+        {/* Sheet Ordre du Jour */}
+        <SheetOrdreDuJour
+          isOpen={isSheetOdjOpen}
+          onClose={handleCloseOdj}
+          propertyLabel={
+            deal?.Property
+              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
+              : ''
+          }
+          clientName={clientFullName}
+          content={odjContent}
+          onContentChange={handleOdjContentChange}
+          odjStatus={
+            selectedVisiteEvent.odjStatus === 'EDITE' ||
+            selectedVisiteEvent.odjStatus === 'REVISE' ||
+            selectedVisiteEvent.odjStatus === 'ENVOYE'
+              ? selectedVisiteEvent.odjStatus
+              : 'EDITE'
+          }
+          isRevision={odjIsRevision}
+          onToggleRevision={handleOdjToggleRevision}
+          onSend={handleSendOdj}
+        />
+
+        {/* Sheet Guide de Visite (Compte-rendu) */}
+        <SheetGuideDeVisite
+          isOpen={isSheetGuideOpen}
+          onClose={handleCloseGuide}
+          propertyLabel={
+            deal?.Property
+              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
+              : ''
+          }
+          clientName={clientFullName}
+          criteria={visitGuideCriteria}
+          commentaire={visitGuideCommentaire}
+          submittedAt={visitGuideSubmittedAt}
+        />
+        </>
       )}
     </div>
   );
