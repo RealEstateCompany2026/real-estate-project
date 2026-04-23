@@ -13,7 +13,7 @@ import { DealType } from "./deal-types";
 
 // ── Types ──────────────────────────────────────────────
 
-export type FieldType = "text" | "number" | "date" | "select";
+export type FieldType = "text" | "number" | "date" | "select" | "divider";
 
 export interface EligibilityField {
   entity: "organization" | "client" | "property" | "deal";
@@ -138,6 +138,7 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
             // Check if this section has changes
             const initial = buildInitialValues(sections);
             const sectionHasChanges = section.fields.some((f) => {
+              if (f.type === 'divider') return false;
               const current = localValues[f.entity]?.[f.field] ?? "";
               const orig = initial[f.entity]?.[f.field] ?? "";
               return current !== orig;
@@ -148,6 +149,7 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
               const initial2 = buildInitialValues(sections);
               const changed: Record<string, Record<string, string | number | null>> = {};
               for (const f of section.fields) {
+                if (f.type === 'divider') continue;
                 const current = localValues[f.entity]?.[f.field] ?? "";
                 const orig = initial2[f.entity]?.[f.field] ?? "";
                 if (current !== orig) {
@@ -173,6 +175,16 @@ export const SheetMandatEdit: React.FC<SheetMandatEditProps> = ({
               >
                 <div className="flex flex-col gap-[12px]">
                   {section.fields.map((f) => {
+                    if (f.type === "divider") {
+                      return (
+                        <div key={`${f.entity}.${f.field}`} className="flex items-center gap-3 py-1">
+                          <div className="flex-1 h-px bg-[var(--border-divider)]" />
+                          <span className="text-xs font-medium text-content-subtle uppercase tracking-wider">ou</span>
+                          <div className="flex-1 h-px bg-[var(--border-divider)]" />
+                        </div>
+                      );
+                    }
+
                     const currentValue =
                       localValues[f.entity]?.[f.field] ?? "";
 
@@ -250,6 +262,7 @@ function buildInitialValues(
   const values: Record<string, Record<string, string>> = {};
   for (const section of sections) {
     for (const f of section.fields) {
+      if (f.type === 'divider') continue;
       if (!values[f.entity]) values[f.entity] = {};
       values[f.entity][f.field] = f.value ?? "";
     }

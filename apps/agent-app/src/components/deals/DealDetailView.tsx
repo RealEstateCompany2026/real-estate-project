@@ -666,6 +666,16 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
       setDeal(normalizedDeal);
 
+      // Determine deal type for downstream logic
+      const fetchedType = (normalizedDeal.type as DealType) ?? 'VENTE';
+
+      // Initialize revision state from mandate status
+      const statusKey = fetchedType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+      const currentStatus = (normalizedDeal as any)[statusKey] ?? 'NON_CREE';
+      if (currentStatus === 'REVISE') {
+        setIsRevision(true);
+      }
+
       // 2-4. Events, Documents, Messages in parallel
       const [eventsRes, documentsRes, messagesRes] = await Promise.all([
         supabase
@@ -690,7 +700,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       setMessages((messagesRes.data ?? []) as MessageRow[]);
 
       // Map events to ActivityLog with category based on deal type
-      const fetchedType = (normalizedDeal.type as DealType) ?? 'VENTE';
       const mappedActivities: ActivityLog[] = (eventsRes.data ?? []).map((ev: any) => ({
         id: ev.id,
         date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
@@ -725,6 +734,29 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
     load();
   }, [dealId]);
+
+  // Auto-activate deal when mandate is signed (auto-managed mode)
+  useEffect(() => {
+    if (!deal) return;
+    const isAutoManaged = !deal.mandateWaived;
+    if (!isAutoManaged) return;
+
+    const dealType = (deal.type as string) ?? 'VENTE';
+    const statusKey = dealType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+    const mandateStatus = (deal as any)[statusKey] ?? 'NON_CREE';
+
+    if (mandateStatus === 'SIGNE' && deal.pipelineStage === 'MANDAT') {
+      const nextStage = (dealType === 'ACQUISITION' || dealType === 'LOCATION') ? 'RECHERCHE' : 'COMMERCIALISATION';
+      const supabase = createClient();
+      supabase.from('Deal').update({ pipelineStage: nextStage }).eq('id', deal.id).then(({ error: updateError }) => {
+        if (!updateError) {
+          setDeal((prev) => prev ? { ...prev, pipelineStage: nextStage } : prev);
+        }
+      }).catch((err) => {
+        console.error('[auto-activation] failed:', err);
+      });
+    }
+  }, [deal?.id, deal?.mandateWaived, deal?.pipelineStage, deal?.saleMandateStatus, deal?.mgmtMandateStatus, deal?.type]);
 
   // ── Sync recherche form with deal data ──
   useEffect(() => {
@@ -969,12 +1001,16 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     // Section Honoraires
     const honorairesFields: EligibilityField[] = [
       { entity: 'deal', field: 'mandateCommissionRate', label: 'Taux de commission (%)', value: deal.mandateCommissionRate != null ? String(deal.mandateCommissionRate) : null, type: 'number' },
-      { entity: 'deal', field: 'mandateCommissionPayer', label: 'À la charge de', value: deal.mandateCommissionPayer, type: 'select', options: [{ value: 'VENDEUR', label: 'Vendeur' }, { value: 'ACQUEREUR', label: 'Acquéreur' }, { value: 'PARTAGE', label: 'Partagé' }] },
+      { entity: 'deal', field: 'divider_honoraires', label: '', value: null, type: 'divider' },
       { entity: 'deal', field: 'mandateFixedFee', label: 'Honoraires fixes (€)', value: deal.mandateFixedFee != null ? String(deal.mandateFixedFee) : null, type: 'number' },
+      { entity: 'deal', field: 'mandateCommissionPayer', label: 'À la charge de', value: deal.mandateCommissionPayer, type: 'select', options: [{ value: 'VENDEUR', label: 'Vendeur' }, { value: 'ACQUEREUR', label: 'Acquéreur' }, { value: 'PARTAGE', label: 'Partagé' }] },
     ];
+    // Validation: (rate OR fixedFee) AND payer
+    const hasHonoraires = !!((deal.mandateCommissionRate != null && deal.mandateCommissionRate > 0) || (deal.mandateFixedFee != null && deal.mandateFixedFee > 0));
+    const hasPayer = !!deal.mandateCommissionPayer;
     sections.push({
       title: 'Honoraires',
-      status: honorairesFields.every(f => !!f.value) ? 'valid' : 'invalid',
+      status: (hasHonoraires && hasPayer) ? 'valid' : 'invalid',
       fields: honorairesFields,
     });
 
@@ -1877,8 +1913,13 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           if (!deal) return;
           const supabase = createClient();
           const statusField = currentType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
-          await supabase.from('Deal').update({ [statusField]: 'EDITE' }).eq('id', deal.id);
-          window.location.reload();
+          const { error: updateError } = await supabase
+            .from('Deal')
+            .update({ [statusField]: 'EDITE' })
+            .eq('id', deal.id);
+          if (!updateError) {
+            setDeal((prev) => prev ? { ...prev, [statusField]: 'EDITE' } : prev);
+          }
         }}
       />
 
@@ -1901,14 +1942,37 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         sections={buildFullMandateSections()}
         onSave={handleMandatEditSave}
         isRevision={isRevision}
-        onToggleRevision={setIsRevision}
+        onToggleRevision={async (checked) => {
+          if (!deal) return;
+          const supabase = createClient();
+          const statusField = currentType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
+          // Guard: don't regress from ENVOYE or SIGNE
+          const currentMandateStatus = (deal as any)[statusField] ?? 'NON_CREE';
+          const MANDATE_ORDER = ['NON_CREE', 'EDITE', 'REVISE', 'ENVOYE', 'SIGNE'];
+          if (MANDATE_ORDER.indexOf(currentMandateStatus) > MANDATE_ORDER.indexOf('REVISE')) return;
+          const newStatus = checked ? 'REVISE' : 'EDITE';
+          const { error: updateError } = await supabase
+            .from('Deal')
+            .update({ [statusField]: newStatus })
+            .eq('id', deal.id);
+          if (!updateError) {
+            setIsRevision(checked);
+            setDeal((prev) => prev ? { ...prev, [statusField]: newStatus } : prev);
+          }
+        }}
         footerMode="review"
         onSendMandate={async () => {
           if (!deal) return;
           const supabase = createClient();
           const statusField = currentType === 'GESTION' ? 'mgmtMandateStatus' : 'saleMandateStatus';
-          await supabase.from('Deal').update({ [statusField]: 'ENVOYE' }).eq('id', deal.id);
-          window.location.reload();
+          const { error: updateError } = await supabase
+            .from('Deal')
+            .update({ [statusField]: 'ENVOYE' })
+            .eq('id', deal.id);
+          if (!updateError) {
+            setDeal((prev) => prev ? { ...prev, [statusField]: 'ENVOYE' } : prev);
+            setIsSheetMandatViewOpen(false);
+          }
         }}
       />
 

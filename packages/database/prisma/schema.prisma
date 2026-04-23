@@ -1396,6 +1396,7 @@ model Deal {
   mandateCommissionRate   Float?
   mandateCommissionPayer  MandateCommissionPayer?
   mandateFixedFee         Float?
+  mandateWaived           Boolean   @default(false)
 
   // Pipeline commercial
   infoRequestsCount   Int?
