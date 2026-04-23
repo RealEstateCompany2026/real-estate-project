@@ -2743,15 +2743,19 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         <SheetGuideDeVisite
           isOpen={isSheetGuideOpen}
           onClose={handleCloseGuide}
-          propertyLabel={
-            deal?.Property
-              ? `${deal.Property.address ?? ''}, ${deal.Property.addressCity ?? ''} — ${propertyTypeLabel(deal.Property.type ?? null) || ''} — ${deal.Property.livingAreaSqm ? `${deal.Property.livingAreaSqm}m²` : ''}`
-              : ''
+          propertyAddress={deal?.Property?.address ?? null}
+          propertyCity={deal?.Property?.addressCity ?? null}
+          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
+          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
+          propertyDpeGrade={
+            deal?.Property?.dpeEnergyClass &&
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
+              ? (deal.Property.dpeEnergyClass as DpeType)
+              : null
           }
           clientName={clientFullName}
           criteria={visitGuideCriteria}
           commentaire={visitGuideCommentaire}
-          submittedAt={visitGuideSubmittedAt}
         />
 
         {/* Sheet Agenda du bien */}
