@@ -1172,6 +1172,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 revision: mapMandateWorkflow(mandateStatusKey, 'revision'),
                 signature: mapMandateWorkflow(mandateStatusKey, 'signature'),
               }}
+              showWorkflow={!deal.mandateWaived}
               aiSuggestions={0}
               onView={() => setIsSheetMandatOpen(true)}
             />

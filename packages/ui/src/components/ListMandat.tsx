@@ -45,6 +45,8 @@ export interface ListMandatProps {
   clientName?: string;
   /** Statuts des 3 étapes du workflow */
   workflow: MandatWorkflow;
+  /** Afficher les badges workflow (défaut: true, false pour gestion manuelle) */
+  showWorkflow?: boolean;
   /** Nombre de suggestions IA */
   aiSuggestions?: number;
   /** Callback au clic sur "Voir" */
@@ -72,6 +74,7 @@ export function ListMandat({
   dpeGrade,
   clientName,
   workflow,
+  showWorkflow = true,
   aiSuggestions = 0,
   onView,
   onClick,
@@ -119,11 +122,13 @@ export function ListMandat({
 
       {/* Droite : workflow badges + bouton + AI suggestions */}
       <div className="flex gap-[24px] items-center shrink-0">
-        <div className="flex gap-[24px] items-center">
-          <Badge variant={workflow.edition}>ÉDITION</Badge>
-          <Badge variant={workflow.revision}>RÉVISION</Badge>
-          <Badge variant={workflow.signature}>SIGNATURE</Badge>
-        </div>
+        {showWorkflow && (
+          <div className="flex gap-[24px] items-center">
+            <Badge variant={workflow.edition}>ÉDITION</Badge>
+            <Badge variant={workflow.revision}>RÉVISION</Badge>
+            <Badge variant={workflow.signature}>SIGNATURE</Badge>
+          </div>
+        )}
 
         <Button variant="ghost" size="default" onClick={onView}>
           Voir
