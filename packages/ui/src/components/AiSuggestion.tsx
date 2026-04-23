@@ -26,9 +26,10 @@
 export interface AiSuggestionProps {
   count: number;
   className?: string;
+  onClick?: () => void;
 }
 
-export function AiSuggestion({ count, className = "" }: AiSuggestionProps) {
+export function AiSuggestion({ count, className = "", onClick }: AiSuggestionProps) {
   const hasCount = count > 0;
 
   return (
@@ -38,7 +39,9 @@ export function AiSuggestion({ count, className = "" }: AiSuggestionProps) {
         ${hasCount
           ? "bg-[var(--surface-branded-default)] border-[var(--surface-branded-action-hover)]"
           : "bg-transparent border-[var(--border-disabled)]"}
+        ${onClick ? "cursor-pointer" : ""}
         ${className}`}
+      {...(onClick ? { onClick, role: "button", tabIndex: 0 } : {})}
     >
       <span
         className="text-[14px] font-bold leading-[16px] tracking-[0.14px] whitespace-nowrap px-[6px] py-[4px]"

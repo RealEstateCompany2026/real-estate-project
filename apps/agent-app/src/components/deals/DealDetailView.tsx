@@ -804,13 +804,16 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     if (mandateStatus === 'SIGNE' && deal.pipelineStage === 'MANDAT') {
       const nextStage = (dealType === 'ACQUISITION' || dealType === 'LOCATION') ? 'RECHERCHE' : 'COMMERCIALISATION';
       const supabase = createClient();
-      supabase.from('Deal').update({ pipelineStage: nextStage }).eq('id', deal.id).then(({ error: updateError }) => {
-        if (!updateError) {
-          setDeal((prev) => prev ? { ...prev, pipelineStage: nextStage } : prev);
+      void (async () => {
+        try {
+          const { error: updateError } = await supabase.from('Deal').update({ pipelineStage: nextStage }).eq('id', deal.id);
+          if (!updateError) {
+            setDeal((prev) => prev ? { ...prev, pipelineStage: nextStage } : prev);
+          }
+        } catch (err: unknown) {
+          console.error('[auto-activation] failed:', err);
         }
-      }).catch((err) => {
-        console.error('[auto-activation] failed:', err);
-      });
+      })();
     }
   }, [deal?.id, deal?.mandateWaived, deal?.pipelineStage, deal?.saleMandateStatus, deal?.mgmtMandateStatus, deal?.type]);
 
