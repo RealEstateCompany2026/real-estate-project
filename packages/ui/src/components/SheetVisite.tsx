@@ -156,11 +156,6 @@ export const SheetVisite: React.FC<SheetVisiteProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Visite"
-      headerAfterTitle={
-        <Badge variant={visitStatusToBadgeVariant[visitStatus]}>
-          {visitStatus}
-        </Badge>
-      }
       className={className}
     >
       <div className="py-[16px]">
