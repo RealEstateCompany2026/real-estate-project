@@ -1612,21 +1612,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
               </div>
             </div>
           )}
-          {currentType === 'GESTION' && isMandateEndingSoon(deal.saleMandateEndDate) && (
-            <AiSuggestionBanner
-              suggestion="Le mandat de gestion arrive à échéance dans moins de 3 mois. Prévoir le renouvellement."
-              variant="compact"
-            />
-          )}
-
-          {/* VENTE + ACQ/LOC (sans waived) : suggestion relance si non signe */}
-          {currentType !== 'GESTION' && mandateStatusKey !== 'SIGNE' &&
-            !((currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived) && (
-            <AiSuggestionBanner
-              suggestion="Relancer le client pour la signature du mandat"
-              variant="compact"
-            />
-          )}
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
