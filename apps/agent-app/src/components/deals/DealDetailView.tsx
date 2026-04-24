@@ -1550,11 +1550,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Mandat (commune, adaptee par variant) ──              */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         <section id="mandat" className="px-5 py-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-[12px]">
             <h5 className="text-xl font-bold text-content-headings">Mandat</h5>
-            {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived && (
-              <Chip variant="filled" label="Mandat non nécessaire" />
-            )}
+            <div className="flex items-center gap-2">
+              {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && deal.mandateWaived && (
+                <Chip variant="filled" label="Mandat non nécessaire" />
+              )}
+              <Badge variant="default">{deal.mandateWaived ? 0 : 1}</Badge>
+            </div>
           </div>
 
           {/* Ne pas afficher le workflow si mandat waived (ACQ/LOC) */}
@@ -1868,7 +1871,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           <>
             {/* ─────────── Section Promesses ─────────── */}
             <section id="promesse" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
-              <h5 className="text-xl font-bold text-content-headings">Promesses</h5>
+              <div className="flex items-center justify-between mb-[12px]">
+                <h5 className="text-xl font-bold text-content-headings">Promesses</h5>
+                <Badge variant="default">1</Badge>
+              </div>
               {currentType === 'VENTE' ? (
                 deal.purchaseOfferStatus ? (
                   <ListPromesse
@@ -1913,7 +1919,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
             {/* ─────────── Section Financement ─────────── */}
             <section id="finance" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
-              <h5 className="text-xl font-bold text-content-headings">Financement</h5>
+              <div className="flex items-center justify-between mb-[12px]">
+                <h5 className="text-xl font-bold text-content-headings">Financement</h5>
+                <Badge variant="default">1</Badge>
+              </div>
               {currentType === 'VENTE' ? (
                 <ListFinancement
                   useCase="vente"
@@ -1948,7 +1957,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
 
             {/* ─────────── Section Notaire ─────────── */}
             <section id="notaire" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
-              <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
+              <div className="flex items-center justify-between mb-[12px]">
+                <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
+                <Badge variant="default">1</Badge>
+              </div>
               <ListActeNotarie
                 sellerName={currentType === 'VENTE' ? clientFullName : 'Vendeur'}
                 buyerName={currentType === 'VENTE' ? 'Acquéreur' : clientFullName}
@@ -1973,7 +1985,10 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           <>
             {/* ─────────── Section Dossiers candidature ─────────── */}
             <section id="dossiers" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
-              <h5 className="text-xl font-bold text-content-headings">Dossiers candidature</h5>
+              <div className="flex items-center justify-between mb-[12px]">
+                <h5 className="text-xl font-bold text-content-headings">Dossiers candidature</h5>
+                <Badge variant="default">1</Badge>
+              </div>
               {/* Placeholder — pas de table dédiée pour les dossiers actuellement */}
               <ListCandidatureLocataire
                 tenantName={clientFullName}
