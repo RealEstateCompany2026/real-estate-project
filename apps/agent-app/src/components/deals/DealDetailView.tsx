@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles,
@@ -136,6 +136,23 @@ interface DealRow {
   occupancyStatus: string | null;
   rentPaymentStatus: string | null;
   maintenanceStatus: string | null;
+}
+
+interface PropertyMatchRow {
+  id: string;
+  propertyId: string;
+  status: string;
+  matchScore: number | null;
+  Property: {
+    id: string;
+    type: string | null;
+    address: string;
+    addressCity: string | null;
+    livingAreaSqm: number | null;
+    desiredSellingPrice: number | null;
+    dpeEnergyClass: string | null;
+    status: string | null;
+  } | null;
 }
 
 interface EventRow {
@@ -658,6 +675,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [allActivities, setAllActivities] = useState<ActivityLog[]>([]);
   const [isActivitySheetOpen, setIsActivitySheetOpen] = useState(false);
   const [bienFilter, setBienFilter] = useState<'tous' | 'shortlist'>('tous');
+  const [propertyMatches, setPropertyMatches] = useState<PropertyMatchRow[]>([]);
   const [isSheetMandatOpen, setIsSheetMandatOpen] = useState(false);
   const [isAnnonceSheetOpen, setIsAnnonceSheetOpen] = useState(false);
   const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
@@ -705,6 +723,13 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     budgetMax: '',
   });
 
+  const filteredMatches = useMemo(() => {
+    if (bienFilter === 'shortlist') {
+      return propertyMatches.filter((pm) => pm.status === 'SHORTLIST');
+    }
+    return propertyMatches.filter((pm) => pm.status !== 'REJECTED');
+  }, [propertyMatches, bienFilter]);
+
   // ── Fetch ──
   useEffect(() => {
     async function load() {
@@ -748,8 +773,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         setIsRevision(true);
       }
 
-      // 2-4. Events, Documents, Messages in parallel
-      const [eventsRes, documentsRes, messagesRes] = await Promise.all([
+      // 2-5. Events, Documents, Messages, PropertyMatches in parallel
+      const [eventsRes, documentsRes, messagesRes, propertyMatchesRes] = await Promise.all([
         supabase
           .from('Event')
           .select('id, type, status, title, description, eventDate, reportContent, odjContent, odjStatus, odjSentAt, clientId, agentId, User:agentId(name)')
@@ -765,11 +790,24 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           .select('id, senderType, body, messageDate, status, attachmentsUrls')
           .eq('dealId', dealId)
           .order('messageDate', { ascending: false }),
+        supabase
+          .from('PropertyMatch')
+          .select('id, propertyId, status, matchScore, Property:propertyId (id, type, address, addressCity, livingAreaSqm, desiredSellingPrice, dpeEnergyClass, status)')
+          .eq('dealId', dealId)
+          .order('matchScore', { ascending: false }),
       ]);
 
       setEvents((eventsRes.data ?? []) as EventRow[]);
       setDocuments((documentsRes.data ?? []) as DocumentRow[]);
       setMessages((messagesRes.data ?? []) as MessageRow[]);
+
+      if (propertyMatchesRes.data) {
+        const normalized = (propertyMatchesRes.data as any[]).map((pm: any) => ({
+          ...pm,
+          Property: Array.isArray(pm.Property) ? pm.Property[0] ?? null : pm.Property,
+        }));
+        setPropertyMatches(normalized);
+      }
 
       // Map events to ActivityLog with category based on deal type
       const mappedActivities: ActivityLog[] = (eventsRes.data ?? []).map((ev: any) => ({
@@ -1815,16 +1853,34 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             <section id="biens" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Biens</h5>
-                <Badge variant="default">0</Badge>
+                <Badge variant="default">{filteredMatches.length}</Badge>
               </div>
               <div className="flex gap-2">
                 <Chip variant={bienFilter === 'tous' ? 'filled' : 'outlined'} label="Tous" onClick={() => setBienFilter('tous')} />
                 <Chip variant={bienFilter === 'shortlist' ? 'filled' : 'outlined'} label="Shortlist" onClick={() => setBienFilter('shortlist')} />
               </div>
-              {/* Placeholder — le matching sera implemente plus tard */}
-              <p className="text-sm text-content-subtle italic">
-                La recherche de biens correspondants sera disponible prochainement
-              </p>
+              {filteredMatches.map((pm) => {
+                const p = pm.Property;
+                if (!p) return null;
+                return (
+                  <ListBien
+                    key={pm.id}
+                    operationType={p.status === 'A_LOUER' ? 'LOCATION' : 'VENTE'}
+                    price={p.desiredSellingPrice ? `${p.desiredSellingPrice.toLocaleString('fr-FR')}€` : '—'}
+                    city={p.addressCity ?? '—'}
+                    propertyType={PROPERTY_TYPE_LABELS[p.type as keyof typeof PROPERTY_TYPE_LABELS] ?? p.type ?? '—'}
+                    surface={p.livingAreaSqm ? `${p.livingAreaSqm}m²` : '—'}
+                    dpeGrade={
+                      p.dpeEnergyClass && ['A','B','C','D','E','F','G'].includes(p.dpeEnergyClass)
+                        ? (p.dpeEnergyClass as DpeType) : undefined
+                    }
+                    kpis={{ qualification: pm.matchScore ?? 0, entretien: 0, conversion: 0 }}
+                  />
+                );
+              })}
+              {filteredMatches.length === 0 && (
+                <p className="text-sm text-content-subtle italic">Aucun bien correspondant</p>
+              )}
             </section>
           </>
         )}

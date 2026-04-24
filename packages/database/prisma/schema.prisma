@@ -629,6 +629,12 @@ enum PropertyCondition {
   ANCIEN
 }
 
+enum PropertyMatchStatus {
+  MATCH
+  SHORTLIST
+  REJECTED
+}
+
 enum PropertyStatus {
   OFF_MARKET
   A_VENDRE
@@ -1212,6 +1218,7 @@ model Property {
   propertyMedia                   PropertyMedia[]
   listings                        Listing[]                      @relation("ListingProperty")
   availabilityExceptions          PropertyAvailabilityException[]
+  propertyMatches                 PropertyMatch[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -1363,6 +1370,21 @@ model VisitGuideResponse {
   updatedAt   DateTime  @default(now())
 }
 
+model PropertyMatch {
+  id         String              @id @default(uuid())
+  dealId     String
+  deal       Deal                @relation(fields: [dealId], references: [id])
+  propertyId String
+  property   Property            @relation(fields: [propertyId], references: [id])
+  status     PropertyMatchStatus @default(MATCH)
+  matchScore Int?
+  notes      String?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @default(now())
+
+  @@unique([dealId, propertyId])
+}
+
 model PropertyMedia {
   id             String   @id @default(uuid())
   propertyId     String
@@ -1478,6 +1500,7 @@ model Deal {
   mandateSignals      MandateSignal[]
   dealMilestoneEvents DealMilestoneEvent[]
   playbookEnrollments PlaybookEnrollment[]
+  propertyMatches     PropertyMatch[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

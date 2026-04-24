@@ -1,4 +1,4 @@
-import { PrismaClient, ClientStatus, ClientGender, MaritalStatus, DealType, DealStatus, PropertyType, PropertyStatus, EventType, EventStatus, OdjStatus, DocumentType, DocumentStatus, FileFormat, MessageSenderType, MessageChannel, MessageStatus } from '@prisma/client'
+import { PrismaClient, ClientStatus, ClientGender, MaritalStatus, DealType, DealStatus, PropertyType, PropertyStatus, PropertyMatchStatus, EventType, EventStatus, OdjStatus, DocumentType, DocumentStatus, FileFormat, MessageSenderType, MessageChannel, MessageStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -873,6 +873,21 @@ async function main() {
             status: MessageStatus.DELIVRE,
             messageDate: new Date('2026-04-14T09:15:00'),
         }
+    });
+
+    // --- PropertyMatch (biens matchés pour ACQUISITION et LOCATION) ---
+    console.log('Creating PropertyMatch entries...')
+
+    await prisma.propertyMatch.createMany({
+        data: [
+            // dealAcquisition — 3 biens matchés
+            { dealId: dealAcquisition.id, propertyId: propStudio.id, status: PropertyMatchStatus.SHORTLIST, matchScore: 92 },
+            { dealId: dealAcquisition.id, propertyId: propT2.id, status: PropertyMatchStatus.MATCH, matchScore: 78 },
+            { dealId: dealAcquisition.id, propertyId: propT4.id, status: PropertyMatchStatus.MATCH, matchScore: 65 },
+            // dealLocation — 2 biens matchés
+            { dealId: dealLocation.id, propertyId: propT3.id, status: PropertyMatchStatus.SHORTLIST, matchScore: 88 },
+            { dealId: dealLocation.id, propertyId: propT1.id, status: PropertyMatchStatus.MATCH, matchScore: 71 },
+        ]
     });
 
     console.log('Seed completed successfully.')
