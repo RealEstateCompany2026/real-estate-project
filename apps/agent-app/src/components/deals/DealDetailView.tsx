@@ -1580,7 +1580,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Mandat (commune, adaptee par variant) ──              */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="mandat" className="px-5 py-6 flex flex-col gap-4">
+        <section id="mandat" className="scroll-mt-[200px] py-[50px] px-5 flex flex-col gap-6">
           <div className="flex items-center justify-between mb-[12px]">
             <div className="flex items-center gap-[4px]">
               <h5 className="text-xl font-bold text-content-headings">Mandat</h5>
@@ -1651,7 +1651,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Activites (commune) ──                                */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="activite" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5">
+        <section id="activite" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
           {/* Header : titre + badge + chips filtre + bouton Voir tout */}
           <div className="flex items-center justify-between mb-[50px]">
             <div className="flex items-center gap-[12px]">
@@ -1713,7 +1713,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Annonce (VENTE + GESTION) ──                          */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {(currentType === 'VENTE' || currentType === 'GESTION') && (
-          <section id="annonce" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+          <section id="annonce" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
             <h5 className="text-xl font-bold text-content-headings">Annonce</h5>
             {listing ? (
               <>
@@ -1755,7 +1755,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Leads (VENTE only) ──                                 */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {currentType === 'VENTE' && (
-          <section id="leads" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+          <section id="leads" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
             <div className="flex items-center gap-[4px]">
               <h5 className="text-xl font-bold text-content-headings">Leads</h5>
               <Badge variant="default">{deal.infoRequestsCount ?? 0}</Badge>
@@ -1774,7 +1774,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {(currentType === 'ACQUISITION' || currentType === 'LOCATION') && (
           <>
             {/* ─────────── Section Recherche ─────────── */}
-            <section id="recherche" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5">
+            <section id="recherche" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center justify-between mb-[50px]">
                 <div className="flex items-center gap-[4px]">
                   <h3 className="font-bold text-[20px] leading-[24px] tracking-[0.2px] text-content-headings">
@@ -1843,7 +1843,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Biens matches ─────────── */}
-            <section id="biens" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="biens" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center gap-[4px]">
                 <h5 className="text-xl font-bold text-content-headings">Biens</h5>
                 <Badge variant="default">{filteredMatches.length}</Badge>
@@ -1882,7 +1882,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Visites (VENTE + ACQUISITION + LOCATION) ──           */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {currentType !== 'GESTION' && (
-          <section id="visites" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+          <section id="visites" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
             <div className="flex items-center gap-[4px]">
               <h5 className="text-xl font-bold text-content-headings">Visites</h5>
               <Badge variant="default">{visitEvents.length}</Badge>
@@ -1919,7 +1919,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {(currentType === 'VENTE' || currentType === 'ACQUISITION') && (
           <>
             {/* ─────────── Section Promesses ─────────── */}
-            <section id="promesse" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="promesse" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center gap-[4px] mb-[12px]">
                 <h5 className="text-xl font-bold text-content-headings">Promesses</h5>
                 <Badge variant="default">1</Badge>
@@ -1967,7 +1967,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Financement ─────────── */}
-            <section id="finance" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="finance" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center gap-[4px] mb-[12px]">
                 <h5 className="text-xl font-bold text-content-headings">Financement</h5>
                 <Badge variant="default">1</Badge>
@@ -2005,7 +2005,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Notaire ─────────── */}
-            <section id="notaire" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="notaire" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center gap-[4px] mb-[12px]">
                 <h5 className="text-xl font-bold text-content-headings">Notaire</h5>
                 <Badge variant="default">1</Badge>
@@ -2033,7 +2033,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {currentType === 'LOCATION' && (
           <>
             {/* ─────────── Section Dossiers candidature ─────────── */}
-            <section id="dossiers" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="dossiers" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center gap-[4px] mb-[12px]">
                 <h5 className="text-xl font-bold text-content-headings">Dossiers candidature</h5>
                 <Badge variant="default">1</Badge>
@@ -2053,7 +2053,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Bail ─────────── */}
-            <section id="bail" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="bail" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <h5 className="text-xl font-bold text-content-headings">Bail</h5>
               {deal.bailType ? (
                 <ListBail
@@ -2098,7 +2098,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {currentType === 'GESTION' && (
           <>
             {/* ─────────── Section Occupation ─────────── */}
-            <section id="occupation" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="occupation" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Occupation</h5>
                 <Badge variant={deal.occupancyStatus === 'OCCUPE' ? 'success' : 'disabled'}>
@@ -2111,7 +2111,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Loyers ─────────── */}
-            <section id="loyers" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="loyers" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Loyers</h5>
                 <Badge variant={deal.rentPaymentStatus === 'EN_REGLE' ? 'success' : 'warning'}>
@@ -2137,7 +2137,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             </section>
 
             {/* ─────────── Section Entretien ─────────── */}
-            <section id="entretien" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+            <section id="entretien" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <h5 className="text-xl font-bold text-content-headings">Entretien</h5>
                 <Badge variant={
@@ -2175,7 +2175,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Budget (commune, adaptee par variant) ──              */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="ca" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+        <section id="ca" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
           <h5 className="text-xl font-bold text-content-headings">Budget</h5>
           <CardCA
             chiffreAffaire={formatPrice(deal.forecastRevenue)}
@@ -2216,7 +2216,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Documents (commune) ──                                */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section className="px-5 py-6 flex flex-col gap-4">
+        <section id="documents" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-[4px]">
               <h5 className="text-xl font-bold text-content-headings">Documents</h5>
@@ -2242,7 +2242,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Messages (commune) ──                                 */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section id="messages" className="px-5 py-6 flex flex-col gap-4 border-t border-edge-default">
+        <section id="messages" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
           <div className="flex items-center gap-[4px]">
             <h5 className="text-xl font-bold text-content-headings">Messages</h5>
             <Badge variant="default">{messages.length}</Badge>
@@ -2301,7 +2301,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Notes (commune) ──                                    */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        <section className="px-5 py-6 flex flex-col gap-4">
+        <section id="notes" className="scroll-mt-[200px] py-[50px] border-t border-edge-default px-5 flex flex-col gap-6">
           <div className="flex items-center gap-[4px]">
             <h5 className="text-xl font-bold text-content-headings">Notes</h5>
             <Badge variant="default">{noteEvents.length}</Badge>
