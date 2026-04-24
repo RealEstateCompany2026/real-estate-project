@@ -25,6 +25,8 @@ import {
   Banknote,
   ArrowRight,
   Pencil,
+  FileText,
+  Upload,
 } from 'lucide-react';
 
 // ── DS Components ──
@@ -1529,15 +1531,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
       }
     : { edition: 'disabled' as BadgeVariant, revision: 'disabled' as BadgeVariant, publication: 'disabled' as BadgeVariant };
 
-  // ── Document status badge variant ──
-  function docStatusVariant(status: string | null): BadgeVariant {
-    switch (status) {
-      case 'VALIDE': return 'success';
-      case 'EN_ATTENTE': return 'warning';
-      case 'REFUSE': return 'error';
-      default: return 'default';
-    }
-  }
 
   // ── Mandate status key (GESTION uses mgmtMandateStatus) ──
   const mandateStatusKey = currentType === 'GESTION'
@@ -2224,29 +2217,21 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         {/* ── Section Documents (commune) ──                                */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         <section className="px-5 py-6 flex flex-col gap-4">
-          <div className="flex items-center gap-[4px]">
-            <h5 className="text-xl font-bold text-content-headings">Documents</h5>
-            <Badge variant="default">{documents.length}</Badge>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-[4px]">
+              <h5 className="text-xl font-bold text-content-headings">Documents</h5>
+              <Badge variant="default">{documents.length}</Badge>
+            </div>
+            <Button variant="default" onClick={() => { /* TODO: open upload sheet */ }}>
+              <Upload size={16} /> Ajouter
+            </Button>
           </div>
           {documents.length > 0 ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-[12px]">
               {documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between bg-surface-neutral-default border border-edge-default rounded-lg px-5 py-3"
-                >
-                  <span className="text-sm font-semibold text-content-body">
-                    {doc.title ?? doc.type ?? 'Document'}
-                  </span>
-                  <div className="flex gap-2 items-center">
-                    {doc.type && <Badge variant="default">{doc.type}</Badge>}
-                    {doc.documentStatus && (
-                      <Badge variant={docStatusVariant(doc.documentStatus)}>
-                        {doc.documentStatus}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+                <Button key={doc.id} variant="outline" onClick={() => {}}>
+                  <FileText size={16} /> {doc.title ?? doc.type ?? 'Document'}
+                </Button>
               ))}
             </div>
           ) : (
