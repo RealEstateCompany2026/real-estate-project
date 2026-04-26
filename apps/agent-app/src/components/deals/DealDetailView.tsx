@@ -25,7 +25,6 @@ import {
   Banknote,
   ArrowRight,
   Pencil,
-  FileText,
   Upload,
 } from 'lucide-react';
 
@@ -2232,7 +2231,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             <div className="flex flex-wrap gap-[12px]">
               {documents.map((doc) => (
                 <Button key={doc.id} variant="outline" onClick={() => {}}>
-                  <FileText size={16} /> {doc.title ?? doc.type ?? 'Document'}
+                  {doc.title ?? doc.type ?? 'Document'}
                 </Button>
               ))}
             </div>

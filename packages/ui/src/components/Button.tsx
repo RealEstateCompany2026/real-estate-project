@@ -24,7 +24,7 @@ const buttonVariants = cva(
                 primary:
                     "bg-surface-branded-action text-content-branded-on-action border border-[var(--surface-branded-action)] hover:bg-surface-branded-action-hover hover:border-[var(--surface-branded-action-hover)]",
                 outline:
-                    "border border-edge-neutral-default bg-surface-neutral-default hover:bg-surface-neutral-default text-content-body hover:border-edge-neutral-action",
+                    "border border-edge-neutral-default bg-surface-neutral-default hover:bg-surface-neutral-action-hover text-content-body hover:border-edge-neutral-action",
                 ghost:
                     "text-content-body hover:bg-surface-neutral-action",
                 // Extensions (not in Figma DS, but used in app)

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, AlertCircle } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, AlertCircle } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -1077,7 +1077,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           <div className="flex flex-wrap gap-[12px]">
             {documents.map((d) => (
               <Button key={d.id} variant="outline" onClick={() => {}}>
-                <FileText size={16} /> {d.label}
+                {d.label}
               </Button>
             ))}
           </div>

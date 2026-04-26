@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, FileText, Download, Send, X, Copy, Globe, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, Download, Send, X, Copy, Globe, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheBien } from '@real-estate/ui/app-bar-fiche-bien';
@@ -1917,7 +1917,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           <div className="flex flex-wrap gap-[12px]">
             {documents.map((d) => (
               <Button key={d.id} variant="outline" onClick={() => {}}>
-                <FileText size={16} /> {d.label}
+                {d.label}
               </Button>
             ))}
           </div>
