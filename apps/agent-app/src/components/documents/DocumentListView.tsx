@@ -11,6 +11,7 @@ import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { IconButton } from '@real-estate/ui/button';
 import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
+import { SheetDocument } from '@real-estate/ui/sheet-document';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -30,6 +31,13 @@ interface DocumentRow {
   clientId: string | null;
   propertyId: string | null;
   dealId: string | null;
+  fileName: string | null;
+  fileFormat: string | null;
+  fileSizeKb: number | null;
+  url: string | null;
+  signedAt: string | null;
+  updatedAt: string | null;
+  uploadedById: string | null;
   Client: { firstName: string; lastName: string } | null;
   Property: { addressCity: string | null; type: string; livingAreaSqm: number | null } | null;
   Deal: { mandateNumber: string | null } | null;
@@ -51,6 +59,21 @@ interface DocumentDisplayItem {
   hasClient: boolean;
   hasProperty: boolean;
   hasDeal: boolean;
+  // Fields for SheetDocument
+  fileName?: string;
+  fileFormat?: string;
+  fileSizeKb?: number;
+  documentType?: string;
+  documentStatus?: string;
+  expiryDate?: string;
+  previewUrl?: string;
+  uploadedBy?: string;
+  uploadedDate?: string;
+  modifiedDate?: string;
+  signedDate?: string;
+  clients: Array<{ name: string; onClick?: () => void }>;
+  properties: Array<{ label: string; onClick?: () => void }>;
+  deals: Array<{ label: string; onClick?: () => void }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,6 +196,10 @@ export function DocumentListView() {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [page, setPage] = useState(0);
 
+  // ── Sheet state ──
+  const [selectedDocument, setSelectedDocument] = useState<DocumentDisplayItem | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   // ── Fetch documents ──
   useEffect(() => {
     async function load() {
@@ -181,6 +208,7 @@ export function DocumentListView() {
         .from('Document')
         .select(`
           id, title, type, documentStatus, expiryDate, createdAt, clientId, propertyId, dealId,
+          fileName, fileFormat, fileSizeKb, url, signedAt, updatedAt, uploadedById,
           Client:clientId ( firstName, lastName ),
           Property:propertyId ( addressCity, type, livingAreaSqm ),
           Deal:dealId ( mandateNumber )
@@ -202,6 +230,21 @@ export function DocumentListView() {
         hasClient: d.clientId !== null,
         hasProperty: d.propertyId !== null,
         hasDeal: d.dealId !== null,
+        // SheetDocument fields
+        fileName: d.fileName ?? undefined,
+        fileFormat: d.fileFormat ?? undefined,
+        fileSizeKb: d.fileSizeKb ?? undefined,
+        documentType: DOCUMENT_TYPE_LABELS[d.type] ?? d.type,
+        documentStatus: d.documentStatus,
+        expiryDate: d.expiryDate ? formatDate(d.expiryDate) : undefined,
+        previewUrl: d.url ?? undefined,
+        uploadedBy: 'Agent',  // TODO: fetch user name from uploadedById
+        uploadedDate: formatDate(d.createdAt),
+        modifiedDate: d.updatedAt ? formatDate(d.updatedAt) : undefined,
+        signedDate: d.signedAt ? formatDate(d.signedAt) : undefined,
+        clients: d.Client ? [{ name: `${d.Client.firstName} ${d.Client.lastName}` }] : [],
+        properties: d.Property ? [{ label: d.Property.addressCity ?? 'Bien' }] : [],
+        deals: d.Deal ? [{ label: d.Deal.mandateNumber ?? 'Affaire' }] : [],
       }));
 
       setDocuments(mapped);
@@ -255,6 +298,11 @@ export function DocumentListView() {
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   // ── Handlers ──
+  const handleDocumentClick = useCallback((doc: DocumentDisplayItem) => {
+    setSelectedDocument(doc);
+    setSheetOpen(true);
+  }, []);
+
   const handleRemoveFilter = useCallback((criterionId: string) => {
     setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
     setPage(0);
@@ -355,8 +403,8 @@ export function DocumentListView() {
             createdDate={doc.createdDate}
             validityStatus={doc.validityStatus}
             aiSuggestions={doc.aiSuggestions}
-            onClick={() => {/* Phase 4: open SheetDocument */}}
-            onView={() => {/* Phase 4: open SheetDocument */}}
+            onClick={() => handleDocumentClick(doc)}
+            onView={() => handleDocumentClick(doc)}
           />
         ))}
       </div>
@@ -377,6 +425,38 @@ export function DocumentListView() {
           canGoNext={page < totalPages - 1}
         />
       </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          5. Sheet — Document detail (opens on click)
+          ═══════════════════════════════════════════════════════ */}
+      {selectedDocument && (
+        <SheetDocument
+          isOpen={sheetOpen}
+          onClose={() => {
+            setSheetOpen(false);
+            setSelectedDocument(null);
+          }}
+          title={selectedDocument.title}
+          validityStatus={selectedDocument.validityStatus}
+          expiryDate={selectedDocument.expiryDate}
+          fileFormat={selectedDocument.fileFormat}
+          fileName={selectedDocument.fileName}
+          fileSizeKb={selectedDocument.fileSizeKb}
+          previewUrl={selectedDocument.previewUrl}
+          documentType={selectedDocument.documentType}
+          documentStatus={selectedDocument.documentStatus}
+          uploadedBy={selectedDocument.uploadedBy}
+          uploadedDate={selectedDocument.uploadedDate}
+          modifiedDate={selectedDocument.modifiedDate}
+          signedDate={selectedDocument.signedDate}
+          clients={selectedDocument.clients}
+          properties={selectedDocument.properties}
+          deals={selectedDocument.deals}
+          onDownload={() => {/* TODO */}}
+          onSend={() => {/* TODO */}}
+          onEdit={() => {/* TODO */}}
+        />
+      )}
     </>
   );
 }
