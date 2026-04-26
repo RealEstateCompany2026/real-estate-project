@@ -399,7 +399,7 @@ export function ClientListView() {
           ═══════════════════════════════════════════════════════ */}
       {viewMode === 'list' ? (
         /* ── MODE LIST : ListClient rows ── */
-        <div className="flex flex-col gap-[17px]">
+        <div className="flex flex-col gap-0">
           {paginated.map((client) => (
             <ListClient
               key={client.id}

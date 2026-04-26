@@ -1971,7 +1971,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
             <Badge variant="default">{data.matchingBuyers.length}</Badge>
           </div>
           {data.matchingBuyers.length > 0 && (
-            <div className="flex flex-col gap-[8px]">
+            <div className="flex flex-col gap-0">
               {data.matchingBuyers.map((buyer) => (
                 <ListClient
                   key={buyer.id}
