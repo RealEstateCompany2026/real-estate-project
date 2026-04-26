@@ -27,6 +27,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { PropertyStatus, DpeClass } from '@/types/property';
 import { PROPERTY_TYPE_LABELS } from '@/types/property';
 import { formatPrice } from '@/lib/utils/format';
+import { seedRandomInt } from '@/utils/seedRandom';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -87,11 +88,11 @@ interface PropertyKpis {
 // ---------------------------------------------------------------------------
 
 /** Generate mock KPIs (replace with real RPC call later) */
-function mockKpis(): PropertyKpis {
+function mockKpis(id: string): PropertyKpis {
   return {
-    qualification: Math.floor(Math.random() * 60) + 20,
-    entretien: Math.floor(Math.random() * 60) + 20,
-    conversion: Math.floor(Math.random() * 40) + 10,
+    qualification: seedRandomInt(id, 0, 20, 79),
+    entretien: seedRandomInt(id, 1, 20, 79),
+    conversion: seedRandomInt(id, 2, 10, 49),
   };
 }
 
@@ -239,8 +240,8 @@ export function PropertyListView() {
           rawLivingAreaSqm: p.livingAreaSqm,
           rawDesiredSellingPrice: p.desiredSellingPrice ?? p.estimatedMarketValue,
           rawAddressCity: p.addressCity,
-          kpis: mockKpis(),
-          aiSuggestions: Math.floor(Math.random() * 5),
+          kpis: mockKpis(p.id),
+          aiSuggestions: seedRandomInt(p.id, 10, 0, 4),
           suggestions: [
             { text: "Ce bien correspond à 3 acquéreurs actifs", actionLabel: "Envoyer" },
             { text: "Photos à mettre à jour — dernier shooting il y a 8 mois", actionLabel: "Programmer" },

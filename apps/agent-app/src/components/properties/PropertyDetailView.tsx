@@ -48,6 +48,7 @@ import {
   HEATING_TYPE_LABELS, HOT_WATER_SYSTEM_LABELS, KITCHEN_TYPE_LABELS, PARKING_TYPE_LABELS,
   POOL_TYPE_LABELS, VIEW_TYPE_LABELS,
 } from '@/types/property';
+import { seedRandomInt } from '@/utils/seedRandom';
 import { formatPrice } from '@/lib/utils/format';
 import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 
@@ -230,9 +231,9 @@ interface PropertyDetailData {
 // Helpers — mock data & mappers
 // ---------------------------------------------------------------------------
 
-function mockKpis(): PropertyKpis {
+function mockKpis(id: string): PropertyKpis {
   return {
-    qualification: Math.floor(Math.random() * 60) + 20,
+    qualification: seedRandomInt(id, 0, 20, 79),
   };
 }
 
@@ -633,8 +634,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       setData({
         property: prop as Property,
         photos: (media ?? []) as PropertyMedia[],
-        kpis: mockKpis(),
-        aiSuggestions: Math.floor(Math.random() * 15) + 1,
+        kpis: mockKpis(propertyId),
+        aiSuggestions: seedRandomInt(propertyId, 10, 1, 15),
         activities,
         allActivities,
         deals,

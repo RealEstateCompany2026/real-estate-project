@@ -30,6 +30,7 @@ import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 import { createClient } from '@/lib/supabase/client';
 import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 import type { Client, ClientStatus } from '@/types/client';
+import { seedRandomInt } from '@/utils/seedRandom';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import {
   computeWeightedRevenue,
@@ -185,12 +186,12 @@ interface ClientDetailData {
 // Helpers — mock data (à remplacer par des appels RPC réels)
 // ---------------------------------------------------------------------------
 
-function mockKpis(): ClientKpis {
+function mockKpis(id: string): ClientKpis {
   return {
-    qualification: Math.floor(Math.random() * 60) + 20,
-    engagement: Math.floor(Math.random() * 60) + 20,
-    conversion: Math.floor(Math.random() * 40) + 10,
-    reactivation: Math.floor(Math.random() * 60) + 20,
+    qualification: seedRandomInt(id, 0, 20, 79),
+    engagement: seedRandomInt(id, 1, 20, 79),
+    conversion: seedRandomInt(id, 2, 10, 49),
+    reactivation: seedRandomInt(id, 3, 20, 79),
   };
 }
 
@@ -579,8 +580,8 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
       setData({
         client: clientData as Client,
-        kpis: mockKpis(),
-        aiSuggestions: Math.floor(Math.random() * 15) + 1,
+        kpis: mockKpis(clientId),
+        aiSuggestions: seedRandomInt(clientId, 20, 1, 15),
         graphData: mockGraphData(),
         activities,
         allActivities,

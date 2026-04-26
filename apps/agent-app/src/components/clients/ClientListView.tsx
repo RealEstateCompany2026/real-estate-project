@@ -23,6 +23,7 @@ import { MessageCircle, Phone } from 'lucide-react';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import type { ClientListItem, ClientStatus } from '@/types/client';
+import { seedRandom, seedRandomInt } from '@/utils/seedRandom';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -81,43 +82,43 @@ function statusToBadges(status: ClientStatus[]): ClientWithKpis['badges'] {
 }
 
 /** Generate mock KPIs (replace with real RPC call later) */
-function mockKpis(): ClientKpis {
+function mockKpis(id: string): ClientKpis {
   return {
-    qualification: Math.floor(Math.random() * 60) + 20,
-    engagement: Math.floor(Math.random() * 60) + 20,
-    conversion: Math.floor(Math.random() * 40) + 10,
-    reactivation: Math.floor(Math.random() * 60) + 20,
+    qualification: seedRandomInt(id, 0, 20, 79),
+    engagement: seedRandomInt(id, 1, 20, 79),
+    conversion: seedRandomInt(id, 2, 10, 49),
+    reactivation: seedRandomInt(id, 3, 20, 79),
   };
 }
 
 /** Generate mock KPI sub-details per section (replace with real data later) */
-function mockKpiDetails(kpis: ClientKpis): ClientKpiDetails {
-  const rp = () => `${Math.floor(Math.random() * 80) + 10}%`;
+function mockKpiDetails(id: string, kpis: ClientKpis): ClientKpiDetails {
+  const rp = (idx: number) => `${seedRandomInt(id, idx, 10, 89)}%`;
   return {
     qualificationDetails: [
-      { label: 'Informations de profil :', value: rp() },
-      { label: 'Informations de contact :', value: rp() },
-      { label: 'Informations professionnelles :', value: rp() },
+      { label: 'Informations de profil :', value: rp(10) },
+      { label: 'Informations de contact :', value: rp(11) },
+      { label: 'Informations professionnelles :', value: rp(12) },
     ],
     engagementDetails: [
-      { label: "Taux d'ouverture :", value: rp() },
-      { label: 'Taux de clics :', value: rp() },
-      { label: "Taux de passage à l'action :", value: rp() },
-      { label: 'Taux de réponses :', value: rp() },
+      { label: "Taux d'ouverture :", value: rp(13) },
+      { label: 'Taux de clics :', value: rp(14) },
+      { label: "Taux de passage à l'action :", value: rp(15) },
+      { label: 'Taux de réponses :', value: rp(16) },
     ],
     conversionDetails: [
-      { label: `Date dernier mandat : > ${Math.floor(Math.random() * 3) + 1} ans` },
-      { label: `Projection prochain mandat : > ${Math.floor(Math.random() * 12) + 1} mois` },
+      { label: `Date dernier mandat : > ${seedRandomInt(id, 17, 1, 3)} ans` },
+      { label: `Projection prochain mandat : > ${seedRandomInt(id, 18, 1, 12)} mois` },
     ],
     reactivationDetails: [
-      { label: 'Dernière activité :', value: `${Math.floor(Math.random() * 60) + 1} jours` },
-      { label: 'Réceptivité :', value: rp() },
-      { label: 'Engagement :', value: rp() },
+      { label: 'Dernière activité :', value: `${seedRandomInt(id, 19, 1, 60)} jours` },
+      { label: 'Réceptivité :', value: rp(21) },
+      { label: 'Engagement :', value: rp(22) },
     ],
-    qualificationAiSuggestions: Math.floor(Math.random() * 3),
-    engagementAiSuggestions: Math.floor(Math.random() * 4),
-    conversionAiSuggestions: Math.floor(Math.random() * 2),
-    reactivationAiSuggestions: Math.floor(Math.random() * 3),
+    qualificationAiSuggestions: seedRandomInt(id, 23, 0, 2),
+    engagementAiSuggestions: seedRandomInt(id, 24, 0, 3),
+    conversionAiSuggestions: seedRandomInt(id, 25, 0, 1),
+    reactivationAiSuggestions: seedRandomInt(id, 26, 0, 2),
   };
 }
 
@@ -210,14 +211,14 @@ export function ClientListView() {
 
       const rawRows = (data ?? []) as unknown as (ClientListItem & { address?: string | null; dateOfBirth?: string | null })[];
       const enriched: ClientWithKpis[] = rawRows.map((c) => {
-        const kpis = mockKpis();
+        const kpis = mockKpis(c.id);
         return {
           ...c,
           address: c.address ?? null,
           dateOfBirth: c.dateOfBirth ?? null,
           kpis,
-          kpiDetails: mockKpiDetails(kpis),
-          aiSuggestions: Math.floor(Math.random() * 20),
+          kpiDetails: mockKpiDetails(c.id, kpis),
+          aiSuggestions: seedRandomInt(c.id, 20, 0, 19),
           badges: statusToBadges(c.status),
           suggestions: [
             { text: "Relancer ce client — inactif depuis 30 jours", actionLabel: "Programmer" },
