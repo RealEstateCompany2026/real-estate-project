@@ -396,6 +396,7 @@ export function PropertyListView() {
         <ViewModeDropdown
           viewMode={viewMode}
           onViewModeChange={setViewMode}
+          variant="ghost"
         />
       </div>
 

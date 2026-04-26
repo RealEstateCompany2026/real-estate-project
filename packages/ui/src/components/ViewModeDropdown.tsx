@@ -12,9 +12,12 @@ import { LayoutList, LayoutGrid } from "lucide-react";
 
 export type ViewMode = "list" | "cards";
 
+export type ViewModeVariant = "default" | "ghost";
+
 export interface ViewModeDropdownProps {
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  variant?: ViewModeVariant;
   className?: string;
   disabled?: boolean;
 }
@@ -22,6 +25,7 @@ export interface ViewModeDropdownProps {
 export function ViewModeDropdown({
   viewMode,
   onViewModeChange,
+  variant = "default",
   className = "",
   disabled = false,
 }: ViewModeDropdownProps) {
@@ -42,10 +46,10 @@ export function ViewModeDropdown({
         className={`
           inline-flex items-center gap-2
           p-3 rounded-lg
-          border border-edge-neutral-default
-          bg-surface-neutral-default
-          hover:bg-surface-neutral-action-hover
-          text-content-body
+          ${variant === 'ghost'
+            ? 'text-content-body hover:bg-surface-neutral-action'
+            : 'border border-edge-neutral-default bg-surface-neutral-default hover:bg-surface-neutral-action-hover text-content-body'
+          }
           text-base font-semibold tracking-[0.16px]
           transition-colors
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ring-offset-surface-page

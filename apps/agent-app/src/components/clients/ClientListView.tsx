@@ -370,6 +370,7 @@ export function ClientListView() {
         <ViewModeDropdown
           viewMode={viewMode}
           onViewModeChange={setViewMode}
+          variant="ghost"
         />
       </div>
 
