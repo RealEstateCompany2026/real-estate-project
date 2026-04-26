@@ -31,6 +31,7 @@ import { Switch } from '@real-estate/ui/switch';
 import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 import { IconDpe } from '@real-estate/ui/icon-dpe';
 import { IconGes } from '@real-estate/ui/icon-ges';
+import { SheetDocument } from '@real-estate/ui/sheet-document';
 
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
@@ -49,6 +50,7 @@ import {
   POOL_TYPE_LABELS, VIEW_TYPE_LABELS,
 } from '@/types/property';
 import { seedRandomInt } from '@/utils/seedRandom';
+import { DOCUMENT_TYPE_LABELS, computeDocumentValidity, formatDocumentDate } from '@/utils/documentHelpers';
 import { formatPrice } from '@/lib/utils/format';
 import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 
@@ -146,11 +148,28 @@ interface DocumentRow {
   title: string | null;
   fileName: string | null;
   type: string | null;
+  documentStatus: string | null;
+  expiryDate: string | null;
+  fileFormat: string | null;
+  fileSizeKb: number | null;
+  url: string | null;
+  signedAt: string | null;
+  createdAt: string | null;
 }
 
 interface DocumentItem {
   id: string;
   label: string;
+  title: string;
+  type: string;
+  fileName?: string;
+  fileFormat?: string;
+  fileSizeKb?: number;
+  documentStatus?: string;
+  expiryDate?: string;
+  url?: string;
+  signedAt?: string;
+  createdAt?: string;
 }
 
 interface MessageRow {
@@ -474,6 +493,8 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
+  const [docSheetOpen, setDocSheetOpen] = useState(false);
   const [gallerySheetOpen, setGallerySheetOpen] = useState(false);
   const [annonceSheetListing, setAnnonceSheetListing] = useState<ListingRow | null>(null);
 
@@ -516,7 +537,7 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           Client(firstName, lastName)
         `).eq('propertyId', propertyId).order('lastActivityDate', { ascending: false }),
         supabase.from('Listing').select('id, status, title, description, descriptionSource, alurCompliant, slug, publishedAt, contactFormEnabled, viewCount, leadCount').eq('propertyId', propertyId),
-        supabase.from('Document').select('id, title, fileName, type').eq('propertyId', propertyId),
+        supabase.from('Document').select('id, title, fileName, type, documentStatus, expiryDate, fileFormat, fileSizeKb, url, signedAt, createdAt').eq('propertyId', propertyId),
         supabase
           .from('Message')
           .select('id, senderType, body, messageDate, status, attachmentsUrls')
@@ -617,6 +638,16 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
       const documents: DocumentItem[] = ((documentsData ?? []) as DocumentRow[]).map((d) => ({
         id: d.id,
         label: documentLabel(d),
+        title: d.title ?? d.fileName ?? 'Document',
+        type: d.type ?? 'AUTRE',
+        fileName: d.fileName ?? undefined,
+        fileFormat: d.fileFormat ?? undefined,
+        fileSizeKb: d.fileSizeKb ?? undefined,
+        documentStatus: d.documentStatus ?? undefined,
+        expiryDate: d.expiryDate ?? undefined,
+        url: d.url ?? undefined,
+        signedAt: d.signedAt ?? undefined,
+        createdAt: d.createdAt ?? undefined,
       }));
 
       // Handle Message data — TODO: awaiting propertyId column
@@ -1916,12 +1947,33 @@ export function PropertyDetailView({ propertyId }: PropertyDetailViewProps) {
           </div>
           <div className="flex flex-wrap gap-[12px]">
             {documents.map((d) => (
-              <Button key={d.id} variant="outline" onClick={() => {}}>
+              <Button key={d.id} variant="outline" onClick={() => { setSelectedDoc(d); setDocSheetOpen(true); }}>
                 {d.label}
               </Button>
             ))}
           </div>
         </section>
+
+        {selectedDoc && (
+          <SheetDocument
+            isOpen={docSheetOpen}
+            onClose={() => { setDocSheetOpen(false); setSelectedDoc(null); }}
+            title={selectedDoc.title}
+            validityStatus={computeDocumentValidity(selectedDoc.expiryDate ?? null)}
+            expiryDate={selectedDoc.expiryDate ? formatDocumentDate(selectedDoc.expiryDate) : undefined}
+            fileFormat={selectedDoc.fileFormat}
+            fileName={selectedDoc.fileName}
+            fileSizeKb={selectedDoc.fileSizeKb}
+            previewUrl={selectedDoc.url}
+            documentType={DOCUMENT_TYPE_LABELS[selectedDoc.type] ?? selectedDoc.type}
+            documentStatus={selectedDoc.documentStatus}
+            uploadedDate={selectedDoc.createdAt ? formatDocumentDate(selectedDoc.createdAt) : undefined}
+            signedDate={selectedDoc.signedAt ? formatDocumentDate(selectedDoc.signedAt) : undefined}
+            onDownload={() => {}}
+            onSend={() => {}}
+            onEdit={() => {}}
+          />
+        )}
 
         {/* Bloc 8 — Messages */}
         <section ref={setSectionRef('messages')} id="messages" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">

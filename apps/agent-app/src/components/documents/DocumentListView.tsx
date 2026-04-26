@@ -16,6 +16,7 @@ import { SheetDocument } from '@real-estate/ui/sheet-document';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import { seedRandomInt } from '@/utils/seedRandom';
+import { DOCUMENT_TYPE_LABELS, computeDocumentValidity, formatDocumentDate } from '@/utils/documentHelpers';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,7 +41,7 @@ interface DocumentRow {
   uploadedById: string | null;
   Client: { firstName: string; lastName: string } | null;
   Property: { addressCity: string | null; type: string; livingAreaSqm: number | null } | null;
-  Deal: { mandateNumber: string | null } | null;
+  Deal: { reference: string | null } | null;
 }
 
 interface DocumentDisplayItem {
@@ -76,36 +77,7 @@ interface DocumentDisplayItem {
   deals: Array<{ label: string; onClick?: () => void }>;
 }
 
-// ---------------------------------------------------------------------------
-// DOCUMENT_TYPE_LABELS mapping
-// ---------------------------------------------------------------------------
-
-const DOCUMENT_TYPE_LABELS: Record<string, string> = {
-  CNI: 'CNI',
-  PASSEPORT: 'Passeport',
-  KBIS: 'KBIS',
-  DPE: 'DPE',
-  AMIANTE: 'Amiante',
-  PLOMB: 'Plomb',
-  TERMITES: 'Termites',
-  GAZ: 'Gaz',
-  ELECTRICITE: 'Électricité',
-  ERP: 'ERP',
-  LOI_CARREZ: 'Loi Carrez',
-  DIAGNOSTIC_BRUIT: 'Diagnostic bruit',
-  DIAGNOSTIC_ASSAINISSEMENT: 'Diagnostic assainissement',
-  MANDAT_VENTE: 'Mandat de vente',
-  MANDAT_LOCATION: 'Mandat de location',
-  MANDAT_GESTION: 'Mandat de gestion',
-  BAIL: 'Bail',
-  COMPROMIS: 'Compromis',
-  ACTE_NOTARIE: 'Acte notarié',
-  OFFRE_ACHAT: "Offre d'achat",
-  ETAT_DES_LIEUX: 'État des lieux',
-  QUITTANCE: 'Quittance',
-  ATTESTATION_VISITE: 'Attestation de visite',
-  AUTRE: 'Autre',
-};
+// DOCUMENT_TYPE_LABELS imported from @/utils/documentHelpers
 
 // ---------------------------------------------------------------------------
 // Category filters (dropdown AppBar)
@@ -160,20 +132,7 @@ const DOCUMENT_FILTER_CRITERIA: FilterCriterionDef[] = [
 // Helpers
 // ---------------------------------------------------------------------------
 
-function computeValidity(expiryDate: string | null): 'valid' | 'expiring' | 'expired' | undefined {
-  if (!expiryDate) return undefined;
-  const expiry = new Date(expiryDate);
-  const now = new Date();
-  const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-  if (expiry < now) return 'expired';
-  if (expiry.getTime() - now.getTime() < thirtyDays) return 'expiring';
-  return 'valid';
-}
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
-}
+// computeDocumentValidity and formatDocumentDate imported from @/utils/documentHelpers
 
 // ---------------------------------------------------------------------------
 // Page size
@@ -211,7 +170,7 @@ export function DocumentListView() {
           fileName, fileFormat, fileSizeKb, url, signedAt, updatedAt, uploadedById,
           Client:clientId ( firstName, lastName ),
           Property:propertyId ( addressCity, type, livingAreaSqm ),
-          Deal:dealId ( mandateNumber )
+          Deal:dealId ( reference )
         `)
         .order('createdAt', { ascending: false });
 
@@ -223,8 +182,8 @@ export function DocumentListView() {
         propertyRef: d.Property?.addressCity ?? undefined,
         propertyType: d.Property?.type ?? undefined,
         surface: d.Property?.livingAreaSqm ? `${d.Property.livingAreaSqm}m²` : undefined,
-        createdDate: formatDate(d.createdAt),
-        validityStatus: computeValidity(d.expiryDate),
+        createdDate: formatDocumentDate(d.createdAt),
+        validityStatus: computeDocumentValidity(d.expiryDate),
         aiSuggestions: seedRandomInt(d.id, 0, 0, 3),
         rawCreatedAt: d.createdAt,
         hasClient: d.clientId !== null,
@@ -236,15 +195,15 @@ export function DocumentListView() {
         fileSizeKb: d.fileSizeKb ?? undefined,
         documentType: DOCUMENT_TYPE_LABELS[d.type] ?? d.type,
         documentStatus: d.documentStatus,
-        expiryDate: d.expiryDate ? formatDate(d.expiryDate) : undefined,
+        expiryDate: d.expiryDate ? formatDocumentDate(d.expiryDate) : undefined,
         previewUrl: d.url ?? undefined,
         uploadedBy: 'Agent',  // TODO: fetch user name from uploadedById
-        uploadedDate: formatDate(d.createdAt),
-        modifiedDate: d.updatedAt ? formatDate(d.updatedAt) : undefined,
-        signedDate: d.signedAt ? formatDate(d.signedAt) : undefined,
+        uploadedDate: formatDocumentDate(d.createdAt),
+        modifiedDate: d.updatedAt ? formatDocumentDate(d.updatedAt) : undefined,
+        signedDate: d.signedAt ? formatDocumentDate(d.signedAt) : undefined,
         clients: d.Client ? [{ name: `${d.Client.firstName} ${d.Client.lastName}` }] : [],
         properties: d.Property ? [{ label: d.Property.addressCity ?? 'Bien' }] : [],
-        deals: d.Deal ? [{ label: d.Deal.mandateNumber ?? 'Affaire' }] : [],
+        deals: d.Deal ? [{ label: d.Deal.reference ?? 'Affaire' }] : [],
       }));
 
       setDocuments(mapped);
