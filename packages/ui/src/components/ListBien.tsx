@@ -109,7 +109,7 @@ export function ListBien({
       onClick={onClick}
     >
       {/* Section image + infos du bien */}
-      <div className="flex items-center shrink-0 h-[120px]">
+      <div className="flex items-center shrink-0 h-[120px] pl-[10px] min-w-[620px]">
         {/* Image du bien */}
         <div className="h-[100px] w-[150px] shrink-0 overflow-hidden rounded-lg">
           {imageUrl ? (
