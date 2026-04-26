@@ -108,7 +108,9 @@
         "./list-candidature-locataire": "./src/components/ListCandidatureLocataire.tsx",
         "./message-edit": "./src/components/MessageEdit.tsx",
         "./sheet-agenda-bien": "./src/components/SheetAgendaBien.tsx",
-        "./sheet-visite": "./src/components/SheetVisite.tsx"
+        "./sheet-visite": "./src/components/SheetVisite.tsx",
+        "./list-document": "./src/components/ListDocument.tsx",
+        "./sheet-document": "./src/components/SheetDocument.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
