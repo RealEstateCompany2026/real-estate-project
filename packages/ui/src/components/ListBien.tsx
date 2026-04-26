@@ -12,7 +12,7 @@ import { IconDpe, DpeType } from "./IconDpe";
  * Organism du design system RealAgent
  *
  * Affiche une ligne de la liste des biens avec :
- * - Image du bien (160×120, coins arrondis à gauche)
+ * - Image du bien (150×100, coins arrondis 8px)
  * - Section infos : stickers (type opération, carnet), prix, ville, type, surface, DPE
  * - 3 KPI indicators (qualification, entretien, conversion)
  * - Badge IA suggestions
@@ -105,13 +105,13 @@ export function ListBien({
 
   return (
     <div
-      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action border border-[var(--border-divider)] hover:border-[var(--border-default)] rounded-lg flex items-center justify-between h-[120px] cursor-pointer transition-colors ${className}`.trim()}
+      className={`group bg-surface-neutral-default hover:bg-surface-neutral-action rounded-lg flex items-center justify-between h-[120px] cursor-pointer transition-colors ${className}`.trim()}
       onClick={onClick}
     >
       {/* Section image + infos du bien */}
       <div className="flex items-center shrink-0 h-[120px]">
         {/* Image du bien */}
-        <div className="h-[120px] w-[160px] shrink-0 overflow-hidden rounded-l-lg">
+        <div className="h-[100px] w-[150px] shrink-0 overflow-hidden rounded-lg">
           {imageUrl ? (
             <img
               src={imageUrl}

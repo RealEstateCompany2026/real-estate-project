@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * ImageBien - Image de bien immobilier avec coins arrondis à gauche
+ * ImageBien - Image de bien immobilier avec coins arrondis
  *
- * Dimensions: 160px × 120px
- * Border-radius: 16px (gauche uniquement)
+ * Dimensions: 150px × 100px
+ * Border-radius: 8px (4 coins)
  */
 
 export interface ImageBienProps {
@@ -21,11 +21,11 @@ export function ImageBien({
   return (
     <div
       className={`
-        relative overflow-hidden rounded-bl-[16px] rounded-tl-[16px] ${className}
+        relative overflow-hidden rounded-lg ${className}
       `.trim()}
       style={{
-        width: "160px",
-        height: "120px",
+        width: "150px",
+        height: "100px",
       }}
     >
       <img

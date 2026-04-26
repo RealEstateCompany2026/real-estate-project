@@ -1852,28 +1852,30 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 <Chip variant={bienFilter === 'tous' ? 'filled' : 'outlined'} label="Tous" onClick={() => setBienFilter('tous')} />
                 <Chip variant={bienFilter === 'shortlist' ? 'filled' : 'outlined'} label="Shortlist" onClick={() => setBienFilter('shortlist')} />
               </div>
-              {filteredMatches.map((pm) => {
-                const p = pm.Property;
-                if (!p) return null;
-                return (
-                  <ListBien
-                    key={pm.id}
-                    operationType={p.status === 'A_LOUER' ? 'LOCATION' : 'VENTE'}
-                    price={p.desiredSellingPrice ? `${p.desiredSellingPrice.toLocaleString('fr-FR')}€` : '—'}
-                    city={p.addressCity ?? '—'}
-                    propertyType={PROPERTY_TYPE_LABELS[p.type as keyof typeof PROPERTY_TYPE_LABELS] ?? p.type ?? '—'}
-                    surface={p.livingAreaSqm ? `${p.livingAreaSqm}m²` : '—'}
-                    dpeGrade={
-                      p.dpeEnergyClass && ['A','B','C','D','E','F','G'].includes(p.dpeEnergyClass)
-                        ? (p.dpeEnergyClass as DpeType) : undefined
-                    }
-                    kpis={{ qualification: pm.matchScore ?? 0, entretien: 0, conversion: 0 }}
-                  />
-                );
-              })}
-              {filteredMatches.length === 0 && (
-                <p className="text-sm text-content-subtle italic">Aucun bien correspondant</p>
-              )}
+              <div className="flex flex-col gap-0">
+                {filteredMatches.map((pm) => {
+                  const p = pm.Property;
+                  if (!p) return null;
+                  return (
+                    <ListBien
+                      key={pm.id}
+                      operationType={p.status === 'A_LOUER' ? 'LOCATION' : 'VENTE'}
+                      price={p.desiredSellingPrice ? `${p.desiredSellingPrice.toLocaleString('fr-FR')}€` : '—'}
+                      city={p.addressCity ?? '—'}
+                      propertyType={PROPERTY_TYPE_LABELS[p.type as keyof typeof PROPERTY_TYPE_LABELS] ?? p.type ?? '—'}
+                      surface={p.livingAreaSqm ? `${p.livingAreaSqm}m²` : '—'}
+                      dpeGrade={
+                        p.dpeEnergyClass && ['A','B','C','D','E','F','G'].includes(p.dpeEnergyClass)
+                          ? (p.dpeEnergyClass as DpeType) : undefined
+                      }
+                      kpis={{ qualification: pm.matchScore ?? 0, entretien: 0, conversion: 0 }}
+                    />
+                  );
+                })}
+                {filteredMatches.length === 0 && (
+                  <p className="text-sm text-content-subtle italic">Aucun bien correspondant</p>
+                )}
+              </div>
             </section>
           </>
         )}

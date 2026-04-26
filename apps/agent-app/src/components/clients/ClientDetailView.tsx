@@ -1016,7 +1016,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </h3>
             <Badge variant="default">{properties.length}</Badge>
           </div>
-          <div className="flex flex-col gap-[16px]">
+          <div className="flex flex-col gap-0">
             {properties.map((p) => (
               <ListBien
                 key={p.id}
