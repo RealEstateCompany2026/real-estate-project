@@ -47,7 +47,6 @@ import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
 import { SheetVisite } from '@real-estate/ui/sheet-visite';
 import { SheetOrdreDuJour } from '@real-estate/ui/sheet-ordre-du-jour';
-import { SheetGuideDeVisite, VisitCriterion } from '@real-estate/ui/sheet-guide-de-visite';
 import { SheetAgendaBien, AgendaDay, TimeSlot } from '@real-estate/ui/sheet-agenda-bien';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
@@ -694,17 +693,14 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isRevision, setIsRevision] = useState(false);
   // Sub-sheets visite
   const [isSheetOdjOpen, setIsSheetOdjOpen] = useState(false);
-  const [isSheetGuideOpen, setIsSheetGuideOpen] = useState(false);
   const [odjContent, setOdjContent] = useState('');
   const [odjIsRevision, setOdjIsRevision] = useState(false);
-  const [visitGuideCriteria, setVisitGuideCriteria] = useState<VisitCriterion[]>([]);
-  const [visitGuideCommentaire, setVisitGuideCommentaire] = useState<string | null>(null);
   const [visitGuideSubmittedAt, setVisitGuideSubmittedAt] = useState<string | null>(null);
   // Agenda bien
   const [isSheetAgendaOpen, setIsSheetAgendaOpen] = useState(false);
   const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([]);
   const [selectedAgendaSlot, setSelectedAgendaSlot] = useState<{ date: string; startTime: string } | null>(null);
-  const { openSheet: openDocSheet } = useSheetManager();
+  const { openSheet } = useSheetManager();
   // Visite — property edit & invite add
   const [isEditingProperty, setIsEditingProperty] = useState(false);
   const [propertySearchQuery, setPropertySearchQuery] = useState('');
@@ -1129,52 +1125,17 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   // ── Guide de visite handlers ──
   const handleOpenGuide = useCallback(async () => {
     if (!selectedVisiteEvent) return;
+    // Quick check for badge status (used by SheetVisite)
     const supabase = createClient();
-    // Fetch VisitGuideResponse from Supabase
     const { data } = await supabase
       .from('VisitGuideResponse')
-      .select('responses, commentaire, submittedAt')
+      .select('submittedAt')
       .eq('eventId', selectedVisiteEvent.id)
       .maybeSingle();
-
-    if (data) {
-      // Parse JSON responses into VisitCriterion[]
-      const responses = (data.responses ?? {}) as Record<string, string>;
-      const criteriaLabels: Record<string, string> = {
-        criterion_1: 'Localisation',
-        criterion_2: 'Qualité du bien',
-        criterion_3: 'Équipements',
-        criterion_4: 'Critère',
-        criterion_5: 'Souhaite faire une offre',
-      };
-      const criteria: VisitCriterion[] = Object.entries(criteriaLabels).map(([id, label]) => ({
-        id,
-        label,
-        answer: (responses[id] === 'OUI' || responses[id] === 'NON' || responses[id] === 'PEUT_ETRE')
-          ? responses[id] as 'OUI' | 'NON' | 'PEUT_ETRE'
-          : null,
-      }));
-      setVisitGuideCriteria(criteria);
-      setVisitGuideCommentaire(data.commentaire ?? null);
-      setVisitGuideSubmittedAt(data.submittedAt ?? null);
-    } else {
-      // No response yet — show empty criteria
-      setVisitGuideCriteria([
-        { id: 'criterion_1', label: 'Localisation', answer: null },
-        { id: 'criterion_2', label: 'Qualité du bien', answer: null },
-        { id: 'criterion_3', label: 'Équipements', answer: null },
-        { id: 'criterion_4', label: 'Critère', answer: null },
-        { id: 'criterion_5', label: 'Souhaite faire une offre', answer: null },
-      ]);
-      setVisitGuideCommentaire(null);
-      setVisitGuideSubmittedAt(null);
-    }
-    setIsSheetGuideOpen(true);
-  }, [selectedVisiteEvent]);
-
-  const handleCloseGuide = useCallback(() => {
-    setIsSheetGuideOpen(false);
-  }, []);
+    setVisitGuideSubmittedAt(data?.submittedAt ?? null);
+    // Open via SheetManager
+    openSheet('guide-de-visite', { eventId: selectedVisiteEvent.id });
+  }, [selectedVisiteEvent, openSheet]);
 
   // ── Agenda bien handlers ──
   const handleOpenAgenda = useCallback(async () => {
@@ -2238,7 +2199,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           {documents.length > 0 ? (
             <div className="flex flex-wrap gap-[12px]">
               {documents.map((doc) => (
-                <Button key={doc.id} variant="outline" onClick={() => openDocSheet('document', { documentId: doc.id })}>
+                <Button key={doc.id} variant="outline" onClick={() => openSheet('document', { documentId: doc.id })}>
                   {doc.title ?? doc.type ?? 'Document'}
                 </Button>
               ))}
@@ -2787,30 +2748,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           isRevision={odjIsRevision}
           onToggleRevision={handleOdjToggleRevision}
           onSend={handleSendOdj}
-        />
-
-        {/* Sheet Guide de Visite (Compte-rendu) */}
-        <SheetGuideDeVisite
-          isOpen={isSheetGuideOpen}
-          onClose={handleCloseGuide}
-          propertyAddress={deal?.Property?.address ?? null}
-          propertyCity={deal?.Property?.addressCity ?? null}
-          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
-          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
-          propertyDpeGrade={
-            deal?.Property?.dpeEnergyClass &&
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-              ? (deal.Property.dpeEnergyClass as DpeType)
-              : null
-          }
-          clientName={clientFullName}
-          criteria={visitGuideCriteria}
-          commentaire={visitGuideCommentaire}
-          visitDateLabel={
-            selectedVisiteEvent?.eventDate
-              ? `${formatDateOnly(selectedVisiteEvent.eventDate)} à ${formatTimeOnly(selectedVisiteEvent.eventDate)}`
-              : null
-          }
         />
 
         {/* Sheet Agenda du bien */}
