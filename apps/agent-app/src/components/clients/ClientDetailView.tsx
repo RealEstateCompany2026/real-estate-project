@@ -212,6 +212,14 @@ function mockKpis(id: string): ClientKpis {
   };
 }
 
+function mockPropertyKpis(id: string) {
+  return {
+    qualification: seedRandomInt(id, 0, 20, 79),
+    entretien: seedRandomInt(id, 1, 20, 79),
+    conversion: seedRandomInt(id, 2, 10, 49),
+  };
+}
+
 function mockGraphData(): GraphDataPoint[] {
   return [
     { label: '10 avr', value: 18 },
@@ -1057,7 +1065,8 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 propertyType={p.propertyType}
                 surface={p.surface}
                 dpeGrade={p.dpeGrade}
-                kpis={{ qualification: 0, entretien: 0, conversion: 0 }}
+                kpis={mockPropertyKpis(p.id)}
+                onClick={() => openSheet('bien', { propertyId: p.id })}
                 aiSuggestions={0}
               />
             ))}

@@ -10,6 +10,7 @@ import { fetchVisiteData } from './fetchers/fetchVisiteData';
 import { fetchAgendaBienData } from './fetchers/fetchAgendaBienData';
 import { fetchMandatData } from './fetchers/fetchMandatData';
 import { fetchMandatEditData } from './fetchers/fetchMandatEditData';
+import { fetchBienData } from './fetchers/fetchBienData';
 
 export interface SheetRegistryEntry {
   /** Lazy-loaded component (receives { data, onClose } props) */
@@ -49,6 +50,11 @@ export const SHEET_REGISTRY: Partial<Record<SheetType, SheetRegistryEntry>> = {
   'mandat': {
     component: lazy(() => import('./wrappers/MandatSheetWrapper')),
     fetcher: (payload) => fetchMandatData(payload as { dealId: string }),
+    width: 'narrow',
+  },
+  'bien': {
+    component: lazy(() => import('./wrappers/BienSheetWrapper')),
+    fetcher: (payload) => fetchBienData(payload as { propertyId: string }),
     width: 'narrow',
   },
   'mandat-edit': {
