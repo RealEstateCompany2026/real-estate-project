@@ -5,7 +5,7 @@ import {
   Database,
   Users,
   Home,
-  ClipboardList,
+  Tags,
   Layers,
   Calendar,
   Workflow,
@@ -102,7 +102,7 @@ const NAV_SECTIONS: NavRailSection[][] = [
   [
     { id: "clients", icon: Users, label: "Clients" },
     { id: "properties", icon: Home, label: "Biens" },
-    { id: "deals", icon: ClipboardList, label: "Affaires" },
+    { id: "deals", icon: Tags, label: "Affaires" },
     { id: "documents", icon: Layers, label: "Documents" },
   ],
   // Section 3: Outils
