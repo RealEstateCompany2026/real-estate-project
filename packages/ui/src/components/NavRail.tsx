@@ -3,7 +3,7 @@
 import {
   Gauge,
   Database,
-  User,
+  Users,
   Home,
   ClipboardList,
   Layers,
@@ -100,7 +100,7 @@ const NAV_SECTIONS: NavRailSection[][] = [
   ],
   // Section 2: Données principales
   [
-    { id: "clients", icon: User, label: "Clients" },
+    { id: "clients", icon: Users, label: "Clients" },
     { id: "properties", icon: Home, label: "Biens" },
     { id: "deals", icon: ClipboardList, label: "Affaires" },
     { id: "documents", icon: Layers, label: "Documents" },
