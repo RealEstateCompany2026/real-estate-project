@@ -69,10 +69,9 @@ import { SheetMandatEdit } from '@real-estate/ui/sheet-mandat-edit';
 import type { EligibilitySection, EligibilityField } from '@real-estate/ui/sheet-mandat-edit';
 import { checkMandateEligibility } from '@/lib/checkMandateEligibility';
 import type { MissingField } from '@/lib/checkMandateEligibility';
-import { SheetDocument } from '@real-estate/ui/sheet-document';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
-import { DOCUMENT_TYPE_LABELS, computeDocumentValidity, formatDocumentDate } from '@/utils/documentHelpers';
+import { useSheetManager } from '@/hooks/useSheetManager';
 import { PROPERTY_TYPE_LABELS } from '@/types/property';
 import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 
@@ -705,8 +704,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isSheetAgendaOpen, setIsSheetAgendaOpen] = useState(false);
   const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([]);
   const [selectedAgendaSlot, setSelectedAgendaSlot] = useState<{ date: string; startTime: string } | null>(null);
-  const [selectedDoc, setSelectedDoc] = useState<DocumentRow | null>(null);
-  const [docSheetOpen, setDocSheetOpen] = useState(false);
+  const { openSheet: openDocSheet } = useSheetManager();
   // Visite — property edit & invite add
   const [isEditingProperty, setIsEditingProperty] = useState(false);
   const [propertySearchQuery, setPropertySearchQuery] = useState('');
@@ -2240,7 +2238,7 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           {documents.length > 0 ? (
             <div className="flex flex-wrap gap-[12px]">
               {documents.map((doc) => (
-                <Button key={doc.id} variant="outline" onClick={() => { setSelectedDoc(doc); setDocSheetOpen(true); }}>
+                <Button key={doc.id} variant="outline" onClick={() => openDocSheet('document', { documentId: doc.id })}>
                   {doc.title ?? doc.type ?? 'Document'}
                 </Button>
               ))}
@@ -2249,27 +2247,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
             <p className="text-sm text-content-subtle italic">Aucun document</p>
           )}
         </section>
-
-        {selectedDoc && (
-          <SheetDocument
-            isOpen={docSheetOpen}
-            onClose={() => { setDocSheetOpen(false); setSelectedDoc(null); }}
-            title={selectedDoc.title ?? 'Document'}
-            validityStatus={computeDocumentValidity(selectedDoc.expiryDate ?? null)}
-            expiryDate={selectedDoc.expiryDate ? formatDocumentDate(selectedDoc.expiryDate) : undefined}
-            fileFormat={selectedDoc.fileFormat ?? undefined}
-            fileName={selectedDoc.fileName ?? undefined}
-            fileSizeKb={selectedDoc.fileSizeKb ?? undefined}
-            previewUrl={selectedDoc.url ?? undefined}
-            documentType={DOCUMENT_TYPE_LABELS[selectedDoc.type ?? ''] ?? selectedDoc.type ?? undefined}
-            documentStatus={selectedDoc.documentStatus ?? undefined}
-            uploadedDate={selectedDoc.createdAt ? formatDocumentDate(selectedDoc.createdAt) : undefined}
-            signedDate={selectedDoc.signedAt ? formatDocumentDate(selectedDoc.signedAt) : undefined}
-            onDownload={() => {}}
-            onSend={() => {}}
-            onEdit={() => {}}
-          />
-        )}
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* ── Section Messages (commune) ──                                 */}

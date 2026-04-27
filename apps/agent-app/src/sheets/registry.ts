@@ -1,7 +1,9 @@
 // Sheet registry — maps SheetType to component + fetcher + width
 // Components and fetchers will be registered as sheets are migrated (Phase 2+)
 
+import { lazy } from 'react';
 import type { SheetType } from './types';
+import { fetchDocumentData } from './fetchers/fetchDocumentData';
 
 export interface SheetRegistryEntry {
   /** Lazy-loaded component (receives { data, onClose } props) */
@@ -12,5 +14,10 @@ export interface SheetRegistryEntry {
   width: 'narrow' | 'wide';
 }
 
-// Registry starts empty — entries are added as sheets are migrated
-export const SHEET_REGISTRY: Partial<Record<SheetType, SheetRegistryEntry>> = {};
+export const SHEET_REGISTRY: Partial<Record<SheetType, SheetRegistryEntry>> = {
+  'document': {
+    component: lazy(() => import('./wrappers/DocumentSheetWrapper')),
+    fetcher: (payload) => fetchDocumentData(payload as { documentId: string }),
+    width: 'wide',
+  },
+};

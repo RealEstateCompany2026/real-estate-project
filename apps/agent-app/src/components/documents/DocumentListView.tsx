@@ -11,12 +11,11 @@ import { ButtonPagination } from '@real-estate/ui/button-pagination';
 import { IconButton } from '@real-estate/ui/button';
 import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
-import { SheetDocument } from '@real-estate/ui/sheet-document';
-
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import { seedRandomInt } from '@/utils/seedRandom';
 import { DOCUMENT_TYPE_LABELS, computeDocumentValidity, formatDocumentDate } from '@/utils/documentHelpers';
+import { useSheetManager } from '@/hooks/useSheetManager';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -155,9 +154,8 @@ export function DocumentListView() {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [page, setPage] = useState(0);
 
-  // ── Sheet state ──
-  const [selectedDocument, setSelectedDocument] = useState<DocumentDisplayItem | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  // ── SheetManager ──
+  const { openSheet } = useSheetManager();
 
   // ── Fetch documents ──
   useEffect(() => {
@@ -258,9 +256,8 @@ export function DocumentListView() {
 
   // ── Handlers ──
   const handleDocumentClick = useCallback((doc: DocumentDisplayItem) => {
-    setSelectedDocument(doc);
-    setSheetOpen(true);
-  }, []);
+    openSheet('document', { documentId: doc.id });
+  }, [openSheet]);
 
   const handleRemoveFilter = useCallback((criterionId: string) => {
     setActiveFilters((prev) => prev.filter((f) => f.criterionId !== criterionId));
@@ -385,37 +382,6 @@ export function DocumentListView() {
         />
       </div>
 
-      {/* ═══════════════════════════════════════════════════════
-          5. Sheet — Document detail (opens on click)
-          ═══════════════════════════════════════════════════════ */}
-      {selectedDocument && (
-        <SheetDocument
-          isOpen={sheetOpen}
-          onClose={() => {
-            setSheetOpen(false);
-            setSelectedDocument(null);
-          }}
-          title={selectedDocument.title}
-          validityStatus={selectedDocument.validityStatus}
-          expiryDate={selectedDocument.expiryDate}
-          fileFormat={selectedDocument.fileFormat}
-          fileName={selectedDocument.fileName}
-          fileSizeKb={selectedDocument.fileSizeKb}
-          previewUrl={selectedDocument.previewUrl}
-          documentType={selectedDocument.documentType}
-          documentStatus={selectedDocument.documentStatus}
-          uploadedBy={selectedDocument.uploadedBy}
-          uploadedDate={selectedDocument.uploadedDate}
-          modifiedDate={selectedDocument.modifiedDate}
-          signedDate={selectedDocument.signedDate}
-          clients={selectedDocument.clients}
-          properties={selectedDocument.properties}
-          deals={selectedDocument.deals}
-          onDownload={() => {/* TODO */}}
-          onSend={() => {/* TODO */}}
-          onEdit={() => {/* TODO */}}
-        />
-      )}
     </>
   );
 }

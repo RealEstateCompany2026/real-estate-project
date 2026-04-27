@@ -25,14 +25,12 @@ import { InputFieldOutlined } from '@real-estate/ui/input-field-outlined';
 import { SelectField } from '@real-estate/ui/select-field';
 import { FileUpload } from '@real-estate/ui/file-upload';
 import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
-import { SheetDocument } from '@real-estate/ui/sheet-document';
-
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
 import type { Client, ClientStatus } from '@/types/client';
 import { seedRandomInt } from '@/utils/seedRandom';
-import { DOCUMENT_TYPE_LABELS, computeDocumentValidity, formatDocumentDate } from '@/utils/documentHelpers';
+import { useSheetManager } from '@/hooks/useSheetManager';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
 import {
   computeWeightedRevenue,
@@ -476,8 +474,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
-  const [docSheetOpen, setDocSheetOpen] = useState(false);
+  const { openSheet } = useSheetManager();
 
   // ── Section refs for anchor navigation ──
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -1107,33 +1104,12 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           </div>
           <div className="flex flex-wrap gap-[12px]">
             {documents.map((d) => (
-              <Button key={d.id} variant="outline" onClick={() => { setSelectedDoc(d); setDocSheetOpen(true); }}>
+              <Button key={d.id} variant="outline" onClick={() => openSheet('document', { documentId: d.id })}>
                 {d.label}
               </Button>
             ))}
           </div>
         </section>
-
-        {selectedDoc && (
-          <SheetDocument
-            isOpen={docSheetOpen}
-            onClose={() => { setDocSheetOpen(false); setSelectedDoc(null); }}
-            title={selectedDoc.title}
-            validityStatus={computeDocumentValidity(selectedDoc.expiryDate ?? null)}
-            expiryDate={selectedDoc.expiryDate ? formatDocumentDate(selectedDoc.expiryDate) : undefined}
-            fileFormat={selectedDoc.fileFormat}
-            fileName={selectedDoc.fileName}
-            fileSizeKb={selectedDoc.fileSizeKb}
-            previewUrl={selectedDoc.url}
-            documentType={DOCUMENT_TYPE_LABELS[selectedDoc.type] ?? selectedDoc.type}
-            documentStatus={selectedDoc.documentStatus}
-            uploadedDate={selectedDoc.createdAt ? formatDocumentDate(selectedDoc.createdAt) : undefined}
-            signedDate={selectedDoc.signedAt ? formatDocumentDate(selectedDoc.signedAt) : undefined}
-            onDownload={() => {}}
-            onSend={() => {}}
-            onEdit={() => {}}
-          />
-        )}
 
         {/* Bloc 8 — Messages */}
         <section ref={setSectionRef('messages')} id="messages" className="scroll-mt-[200px] py-[50px] border-t border-edge-default">
