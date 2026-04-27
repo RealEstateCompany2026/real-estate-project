@@ -56,24 +56,33 @@ export interface SheetPayloadMap {
   'acte-notarie': { dealId: string };
 }
 
+// Options passed when opening a sheet
+export interface SheetOpenOptions {
+  /** Called by the wrapper after mutating data — allows the parent page to refresh its state */
+  onMutate?: () => void;
+}
+
 // Stack entry representing one open sheet
 export interface SheetStackEntry {
   type: SheetType;
   payload: SheetPayloadMap[SheetType];
   data?: unknown;
   status: 'loading' | 'ready' | 'error';
+  onMutate?: () => void;
 }
 
 // Public API exposed by useSheetManager
 export interface SheetManagerAPI {
   /** Open a sheet (replaces current stack) */
-  openSheet: <T extends SheetType>(type: T, payload: SheetPayloadMap[T]) => void;
+  openSheet: <T extends SheetType>(type: T, payload: SheetPayloadMap[T], options?: SheetOpenOptions) => void;
   /** Push a sheet on top of the current one (for transverse navigation) */
-  pushSheet: <T extends SheetType>(type: T, payload: SheetPayloadMap[T]) => void;
+  pushSheet: <T extends SheetType>(type: T, payload: SheetPayloadMap[T], options?: SheetOpenOptions) => void;
   /** Close the topmost sheet (pops from stack) */
   closeSheet: () => void;
   /** Close all sheets */
   closeAll: () => void;
+  /** Notify the parent page that the wrapper mutated data — calls the topmost sheet's onMutate callback */
+  notifyMutate: () => void;
   /** Current topmost sheet entry (or null if no sheet open) */
   currentSheet: SheetStackEntry | null;
   /** Full navigation stack */

@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useCallback, useState, type ReactNode } from 'react';
-import type { SheetType, SheetPayloadMap, SheetStackEntry, SheetManagerAPI } from '@/sheets/types';
+import { createContext, useCallback, useRef, useState, type ReactNode } from 'react';
+import type { SheetType, SheetPayloadMap, SheetOpenOptions, SheetStackEntry, SheetManagerAPI } from '@/sheets/types';
 import { SHEET_REGISTRY } from '@/sheets/registry';
 
 const SheetContext = createContext<SheetManagerAPI>({
@@ -9,6 +9,7 @@ const SheetContext = createContext<SheetManagerAPI>({
   pushSheet: () => {},
   closeSheet: () => {},
   closeAll: () => {},
+  notifyMutate: () => {},
   currentSheet: null,
   stack: [],
   isOpen: false,
@@ -18,9 +19,11 @@ export { SheetContext };
 
 export function SheetProvider({ children }: { children: ReactNode }) {
   const [stack, setStack] = useState<SheetStackEntry[]>([]);
+  const stackRef = useRef<SheetStackEntry[]>([]);
+  stackRef.current = stack;
 
-  const openSheet = useCallback(<T extends SheetType>(type: T, payload: SheetPayloadMap[T]) => {
-    const entry: SheetStackEntry = { type, payload, status: 'loading' };
+  const openSheet = useCallback(<T extends SheetType>(type: T, payload: SheetPayloadMap[T], options?: SheetOpenOptions) => {
+    const entry: SheetStackEntry = { type, payload, status: 'loading', onMutate: options?.onMutate };
     setStack([entry]);
 
     // Fetch data if registry has a fetcher for this type
@@ -38,8 +41,8 @@ export function SheetProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const pushSheet = useCallback(<T extends SheetType>(type: T, payload: SheetPayloadMap[T]) => {
-    const entry: SheetStackEntry = { type, payload, status: 'loading' };
+  const pushSheet = useCallback(<T extends SheetType>(type: T, payload: SheetPayloadMap[T], options?: SheetOpenOptions) => {
+    const entry: SheetStackEntry = { type, payload, status: 'loading', onMutate: options?.onMutate };
     setStack((prev) => [...prev, entry]);
 
     const registryEntry = SHEET_REGISTRY[type];
@@ -64,11 +67,17 @@ export function SheetProvider({ children }: { children: ReactNode }) {
     setStack([]);
   }, []);
 
+  const notifyMutate = useCallback(() => {
+    const currentStack = stackRef.current;
+    const top = currentStack[currentStack.length - 1];
+    top?.onMutate?.();
+  }, []);
+
   const currentSheet = stack.length > 0 ? stack[stack.length - 1] : null;
   const isOpen = stack.length > 0;
 
   return (
-    <SheetContext.Provider value={{ openSheet, pushSheet, closeSheet, closeAll, currentSheet, stack, isOpen }}>
+    <SheetContext.Provider value={{ openSheet, pushSheet, closeSheet, closeAll, notifyMutate, currentSheet, stack, isOpen }}>
       {children}
     </SheetContext.Provider>
   );
