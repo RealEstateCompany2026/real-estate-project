@@ -6,7 +6,7 @@ import {
   User,
   Home,
   ClipboardList,
-  FileText,
+  Layers,
   Calendar,
   Workflow,
   type LucideIcon,
@@ -103,7 +103,7 @@ const NAV_SECTIONS: NavRailSection[][] = [
     { id: "clients", icon: User, label: "Clients" },
     { id: "properties", icon: Home, label: "Biens" },
     { id: "deals", icon: ClipboardList, label: "Affaires" },
-    { id: "documents", icon: FileText, label: "Documents" },
+    { id: "documents", icon: Layers, label: "Documents" },
   ],
   // Section 3: Outils
   [
