@@ -46,7 +46,6 @@ import { Sheet } from '@real-estate/ui/sheet';
 import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
 import { SheetVisite } from '@real-estate/ui/sheet-visite';
-import { SheetOrdreDuJour } from '@real-estate/ui/sheet-ordre-du-jour';
 import { SheetAgendaBien, AgendaDay, TimeSlot } from '@real-estate/ui/sheet-agenda-bien';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
@@ -692,9 +691,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [selectedVisiteEvent, setSelectedVisiteEvent] = useState<EventRow | null>(null);
   const [isRevision, setIsRevision] = useState(false);
   // Sub-sheets visite
-  const [isSheetOdjOpen, setIsSheetOdjOpen] = useState(false);
-  const [odjContent, setOdjContent] = useState('');
-  const [odjIsRevision, setOdjIsRevision] = useState(false);
   const [visitGuideSubmittedAt, setVisitGuideSubmittedAt] = useState<string | null>(null);
   // Agenda bien
   const [isSheetAgendaOpen, setIsSheetAgendaOpen] = useState(false);
@@ -1064,63 +1060,32 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   }, []);
 
   // ── ODJ handlers ──
-  const handleOpenOdj = useCallback(async () => {
+  const refreshSelectedEvent = useCallback(async () => {
     if (!selectedVisiteEvent) return;
-    // Init local state from event data
-    setOdjContent(selectedVisiteEvent.odjContent ?? '');
-    setOdjIsRevision(selectedVisiteEvent.odjStatus === 'REVISE' || selectedVisiteEvent.odjStatus === 'ENVOYE');
-    setIsSheetOdjOpen(true);
+    const supabase = createClient();
+    const { data: refreshed } = await supabase
+      .from('Event')
+      .select('odjContent, odjStatus, odjSentAt')
+      .eq('id', selectedVisiteEvent.id)
+      .single();
+    if (refreshed) {
+      setSelectedVisiteEvent((prev) =>
+        prev ? { ...prev, odjContent: refreshed.odjContent, odjStatus: refreshed.odjStatus, odjSentAt: refreshed.odjSentAt } : prev
+      );
+      setEvents((prev) =>
+        prev.map((e) =>
+          e.id === selectedVisiteEvent.id
+            ? { ...e, odjContent: refreshed.odjContent, odjStatus: refreshed.odjStatus, odjSentAt: refreshed.odjSentAt }
+            : e
+        )
+      );
+    }
   }, [selectedVisiteEvent]);
 
-  const handleCloseOdj = useCallback(() => {
-    setIsSheetOdjOpen(false);
-  }, []);
-
-  const handleOdjContentChange = useCallback((content: string) => {
-    setOdjContent(content);
-  }, []);
-
-  const handleOdjToggleRevision = useCallback(async (checked: boolean) => {
+  const handleOpenOdj = useCallback(async () => {
     if (!selectedVisiteEvent) return;
-    const supabase = createClient();
-    const newStatus = checked ? 'REVISE' : 'EDITE';
-    // Persist to Supabase
-    await supabase
-      .from('Event')
-      .update({ odjContent, odjStatus: newStatus })
-      .eq('id', selectedVisiteEvent.id);
-    setOdjIsRevision(checked);
-    // Update local event data
-    setSelectedVisiteEvent((prev) =>
-      prev ? { ...prev, odjContent, odjStatus: newStatus } : prev
-    );
-    // Update events list
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === selectedVisiteEvent.id ? { ...e, odjContent, odjStatus: newStatus } : e
-      )
-    );
-  }, [selectedVisiteEvent, odjContent]);
-
-  const handleSendOdj = useCallback(async () => {
-    if (!selectedVisiteEvent) return;
-    const supabase = createClient();
-    const now = new Date().toISOString();
-    await supabase
-      .from('Event')
-      .update({ odjContent, odjStatus: 'ENVOYE', odjSentAt: now })
-      .eq('id', selectedVisiteEvent.id);
-    // Update local state
-    setSelectedVisiteEvent((prev) =>
-      prev ? { ...prev, odjContent, odjStatus: 'ENVOYE', odjSentAt: now } : prev
-    );
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === selectedVisiteEvent.id ? { ...e, odjContent, odjStatus: 'ENVOYE', odjSentAt: now } : e
-      )
-    );
-    setIsSheetOdjOpen(false);
-  }, [selectedVisiteEvent, odjContent]);
+    openSheet('ordre-du-jour', { eventId: selectedVisiteEvent.id }, { onMutate: refreshSelectedEvent });
+  }, [selectedVisiteEvent, openSheet, refreshSelectedEvent]);
 
   // ── Guide de visite handlers ──
   const handleOpenGuide = useCallback(async () => {
@@ -2719,35 +2684,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
           clientSearchResults={clientSearchResults}
           onClientSelect={handleClientSelect}
           onSaveInvite={handleSaveInvite}
-        />
-
-        {/* Sheet Ordre du Jour */}
-        <SheetOrdreDuJour
-          isOpen={isSheetOdjOpen}
-          onClose={handleCloseOdj}
-          propertyAddress={deal?.Property?.address ?? null}
-          propertyCity={deal?.Property?.addressCity ?? null}
-          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
-          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
-          propertyDpeGrade={
-            deal?.Property?.dpeEnergyClass &&
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-              ? (deal.Property.dpeEnergyClass as DpeType)
-              : null
-          }
-          clientName={clientFullName}
-          content={odjContent}
-          onContentChange={handleOdjContentChange}
-          odjStatus={
-            selectedVisiteEvent.odjStatus === 'EDITE' ||
-            selectedVisiteEvent.odjStatus === 'REVISE' ||
-            selectedVisiteEvent.odjStatus === 'ENVOYE'
-              ? selectedVisiteEvent.odjStatus
-              : null
-          }
-          isRevision={odjIsRevision}
-          onToggleRevision={handleOdjToggleRevision}
-          onSend={handleSendOdj}
         />
 
         {/* Sheet Agenda du bien */}

@@ -5,6 +5,7 @@ import { lazy } from 'react';
 import type { SheetType } from './types';
 import { fetchDocumentData } from './fetchers/fetchDocumentData';
 import { fetchGuideDeVisiteData } from './fetchers/fetchGuideDeVisiteData';
+import { fetchOrdreDuJourData } from './fetchers/fetchOrdreDuJourData';
 
 export interface SheetRegistryEntry {
   /** Lazy-loaded component (receives { data, onClose } props) */
@@ -24,6 +25,11 @@ export const SHEET_REGISTRY: Partial<Record<SheetType, SheetRegistryEntry>> = {
   'guide-de-visite': {
     component: lazy(() => import('./wrappers/GuideDeVisiteSheetWrapper')),
     fetcher: (payload) => fetchGuideDeVisiteData(payload as { eventId: string }),
+    width: 'narrow',
+  },
+  'ordre-du-jour': {
+    component: lazy(() => import('./wrappers/OrdreDuJourSheetWrapper')),
+    fetcher: (payload) => fetchOrdreDuJourData(payload as { eventId: string }),
     width: 'narrow',
   },
 };
