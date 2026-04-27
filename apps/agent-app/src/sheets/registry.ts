@@ -8,6 +8,8 @@ import { fetchGuideDeVisiteData } from './fetchers/fetchGuideDeVisiteData';
 import { fetchOrdreDuJourData } from './fetchers/fetchOrdreDuJourData';
 import { fetchVisiteData } from './fetchers/fetchVisiteData';
 import { fetchAgendaBienData } from './fetchers/fetchAgendaBienData';
+import { fetchMandatData } from './fetchers/fetchMandatData';
+import { fetchMandatEditData } from './fetchers/fetchMandatEditData';
 
 export interface SheetRegistryEntry {
   /** Lazy-loaded component (receives { data, onClose } props) */
@@ -42,6 +44,16 @@ export const SHEET_REGISTRY: Partial<Record<SheetType, SheetRegistryEntry>> = {
   'agenda-bien': {
     component: lazy(() => import('./wrappers/AgendaBienSheetWrapper')),
     fetcher: (payload) => fetchAgendaBienData(payload as { propertyId: string; eventId: string }),
+    width: 'narrow',
+  },
+  'mandat': {
+    component: lazy(() => import('./wrappers/MandatSheetWrapper')),
+    fetcher: (payload) => fetchMandatData(payload as { dealId: string }),
+    width: 'narrow',
+  },
+  'mandat-edit': {
+    component: lazy(() => import('./wrappers/MandatEditSheetWrapper')),
+    fetcher: (payload) => fetchMandatEditData(payload as { dealId: string; mode: 'edit' | 'review' }),
     width: 'narrow',
   },
 };

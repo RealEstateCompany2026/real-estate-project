@@ -38,7 +38,7 @@ export interface SheetPayloadMap {
   'document-import': { entityType: 'client' | 'property' | 'deal'; entityId: string };
   'document-edit': { documentId: string };
   'mandat': { dealId: string };
-  'mandat-edit': { dealId: string };
+  'mandat-edit': { dealId: string; mode: 'edit' | 'review' };
   'visite': { eventId: string };
   'ordre-du-jour': { eventId: string };
   'guide-de-visite': { eventId: string };
