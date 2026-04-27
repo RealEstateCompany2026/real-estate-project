@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/Sidebar'
 import { ToastProvider } from '@/components/ui/Toast'
+import { SheetProvider } from '@/providers/SheetProvider'
+import { SheetOutlet } from '@/providers/SheetOutlet'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -34,14 +36,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <ToastProvider>
-      <div className="flex min-h-screen bg-surface-page">
-        <Sidebar />
-        <main className="flex-1 pl-[90px]">
-          <div className="page-content ml-[25px]">
-            {children}
-          </div>
-        </main>
-      </div>
+      <SheetProvider>
+        <div className="flex min-h-screen bg-surface-page">
+          <Sidebar />
+          <main className="flex-1 pl-[90px]">
+            <div className="page-content ml-[25px]">
+              {children}
+            </div>
+          </main>
+        </div>
+        <SheetOutlet />
+      </SheetProvider>
     </ToastProvider>
   )
 }
