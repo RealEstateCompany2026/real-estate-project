@@ -42,7 +42,7 @@ export interface SheetPayloadMap {
   'visite': { eventId: string };
   'ordre-du-jour': { eventId: string };
   'guide-de-visite': { eventId: string };
-  'agenda-bien': { propertyId: string };
+  'agenda-bien': { propertyId: string; eventId: string };
   'annonce': { listingId: string };
   'messages': { entityType: 'client' | 'property' | 'deal'; entityId: string };
   'messages-edit': { entityType: 'client' | 'property' | 'deal'; entityId: string };
@@ -81,7 +81,7 @@ export interface SheetManagerAPI {
   closeSheet: () => void;
   /** Close all sheets */
   closeAll: () => void;
-  /** Notify the parent page that the wrapper mutated data — calls the topmost sheet's onMutate callback */
+  /** Notify the parent page that the wrapper mutated data — calls every onMutate callback in the stack */
   notifyMutate: () => void;
   /** Current topmost sheet entry (or null if no sheet open) */
   currentSheet: SheetStackEntry | null;

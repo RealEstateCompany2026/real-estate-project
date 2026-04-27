@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles,
@@ -45,8 +45,6 @@ import type { DpeType } from '@real-estate/ui/icon-dpe';
 import { Sheet } from '@real-estate/ui/sheet';
 import { SheetMandat } from '@real-estate/ui/sheet-mandat';
 import { ListVisite } from '@real-estate/ui/list-visite';
-import { SheetVisite } from '@real-estate/ui/sheet-visite';
-import { SheetAgendaBien, AgendaDay, TimeSlot } from '@real-estate/ui/sheet-agenda-bien';
 import { ListPromesse } from '@real-estate/ui/list-promesse';
 import { ListActeNotarie } from '@real-estate/ui/list-acte-notarie';
 import { CardCA } from '@real-estate/ui/card-ca';
@@ -207,11 +205,6 @@ interface ListingRow {
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Échappe les caractères spéciaux ILIKE (%, _, \) pour éviter les wildcards involontaires. */
-function escapeIlike(str: string): string {
-  return str.replace(/[%_\\]/g, '\\$&');
-}
-
 function formatDateTime(date: string): string {
   return new Date(date).toLocaleDateString('fr-FR', {
     day: '2-digit',
@@ -316,48 +309,6 @@ function mapVisiteWorkflow(event: EventRow): { cal: BadgeVariant; odj: BadgeVari
   return { cal, odj, cr };
 }
 
-// ── Agenda bien — default days generator ──
-
-/**
- * Génère les 5 prochains jours ouvrés avec créneaux de 30min (9h-19h).
- * Exclut samedi et dimanche.
- */
-function generateDefaultAgendaDays(): AgendaDay[] {
-  const days: AgendaDay[] = [];
-  const now = new Date();
-  let current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const dayLabels = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-  const monthLabels = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-
-  while (days.length < 5) {
-    const dow = current.getDay();
-    if (dow !== 0 && dow !== 6) {
-      // Weekday
-      const slots: TimeSlot[] = [];
-      for (let h = 9; h < 19; h++) {
-        for (const m of [0, 30]) {
-          const startH = String(h).padStart(2, '0');
-          const startM = String(m).padStart(2, '0');
-          const endM = m === 30 ? '00' : '30';
-          const endH = m === 30 ? String(h + 1).padStart(2, '0') : startH;
-          slots.push({
-            startTime: `${startH}:${startM}`,
-            endTime: `${endH}:${endM}`,
-            status: 'available',
-          });
-        }
-      }
-      const dateISO = current.toISOString().split('T')[0];
-      days.push({
-        label: `${dayLabels[dow]} ${current.getDate()} ${monthLabels[current.getMonth()]}`,
-        date: dateISO,
-        slots,
-      });
-    }
-    current = new Date(current.getTime() + 86400000);
-  }
-  return days;
-}
 
 // ── Offer workflow mapping (ÉDITION / ACCORD) ──
 
@@ -687,27 +638,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
   const [isRechercheSheetOpen, setIsRechercheSheetOpen] = useState(false);
   const [isSheetMandatEditOpen, setIsSheetMandatEditOpen] = useState(false);
   const [isSheetMandatViewOpen, setIsSheetMandatViewOpen] = useState(false);
-  const [isSheetVisiteOpen, setIsSheetVisiteOpen] = useState(false);
-  const [selectedVisiteEvent, setSelectedVisiteEvent] = useState<EventRow | null>(null);
   const [isRevision, setIsRevision] = useState(false);
-  // Sub-sheets visite
-  const [visitGuideSubmittedAt, setVisitGuideSubmittedAt] = useState<string | null>(null);
-  // Agenda bien
-  const [isSheetAgendaOpen, setIsSheetAgendaOpen] = useState(false);
-  const [agendaDays, setAgendaDays] = useState<AgendaDay[]>([]);
-  const [selectedAgendaSlot, setSelectedAgendaSlot] = useState<{ date: string; startTime: string } | null>(null);
   const { openSheet } = useSheetManager();
-  // Visite — property edit & invite add
-  const [isEditingProperty, setIsEditingProperty] = useState(false);
-  const [propertySearchQuery, setPropertySearchQuery] = useState('');
-  const [propertySearchResults, setPropertySearchResults] = useState<Array<{ id: string; label: string }>>([]);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
-  const [isAddingInvite, setIsAddingInvite] = useState(false);
-  const [clientSearchQuery, setClientSearchQuery] = useState('');
-  const [clientSearchResults, setClientSearchResults] = useState<Array<{ id: string; label: string }>>([]);
-  const [selectedInviteClientId, setSelectedInviteClientId] = useState<string | null>(null);
-  const propertySearchAbort = useRef<AbortController | null>(null);
-  const clientSearchAbort = useRef<AbortController | null>(null);
   const [organization, setOrganization] = useState<{
     name: string | null; address: string | null; siret: string | null;
     rcpInsuranceRef: string | null; rcpExpiryDate: string | null;
@@ -1048,287 +980,30 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
     }
   }, [deal]);
 
-  // ── Visite handlers ──
-  const handleOpenVisite = useCallback((event: EventRow) => {
-    setSelectedVisiteEvent(event);
-    setIsSheetVisiteOpen(true);
-  }, []);
-
-  const handleCloseVisite = useCallback(() => {
-    setIsSheetVisiteOpen(false);
-    setSelectedVisiteEvent(null);
-  }, []);
-
-  // ── ODJ handlers ──
-  const refreshSelectedEvent = useCallback(async () => {
-    if (!selectedVisiteEvent) return;
-    const supabase = createClient();
-    const { data: refreshed } = await supabase
-      .from('Event')
-      .select('odjContent, odjStatus, odjSentAt')
-      .eq('id', selectedVisiteEvent.id)
-      .single();
-    if (refreshed) {
-      setSelectedVisiteEvent((prev) =>
-        prev ? { ...prev, odjContent: refreshed.odjContent, odjStatus: refreshed.odjStatus, odjSentAt: refreshed.odjSentAt } : prev
-      );
-      setEvents((prev) =>
-        prev.map((e) =>
-          e.id === selectedVisiteEvent.id
-            ? { ...e, odjContent: refreshed.odjContent, odjStatus: refreshed.odjStatus, odjSentAt: refreshed.odjSentAt }
-            : e
-        )
-      );
-    }
-  }, [selectedVisiteEvent]);
-
-  const handleOpenOdj = useCallback(async () => {
-    if (!selectedVisiteEvent) return;
-    openSheet('ordre-du-jour', { eventId: selectedVisiteEvent.id }, { onMutate: refreshSelectedEvent });
-  }, [selectedVisiteEvent, openSheet, refreshSelectedEvent]);
-
-  // ── Guide de visite handlers ──
-  const handleOpenGuide = useCallback(async () => {
-    if (!selectedVisiteEvent) return;
-    // Quick check for badge status (used by SheetVisite)
+  // ── refreshEvents — called by SheetManager onMutate ──
+  const refreshEvents = useCallback(async () => {
     const supabase = createClient();
     const { data } = await supabase
-      .from('VisitGuideResponse')
-      .select('submittedAt')
-      .eq('eventId', selectedVisiteEvent.id)
-      .maybeSingle();
-    setVisitGuideSubmittedAt(data?.submittedAt ?? null);
-    // Open via SheetManager
-    openSheet('guide-de-visite', { eventId: selectedVisiteEvent.id });
-  }, [selectedVisiteEvent, openSheet]);
-
-  // ── Agenda bien handlers ──
-  const handleOpenAgenda = useCallback(async () => {
-    if (!deal?.Property?.id) return;
-    const supabase = createClient();
-    const propertyId = deal.Property.id;
-
-    // 1. Generate default days (5 weekdays, 30min slots, all available)
-    const defaultDays = generateDefaultAgendaDays();
-
-    // 2. Fetch closed slots (exceptions) from Supabase
-    const startDate = defaultDays[0]?.date;
-    const endDate = defaultDays[defaultDays.length - 1]?.date;
-    const { data: exceptions } = await supabase
-      .from('PropertyAvailabilityException')
-      .select('date, startTime, endTime')
-      .eq('propertyId', propertyId)
-      .gte('date', `${startDate}T00:00:00`)
-      .lte('date', `${endDate}T23:59:59`);
-
-    // 3. Fetch existing VISITE events for this property in the date range
-    const { data: existingVisits } = await supabase
       .from('Event')
-      .select('eventDate')
-      .eq('propertyId', propertyId)
-      .eq('type', 'VISITE')
-      .in('status', ['PROGRAMME', 'CONFIRME'])
-      .gte('eventDate', `${startDate}T00:00:00`)
-      .lte('eventDate', `${endDate}T23:59:59`);
-
-    // 4. Mark closed slots and occupied slots
-    const closedSet = new Set<string>();
-    if (exceptions) {
-      for (const ex of exceptions) {
-        const exDate = new Date(ex.date).toISOString().split('T')[0];
-        closedSet.add(`${exDate}_${ex.startTime}`);
-      }
+      .select('id, type, status, title, description, eventDate, reportContent, odjContent, odjStatus, odjSentAt, clientId, agentId, User:agentId(name)')
+      .eq('dealId', dealId)
+      .order('eventDate', { ascending: false });
+    if (data) {
+      setEvents(data as EventRow[]);
+      // Also update activities
+      const fetchedType = (deal?.type as string) ?? 'VENTE';
+      const mappedActivities: ActivityLog[] = data.map((ev: any) => ({
+        id: ev.id,
+        date: new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(ev.eventDate)),
+        time: new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ev.eventDate)),
+        author: ev.User?.[0]?.name ?? ev.User?.name ?? 'Syst\u00e8me',
+        category: eventTypeToCategory(ev.type, fetchedType as any),
+        status: ev.status,
+        description: ev.description ?? ev.title ?? '',
+      }));
+      setAllActivities(mappedActivities);
     }
-
-    const occupiedSet = new Set<string>();
-    if (existingVisits) {
-      for (const visit of existingVisits) {
-        const visitDate = new Date(visit.eventDate);
-        const vDate = visitDate.toISOString().split('T')[0];
-        const vTime = `${String(visitDate.getHours()).padStart(2, '0')}:${String(visitDate.getMinutes()).padStart(2, '0')}`;
-        occupiedSet.add(`${vDate}_${vTime}`);
-      }
-    }
-
-    // 5. Apply statuses to slots
-    const enrichedDays = defaultDays.map((day) => ({
-      ...day,
-      slots: day.slots.map((slot) => {
-        const key = `${day.date}_${slot.startTime}`;
-        if (closedSet.has(key) || occupiedSet.has(key)) {
-          return { ...slot, status: 'occupied' as const };
-        }
-        return slot;
-      }),
-    }));
-
-    setAgendaDays(enrichedDays);
-    setSelectedAgendaSlot(null);
-    setIsSheetAgendaOpen(true);
-  }, [deal]);
-
-  const handleCloseAgenda = useCallback(() => {
-    setIsSheetAgendaOpen(false);
-    setSelectedAgendaSlot(null);
-  }, []);
-
-  const handleAgendaSlotSelect = useCallback((date: string, startTime: string) => {
-    setSelectedAgendaSlot({ date, startTime });
-    // Also update the visual state in agendaDays
-    setAgendaDays((prev) =>
-      prev.map((day) => ({
-        ...day,
-        slots: day.slots.map((slot) => ({
-          ...slot,
-          status:
-            day.date === date && slot.startTime === startTime
-              ? 'selected' as const
-              : slot.status === 'selected'
-                ? 'available' as const
-                : slot.status,
-        })),
-      }))
-    );
-  }, []);
-
-  // ── Property search autocomplete ──
-  const handlePropertySearchChange = useCallback(async (query: string) => {
-    setPropertySearchQuery(query);
-    setSelectedPropertyId(null);
-    if (query.length < 3) {
-      setPropertySearchResults([]);
-      return;
-    }
-    propertySearchAbort.current?.abort();
-    const controller = new AbortController();
-    propertySearchAbort.current = controller;
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('Property')
-      .select('id, address')
-      .ilike('address', `%${escapeIlike(query)}%`)
-      .limit(10)
-      .abortSignal(controller.signal);
-    if (controller.signal.aborted) return;
-    setPropertySearchResults(
-      (data ?? []).map((p: { id: string; address: string | null }) => ({ id: p.id, label: p.address ?? '' }))
-    );
-  }, []);
-
-  const handlePropertySelect = useCallback((propertyId: string) => {
-    setSelectedPropertyId(propertyId);
-    const match = propertySearchResults.find((r) => r.id === propertyId);
-    if (match) setPropertySearchQuery(match.label);
-    setPropertySearchResults([]);
-  }, [propertySearchResults]);
-
-  const handleSaveProperty = useCallback(async () => {
-    if (!selectedPropertyId || !deal?.id) return;
-    const supabase = createClient();
-    await supabase.from('Deal').update({ propertyId: selectedPropertyId }).eq('id', deal.id);
-    // Fetch the selected property to update local state
-    const { data: prop } = await supabase
-      .from('Property')
-      .select('id, address, addressCity, type, livingAreaSqm, dpeEnergyClass, desiredSellingPrice, numberOfRooms')
-      .eq('id', selectedPropertyId)
-      .single();
-    if (prop) {
-      setDeal((prev) => prev ? {
-        ...prev,
-        propertyId: selectedPropertyId,
-        Property: {
-          id: prop.id,
-          address: prop.address ?? null,
-          addressCity: prop.addressCity ?? null,
-          type: prop.type ?? null,
-          livingAreaSqm: prop.livingAreaSqm ?? null,
-          dpeEnergyClass: prop.dpeEnergyClass ?? null,
-          desiredSellingPrice: prop.desiredSellingPrice ?? null,
-          numberOfRooms: prop.numberOfRooms ?? null,
-        },
-      } : prev);
-    }
-    setIsEditingProperty(false);
-    setPropertySearchQuery('');
-    setPropertySearchResults([]);
-    setSelectedPropertyId(null);
-  }, [selectedPropertyId, deal?.id]);
-
-  // ── Client search autocomplete ──
-  const handleClientSearchChange = useCallback(async (query: string) => {
-    setClientSearchQuery(query);
-    setSelectedInviteClientId(null);
-    if (query.length < 2) {
-      setClientSearchResults([]);
-      return;
-    }
-    clientSearchAbort.current?.abort();
-    const controller = new AbortController();
-    clientSearchAbort.current = controller;
-    const supabase = createClient();
-    const escaped = escapeIlike(query);
-    const { data } = await supabase
-      .from('Client')
-      .select('id, firstName, lastName')
-      .or(`firstName.ilike.%${escaped}%,lastName.ilike.%${escaped}%`)
-      .limit(10)
-      .abortSignal(controller.signal);
-    if (controller.signal.aborted) return;
-    setClientSearchResults(
-      (data ?? []).map((c: { id: string; firstName: string | null; lastName: string | null }) => ({
-        id: c.id,
-        label: `${c.firstName ?? ''} ${c.lastName ?? ''}`.trim(),
-      }))
-    );
-  }, []);
-
-  const handleClientSelect = useCallback((clientId: string) => {
-    setSelectedInviteClientId(clientId);
-    const match = clientSearchResults.find((r) => r.id === clientId);
-    if (match) setClientSearchQuery(match.label);
-    setClientSearchResults([]);
-  }, [clientSearchResults]);
-
-  const handleSaveInvite = useCallback(async () => {
-    if (!selectedInviteClientId || !selectedVisiteEvent) return;
-    const supabase = createClient();
-    // Niveau 3B — persist Event.clientId
-    await supabase.from('Event').update({ clientId: selectedInviteClientId }).eq('id', selectedVisiteEvent.id);
-    // Update local state
-    setSelectedVisiteEvent((prev) =>
-      prev ? { ...prev, clientId: selectedInviteClientId } : prev
-    );
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === selectedVisiteEvent.id ? { ...e, clientId: selectedInviteClientId } : e
-      )
-    );
-    setIsAddingInvite(false);
-    setClientSearchQuery('');
-    setClientSearchResults([]);
-    setSelectedInviteClientId(null);
-  }, [selectedInviteClientId, selectedVisiteEvent]);
-
-  const handleProposeSlot = useCallback(async () => {
-    if (!selectedAgendaSlot || !selectedVisiteEvent) return;
-    const supabase = createClient();
-    // Stocker la date/heure telle quelle (sans conversion UTC)
-    const eventDateStr = `${selectedAgendaSlot.date}T${selectedAgendaSlot.startTime}:00`;
-    await supabase
-      .from('Event')
-      .update({ eventDate: eventDateStr, status: 'PROGRAMME' })
-      .eq('id', selectedVisiteEvent.id);
-    // Update local state
-    setSelectedVisiteEvent((prev) =>
-      prev ? { ...prev, eventDate: eventDateStr, status: 'PROGRAMME' } : prev
-    );
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === selectedVisiteEvent.id ? { ...e, eventDate: eventDateStr, status: 'PROGRAMME' } : e
-      )
-    );
-    setIsSheetAgendaOpen(false);
-  }, [selectedAgendaSlot, selectedVisiteEvent]);
+  }, [dealId, deal?.type]);
 
   // ── Build full mandate sections (for "Voir le mandat") ──
   const buildFullMandateSections = useCallback((): EligibilitySection[] => {
@@ -1838,8 +1513,8 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
                 }
                 clientName={clientFullName}
                 workflow={mapVisiteWorkflow(v)}
-                onClick={() => handleOpenVisite(v)}
-                onView={() => handleOpenVisite(v)}
+                onClick={() => openSheet('visite', { eventId: v.id }, { onMutate: refreshEvents })}
+                onView={() => openSheet('visite', { eventId: v.id }, { onMutate: refreshEvents })}
               />
             ))}
             {visitEvents.length === 0 && (
@@ -2620,98 +2295,6 @@ export function DealDetailView({ dealId }: DealDetailViewProps) {
         </Sheet>
       )}
 
-      {/* Sheet Visite */}
-      {selectedVisiteEvent && (
-        <>
-        <SheetVisite
-          isOpen={isSheetVisiteOpen}
-          onClose={handleCloseVisite}
-          visitStatus={
-            (selectedVisiteEvent.status === 'PROGRAMME' ||
-             selectedVisiteEvent.status === 'CONFIRME' ||
-             selectedVisiteEvent.status === 'TERMINE' ||
-             selectedVisiteEvent.status === 'ANNULE')
-              ? selectedVisiteEvent.status
-              : 'PROGRAMME'
-          }
-          propertyAddress={deal?.Property?.address ?? null}
-          propertyCity={deal?.Property?.addressCity ?? null}
-          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
-          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
-          propertyDpeGrade={
-            deal?.Property?.dpeEnergyClass &&
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-              ? (deal.Property.dpeEnergyClass as DpeType)
-              : null
-          }
-          invites={
-            (() => {
-              const inviteClientId = selectedVisiteEvent.clientId || deal?.Client?.id;
-              const inviteClientName = clientFullName !== '—' ? clientFullName : null;
-              if (inviteClientId && inviteClientName) {
-                return [{ id: inviteClientId, name: inviteClientName, calStatus: mapVisiteWorkflow(selectedVisiteEvent).cal }];
-              }
-              return [];
-            })()
-          }
-          selectedSlotLabel={
-            selectedVisiteEvent.eventDate
-              ? `${formatDateOnly(selectedVisiteEvent.eventDate)} à ${formatTimeOnly(selectedVisiteEvent.eventDate)}`
-              : null
-          }
-          odjStatus={
-            selectedVisiteEvent.odjStatus === 'EDITE' ||
-            selectedVisiteEvent.odjStatus === 'REVISE' ||
-            selectedVisiteEvent.odjStatus === 'ENVOYE'
-              ? selectedVisiteEvent.odjStatus
-              : null
-          }
-          guideStatus={visitGuideSubmittedAt ? 'COMPLET' : null}
-          onViewOdj={handleOpenOdj}
-          onViewGuide={handleOpenGuide}
-          onOpenAgenda={handleOpenAgenda}
-          isEditingProperty={isEditingProperty}
-          onToggleEditProperty={() => setIsEditingProperty((v) => !v)}
-          propertySearchQuery={propertySearchQuery}
-          onPropertySearchChange={handlePropertySearchChange}
-          propertySearchResults={propertySearchResults}
-          onPropertySelect={handlePropertySelect}
-          onSaveProperty={handleSaveProperty}
-          isAddingInvite={isAddingInvite}
-          onToggleAddInvite={() => setIsAddingInvite((v) => !v)}
-          clientSearchQuery={clientSearchQuery}
-          onClientSearchChange={handleClientSearchChange}
-          clientSearchResults={clientSearchResults}
-          onClientSelect={handleClientSelect}
-          onSaveInvite={handleSaveInvite}
-        />
-
-        {/* Sheet Agenda du bien */}
-        <SheetAgendaBien
-          isOpen={isSheetAgendaOpen}
-          onClose={handleCloseAgenda}
-          propertyAddress={deal?.Property?.address ?? null}
-          propertyType={propertyTypeLabel(deal?.Property?.type ?? null) || null}
-          propertySurface={deal?.Property?.livingAreaSqm ? `${deal.Property.livingAreaSqm} m²` : null}
-          propertyDpeGrade={
-            deal?.Property?.dpeEnergyClass &&
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(deal.Property.dpeEnergyClass)
-              ? (deal.Property.dpeEnergyClass as DpeType)
-              : null
-          }
-          clientName={clientFullName}
-          currentVisitDateLabel={
-            selectedVisiteEvent?.eventDate
-              ? `${formatDateOnly(selectedVisiteEvent.eventDate)} à ${formatTimeOnly(selectedVisiteEvent.eventDate)}`
-              : null
-          }
-          days={agendaDays}
-          onSlotSelect={handleAgendaSlotSelect}
-          onProposeSlot={handleProposeSlot}
-          selectedSlot={selectedAgendaSlot}
-        />
-        </>
-      )}
     </div>
   );
 }

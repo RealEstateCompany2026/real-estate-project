@@ -69,8 +69,9 @@ export function SheetProvider({ children }: { children: ReactNode }) {
 
   const notifyMutate = useCallback(() => {
     const currentStack = stackRef.current;
-    const top = currentStack[currentStack.length - 1];
-    top?.onMutate?.();
+    for (let i = currentStack.length - 1; i >= 0; i--) {
+      currentStack[i].onMutate?.();
+    }
   }, []);
 
   const currentSheet = stack.length > 0 ? stack[stack.length - 1] : null;

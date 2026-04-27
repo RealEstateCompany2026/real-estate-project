@@ -6,6 +6,8 @@ import type { SheetType } from './types';
 import { fetchDocumentData } from './fetchers/fetchDocumentData';
 import { fetchGuideDeVisiteData } from './fetchers/fetchGuideDeVisiteData';
 import { fetchOrdreDuJourData } from './fetchers/fetchOrdreDuJourData';
+import { fetchVisiteData } from './fetchers/fetchVisiteData';
+import { fetchAgendaBienData } from './fetchers/fetchAgendaBienData';
 
 export interface SheetRegistryEntry {
   /** Lazy-loaded component (receives { data, onClose } props) */
@@ -30,6 +32,16 @@ export const SHEET_REGISTRY: Partial<Record<SheetType, SheetRegistryEntry>> = {
   'ordre-du-jour': {
     component: lazy(() => import('./wrappers/OrdreDuJourSheetWrapper')),
     fetcher: (payload) => fetchOrdreDuJourData(payload as { eventId: string }),
+    width: 'narrow',
+  },
+  'visite': {
+    component: lazy(() => import('./wrappers/VisiteSheetWrapper')),
+    fetcher: (payload) => fetchVisiteData(payload as { eventId: string }),
+    width: 'narrow',
+  },
+  'agenda-bien': {
+    component: lazy(() => import('./wrappers/AgendaBienSheetWrapper')),
+    fetcher: (payload) => fetchAgendaBienData(payload as { propertyId: string; eventId: string }),
     width: 'narrow',
   },
 };
