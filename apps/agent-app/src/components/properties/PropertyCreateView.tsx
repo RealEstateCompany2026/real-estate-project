@@ -727,11 +727,9 @@ export function PropertyCreateView() {
               <div className="flex flex-wrap items-center gap-2">
                 {selectedClients.map((client) => (
                   <div key={client.id} className="flex items-center gap-1">
-                    <Chip
-                      label={client.name}
-                      variant="filled"
-                      selected
-                    />
+                    <Button variant="outline" type="button">
+                      {client.name}
+                    </Button>
                     <IconButton variant="ghost" type="button" onClick={() => removeClient(client.id)}>
                       <X size={14} />
                     </IconButton>
