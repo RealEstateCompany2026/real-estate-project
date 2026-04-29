@@ -273,7 +273,7 @@ export function ClientCreateView() {
             ...data,
             mobilePhone: normalizePhoneE164(data.mobilePhone),
             dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,
-            agentId: agent.id,
+            agentId: userRow.id,
             organizationId: agent.organizationId,
             isActive: true,
             completionScore: 0,
@@ -293,7 +293,7 @@ export function ClientCreateView() {
         toast('Client créé avec succès', 'success');
         router.push(`/clients/${client.id}`);
       } catch (err) {
-        console.error('Error creating client:', err);
+        console.error('Error creating client:', (err as any)?.message ?? (err as any)?.code ?? JSON.stringify(err));
         toast('Erreur lors de la création du client', 'error');
       } finally {
         setIsSubmitting(false);

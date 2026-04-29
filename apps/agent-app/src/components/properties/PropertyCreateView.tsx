@@ -662,7 +662,7 @@ export function PropertyCreateView() {
       toast('Bien créé avec succès', 'success');
       router.push(`/properties/${property.id}`);
     } catch (err) {
-      console.error('Erreur création bien:', err);
+      console.error('Erreur création bien:', (err as any)?.message ?? (err as any)?.code ?? JSON.stringify(err));
       toast('Erreur lors de la création', 'error');
     } finally {
       setIsSubmitting(false);
