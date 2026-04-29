@@ -532,10 +532,17 @@ export function PropertyCreateView() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Non authentifié');
 
+      const { data: appUser } = await supabase
+        .from('AppUser')
+        .select('id')
+        .eq('supabase_id', user.id)
+        .single();
+      if (!appUser) throw new Error('Utilisateur non trouvé');
+
       const { data: agent } = await supabase
         .from('Agent')
         .select('id, organizationId')
-        .eq('userId', user.id)
+        .eq('userId', appUser.id)
         .single();
       if (!agent) throw new Error('Agent non trouvé');
 
@@ -651,11 +658,11 @@ export function PropertyCreateView() {
         if (featuresError) console.error('Erreur insertion équipements:', featuresError);
       }
 
-      toast({ title: 'Bien créé avec succès', variant: 'success' });
+      toast('Bien créé avec succès', 'success');
       router.push(`/properties/${property.id}`);
     } catch (err) {
       console.error('Erreur création bien:', err);
-      toast({ title: 'Erreur lors de la création', variant: 'error' });
+      toast('Erreur lors de la création', 'error');
     } finally {
       setIsSubmitting(false);
     }
