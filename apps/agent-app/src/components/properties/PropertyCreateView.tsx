@@ -28,11 +28,7 @@ import {
   PROPERTY_CATEGORY_TYPES,
   CATEGORY_LABELS,
   PROPERTY_TYPE_LABELS,
-  OPERATION_TYPE_LABELS,
-  ROOM_COUNT_LABELS,
   PROPERTY_CONDITION_LABELS,
-  HEATING_TYPE_LABELS,
-  HOT_WATER_SYSTEM_LABELS,
   VIEW_TYPE_LABELS,
   PARKING_TYPE_LABELS,
   KITCHEN_TYPE_LABELS,
@@ -40,18 +36,21 @@ import {
   PROPERTY_STATUS_LABELS,
   EXPOSURE_LABELS,
   DPE_COLORS,
+  DIAGNOSTIC_TYPE_LABELS,
   type DpeClass,
   type PropertyCategory,
   type PropertyType,
-  type OperationType,
+  type PropertyStatus,
   type RoomType,
   type Exposure,
+  type ViewType,
+  type DiagnosticType,
   type PropertyRoomFormData,
 } from '@/types/property';
 import { searchAddress } from '@/lib/utils/address';
 
 // ---------------------------------------------------------------------------
-// FEATURE_KEYS — equipment checkboxes
+// FEATURE_KEYS — equipment options for add-row pattern
 // ---------------------------------------------------------------------------
 
 const FEATURE_KEYS = [
@@ -76,17 +75,16 @@ const FEATURE_KEYS = [
 ];
 
 // ---------------------------------------------------------------------------
-// Residential types that show room count + floor fields
+// Apartment-like types that show building/floor fields
 // ---------------------------------------------------------------------------
 
 const APARTMENT_LIKE_TYPES: PropertyType[] = [
   'APPARTEMENT', 'STUDIO', 'LOFT', 'T1', 'T2', 'T3', 'T4',
 ];
 
-const LAND_TYPES: PropertyType[] = ['MAISON', 'MAISON_DE_VILLE', 'TERRAIN'];
-
-const RESIDENTIAL_ROOM_COUNT_TYPES: PropertyType[] = [
-  'APPARTEMENT', 'MAISON_DE_VILLE', 'LOFT',
+// Status checkboxes to show (excluding OFF_MARKET and OTHER)
+const STATUS_CHECKBOX_VALUES: PropertyStatus[] = [
+  'A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER',
 ];
 
 // ---------------------------------------------------------------------------
@@ -109,7 +107,9 @@ function FormSection({
     <div className={`border border-edge-default rounded-lg p-6 ${className ?? ''}`.trim()}>
       <div className="flex items-center gap-2 mb-4">
         <h6 className="text-h6 text-content-headings">{title}</h6>
-        <Badge variant={variant}>{Math.round(completion)}%</Badge>
+        {className?.includes('bg-surface-neutral-action') ? null : (
+          <Badge variant={variant}>{Math.round(completion)}%</Badge>
+        )}
       </div>
       {children}
     </div>
@@ -136,8 +136,31 @@ export function PropertyCreateView() {
   // Rooms state (separate from react-hook-form — stored in PropertyRoom table)
   const [rooms, setRooms] = useState<PropertyRoomFormData[]>([
     { roomType: 'SEJOUR', areaSqm: null, kitchenType: null, hasBathtub: null, hasShower: null, hasToilet: null, equipment: [], sortOrder: 0 },
-    { roomType: 'CUISINE', areaSqm: null, kitchenType: null, hasBathtub: null, hasShower: null, hasToilet: null, equipment: [], sortOrder: 0 },
+    { roomType: 'CUISINE', areaSqm: null, kitchenType: null, hasBathtub: null, hasShower: null, hasToilet: null, equipment: [], sortOrder: 1 },
   ]);
+
+  // Diagnostics state (add-row pattern)
+  const [diagnosticRows, setDiagnosticRows] = useState<{
+    diagnosticType: DiagnosticType;
+    class: string | null;
+    value: number | null;
+    unit: string | null;
+    validityDate: string | null;
+    companyName: string | null;
+  }[]>([
+    { diagnosticType: 'DPE', class: null, value: null, unit: 'kWh/m²/an', validityDate: null, companyName: null },
+    { diagnosticType: 'GES', class: null, value: null, unit: 'gCO₂/m²/an', validityDate: null, companyName: null },
+  ]);
+
+  // Equipment state (add-row pattern with key + comment)
+  const [equipmentRows, setEquipmentRows] = useState<{ key: string; comment: string }[]>([]);
+
+  // Parking state (add-row pattern — multi-row ready, first row stored in flat columns)
+  const [parkingRows, setParkingRows] = useState<{
+    parkingType: string;
+    parkingLengthM: string;
+    parkingWidthM: string;
+  }[]>([]);
 
   // Client (owner) search state
   const [clientSearch, setClientSearch] = useState('');
@@ -151,40 +174,42 @@ export function PropertyCreateView() {
   const methods = useForm<PropertyCreateData>({
     resolver: zodResolver(propertyCreateSchema) as any,
     defaultValues: {
+      statusCheckboxes: [],
+      clientId: '',
       type: undefined,
-      operationTypes: [],
+      livingAreaSqm: undefined as unknown as number,
       numberOfRooms: undefined,
+      mainExposure: undefined,
+      mainViewType: undefined,
       address: '',
       addressStreet: '',
       addressZipCode: '',
       addressCity: '',
       addressLat: undefined,
       addressLng: undefined,
-      neighborhoodName: '',
+      building: '',
+      doorNumber: '',
       floorLevel: undefined,
       numberOfFloors: undefined,
-      livingAreaSqm: undefined as unknown as number,
+      constructionYear: undefined,
+      condition: undefined,
+      desiredSellingPrice: undefined,
+      estimatedMarketValue: undefined,
       landAreaSqm: undefined,
       terraceAreaSqm: undefined,
-      balconyAreaSqm: undefined,
-      gardenAreaSqm: undefined,
       rooms: [],
-      condition: undefined,
-      constructionYear: undefined,
-      heatingType: undefined,
-      hotWaterSystem: undefined,
-      exposures: [],
-      mainViewType: undefined,
-      parkingType: undefined,
-      parkingSpotCount: undefined,
-      featureKeys: [],
       diagnostics: [],
-      desiredSellingPrice: undefined as unknown as number,
-      estimatedMarketValue: undefined,
-      clientId: '',
-      status: 'OFF_MARKET',
-      internalRef: '',
+      featureKeys: [],
+      parkingType: undefined,
+      parkingLengthM: undefined,
+      parkingWidthM: undefined,
+      hasElevator: false,
+      hasDigicode: false,
+      hasIntercom: false,
       notes: '',
+      exposures: [],
+      operationTypes: [],
+      status: 'OFF_MARKET',
       tags: [],
     },
     mode: 'onTouched',
@@ -200,6 +225,11 @@ export function PropertyCreateView() {
 
   const formValues = watch();
 
+  // ---------- Derived state ----------
+
+  const isApartmentType = formValues.type != null && APARTMENT_LIKE_TYPES.includes(formValues.type);
+  const isResidentialNonTerrain = formValues.type != null && formValues.type !== 'TERRAIN';
+
   // ---------- Completion logic ----------
 
   const { sectionCompletions, globalCompletion, isThresholdMet } = useMemo(() => {
@@ -207,56 +237,70 @@ export function PropertyCreateView() {
       if (Array.isArray(v)) return v.length > 0;
       if (typeof v === 'number') return true;
       if (typeof v === 'string') return v.length > 0;
+      if (typeof v === 'boolean') return v;
       return v != null;
     };
 
-    // S1: type + operationTypes
-    const s1Fields = [formValues.type, formValues.operationTypes];
-    const s1 = (s1Fields.filter(isFilled).length / 2) * 100;
+    // S1: statusCheckboxes (at least 1) + clientId
+    const s1a = (formValues.statusCheckboxes?.length ?? 0) > 0 ? 1 : 0;
+    const s1b = isFilled(formValues.clientId) ? 1 : 0;
+    const s1 = ((s1a + s1b) / 2) * 100;
 
-    // S2: address (+ optional neighborhoodName, floorLevel, numberOfFloors — 4 fields)
-    const s2Fields = [formValues.address, formValues.neighborhoodName, formValues.floorLevel, formValues.numberOfFloors];
-    const s2 = (s2Fields.filter(isFilled).length / 4) * 100;
+    // S2: type + livingAreaSqm + address required, + optional fields proportional
+    const s2Required = [formValues.type, formValues.livingAreaSqm, formValues.address];
+    const s2Optional = [
+      formValues.numberOfRooms,
+      formValues.mainExposure,
+      formValues.mainViewType,
+      formValues.building,
+      formValues.floorLevel,
+      formValues.doorNumber,
+      formValues.constructionYear,
+      formValues.condition,
+    ];
+    const s2ReqFilled = s2Required.filter(isFilled).length;
+    const s2OptFilled = s2Optional.filter(isFilled).length;
+    const s2 = ((s2ReqFilled + s2OptFilled) / (3 + 8)) * 100;
 
-    // S3: livingAreaSqm + optional surfaces (5 fields)
-    const s3Fields = [formValues.livingAreaSqm, formValues.landAreaSqm, formValues.terraceAreaSqm, formValues.balconyAreaSqm, formValues.gardenAreaSqm];
-    const s3 = (s3Fields.filter(isFilled).length / 5) * 100;
+    // S3: 2 optional prices
+    const s3Fields = [formValues.desiredSellingPrice, formValues.estimatedMarketValue];
+    const s3 = (s3Fields.filter(isFilled).length / 2) * 100;
 
-    // S4: rooms — at least 1 room with areaSqm filled
-    const s4 = rooms.some(r => r.areaSqm != null && r.areaSqm > 0) ? 100 : 0;
+    // S4: 2 optional surfaces
+    const s4Fields = [formValues.landAreaSqm, formValues.terraceAreaSqm];
+    const s4 = (s4Fields.filter(isFilled).length / 2) * 100;
 
-    // S5: characteristics (7 fields)
-    const s5Fields = [formValues.condition, formValues.constructionYear, formValues.heatingType, formValues.hotWaterSystem, formValues.exposures, formValues.mainViewType, formValues.parkingType];
-    const s5 = (s5Fields.filter(isFilled).length / 7) * 100;
+    // S5: at least 1 room with areaSqm filled
+    const s5 = rooms.some(r => r.areaSqm != null && r.areaSqm > 0) ? 100 : 0;
 
-    // S6: features — at least 1 selected
-    const s6 = (formValues.featureKeys?.length ?? 0) > 0 ? 100 : 0;
+    // S6: at least 1 diagnostic with class filled
+    const s6 = diagnosticRows.some(d => d.class != null && d.class.length > 0) ? 100 : 0;
 
-    // S7: diagnostics — at least DPE filled
-    const s7 = (formValues.diagnostics?.length ?? 0) > 0 && formValues.diagnostics?.some(d => d.class) ? 100 : 0;
+    // S7: at least 1 equipment selected
+    const s7 = equipmentRows.length > 0 ? 100 : 0;
 
-    // S8: price
-    const s8Fields = [formValues.desiredSellingPrice, formValues.estimatedMarketValue];
-    const s8 = (s8Fields.filter(isFilled).length / 2) * 100;
+    // S8: parking filled
+    const s8 = parkingRows.length > 0 && parkingRows[0].parkingType ? 100 : 0;
 
-    // S9: clientId + optional notes/tags (3 fields)
-    const s9Fields = [formValues.clientId, formValues.notes, formValues.internalRef];
-    const s9 = (s9Fields.filter(isFilled).length / 3) * 100;
+    // S9: proportional on 3 checkboxes
+    const s9Checks = [formValues.hasElevator, formValues.hasDigicode, formValues.hasIntercom];
+    const s9 = (s9Checks.filter(Boolean).length / 3) * 100;
 
-    const sections = [s1, s2, s3, s4, s5, s6, s7, s8, s9];
-    const global = Math.round(sections.reduce((a, b) => a + b, 0) / 9);
+    // S10: notes filled
+    const s10 = (formValues.notes?.length ?? 0) > 0 ? 100 : 0;
 
-    // Mandatory threshold: type + operationTypes + address + livingAreaSqm + desiredSellingPrice + clientId
+    const sections = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
+    const global = Math.round(sections.reduce((a, b) => a + b, 0) / 10);
+
+    // Mandatory threshold: type + address + livingAreaSqm + clientId
     const met =
       !!formValues.type &&
-      (formValues.operationTypes?.length ?? 0) > 0 &&
       !!formValues.address &&
       formValues.livingAreaSqm != null && formValues.livingAreaSqm > 0 &&
-      formValues.desiredSellingPrice != null && formValues.desiredSellingPrice > 0 &&
       !!formValues.clientId;
 
     return { sectionCompletions: sections, globalCompletion: global, isThresholdMet: met };
-  }, [formValues, rooms]);
+  }, [formValues, rooms, diagnosticRows, equipmentRows, parkingRows]);
 
   // ---------- Address handlers ----------
 
@@ -310,35 +354,29 @@ export function PropertyCreateView() {
     setAddressSuggestions([]);
   }, [setValue]);
 
-  // ---------- Operation type toggle ----------
+  // ---------- Status checkbox toggle ----------
 
-  const toggleOp = (op: OperationType) => {
-    const current = formValues.operationTypes || [];
-    const next = current.includes(op) ? current.filter(o => o !== op) : [...current, op];
-    setValue('operationTypes', next, { shouldValidate: true });
-  };
-
-  // ---------- Exposure toggle ----------
-
-  const toggleExposure = (exp: Exposure) => {
-    const current = formValues.exposures || [];
-    const next = current.includes(exp) ? current.filter(e => e !== exp) : [...current, exp];
-    setValue('exposures', next, { shouldValidate: true });
+  const toggleStatusCheckbox = (status: PropertyStatus) => {
+    const current = formValues.statusCheckboxes ?? [];
+    if (current.includes(status as any)) {
+      setValue('statusCheckboxes', current.filter((s) => s !== status) as any, { shouldValidate: true });
+    } else {
+      setValue('statusCheckboxes', [...current, status] as any, { shouldValidate: true });
+    }
   };
 
   // ---------- Room handlers ----------
 
-  const addRoom = (type: RoomType) => {
-    const existingOfType = rooms.filter(r => r.roomType === type);
+  const addRoom = () => {
     setRooms(prev => [...prev, {
-      roomType: type,
+      roomType: 'CHAMBRE',
       areaSqm: null,
       kitchenType: null,
-      hasBathtub: type === 'SALLE_DE_BAIN' || type === 'DOUCHE' ? false : null,
-      hasShower: type === 'SALLE_DE_BAIN' || type === 'DOUCHE' ? false : null,
-      hasToilet: type === 'WC' ? true : null,
+      hasBathtub: null,
+      hasShower: null,
+      hasToilet: null,
       equipment: [],
-      sortOrder: existingOfType.length,
+      sortOrder: prev.length,
     }]);
   };
 
@@ -350,17 +388,53 @@ export function PropertyCreateView() {
     setRooms(prev => prev.map((r, i) => i === index ? { ...r, ...updates } : r));
   };
 
-  // ---------- Diagnostic helpers ----------
+  // ---------- Diagnostic handlers ----------
 
-  const getDiagnostic = (type: string) => formValues.diagnostics?.find(d => d.diagnosticType === type);
-  const setDiagnostic = (type: string, updates: Record<string, any>) => {
-    const current = formValues.diagnostics ?? [];
-    const existing = current.find(d => d.diagnosticType === type);
-    if (existing) {
-      setValue('diagnostics', current.map(d => d.diagnosticType === type ? { ...d, ...updates } : d), { shouldValidate: true });
-    } else {
-      setValue('diagnostics', [...current, { diagnosticType: type, class: null, value: null, unit: type === 'DPE' ? 'kWh/m²/an' : 'gCO₂/m²/an', validityDate: null, companyName: null, ...updates }], { shouldValidate: true });
-    }
+  const addDiagnostic = () => {
+    setDiagnosticRows(prev => [...prev, {
+      diagnosticType: 'AMIANTE',
+      class: null,
+      value: null,
+      unit: null,
+      validityDate: null,
+      companyName: null,
+    }]);
+  };
+
+  const removeDiagnostic = (index: number) => {
+    setDiagnosticRows(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateDiagnostic = (index: number, updates: Record<string, any>) => {
+    setDiagnosticRows(prev => prev.map((d, i) => i === index ? { ...d, ...updates } : d));
+  };
+
+  // ---------- Equipment handlers ----------
+
+  const addEquipment = () => {
+    setEquipmentRows(prev => [...prev, { key: '', comment: '' }]);
+  };
+
+  const removeEquipment = (index: number) => {
+    setEquipmentRows(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateEquipment = (index: number, updates: Partial<{ key: string; comment: string }>) => {
+    setEquipmentRows(prev => prev.map((e, i) => i === index ? { ...e, ...updates } : e));
+  };
+
+  // ---------- Parking handlers ----------
+
+  const addParking = () => {
+    setParkingRows(prev => [...prev, { parkingType: '', parkingLengthM: '', parkingWidthM: '' }]);
+  };
+
+  const removeParking = (index: number) => {
+    setParkingRows(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateParking = (index: number, updates: Partial<{ parkingType: string; parkingLengthM: string; parkingWidthM: string }>) => {
+    setParkingRows(prev => prev.map((p, i) => i === index ? { ...p, ...updates } : p));
   };
 
   // ---------- Client search handlers ----------
@@ -397,16 +471,6 @@ export function PropertyCreateView() {
   const onSubmit = async (data: PropertyCreateData) => {
     setIsSubmitting(true);
     try {
-      // Validate rooms data (managed outside react-hook-form)
-      const validatedRooms = rooms.filter(r => r.areaSqm != null || r.roomType === 'SEJOUR' || r.roomType === 'CUISINE');
-      for (const room of validatedRooms) {
-        if (room.areaSqm != null && (typeof room.areaSqm !== 'number' || isNaN(room.areaSqm) || room.areaSqm < 0)) {
-          toast({ title: 'Surface de pièce invalide', variant: 'error' });
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       const supabase = createClient();
 
       // 1. Get current agent
@@ -426,13 +490,37 @@ export function PropertyCreateView() {
           ? Math.round(data.estimatedMarketValue / data.livingAreaSqm)
           : null;
 
-      // 3. Insert Property
-      const { rooms: _rooms, diagnostics: _diags, featureKeys: _featureKeys, ...propertyData } = data;
+      // 3. Derive operationTypes + status from statusCheckboxes
+      const opTypes: string[] = [];
+      const statusChecks = data.statusCheckboxes ?? [];
+      if (statusChecks.includes('A_VENDRE') || statusChecks.includes('VENDU')) opTypes.push('VENTE');
+      if (statusChecks.includes('A_LOUER') || statusChecks.includes('LOUE')) opTypes.push('LOCATION');
+      if (statusChecks.includes('EN_VIAGER')) opTypes.push('VIAGER');
+
+      const primaryStatus = statusChecks.length > 0 ? statusChecks[0] : 'OFF_MARKET';
+
+      // 4. Build parking data from first row
+      const firstParking = parkingRows[0];
+      const parkingType = firstParking?.parkingType || null;
+      const parkingLengthM = firstParking?.parkingLengthM ? Number(firstParking.parkingLengthM) : null;
+      const parkingWidthM = firstParking?.parkingWidthM ? Number(firstParking.parkingWidthM) : null;
+
+      // 5. Build mainExposure → exposures array for retro-compat
+      const exposuresArray = data.mainExposure ? [data.mainExposure] : [];
+
+      // 6. Insert Property
+      const { statusCheckboxes: _sc, rooms: _rooms, diagnostics: _diags, featureKeys: _fk, ...rest } = data;
 
       const { data: property, error: propertyError } = await supabase
         .from('Property')
         .insert({
-          ...propertyData,
+          ...rest,
+          operationTypes: opTypes,
+          status: primaryStatus,
+          exposures: exposuresArray,
+          parkingType,
+          parkingLengthM,
+          parkingWidthM,
           agentId: agent.id,
           organizationId: agent.organizationId,
           estimatedMarketValuePerSqm,
@@ -443,7 +531,7 @@ export function PropertyCreateView() {
 
       if (propertyError || !property) throw propertyError ?? new Error('Erreur création bien');
 
-      // 4. Insert PropertyRoom rows
+      // 7. Insert PropertyRoom rows
       const roomsToInsert = rooms
         .filter((r) => r.areaSqm != null || r.roomType === 'SEJOUR' || r.roomType === 'CUISINE')
         .map((r) => ({
@@ -466,8 +554,8 @@ export function PropertyCreateView() {
         if (roomsError) console.error('Erreur insertion pièces:', roomsError);
       }
 
-      // 5. Insert PropertyDiagnostic rows
-      const diagsToInsert = (data.diagnostics ?? [])
+      // 8. Insert PropertyDiagnostic rows
+      const diagsToInsert = diagnosticRows
         .filter((d) => d.class != null)
         .map((d) => ({
           propertyId: property.id,
@@ -487,12 +575,15 @@ export function PropertyCreateView() {
         if (diagsError) console.error('Erreur insertion diagnostics:', diagsError);
       }
 
-      // 6. Insert PropertyFeature rows
-      const featuresToInsert = (data.featureKeys ?? []).map((key) => ({
-        propertyId: property.id,
-        featureKey: key,
-        featureValue: 'true',
-      }));
+      // 9. Insert PropertyFeature rows (key + comment)
+      const featuresToInsert = equipmentRows
+        .filter((e) => e.key.length > 0)
+        .map((e) => ({
+          propertyId: property.id,
+          organizationId: agent.organizationId,
+          featureKey: e.key,
+          featureValue: e.comment || 'true',
+        }));
 
       if (featuresToInsert.length > 0) {
         const { error: featuresError } = await supabase
@@ -519,15 +610,6 @@ export function PropertyCreateView() {
     }
     router.back();
   };
-
-  // ---------- Derived state ----------
-
-  const showRoomCount =
-    selectedCategory === 'RESIDENTIEL' ||
-    (formValues.type && RESIDENTIAL_ROOM_COUNT_TYPES.includes(formValues.type));
-
-  const showFloorFields = formValues.type != null && APARTMENT_LIKE_TYPES.includes(formValues.type);
-  const showLandArea = formValues.type != null && LAND_TYPES.includes(formValues.type);
 
   // ---------- Render ----------
 
@@ -559,702 +641,40 @@ export function PropertyCreateView() {
         />
       </div>
 
-      {/* 9 sections */}
+      {/* 10 sections */}
       <div className="space-y-6">
 
-        {/* ── Section 1 — Catégorie de bien ── */}
-        <FormSection title="Catégorie de bien" completion={sectionCompletions[0]}>
+        {/* ── Section 1 — Statut du bien ── */}
+        <FormSection title="Statut du bien" completion={sectionCompletions[0]} className="bg-surface-neutral-action">
           <div className="space-y-4">
-            {/* Category cards */}
-            <div>
-              <Label label="Catégorie" className="mb-2" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {(Object.entries(CATEGORY_LABELS) as [PropertyCategory, string][]).map(
-                  ([cat, label]) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCategory(cat);
-                        // If category has only one type, auto-select it
-                        const types = PROPERTY_CATEGORY_TYPES[cat];
-                        if (types.length === 1) {
-                          setValue('type', types[0], { shouldValidate: true });
-                        }
-                      }}
-                      className={`rounded-lg border p-4 text-center transition-colors ${
-                        selectedCategory === cat
-                          ? 'border-edge-branded-default bg-surface-information text-content-branded-action'
-                          : 'border-edge-default bg-surface-neutral-action text-content-body hover:border-edge-branded-default'
-                      }`}
-                    >
-                      <span className="text-sm font-semibold">{label}</span>
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
-
-            {/* Sub-types as Chips */}
-            {selectedCategory && PROPERTY_CATEGORY_TYPES[selectedCategory].length > 1 && (
-              <div>
-                <Label label="Type de bien" className="mb-2" />
-                <div className="flex flex-wrap gap-2">
-                  {PROPERTY_CATEGORY_TYPES[selectedCategory].map((subType) => (
-                    <Chip
-                      key={subType}
-                      label={PROPERTY_TYPE_LABELS[subType]}
-                      selected={formValues.type === subType}
-                      variant="filled"
-                      onClick={() => setValue('type', subType, { shouldValidate: true })}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-            {errors.type && (
-              <p className="text-sm text-content-danger mt-1">{errors.type.message}</p>
-            )}
-
-            {/* Operation types */}
-            <div>
-              <Label label="Type d'opération *" className="mb-2" />
-              <div className="flex flex-wrap gap-2">
-                {(Object.entries(OPERATION_TYPE_LABELS) as [OperationType, string][]).map(
-                  ([op, label]) => (
-                    <Chip
-                      key={op}
-                      label={label}
-                      selected={formValues.operationTypes?.includes(op) ?? false}
-                      variant="filled"
-                      onClick={() => toggleOp(op)}
-                    />
-                  ),
-                )}
-              </div>
-              {errors.operationTypes && (
-                <p className="text-sm text-content-danger mt-1">{errors.operationTypes.message}</p>
-              )}
-            </div>
-
-            {/* Room count selector (residential only) */}
-            {showRoomCount && (
-              <div>
-                <Label label="Nombre de pièces" className="mb-2" />
-                <div className="flex flex-wrap gap-2">
-                  {(Object.entries(ROOM_COUNT_LABELS) as [string, string][]).map(
-                    ([count, label]) => (
-                      <Chip
-                        key={count}
-                        label={label}
-                        selected={formValues.numberOfRooms === Number(count)}
-                        variant="filled"
-                        onClick={() => setValue('numberOfRooms', Number(count), { shouldValidate: true })}
-                      />
-                    ),
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </FormSection>
-
-        {/* ── Section 2 — Localisation ── */}
-        <FormSection title="Localisation" completion={sectionCompletions[1]}>
-          <div className="space-y-4">
-            {/* Address */}
-            <div className="w-full">
-              <Label label="Adresse *" className="mb-1" />
-              <AddressField
-                value={formValues.address ?? ''}
-                suggestions={addressSuggestions}
-                onSearch={handleAddressSearch}
-                onSelect={handleAddressSelect}
-                onClear={handleAddressClear}
-                loading={addressLoading}
-                placeholder="Rechercher une adresse..."
-                error={!!errors.address}
-              />
-              {errors.address && (
-                <p className="text-sm text-content-danger mt-1">{errors.address.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Neighborhood */}
-              <InputFieldOutlined
-                label="Quartier"
-                type="text"
-                value={formValues.neighborhoodName ?? ''}
-                onChange={(v) => setValue('neighborhoodName', v)}
-                placeholder="Nom du quartier"
-              />
-
-              {/* Floor fields — apartment-like only */}
-              {showFloorFields && (
-                <>
-                  <Controller
-                    name="floorLevel"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <div>
-                        <InputFieldOutlined
-                          label="Étage"
-                          type="number"
-                          value={field.value != null ? String(field.value) : ''}
-                          onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                          onBlur={field.onBlur}
-                          error={!!fieldState.error}
-                          placeholder="Ex: 3"
-                        />
-                        {fieldState.error && (
-                          <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                        )}
-                      </div>
-                    )}
-                  />
-                  <Controller
-                    name="numberOfFloors"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <div>
-                        <InputFieldOutlined
-                          label="Nombre d'étages de l'immeuble"
-                          type="number"
-                          value={field.value != null ? String(field.value) : ''}
-                          onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                          onBlur={field.onBlur}
-                          error={!!fieldState.error}
-                          placeholder="Ex: 7"
-                        />
-                        {fieldState.error && (
-                          <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                        )}
-                      </div>
-                    )}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        </FormSection>
-
-        {/* ── Section 3 — Surfaces ── */}
-        <FormSection title="Surfaces" completion={sectionCompletions[2]}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Controller
-              name="livingAreaSqm"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <InputFieldOutlined
-                    label="Surface habitable (m²) *"
-                    type="number"
-                    value={field.value != null ? String(field.value) : ''}
-                    onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    placeholder="Ex: 65"
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
-                </div>
-              )}
-            />
-
-            {showLandArea && (
-              <Controller
-                name="landAreaSqm"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div>
-                    <InputFieldOutlined
-                      label="Surface terrain (m²)"
-                      type="number"
-                      value={field.value != null ? String(field.value) : ''}
-                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                      onBlur={field.onBlur}
-                      error={!!fieldState.error}
-                      placeholder="Ex: 500"
-                    />
-                    {fieldState.error && (
-                      <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                    )}
-                  </div>
-                )}
-              />
-            )}
-
-            <Controller
-              name="terraceAreaSqm"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <InputFieldOutlined
-                    label="Surface terrasse (m²)"
-                    type="number"
-                    value={field.value != null ? String(field.value) : ''}
-                    onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    placeholder="Ex: 15"
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="balconyAreaSqm"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <InputFieldOutlined
-                    label="Surface balcon (m²)"
-                    type="number"
-                    value={field.value != null ? String(field.value) : ''}
-                    onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    placeholder="Ex: 8"
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="gardenAreaSqm"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <InputFieldOutlined
-                    label="Surface jardin (m²)"
-                    type="number"
-                    value={field.value != null ? String(field.value) : ''}
-                    onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    placeholder="Ex: 200"
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
-                </div>
-              )}
-            />
-          </div>
-        </FormSection>
-
-        {/* ── Section 4 — Pièces ── */}
-        <FormSection title="Pièces" completion={sectionCompletions[3]}>
-          <div className="space-y-4">
-            {rooms.map((room, index) => (
-              <div
-                key={`${room.roomType}-${index}`}
-                className="border border-edge-default rounded-lg p-4"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-content-headings">
-                    {ROOM_TYPE_LABELS[room.roomType]}
-                    {rooms.filter((r, i) => r.roomType === room.roomType && i <= index).length > 1 &&
-                      ` ${rooms.filter((r, i) => r.roomType === room.roomType && i <= index).length}`}
-                  </span>
-                  {/* Only allow removal for dynamically added rooms (not default SEJOUR/CUISINE at index 0/1) */}
-                  {index >= 2 && (
-                    <IconButton variant="ghost" type="button" onClick={() => removeRoom(index)}>
-                      <Trash2 size={16} />
-                    </IconButton>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Area */}
-                  <InputFieldOutlined
-                    label="Surface (m²)"
-                    type="number"
-                    value={room.areaSqm != null ? String(room.areaSqm) : ''}
-                    onChange={(v) => updateRoom(index, { areaSqm: v === '' ? null : Number(v) })}
-                    placeholder="Ex: 20"
-                  />
-
-                  {/* Kitchen type (CUISINE only) */}
-                  {room.roomType === 'CUISINE' && (
-                    <SelectField
-                      label="Type de cuisine"
-                      value={room.kitchenType ?? ''}
-                      onChange={(val) => updateRoom(index, { kitchenType: val as any })}
-                      options={Object.entries(KITCHEN_TYPE_LABELS).map(([value, label]) => ({
-                        value,
-                        label,
-                      }))}
-                    />
-                  )}
-
-                  {/* Bathroom options (SALLE_DE_BAIN or DOUCHE) */}
-                  {(room.roomType === 'SALLE_DE_BAIN' || room.roomType === 'DOUCHE') && (
-                    <div className="flex items-center gap-6 md:col-span-2">
-                      <Checkbox
-                        label="Baignoire"
-                        checked={room.hasBathtub ?? false}
-                        onChange={(checked) => updateRoom(index, { hasBathtub: checked })}
-                      />
-                      <Checkbox
-                        label="Douche"
-                        checked={room.hasShower ?? false}
-                        onChange={(checked) => updateRoom(index, { hasShower: checked })}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* Add room buttons */}
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => addRoom('CHAMBRE')}
-              >
-                <Plus size={16} className="mr-1" />
-                Chambre
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => addRoom('SALLE_DE_BAIN')}
-              >
-                <Plus size={16} className="mr-1" />
-                Salle de bain
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => addRoom('WC')}
-              >
-                <Plus size={16} className="mr-1" />
-                WC
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => addRoom('BUREAU')}
-              >
-                <Plus size={16} className="mr-1" />
-                Bureau
-              </Button>
-            </div>
-          </div>
-        </FormSection>
-
-        {/* ── Section 5 — Caractéristiques techniques ── */}
-        <FormSection title="Caractéristiques techniques" completion={sectionCompletions[4]}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Condition */}
-              <SelectField
-                label="État général"
-                value={formValues.condition ?? ''}
-                onChange={(val) => setValue('condition', val as any, { shouldValidate: true })}
-                options={Object.entries(PROPERTY_CONDITION_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-
-              {/* Construction year */}
-              <Controller
-                name="constructionYear"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div>
-                    <InputFieldOutlined
-                      label="Année de construction"
-                      type="number"
-                      value={field.value != null ? String(field.value) : ''}
-                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                      onBlur={field.onBlur}
-                      error={!!fieldState.error}
-                      placeholder="Ex: 1985"
-                    />
-                    {fieldState.error && (
-                      <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                    )}
-                  </div>
-                )}
-              />
-
-              {/* Heating type */}
-              <SelectField
-                label="Type de chauffage"
-                value={formValues.heatingType ?? ''}
-                onChange={(val) => setValue('heatingType', val as any, { shouldValidate: true })}
-                options={Object.entries(HEATING_TYPE_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-
-              {/* Hot water system */}
-              <SelectField
-                label="Eau chaude"
-                value={formValues.hotWaterSystem ?? ''}
-                onChange={(val) => setValue('hotWaterSystem', val as any, { shouldValidate: true })}
-                options={Object.entries(HOT_WATER_SYSTEM_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-
-              {/* View type */}
-              <SelectField
-                label="Vue principale"
-                value={formValues.mainViewType ?? ''}
-                onChange={(val) => setValue('mainViewType', val as any, { shouldValidate: true })}
-                options={Object.entries(VIEW_TYPE_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-
-              {/* Parking type */}
-              <SelectField
-                label="Stationnement"
-                value={formValues.parkingType ?? ''}
-                onChange={(val) => setValue('parkingType', val as any, { shouldValidate: true })}
-                options={Object.entries(PARKING_TYPE_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-
-              {/* Parking spot count (only if parking is not AUCUN) */}
-              {formValues.parkingType && formValues.parkingType !== 'AUCUN' && (
-                <Controller
-                  name="parkingSpotCount"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <div>
-                      <InputFieldOutlined
-                        label="Nombre de places"
-                        type="number"
-                        value={field.value != null ? String(field.value) : ''}
-                        onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        placeholder="Ex: 1"
-                      />
-                      {fieldState.error && (
-                        <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                      )}
-                    </div>
-                  )}
+            {/* Ligne 1: Status checkboxes */}
+            <div className="flex flex-wrap gap-4">
+              {STATUS_CHECKBOX_VALUES.map((status) => (
+                <Checkbox
+                  key={status}
+                  label={PROPERTY_STATUS_LABELS[status]}
+                  checked={formValues.statusCheckboxes?.includes(status as any) ?? false}
+                  onChange={() => toggleStatusCheckbox(status)}
                 />
-              )}
+              ))}
             </div>
+            <p className="text-xs text-content-caption">
+              Un bien peut être proposé en vente et en location simultanément.
+            </p>
 
-            {/* Exposures — multi-select Chips */}
+            {/* Ligne 2: Owner search */}
             <div>
-              <Label label="Expositions" className="mb-2" />
-              <div className="flex flex-wrap gap-2">
-                {(Object.entries(EXPOSURE_LABELS) as [Exposure, string][]).map(
-                  ([exp, label]) => (
-                    <Chip
-                      key={exp}
-                      label={label}
-                      selected={formValues.exposures?.includes(exp) ?? false}
-                      variant="filled"
-                      onClick={() => toggleExposure(exp)}
-                    />
-                  ),
-                )}
-              </div>
-            </div>
-          </div>
-        </FormSection>
-
-        {/* ── Section 6 — Équipements ── */}
-        <FormSection title="Équipements" completion={sectionCompletions[5]}>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {FEATURE_KEYS.map(({ key, label }) => (
-              <Checkbox
-                key={key}
-                label={label}
-                checked={formValues.featureKeys?.includes(key) ?? false}
-                onChange={(checked) => {
-                  const current = formValues.featureKeys ?? [];
-                  const next = checked
-                    ? [...current, key]
-                    : current.filter((k) => k !== key);
-                  setValue('featureKeys', next, { shouldValidate: true });
-                }}
-              />
-            ))}
-          </div>
-        </FormSection>
-
-        {/* ── Section 7 — Diagnostics ── */}
-        <FormSection title="Diagnostics" completion={sectionCompletions[6]}>
-          <div className="space-y-6">
-            {/* DPE */}
-            <div>
-              <Label label="DPE — Énergie" className="mb-2" />
-              <div className="flex flex-wrap gap-2 mb-3">
-                {(['A', 'B', 'C', 'D', 'E', 'F', 'G'] as DpeClass[]).map((cls) => (
-                  <button
-                    key={cls}
-                    type="button"
-                    className={`w-10 h-10 rounded-lg font-bold text-white transition-all ${
-                      getDiagnostic('DPE')?.class === cls
-                        ? 'ring-2 ring-offset-2 ring-content-strong scale-110'
-                        : 'opacity-70 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: DPE_COLORS[cls] }}
-                    onClick={() => setDiagnostic('DPE', { class: cls })}
-                  >
-                    {cls}
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputFieldOutlined
-                  label="Consommation (kWh/m²/an)"
-                  type="number"
-                  value={getDiagnostic('DPE')?.value != null ? String(getDiagnostic('DPE')!.value) : ''}
-                  onChange={(v) => setDiagnostic('DPE', { value: v === '' ? null : Number(v) })}
-                />
-                <div>
-                  <Label label="Date de validité DPE" className="mb-3" />
-                  <DatePicker
-                    variant="docked"
-                    selectedDate={getDiagnostic('DPE')?.validityDate ? new Date(getDiagnostic('DPE')!.validityDate!) : undefined}
-                    dateFormat="DD/MM/YYYY"
-                    placeholder="Sélectionner une date"
-                    onDateSelect={(date) => setDiagnostic('DPE', { validityDate: date ? date.toISOString().split('T')[0] : null })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* GES */}
-            <div>
-              <Label label="GES — Gaz à effet de serre" className="mb-2" />
-              <div className="flex flex-wrap gap-2 mb-3">
-                {(['A', 'B', 'C', 'D', 'E', 'F', 'G'] as DpeClass[]).map((cls) => (
-                  <button
-                    key={cls}
-                    type="button"
-                    className={`w-10 h-10 rounded-lg font-bold text-white transition-all ${
-                      getDiagnostic('GES')?.class === cls
-                        ? 'ring-2 ring-offset-2 ring-content-strong scale-110'
-                        : 'opacity-70 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: DPE_COLORS[cls] }}
-                    onClick={() => setDiagnostic('GES', { class: cls })}
-                  >
-                    {cls}
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputFieldOutlined
-                  label="Émissions (gCO₂/m²/an)"
-                  type="number"
-                  value={getDiagnostic('GES')?.value != null ? String(getDiagnostic('GES')!.value) : ''}
-                  onChange={(v) => setDiagnostic('GES', { value: v === '' ? null : Number(v) })}
-                />
-              </div>
-            </div>
-
-            {/* Diagnostiqueur */}
-            <InputFieldOutlined
-              label="Nom du diagnostiqueur"
-              value={getDiagnostic('DPE')?.companyName ?? ''}
-              onChange={(v) => {
-                setDiagnostic('DPE', { companyName: v || null });
-                setDiagnostic('GES', { companyName: v || null });
-              }}
-              placeholder="Ex: Diagamter, Arliane..."
-            />
-          </div>
-        </FormSection>
-
-        {/* ── Section 8 — Prix ── */}
-        <FormSection title="Prix" completion={sectionCompletions[7]}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Controller
-              name="desiredSellingPrice"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <InputFieldOutlined
-                    label="Prix de vente souhaité (€) *"
-                    type="number"
-                    value={field.value != null ? String(field.value) : ''}
-                    onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    placeholder="Ex: 350000"
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
-                </div>
-              )}
-            />
-            <Controller
-              name="estimatedMarketValue"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <InputFieldOutlined
-                    label="Estimation valeur marché (€)"
-                    type="number"
-                    value={field.value != null ? String(field.value) : ''}
-                    onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    placeholder="Ex: 340000"
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
-                </div>
-              )}
-            />
-            {/* Computed price per sqm — read only */}
-            {formValues.estimatedMarketValue && formValues.livingAreaSqm ? (
-              <div className="md:col-span-2">
-                <p className="text-sm text-content-subtle">
-                  Prix estimé au m² :{' '}
-                  <span className="font-semibold text-content-strong">
-                    {Math.round(formValues.estimatedMarketValue / formValues.livingAreaSqm).toLocaleString('fr-FR')} €/m²
-                  </span>
-                </p>
-              </div>
-            ) : null}
-          </div>
-        </FormSection>
-
-        {/* ── Section 9 — Informations complémentaires ── */}
-        <FormSection title="Informations complémentaires" completion={sectionCompletions[8]}>
-          <div className="space-y-4">
-            {/* Client / owner search */}
-            <div>
-              <Label label="Propriétaire *" className="mb-2" />
+              <Label label="Propriétaire" required className="mb-2" />
               {selectedClient ? (
-                <div className="flex items-center gap-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-action">
-                  <span className="text-sm font-medium text-content-strong flex-1">
-                    {selectedClient.name}
-                  </span>
+                <div className="flex items-center gap-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
+                  <Chip
+                    label={selectedClient.name}
+                    variant="filled"
+                    selected
+                  />
                   <IconButton
                     variant="ghost"
+                    type="button"
                     onClick={() => {
                       setSelectedClient(null);
                       setValue('clientId', '', { shouldValidate: true });
@@ -1270,6 +690,7 @@ export function PropertyCreateView() {
                     value={clientSearch}
                     onChange={handleClientSearch}
                     placeholder="Rechercher un client par nom ou email..."
+                    error={!!errors.clientId}
                   />
                   {clientResults.length > 0 && (
                     <div className="absolute z-10 top-full left-0 right-0 mt-1 border border-edge-default rounded-lg bg-surface-neutral-default shadow-lg max-h-48 overflow-y-auto">
@@ -1289,96 +710,677 @@ export function PropertyCreateView() {
                     </div>
                   )}
                   {errors.clientId && (
-                    <p className="text-sm text-content-danger mt-1">{errors.clientId.message}</p>
+                    <p className="text-xs text-content-error mt-1">{errors.clientId.message}</p>
                   )}
                 </div>
               )}
             </div>
+          </div>
+        </FormSection>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Status */}
-              <SelectField
-                label="Statut du bien"
-                value={formValues.status ?? 'OFF_MARKET'}
-                onChange={(val) => setValue('status', val as any, { shouldValidate: true })}
-                options={Object.entries(PROPERTY_STATUS_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
+        {/* ── Section 2 — Informations générales ── */}
+        <FormSection title="Informations générales" completion={sectionCompletions[1]}>
+          <div className="space-y-4">
+            {/* Ligne 1: Catégorie + sous-types */}
+            <div>
+              <div className="w-[330px]">
+                <SelectField
+                  label="Catégorie"
+                  value={selectedCategory ?? ''}
+                  onChange={(val) => {
+                    const cat = val as PropertyCategory;
+                    setSelectedCategory(cat);
+                    const types = PROPERTY_CATEGORY_TYPES[cat];
+                    if (types.length === 1) {
+                      setValue('type', types[0], { shouldValidate: true });
+                    }
+                  }}
+                  options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                  error={errors.type ? 'Catégorie requise' : undefined}
+                />
+              </div>
+              {selectedCategory && PROPERTY_CATEGORY_TYPES[selectedCategory].length > 1 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {PROPERTY_CATEGORY_TYPES[selectedCategory].map((subType) => (
+                    <Chip
+                      key={subType}
+                      label={PROPERTY_TYPE_LABELS[subType]}
+                      selected={formValues.type === subType}
+                      variant="filled"
+                      onClick={() => setValue('type', subType, { shouldValidate: true })}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
 
-              {/* Internal ref */}
-              <Controller
-                name="internalRef"
-                control={control}
-                render={({ field }) => (
-                  <InputFieldOutlined
-                    label="Référence interne"
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    placeholder="Auto-généré si vide"
+            {/* Ligne 2: Surface + Pièces + Orientation + Vue */}
+            <div className="flex gap-4">
+              <div className="w-[180px]">
+                <Controller
+                  name="livingAreaSqm"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <div>
+                      <InputFieldOutlined
+                        label="Surface habitable (m²)"
+                        type="number"
+                        value={field.value != null ? String(field.value) : ''}
+                        onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                        onBlur={field.onBlur}
+                        error={!!fieldState.error}
+                        required
+                      />
+                      {fieldState.error && (
+                        <p className="text-xs text-content-error mt-1">{fieldState.error.message}</p>
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+              {isResidentialNonTerrain && (
+                <div className="w-[180px]">
+                  <Controller
+                    name="numberOfRooms"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div>
+                        <InputFieldOutlined
+                          label="Nombre de pièces"
+                          type="number"
+                          value={field.value != null ? String(field.value) : ''}
+                          onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                        />
+                      </div>
+                    )}
                   />
+                </div>
+              )}
+              <div className="w-[180px]">
+                <SelectField
+                  label="Orientation"
+                  value={formValues.mainExposure ?? ''}
+                  onChange={(val) => setValue('mainExposure', val as Exposure, { shouldValidate: true })}
+                  options={Object.entries(EXPOSURE_LABELS).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                />
+              </div>
+              <div className="w-[180px]">
+                <SelectField
+                  label="Avec vue"
+                  value={formValues.mainViewType ?? ''}
+                  onChange={(val) => setValue('mainViewType', val as ViewType, { shouldValidate: true })}
+                  options={Object.entries(VIEW_TYPE_LABELS).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                />
+              </div>
+            </div>
+
+            {/* Ligne 3: Adresse */}
+            <div className="w-[1030px]">
+              <Label label="Adresse" required className="mb-1" />
+              <AddressField
+                value={formValues.address ?? ''}
+                suggestions={addressSuggestions}
+                onSearch={handleAddressSearch}
+                onSelect={handleAddressSelect}
+                onClear={handleAddressClear}
+                loading={addressLoading}
+                placeholder="Rechercher une adresse..."
+                error={!!errors.address}
+              />
+              {errors.address && (
+                <p className="text-xs text-content-error mt-1">{errors.address.message}</p>
+              )}
+            </div>
+
+            {/* Ligne 4: Building fields (apartment-like only) */}
+            {isApartmentType && (
+              <div className="flex gap-4">
+                <div className="w-[200px]">
+                  <InputFieldOutlined
+                    label="Bâtiment"
+                    type="text"
+                    value={formValues.building ?? ''}
+                    onChange={(v) => setValue('building', v)}
+                    placeholder="Ex: A"
+                  />
+                </div>
+                <div className="w-[200px]">
+                  <Controller
+                    name="floorLevel"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div>
+                        <InputFieldOutlined
+                          label="Étage"
+                          type="number"
+                          value={field.value != null ? String(field.value) : ''}
+                          onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          placeholder="Ex: 3"
+                        />
+                      </div>
+                    )}
+                  />
+                </div>
+                <div className="w-[200px]">
+                  <InputFieldOutlined
+                    label="Porte"
+                    type="text"
+                    value={formValues.doorNumber ?? ''}
+                    onChange={(v) => setValue('doorNumber', v)}
+                    placeholder="Ex: 12B"
+                  />
+                </div>
+                <div className="w-[200px]">
+                  <Controller
+                    name="numberOfFloors"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div>
+                        <InputFieldOutlined
+                          label="Nb étages immeuble"
+                          type="number"
+                          value={field.value != null ? String(field.value) : ''}
+                          onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          placeholder="Ex: 7"
+                        />
+                      </div>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Ligne 5: Année de construction + État général */}
+            <div className="flex gap-4">
+              <div className="w-[330px]">
+                <Controller
+                  name="constructionYear"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <div>
+                      <InputFieldOutlined
+                        label="Année de construction"
+                        type="number"
+                        value={field.value != null ? String(field.value) : ''}
+                        onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                        onBlur={field.onBlur}
+                        error={!!fieldState.error}
+                        placeholder="Ex: 1985"
+                      />
+                      {fieldState.error && (
+                        <p className="text-xs text-content-error mt-1">{fieldState.error.message}</p>
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+              <div className="w-[330px]">
+                <SelectField
+                  label="État général"
+                  value={formValues.condition ?? ''}
+                  onChange={(val) => setValue('condition', val as any, { shouldValidate: true })}
+                  options={Object.entries(PROPERTY_CONDITION_LABELS).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                />
+              </div>
+            </div>
+          </div>
+        </FormSection>
+
+        {/* ── Section 3 — Valeur marché ── */}
+        <FormSection title="Valeur marché" completion={sectionCompletions[2]}>
+          <div className="flex gap-4">
+            <div className="w-[330px]">
+              <Controller
+                name="desiredSellingPrice"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div>
+                    <InputFieldOutlined
+                      label="Prix client (€)"
+                      type="number"
+                      value={field.value != null ? String(field.value) : ''}
+                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                      onBlur={field.onBlur}
+                      error={!!fieldState.error}
+                      placeholder="Ex: 350000"
+                    />
+                    {fieldState.error && (
+                      <p className="text-xs text-content-error mt-1">{fieldState.error.message}</p>
+                    )}
+                  </div>
                 )}
               />
             </div>
+            <div className="w-[330px]">
+              <Controller
+                name="estimatedMarketValue"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div>
+                    <InputFieldOutlined
+                      label="Prix marché (€)"
+                      type="number"
+                      value={field.value != null ? String(field.value) : ''}
+                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                      onBlur={field.onBlur}
+                      error={!!fieldState.error}
+                      placeholder="Ex: 340000"
+                    />
+                    {fieldState.error && (
+                      <p className="text-xs text-content-error mt-1">{fieldState.error.message}</p>
+                    )}
+                  </div>
+                )}
+              />
+            </div>
+          </div>
+        </FormSection>
 
-            {/* Notes */}
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div>
-                  <TextArea
-                    label="Notes internes"
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    maxLength={2000}
-                    error={!!fieldState.error}
-                    placeholder="Notes privées sur ce bien..."
+        {/* ── Section 4 — Surfaces ── */}
+        <FormSection title="Surfaces" completion={sectionCompletions[3]}>
+          <div className="flex gap-4">
+            <div className="w-[240px]">
+              <Controller
+                name="landAreaSqm"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div>
+                    <InputFieldOutlined
+                      label="Surface terrain (m²)"
+                      type="number"
+                      value={field.value != null ? String(field.value) : ''}
+                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                      onBlur={field.onBlur}
+                      error={!!fieldState.error}
+                      placeholder="Ex: 500"
+                    />
+                  </div>
+                )}
+              />
+            </div>
+            <div className="w-[240px]">
+              <Controller
+                name="terraceAreaSqm"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div>
+                    <InputFieldOutlined
+                      label="Surface annexe (m²)"
+                      type="number"
+                      value={field.value != null ? String(field.value) : ''}
+                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                      onBlur={field.onBlur}
+                      error={!!fieldState.error}
+                      placeholder="Ex: 15"
+                    />
+                  </div>
+                )}
+              />
+            </div>
+          </div>
+        </FormSection>
+
+        {/* ── Section 5 — Caractéristiques par pièce ── */}
+        <FormSection title="Caractéristiques par pièce" completion={sectionCompletions[4]}>
+          <div className="space-y-4">
+            {rooms.map((room, index) => (
+              <div
+                key={`room-${index}`}
+                className="flex items-start gap-4 border border-edge-default rounded-lg p-4"
+              >
+                <div className="w-[220px]">
+                  <SelectField
+                    label="Type de pièce"
+                    value={room.roomType}
+                    onChange={(val) => updateRoom(index, { roomType: val as RoomType })}
+                    options={Object.entries(ROOM_TYPE_LABELS).map(([value, label]) => ({
+                      value,
+                      label,
+                    }))}
                   />
-                  {fieldState.error && (
-                    <p className="text-sm text-content-danger mt-1">{fieldState.error.message}</p>
-                  )}
                 </div>
-              )}
-            />
+                <div className="w-[150px]">
+                  <InputFieldOutlined
+                    label="Surface (m²)"
+                    type="number"
+                    value={room.areaSqm != null ? String(room.areaSqm) : ''}
+                    onChange={(v) => updateRoom(index, { areaSqm: v === '' ? null : Number(v) })}
+                    placeholder="Ex: 20"
+                  />
+                </div>
 
-            {/* Tags */}
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <InputFieldOutlined
-                  label="Tags"
-                  value={field.value?.join(', ') ?? ''}
-                  onChange={(v) => {
-                    const tags = v
-                      .split(',')
-                      .map((t) => t.trim())
-                      .filter(Boolean);
-                    field.onChange(tags);
-                  }}
-                  placeholder="Séparés par des virgules (ex: vue mer, calme, lumineux)"
-                />
-              )}
+                {/* Kitchen type (CUISINE only) */}
+                {room.roomType === 'CUISINE' && (
+                  <div className="w-[220px]">
+                    <SelectField
+                      label="Type"
+                      value={room.kitchenType ?? ''}
+                      onChange={(val) => updateRoom(index, { kitchenType: val as any })}
+                      options={Object.entries(KITCHEN_TYPE_LABELS).map(([value, label]) => ({
+                        value,
+                        label,
+                      }))}
+                    />
+                  </div>
+                )}
+
+                {/* Bathroom options (SALLE_DE_BAIN or DOUCHE) */}
+                {(room.roomType === 'SALLE_DE_BAIN' || room.roomType === 'DOUCHE') && (
+                  <>
+                    <div className="w-[100px] pt-6">
+                      <Checkbox
+                        label="Baignoire"
+                        checked={room.hasBathtub ?? false}
+                        onChange={(checked) => updateRoom(index, { hasBathtub: checked })}
+                      />
+                    </div>
+                    <div className="w-[100px] pt-6">
+                      <Checkbox
+                        label="Douche"
+                        checked={room.hasShower ?? false}
+                        onChange={(checked) => updateRoom(index, { hasShower: checked })}
+                      />
+                    </div>
+                    <div className="w-[100px] pt-6">
+                      <Checkbox
+                        label="WC"
+                        checked={room.hasToilet ?? false}
+                        onChange={(checked) => updateRoom(index, { hasToilet: checked })}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Delete button (not for first 2 default rows) */}
+                {index >= 2 && (
+                  <div className="pt-6">
+                    <IconButton variant="ghost" type="button" onClick={() => removeRoom(index)}>
+                      <Trash2 size={16} />
+                    </IconButton>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <Button variant="outline" type="button" onClick={addRoom}>
+              <Plus size={16} className="mr-1" />
+              Ajouter une pièce
+            </Button>
+          </div>
+        </FormSection>
+
+        {/* ── Section 6 — Diagnostics ── */}
+        <FormSection title="Diagnostics" completion={sectionCompletions[5]}>
+          <div className="space-y-4">
+            {diagnosticRows.map((diag, index) => (
+              <div
+                key={`diag-${index}`}
+                className="border border-edge-default rounded-lg p-4 space-y-3"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-[220px]">
+                    <SelectField
+                      label="Type"
+                      value={diag.diagnosticType}
+                      onChange={(val) => updateDiagnostic(index, { diagnosticType: val })}
+                      options={Object.entries(DIAGNOSTIC_TYPE_LABELS).map(([value, label]) => ({
+                        value,
+                        label,
+                      }))}
+                    />
+                  </div>
+
+                  {/* DPE/GES: colored buttons A-G */}
+                  {(diag.diagnosticType === 'DPE' || diag.diagnosticType === 'GES') ? (
+                    <div className="flex-1">
+                      <Label label="Classe" className="mb-2" />
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {(['A', 'B', 'C', 'D', 'E', 'F', 'G'] as DpeClass[]).map((cls) => (
+                          <button
+                            key={cls}
+                            type="button"
+                            className={`w-10 h-10 rounded-lg font-bold text-white transition-all ${
+                              diag.class === cls
+                                ? 'ring-2 ring-offset-2 ring-content-strong scale-110'
+                                : 'opacity-70 hover:opacity-100'
+                            }`}
+                            style={{ backgroundColor: DPE_COLORS[cls] }}
+                            onClick={() => updateDiagnostic(index, { class: cls })}
+                          >
+                            {cls}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="w-[150px]">
+                          <InputFieldOutlined
+                            label="Valeur"
+                            type="number"
+                            value={diag.value != null ? String(diag.value) : ''}
+                            onChange={(v) => updateDiagnostic(index, { value: v === '' ? null : Number(v) })}
+                            placeholder="Ex: 120"
+                          />
+                        </div>
+                        <div className="w-[150px]">
+                          <InputFieldOutlined
+                            label="Unité"
+                            type="text"
+                            value={diag.unit ?? ''}
+                            onChange={(v) => updateDiagnostic(index, { unit: v || null })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="w-[150px]">
+                        <InputFieldOutlined
+                          label="Valeur"
+                          type="text"
+                          value={diag.value != null ? String(diag.value) : ''}
+                          onChange={(v) => updateDiagnostic(index, { value: v === '' ? null : Number(v) })}
+                        />
+                      </div>
+                      <div className="w-[150px]">
+                        <InputFieldOutlined
+                          label="Unité"
+                          type="text"
+                          value={diag.unit ?? ''}
+                          onChange={(v) => updateDiagnostic(index, { unit: v || null })}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="w-[180px]">
+                    <InputFieldOutlined
+                      label="Diagnostiqueur"
+                      type="text"
+                      value={diag.companyName ?? ''}
+                      onChange={(v) => updateDiagnostic(index, { companyName: v || null })}
+                      placeholder="Ex: Diagamter"
+                    />
+                  </div>
+
+                  <div className="w-[180px]">
+                    <div className="flex flex-col gap-[12px]">
+                      <Label label="Date validité" />
+                      <DatePicker
+                        variant="docked"
+                        selectedDate={diag.validityDate ? new Date(diag.validityDate) : undefined}
+                        dateFormat="DD/MM/YYYY"
+                        onDateSelect={(date) => {
+                          updateDiagnostic(index, {
+                            validityDate: date ? date.toISOString().split('T')[0] : null,
+                          });
+                        }}
+                        placeholder="Sélectionner"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-6">
+                    <IconButton variant="ghost" type="button" onClick={() => removeDiagnostic(index)}>
+                      <Trash2 size={16} />
+                    </IconButton>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <Button variant="outline" type="button" onClick={addDiagnostic}>
+              <Plus size={16} className="mr-1" />
+              Ajouter un diagnostic
+            </Button>
+          </div>
+        </FormSection>
+
+        {/* ── Section 7 — Équipements ── */}
+        <FormSection title="Équipements" completion={sectionCompletions[6]}>
+          <div className="space-y-4">
+            {equipmentRows.map((equip, index) => (
+              <div
+                key={`equip-${index}`}
+                className="flex items-start gap-4"
+              >
+                <div className="w-[330px]">
+                  <SelectField
+                    label="Équipement"
+                    value={equip.key}
+                    onChange={(val) => updateEquipment(index, { key: val })}
+                    options={FEATURE_KEYS.map((f) => ({
+                      value: f.key,
+                      label: f.label,
+                    }))}
+                  />
+                </div>
+                <div className="flex-1">
+                  <InputFieldOutlined
+                    label="Commentaire"
+                    type="text"
+                    value={equip.comment}
+                    onChange={(v) => updateEquipment(index, { comment: v })}
+                    placeholder="Détail optionnel..."
+                  />
+                </div>
+                <div className="pt-6">
+                  <IconButton variant="ghost" type="button" onClick={() => removeEquipment(index)}>
+                    <Trash2 size={16} />
+                  </IconButton>
+                </div>
+              </div>
+            ))}
+
+            <Button variant="outline" type="button" onClick={addEquipment}>
+              <Plus size={16} className="mr-1" />
+              Ajouter un équipement
+            </Button>
+          </div>
+        </FormSection>
+
+        {/* ── Section 8 — Stationnement ── */}
+        <FormSection title="Stationnement" completion={sectionCompletions[7]}>
+          <div className="space-y-4">
+            {parkingRows.map((parking, index) => (
+              <div
+                key={`parking-${index}`}
+                className="flex items-start gap-4"
+              >
+                <div className="w-[220px]">
+                  <SelectField
+                    label="Type"
+                    value={parking.parkingType}
+                    onChange={(val) => updateParking(index, { parkingType: val })}
+                    options={Object.entries(PARKING_TYPE_LABELS).map(([value, label]) => ({
+                      value,
+                      label,
+                    }))}
+                  />
+                </div>
+                <div className="w-[150px]">
+                  <InputFieldOutlined
+                    label="Longueur (m)"
+                    type="number"
+                    value={parking.parkingLengthM}
+                    onChange={(v) => updateParking(index, { parkingLengthM: v })}
+                    placeholder="Ex: 5"
+                  />
+                </div>
+                <div className="w-[150px]">
+                  <InputFieldOutlined
+                    label="Largeur (m)"
+                    type="number"
+                    value={parking.parkingWidthM}
+                    onChange={(v) => updateParking(index, { parkingWidthM: v })}
+                    placeholder="Ex: 2.5"
+                  />
+                </div>
+                <div className="pt-6">
+                  <IconButton variant="ghost" type="button" onClick={() => removeParking(index)}>
+                    <Trash2 size={16} />
+                  </IconButton>
+                </div>
+              </div>
+            ))}
+
+            <Button variant="outline" type="button" onClick={addParking}>
+              <Plus size={16} className="mr-1" />
+              Ajouter un stationnement
+            </Button>
+          </div>
+        </FormSection>
+
+        {/* ── Section 9 — Parties Communes ── */}
+        <FormSection title="Parties communes" completion={sectionCompletions[8]}>
+          <div className="flex items-center gap-6">
+            <Checkbox
+              label="Ascenseur"
+              checked={formValues.hasElevator ?? false}
+              onChange={(checked) => setValue('hasElevator', checked)}
+            />
+            <Checkbox
+              label="Digicode"
+              checked={formValues.hasDigicode ?? false}
+              onChange={(checked) => setValue('hasDigicode', checked)}
+            />
+            <Checkbox
+              label="Interphone"
+              checked={formValues.hasIntercom ?? false}
+              onChange={(checked) => setValue('hasIntercom', checked)}
             />
           </div>
         </FormSection>
-      </div>
 
-      {/* Submit footer */}
-      <div className="flex justify-end gap-3 pt-6">
-        <Button variant="outline" type="button" onClick={() => router.back()}>
-          Annuler
-        </Button>
-        <Button
-          variant="primary"
-          onClick={handleSubmit(onSubmit)}
-          disabled={!isThresholdMet || isSubmitting}
-        >
-          {isSubmitting ? 'Création...' : 'Créer le bien'}
-        </Button>
+        {/* ── Section 10 — Informations complémentaires ── */}
+        <FormSection title="Informations complémentaires" completion={sectionCompletions[9]}>
+          <Label label="Commentaire libre" className="mb-1" />
+          <TextArea
+            value={formValues.notes ?? ''}
+            onChange={(val) => setValue('notes', val)}
+            placeholder="Notes visibles uniquement par l'équipe..."
+            maxLength={2000}
+            showCharCount
+            rows={4}
+          />
+        </FormSection>
       </div>
     </form>
   );

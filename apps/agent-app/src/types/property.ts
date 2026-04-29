@@ -103,6 +103,8 @@ export interface Property {
   bedroom4Equipment: string | null;
 
   // Construction
+  building: string | null;
+  doorNumber: string | null;
   floorLevel: number | null;
   numberOfFloors: number | null;
   constructionYear: number | null;

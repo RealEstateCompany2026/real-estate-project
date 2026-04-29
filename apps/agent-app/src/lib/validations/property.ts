@@ -31,87 +31,109 @@ export const propertyDiagnosticSchema = z.object({
   companyName: z.string().optional().nullable(),
 });
 
+// ── PropertyFeature sub-schema (key + comment) ─────────────────────
+export const propertyFeatureSchema = z.object({
+  key: z.string().min(1),
+  comment: z.string().optional().default(''),
+});
+
 // ── Main creation schema ────────────────────────────────────────────
 export const propertyCreateSchema = z.object({
-  // Section 1 — Catégorie
+  // Section 1 — Statut du bien
+  statusCheckboxes: z
+    .array(z.enum(['A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER']))
+    .default([]),
+  clientId: z.string().min(1, 'Propriétaire requis'),
+
+  // Section 2 — Informations générales
   type: z.enum([
     'STUDIO', 'T1', 'T2', 'T3', 'T4',
     'APPARTEMENT', 'MAISON', 'MAISON_DE_VILLE', 'LOFT',
     'TERRAIN', 'IMMEUBLE', 'OTHER',
   ]),
-  operationTypes: z
-    .array(z.enum(['VENTE', 'LOCATION', 'VIAGER', 'CESSION']))
-    .min(1, 'Sélectionnez au moins un type d\'opération'),
-  numberOfRooms: z.coerce.number().int().min(0, 'Nombre de pièces requis').optional(),
-
-  // Section 2 — Localisation
+  livingAreaSqm: z.coerce.number().positive('La surface doit être supérieure à 0'),
+  numberOfRooms: z.coerce.number().int().min(0).optional(),
+  mainExposure: z.enum(['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']).optional(),
+  mainViewType: z.enum([
+    'SUR_RUE', 'SUR_COUR', 'DEGAGEE', 'SUR_JARDIN', 'PANORAMIQUE',
+  ]).optional(),
   address: z.string().min(1, 'Adresse requise'),
   addressStreet: z.string().optional(),
   addressZipCode: z.string().optional(),
   addressCity: z.string().optional(),
   addressLat: z.coerce.number().optional(),
   addressLng: z.coerce.number().optional(),
-  neighborhoodName: z.string().optional(),
+  building: z.string().optional(),
+  doorNumber: z.string().optional(),
   floorLevel: optionalCoerceInt,
   numberOfFloors: optionalCoerceInt,
-
-  // Section 3 — Surfaces
-  livingAreaSqm: z.coerce.number().positive('La surface doit être supérieure à 0'),
-  landAreaSqm: optionalCoerceNumber,
-  terraceAreaSqm: optionalCoerceNumber,
-  balconyAreaSqm: optionalCoerceNumber,
-  gardenAreaSqm: optionalCoerceNumber,
-
-  // Section 4 — Pièces (PropertyRoom) → handled separately
-  rooms: z.array(propertyRoomSchema).default([]),
-
-  // Section 5 — Caractéristiques techniques
-  condition: z.enum(['NEUF', 'RENOVE', 'BON_ETAT', 'A_RENOVER', 'ANCIEN']).optional(),
   constructionYear: z.coerce
     .number()
     .int()
     .min(1800, 'Année invalide')
     .max(currentYear + 2, 'Année invalide')
     .optional(),
+  condition: z.enum(['NEUF', 'RENOVE', 'BON_ETAT', 'A_RENOVER', 'ANCIEN']).optional(),
+
+  // Section 3 — Valeur marché
+  desiredSellingPrice: z.coerce.number().positive().optional(),
+  estimatedMarketValue: optionalCoerceNumber,
+
+  // Section 4 — Surfaces
+  landAreaSqm: optionalCoerceNumber,
+  terraceAreaSqm: optionalCoerceNumber,
+
+  // Section 5 — Pièces (PropertyRoom)
+  rooms: z.array(propertyRoomSchema).default([]),
+
+  // Section 6 — Diagnostics
+  diagnostics: z.array(propertyDiagnosticSchema).default([]),
+
+  // Section 7 — Équipements (now key+comment objects)
+  featureKeys: z.array(propertyFeatureSchema).default([]),
+
+  // Section 8 — Stationnement
+  parkingType: z.enum(['BOX_FERME', 'PARKING_EXTERIEUR', 'GARAGE', 'AUCUN']).optional(),
+  parkingLengthM: z.coerce.number().positive().optional(),
+  parkingWidthM: z.coerce.number().positive().optional(),
+
+  // Section 9 — Parties communes
+  hasElevator: z.boolean().optional(),
+  hasDigicode: z.boolean().optional(),
+  hasIntercom: z.boolean().optional(),
+
+  // Section 10 — Informations complémentaires
+  notes: z.string().max(2000, 'Max 2000 caractères').optional(),
+
+  // Rétrocompatibilité
+  exposures: z
+    .array(z.enum(['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']))
+    .default([]),
+  operationTypes: z
+    .array(z.enum(['VENTE', 'LOCATION', 'VIAGER', 'CESSION']))
+    .default([]),
+  status: z
+    .enum(['OFF_MARKET', 'A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER', 'OTHER'])
+    .default('OFF_MARKET'),
+  tags: z.array(z.string()).default([]),
+  internalRef: z.string().optional(),
+  neighborhoodName: z.string().optional(),
+  balconyAreaSqm: optionalCoerceNumber,
+  gardenAreaSqm: optionalCoerceNumber,
   heatingType: z.enum([
     'INDIVIDUEL_GAZ', 'INDIVIDUEL_ELECTRIQUE', 'COLLECTIF_GAZ', 'PAC', 'FUEL', 'BOIS',
   ]).optional(),
   hotWaterSystem: z.enum([
     'CUMULUS_ELECTRIQUE', 'CHAUDIERE_GAZ', 'SOLAIRE', 'THERMODYNAMIQUE',
   ]).optional(),
-  exposures: z
-    .array(z.enum(['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']))
-    .default([]),
-  mainViewType: z.enum([
-    'SUR_RUE', 'SUR_COUR', 'DEGAGEE', 'SUR_JARDIN', 'PANORAMIQUE',
-  ]).optional(),
-  parkingType: z.enum(['BOX_FERME', 'PARKING_EXTERIEUR', 'GARAGE', 'AUCUN']).optional(),
   parkingSpotCount: optionalCoerceInt,
   shutterType: z.string().optional(),
-
-  // Section 6 — Équipements (PropertyFeature) → stored as string[]
-  featureKeys: z.array(z.string()).default([]),
-
-  // Section 7 — Diagnostics (PropertyDiagnostic) → handled separately
-  diagnostics: z.array(propertyDiagnosticSchema).default([]),
-
-  // Section 8 — Prix
-  desiredSellingPrice: z.coerce.number().positive('Le prix doit être supérieur à 0'),
-  estimatedMarketValue: optionalCoerceNumber,
-
-  // Section 9 — Informations complémentaires
-  clientId: z.string().min(1, 'Propriétaire requis'),
-  status: z
-    .enum(['OFF_MARKET', 'A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER', 'OTHER'])
-    .default('OFF_MARKET'),
-  internalRef: z.string().optional(),
-  notes: z.string().max(2000, 'Max 2000 caractères').optional(),
-  tags: z.array(z.string()).default([]),
 });
 
 export type PropertyCreateData = z.infer<typeof propertyCreateSchema>;
 export type PropertyRoomData = z.infer<typeof propertyRoomSchema>;
 export type PropertyDiagnosticData = z.infer<typeof propertyDiagnosticSchema>;
+export type PropertyFeatureData = z.infer<typeof propertyFeatureSchema>;
 
 // Édition inline — schéma partiel
 export const propertyUpdateSchema = propertyCreateSchema.partial();
