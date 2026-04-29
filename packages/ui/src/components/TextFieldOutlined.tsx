@@ -124,7 +124,7 @@ export function TextFieldOutlined({
 
   const getBorderColor = () => {
     if (disabled) return "border-edge-disabled";
-    if (error) return "border-red-500";
+    if (error) return "border-edge-error-default";
     if (isFocused)
       return "border-edge-neutral-default";
     return "border-edge-disabled";
@@ -132,7 +132,7 @@ export function TextFieldOutlined({
 
   const getBackgroundColor = () => {
     if (disabled) return "bg-surface-neutral-action";
-    if (error) return "bg-red-50";
+    if (error) return "bg-surface-neutral-default";
     return "bg-surface-neutral-default";
   };
 

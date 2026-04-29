@@ -374,28 +374,29 @@ export function ClientCreateView() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-[1191px] mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-h6 text-content-headings">
-          Ajouter un client
-        </h1>
-        <div className="flex items-center gap-3">
-          <Button variant="primary" type="submit" disabled={!isThresholdMet || isSubmitting}>
-            {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
-          </Button>
-          <IconButton variant="ghost" type="button" onClick={handleClose}>
-            <X size={20} />
-          </IconButton>
+      <div className="sticky top-0 z-10 bg-surface-page pb-2">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-h6 text-content-headings">
+            Ajouter un client
+          </h1>
+          <div className="flex items-center gap-3">
+            <Button variant="primary" type="submit" disabled={!isThresholdMet || isSubmitting}>
+              {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+            </Button>
+            <IconButton variant="ghost" type="button" onClick={handleClose}>
+              <X size={20} />
+            </IconButton>
+          </div>
         </div>
-      </div>
 
-      {/* Progress bar */}
-      <ProgressBar
-        progress={globalCompletion}
-        showPercentage
-        threshold={isThresholdMet ? 1 : 101}
-        className="mb-8"
-      />
+        {/* Progress bar */}
+        <ProgressBar
+          progress={globalCompletion}
+          showPercentage
+          threshold={isThresholdMet ? 1 : 101}
+        />
+      </div>
 
       {/* Duplicate alert */}
       <DuplicateAlert matches={matches} onDismiss={dismiss} />
@@ -429,7 +430,7 @@ export function ClientCreateView() {
             <div className="flex items-center gap-2 flex-wrap">
               {linkedProperties.map((p) => (
                 <div key={p.id} className="flex items-center gap-1">
-                  <Button variant="outline" size="sm" type="button" onClick={() => router.push(`/biens/${p.id}`)}>
+                  <Button variant="outline" type="button" onClick={() => router.push(`/biens/${p.id}`)}>
                     {p.label}
                   </Button>
                   <IconButton variant="ghost" type="button" onClick={() => removeLinkedProperty(p.id)}>
@@ -489,7 +490,7 @@ export function ClientCreateView() {
             <div className="flex items-center gap-2 flex-wrap">
               {linkedDeals.map((d) => (
                 <div key={d.id} className="flex items-center gap-1">
-                  <Button variant="outline" size="sm" type="button" onClick={() => router.push(`/affaires/${d.id}`)}>
+                  <Button variant="outline" type="button" onClick={() => router.push(`/affaires/${d.id}`)}>
                     {d.label}
                   </Button>
                   <IconButton variant="ghost" type="button" onClick={() => removeLinkedDeal(d.id)}>
@@ -597,18 +598,20 @@ export function ClientCreateView() {
             {/* Ligne 2 : Date naissance + Ville + Nationalité */}
             <div className="flex gap-4">
               <div className="w-[330px]">
-                <Label label="Date de naissance" required />
-                <DatePicker
-                  variant="docked"
-                  selectedDate={formValues.dateOfBirth ? new Date(formValues.dateOfBirth) : undefined}
-                  dateFormat="DD/MM/YYYY"
-                  maxDate={new Date()}
-                  onDateSelect={(date) => {
-                    setValue('dateOfBirth', date ? date.toISOString() : '', { shouldValidate: true });
-                  }}
-                  placeholder="Sélectionner la date"
-                  error={!!errors.dateOfBirth}
-                />
+                <div className="flex flex-col gap-[12px]">
+                  <Label label="Date de naissance" required />
+                  <DatePicker
+                    variant="docked"
+                    selectedDate={formValues.dateOfBirth ? new Date(formValues.dateOfBirth) : undefined}
+                    dateFormat="DD/MM/YYYY"
+                    maxDate={new Date()}
+                    onDateSelect={(date) => {
+                      setValue('dateOfBirth', date ? date.toISOString() : '', { shouldValidate: true });
+                    }}
+                    placeholder="Sélectionner la date"
+                    error={!!errors.dateOfBirth}
+                  />
+                </div>
                 {errors.dateOfBirth && (
                   <p className="text-xs text-content-error mt-1">{errors.dateOfBirth.message}</p>
                 )}

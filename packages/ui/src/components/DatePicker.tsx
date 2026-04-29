@@ -307,7 +307,7 @@ function DatePickerDocked({
       ? "border-edge-error-default"
       : isFocused
         ? "border-edge-neutral-default"
-        : "border-edge-default";
+        : "border-edge-disabled";
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -325,7 +325,7 @@ function DatePickerDocked({
           relative flex items-center gap-[8px] w-full transition-all
           h-[56px] px-[12px] py-[18px]
           border border-solid rounded-[8px] ${borderColorClass}
-          ${disabled ? "bg-surface-disabled opacity-50 cursor-not-allowed" : "bg-surface-neutral-default cursor-pointer"}
+          ${disabled ? "bg-surface-neutral-action opacity-50 cursor-not-allowed" : "bg-surface-neutral-default cursor-pointer"}
         `.trim()}
       >
         {/* Calendar icon left */}
