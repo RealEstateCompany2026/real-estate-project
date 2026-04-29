@@ -81,7 +81,7 @@ export function TextArea({
   return (
     <div className={`w-full ${className}`.trim()}>
       <div
-        className={`relative w-full ${bgClass} border-b ${borderClass} transition-colors ${
+        className={`relative w-full ${bgClass} border border-solid rounded-[8px] ${borderClass} transition-colors ${
           disabled ? "cursor-not-allowed opacity-50" : ""
         }`.trim()}
       >

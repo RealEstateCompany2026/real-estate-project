@@ -193,7 +193,7 @@ export function AddressField({
           relative flex items-center gap-[8px] transition-all
           h-[56px] px-[12px] py-[18px]
           ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-          border-b ${borderColorClass}
+          border border-solid rounded-[8px] ${borderColorClass}
           ${disabled ? "bg-surface-disabled" : "bg-surface-neutral-default"}
         `.trim()}
       >

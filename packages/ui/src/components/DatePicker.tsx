@@ -324,7 +324,7 @@ function DatePickerDocked({
         className={`
           relative flex items-center gap-[8px] w-full transition-all
           h-[56px] px-[12px] py-[18px]
-          border-b ${borderColorClass}
+          border border-solid rounded-[8px] ${borderColorClass}
           ${disabled ? "bg-surface-disabled opacity-50 cursor-not-allowed" : "bg-surface-neutral-default cursor-pointer"}
         `.trim()}
       >
