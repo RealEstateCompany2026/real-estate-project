@@ -268,6 +268,8 @@ export function ClientCreateView() {
         const { data: client, error } = await supabase
           .from('Client')
           .insert({
+            id: crypto.randomUUID(),
+            updatedAt: new Date().toISOString(),
             ...data,
             mobilePhone: normalizePhoneE164(data.mobilePhone),
             dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,

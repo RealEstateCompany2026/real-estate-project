@@ -579,6 +579,7 @@ export function PropertyCreateView() {
       const { data: property, error: propertyError } = await supabase
         .from('Property')
         .insert({
+          id: crypto.randomUUID(),
           ...rest,
           clientId: primaryClientId,
           operationTypes: opTypes,
