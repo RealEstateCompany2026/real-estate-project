@@ -21,6 +21,8 @@ export interface CheckboxProps {
   id?: string;
   ariaLabel?: string;
   className?: string;
+  label?: string;
+  labelClassName?: string;
 }
 
 export function Checkbox({
@@ -32,6 +34,8 @@ export function Checkbox({
   id,
   ariaLabel,
   className = "",
+  label,
+  labelClassName = "",
 }: CheckboxProps) {
   const handleClick = () => {
     if (disabled) return;
@@ -67,19 +71,19 @@ export function Checkbox({
       ? "text-content-error"
       : "text-content-body";
 
-  return (
+  const checkboxElement = (
     <div
-      className={`${baseClasses} ${cursorClass} ${bgClass} ${className}`.trim()}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      role="checkbox"
-      aria-checked={checked}
-      aria-disabled={disabled}
-      aria-label={ariaLabel}
-      aria-invalid={error}
-      tabIndex={disabled ? -1 : 0}
+      className={`${baseClasses} ${cursorClass} ${bgClass} ${!label ? className : ""}`.trim()}
+      onClick={!label ? handleClick : undefined}
+      onKeyDown={!label ? handleKeyDown : undefined}
+      role={!label ? "checkbox" : undefined}
+      aria-checked={!label ? checked : undefined}
+      aria-disabled={!label ? disabled : undefined}
+      aria-label={!label ? ariaLabel : undefined}
+      aria-invalid={!label ? error : undefined}
+      tabIndex={!label ? (disabled ? -1 : 0) : undefined}
     >
-      {name && (
+      {!label && name && (
         <input
           type="checkbox"
           name={name}
@@ -106,7 +110,7 @@ export function Checkbox({
 
       {/* Focus ring */}
       <div
-        className={`absolute -inset-1.5 rounded-lg border-2 ${borderClass} opacity-0 pointer-events-none group-focus-visible:opacity-100`}
+        className={`absolute -inset-1.5 rounded-lg border-2 ${borderClass} opacity-0 pointer-events-none group-focus-visible:opacity-100 group-focus-within:opacity-100`}
         aria-hidden="true"
       />
 
@@ -122,5 +126,32 @@ export function Checkbox({
         </div>
       )}
     </div>
+  );
+
+  if (!label) return checkboxElement;
+
+  return (
+    <label
+      htmlFor={id}
+      className={`flex items-center gap-3 group ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${className}`.trim()}
+    >
+      <input
+        type="checkbox"
+        name={name}
+        id={id}
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange?.(e.target.checked)}
+        className="sr-only peer"
+        aria-label={ariaLabel}
+        aria-invalid={error || undefined}
+      />
+      {checkboxElement}
+      <span
+        className={`text-sm font-medium select-none ${disabled ? "text-content-disabled" : "text-content-body"} ${labelClassName}`.trim()}
+      >
+        {label}
+      </span>
+    </label>
   );
 }

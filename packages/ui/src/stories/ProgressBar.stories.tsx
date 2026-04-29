@@ -101,6 +101,37 @@ export const AllSizes: Story = {
   ),
 };
 
+export const WithPercentage: Story = {
+  args: {
+    progress: 65,
+    showPercentage: true,
+  },
+};
+
+export const BelowThreshold: Story = {
+  args: {
+    progress: 40,
+    threshold: 60,
+    showPercentage: true,
+  },
+};
+
+export const AboveThreshold: Story = {
+  args: {
+    progress: 75,
+    threshold: 60,
+    showPercentage: true,
+  },
+};
+
+export const CompletionFull: Story = {
+  args: {
+    progress: 100,
+    threshold: 60,
+    showPercentage: true,
+  },
+};
+
 export const ProgressSequence: Story = {
   render: () => (
     <div className="flex flex-col gap-4">

@@ -69,3 +69,36 @@ export const ErrorChecked: Story = {
     ariaLabel: "Accept terms",
   },
 };
+
+export const WithLabel: Story = {
+  args: {
+    checked: false,
+    label: "Propriétaire",
+  },
+};
+
+export const WithLabelChecked: Story = {
+  args: {
+    checked: true,
+    label: "Acquéreur",
+  },
+};
+
+export const WithLabelDisabled: Story = {
+  args: {
+    checked: false,
+    disabled: true,
+    label: "Bailleur",
+  },
+};
+
+export const MultipleCheckboxes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <Checkbox label="Propriétaire" checked={true} />
+      <Checkbox label="Acquéreur" checked={false} />
+      <Checkbox label="Bailleur" checked={false} />
+      <Checkbox label="Locataire" checked={false} />
+    </div>
+  ),
+};

@@ -14,6 +14,7 @@
         "./input-field": "./src/components/InputField.tsx",
         "./input-field-outlined": "./src/components/InputFieldOutlined.tsx",
         "./text-field": "./src/components/TextField.tsx",
+        "./text-area": "./src/components/TextArea.tsx",
         "./text-field-outlined": "./src/components/TextFieldOutlined.tsx",
         "./label": "./src/components/Label.tsx",
         "./badge": "./src/components/Badge.tsx",
