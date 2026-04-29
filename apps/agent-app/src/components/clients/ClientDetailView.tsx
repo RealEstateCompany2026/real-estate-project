@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, AlertCircle, X, Plus } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, AlertCircle } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -11,7 +11,7 @@ import { AppBarClientAncres } from '@real-estate/ui/app-bar-client-ancres';
 import { IconButtonMega } from '@real-estate/ui/icon-button-mega';
 import { Spinner } from '@real-estate/ui/spinner';
 import { Badge } from '@real-estate/ui/badge';
-import { Button, IconButton } from '@real-estate/ui/button';
+import { Button } from '@real-estate/ui/button';
 import { Checkbox } from '@real-estate/ui/checkbox';
 import { DatePicker } from '@real-estate/ui/date-picker';
 import { Label } from '@real-estate/ui/label';
@@ -499,12 +499,6 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
   // Linked biens & affaires for profile sheet
   const [profileLinkedProperties, setProfileLinkedProperties] = useState<{ id: string; label: string }[]>([]);
   const [profileLinkedDeals, setProfileLinkedDeals] = useState<{ id: string; label: string }[]>([]);
-  const [showProfilePropertySearch, setShowProfilePropertySearch] = useState(false);
-  const [showProfileDealSearch, setShowProfileDealSearch] = useState(false);
-  const [profilePropertyQuery, setProfilePropertyQuery] = useState('');
-  const [profileDealQuery, setProfileDealQuery] = useState('');
-  const [profilePropertyResults, setProfilePropertyResults] = useState<{ id: string; label: string }[]>([]);
-  const [profileDealResults, setProfileDealResults] = useState<{ id: string; label: string }[]>([]);
   const isProfileDirty = profileFormInitial !== null && JSON.stringify(profileForm) !== JSON.stringify(profileFormInitial);
   const [isDocUploadSheetOpen, setIsDocUploadSheetOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -767,44 +761,12 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         return;
       }
 
-      // Update property associations
-      const currentPropIds = profileLinkedProperties.map(p => p.id);
-      const { data: existingProps } = await supabase
-        .from('Property')
-        .select('id')
-        .eq('clientId', data.client.id);
-      const existingPropIds = (existingProps ?? []).map((p: any) => p.id);
-      const removedPropIds = existingPropIds.filter((id: string) => !currentPropIds.includes(id));
-      if (removedPropIds.length > 0) {
-        await supabase.from('Property').update({ clientId: null }).in('id', removedPropIds);
-      }
-      const newPropIds = currentPropIds.filter(id => !existingPropIds.includes(id));
-      if (newPropIds.length > 0) {
-        await supabase.from('Property').update({ clientId: data.client.id }).in('id', newPropIds);
-      }
-
-      // Same for deals
-      const currentDealIds = profileLinkedDeals.map(d => d.id);
-      const { data: existingDeals } = await supabase
-        .from('Deal')
-        .select('id')
-        .eq('clientId', data.client.id);
-      const existingDealIds = (existingDeals ?? []).map((d: any) => d.id);
-      const removedDealIds = existingDealIds.filter((id: string) => !currentDealIds.includes(id));
-      if (removedDealIds.length > 0) {
-        await supabase.from('Deal').update({ clientId: null }).in('id', removedDealIds);
-      }
-      const newDealIds = currentDealIds.filter(id => !existingDealIds.includes(id));
-      if (newDealIds.length > 0) {
-        await supabase.from('Deal').update({ clientId: data.client.id }).in('id', newDealIds);
-      }
-
       setIsProfileSheetOpen(false);
       setRefreshKey((k) => k + 1);
     } finally {
       setIsSavingProfile(false);
     }
-  }, [data, profileForm, profileLinkedProperties, profileLinkedDeals]);
+  }, [data, profileForm]);
 
   // Address search for profile sheet
   const handleProfileAddressSearch = useCallback((query: string) => {
@@ -840,40 +802,6 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     updateProfileField('address', '');
     setProfileAddressSuggestions([]);
   }, [updateProfileField]);
-
-  // Property search for profile sheet
-  const searchProfileProperties = useCallback(async (query: string) => {
-    if (query.length < 2) { setProfilePropertyResults([]); return; }
-    const supabase = createClient();
-    const { data: results } = await supabase
-      .from('Property')
-      .select('id, type, livingAreaSqm, addressCity')
-      .ilike('addressCity', `%${query}%`)
-      .limit(5);
-    setProfilePropertyResults(
-      (results ?? []).map((p: any) => ({
-        id: p.id,
-        label: `${p.type ?? ''} · ${p.livingAreaSqm ?? '?'} m² · ${p.addressCity ?? ''}`.trim(),
-      }))
-    );
-  }, []);
-
-  // Deal search for profile sheet
-  const searchProfileDeals = useCallback(async (query: string) => {
-    if (query.length < 2) { setProfileDealResults([]); return; }
-    const supabase = createClient();
-    const { data: results } = await supabase
-      .from('Deal')
-      .select('id, reference')
-      .ilike('reference', `%${query}%`)
-      .limit(5);
-    setProfileDealResults(
-      (results ?? []).map((d: any) => ({
-        id: d.id,
-        label: d.reference ?? d.id.slice(0, 8),
-      }))
-    );
-  }, []);
 
   // Toggle status in profile form
   const toggleProfileStatus = useCallback((status: ClientStatus) => {
@@ -1473,6 +1401,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       >
         <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
           {/* Section 1 — Type de client */}
+          <div className="bg-surface-neutral-action rounded-lg p-4">
           <CollapsibleSection
             title="Type de client"
             defaultExpanded={true}
@@ -1499,93 +1428,36 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               <div>
                 <Label label="Biens associés" className="mb-2" />
                 <div className="flex items-center gap-2 flex-wrap">
-                  {profileLinkedProperties.map((p) => (
-                    <div key={p.id} className="flex items-center gap-1">
-                      <Button variant="outline" type="button" onClick={() => {/* navigate to property */}}>
+                  {profileLinkedProperties.length > 0 ? (
+                    profileLinkedProperties.map((p) => (
+                      <Button key={p.id} variant="outline" type="button" onClick={() => {/* navigate to property */}}>
                         {p.label}
                       </Button>
-                      <IconButton variant="ghost" type="button" onClick={() => setProfileLinkedProperties(prev => prev.filter(x => x.id !== p.id))}>
-                        <X size={14} />
-                      </IconButton>
-                    </div>
-                  ))}
-                  <IconButton variant="outline" type="button" onClick={() => setShowProfilePropertySearch(true)}>
-                    <Plus size={20} />
-                  </IconButton>
+                    ))
+                  ) : (
+                    <p className="text-xs text-content-caption">Aucun bien associé</p>
+                  )}
                 </div>
-                {showProfilePropertySearch && (
-                  <div className="mt-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
-                    <InputFieldOutlined
-                      label="Rechercher un bien"
-                      id="profilePropertySearch"
-                      type="text"
-                      value={profilePropertyQuery}
-                      onChange={(value) => { setProfilePropertyQuery(value); searchProfileProperties(value); }}
-                      placeholder="Rechercher par ville..."
-                    />
-                    {profilePropertyResults.length > 0 && (
-                      <ul className="mt-2 space-y-1">
-                        {profilePropertyResults.map((p) => (
-                          <li key={p.id}>
-                            <button type="button" className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-surface-neutral-action transition-colors cursor-pointer" onClick={() => {
-                              if (!profileLinkedProperties.some(lp => lp.id === p.id)) setProfileLinkedProperties(prev => [...prev, p]);
-                              setShowProfilePropertySearch(false); setProfilePropertyQuery(''); setProfilePropertyResults([]);
-                            }}>{p.label}</button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <Button variant="ghost" size="sm" type="button" onClick={() => { setShowProfilePropertySearch(false); setProfilePropertyQuery(''); setProfilePropertyResults([]); }}>Fermer</Button>
-                  </div>
-                )}
               </div>
 
               {/* Affaires associées */}
               <div>
                 <Label label="Affaires associées" className="mb-2" />
                 <div className="flex items-center gap-2 flex-wrap">
-                  {profileLinkedDeals.map((d) => (
-                    <div key={d.id} className="flex items-center gap-1">
-                      <Button variant="outline" type="button" onClick={() => {/* navigate to deal */}}>
+                  {profileLinkedDeals.length > 0 ? (
+                    profileLinkedDeals.map((d) => (
+                      <Button key={d.id} variant="outline" type="button" onClick={() => {/* navigate to deal */}}>
                         {d.label}
                       </Button>
-                      <IconButton variant="ghost" type="button" onClick={() => setProfileLinkedDeals(prev => prev.filter(x => x.id !== d.id))}>
-                        <X size={14} />
-                      </IconButton>
-                    </div>
-                  ))}
-                  <IconButton variant="outline" type="button" onClick={() => setShowProfileDealSearch(true)}>
-                    <Plus size={20} />
-                  </IconButton>
+                    ))
+                  ) : (
+                    <p className="text-xs text-content-caption">Aucune affaire associée</p>
+                  )}
                 </div>
-                {showProfileDealSearch && (
-                  <div className="mt-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
-                    <InputFieldOutlined
-                      label="Rechercher une affaire"
-                      id="profileDealSearch"
-                      type="text"
-                      value={profileDealQuery}
-                      onChange={(value) => { setProfileDealQuery(value); searchProfileDeals(value); }}
-                      placeholder="Rechercher par référence..."
-                    />
-                    {profileDealResults.length > 0 && (
-                      <ul className="mt-2 space-y-1">
-                        {profileDealResults.map((d) => (
-                          <li key={d.id}>
-                            <button type="button" className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-surface-neutral-action transition-colors cursor-pointer" onClick={() => {
-                              if (!profileLinkedDeals.some(ld => ld.id === d.id)) setProfileLinkedDeals(prev => [...prev, d]);
-                              setShowProfileDealSearch(false); setProfileDealQuery(''); setProfileDealResults([]);
-                            }}>{d.label}</button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <Button variant="ghost" size="sm" type="button" onClick={() => { setShowProfileDealSearch(false); setProfileDealQuery(''); setProfileDealResults([]); }}>Fermer</Button>
-                  </div>
-                )}
               </div>
             </div>
           </CollapsibleSection>
+          </div>
 
           {/* Section 2 — Informations de profil */}
           <CollapsibleSection
@@ -1737,6 +1609,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 onChange={(val) => setProfileForm(prev => ({ ...prev, notes: val }))}
                 placeholder="Notes visibles uniquement par l'équipe..."
                 rows={4}
+                maxLength={2000}
               />
             </div>
           </CollapsibleSection>
