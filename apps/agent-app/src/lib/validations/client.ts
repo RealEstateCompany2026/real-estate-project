@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 
 // Création complète — V2 formulaire one-page 6 sections
 export const clientCreateSchema = z.object({
@@ -17,7 +18,10 @@ export const clientCreateSchema = z.object({
   // Section 3 — Contact
   primaryEmail: z.string().email('Email invalide'),
   secondaryEmail: z.string().email('Email invalide').optional().or(z.literal('')),
-  mobilePhone: z.string().min(1, 'Téléphone requis'),
+  mobilePhone: z.string().min(1, 'Téléphone requis').refine(
+    (val) => val === '' || isValidPhoneNumber(val, 'FR'),
+    { message: 'Numéro de téléphone invalide (ex: 06 12 34 56 78 ou +33 6 12 34 56 78)' },
+  ),
   address: z.string().min(1, 'Adresse requise'),
 
   // Section 4 — Marketing (RGPD)
@@ -57,3 +61,16 @@ export type ClientQuickCreateData = z.infer<typeof clientQuickCreateSchema>;
 export const clientUpdateSchema = clientCreateSchema.partial();
 
 export type ClientUpdateData = z.infer<typeof clientUpdateSchema>;
+
+/**
+ * Normalise un numéro de téléphone au format E.164 (+33612345678).
+ * Retourne le numéro original si le parsing échoue.
+ */
+export function normalizePhoneE164(phone: string): string {
+  try {
+    const parsed = parsePhoneNumber(phone, 'FR');
+    return parsed.format('E.164');
+  } catch {
+    return phone;
+  }
+}

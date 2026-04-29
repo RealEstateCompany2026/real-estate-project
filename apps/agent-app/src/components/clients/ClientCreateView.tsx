@@ -21,7 +21,7 @@ import { DatePicker } from '@real-estate/ui/date-picker';
 // App imports
 import { useToast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
-import { clientCreateSchema, type ClientCreateData } from '@/lib/validations/client';
+import { clientCreateSchema, type ClientCreateData, normalizePhoneE164 } from '@/lib/validations/client';
 import {
   CLIENT_STATUS_LABELS,
   MARITAL_STATUS_LABELS,
@@ -254,6 +254,7 @@ export function ClientCreateView() {
           .from('Client')
           .insert({
             ...data,
+            mobilePhone: normalizePhoneE164(data.mobilePhone),
             dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,
             agentId: user?.id ?? null,
             organizationId: orgId,
