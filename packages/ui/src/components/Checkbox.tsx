@@ -110,7 +110,7 @@ export function Checkbox({
 
       {/* Focus ring */}
       <div
-        className={`absolute -inset-1.5 rounded-lg border-2 ${borderClass} opacity-0 pointer-events-none group-focus-visible:opacity-100 group-focus-within:opacity-100`}
+        className={`absolute -inset-1.5 rounded-lg border-2 ${borderClass} opacity-0 pointer-events-none group-focus-visible:opacity-100`}
         aria-hidden="true"
       />
 
@@ -148,7 +148,7 @@ export function Checkbox({
       />
       {checkboxElement}
       <span
-        className={`text-sm font-medium select-none ${disabled ? "text-content-disabled" : "text-content-body"} ${labelClassName}`.trim()}
+        className={`text-sm font-semibold select-none ${disabled ? "text-content-disabled" : "text-content-body"} ${labelClassName}`.trim()}
       >
         {label}
       </span>
