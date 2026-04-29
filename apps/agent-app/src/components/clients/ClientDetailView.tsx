@@ -1401,9 +1401,9 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       >
         <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
           {/* Section 1 — Type de client */}
-          <div className="bg-surface-neutral-action rounded-lg p-4">
           <CollapsibleSection
             title="Type de client"
+            className="bg-surface-neutral-action"
             defaultExpanded={true}
             badge={(() => {
               const pct = (profileForm.status?.length ?? 0) > 0 ? 100 : 0;
@@ -1430,7 +1430,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   {profileLinkedProperties.length > 0 ? (
                     profileLinkedProperties.map((p) => (
-                      <Button key={p.id} variant="outline" type="button" onClick={() => {/* navigate to property */}}>
+                      <Button key={p.id} variant="outline" type="button" onClick={() => router.push(`/biens/${p.id}`)}>
                         {p.label}
                       </Button>
                     ))
@@ -1446,7 +1446,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   {profileLinkedDeals.length > 0 ? (
                     profileLinkedDeals.map((d) => (
-                      <Button key={d.id} variant="outline" type="button" onClick={() => {/* navigate to deal */}}>
+                      <Button key={d.id} variant="outline" type="button" onClick={() => router.push(`/affaires/${d.id}`)}>
                         {d.label}
                       </Button>
                     ))
@@ -1457,7 +1457,6 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
               </div>
             </div>
           </CollapsibleSection>
-          </div>
 
           {/* Section 2 — Informations de profil */}
           <CollapsibleSection

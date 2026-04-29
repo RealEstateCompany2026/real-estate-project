@@ -30,6 +30,8 @@ export interface CollapsibleSectionProps {
   defaultExpanded?: boolean;
   /** Badge optionnel (ex: nombre de champs complétés) */
   badge?: string | React.ReactNode;
+  /** Classes CSS additionnelles sur le container */
+  className?: string;
 }
 
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
@@ -38,11 +40,12 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   children,
   defaultExpanded = true,
   badge,
+  className,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <div className="rounded-lg border bg-surface-neutral-default border-edge-default">
+    <div className={`rounded-lg border border-edge-default overflow-hidden ${className ?? 'bg-surface-neutral-default'}`.trim()}>
       {/* Header */}
       <button
         className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-surface-neutral-action"
