@@ -532,17 +532,17 @@ export function PropertyCreateView() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Non authentifié');
 
-      const { data: appUser } = await supabase
-        .from('AppUser')
+      const { data: userRow } = await supabase
+        .from('User')
         .select('id')
         .eq('supabase_id', user.id)
         .single();
-      if (!appUser) throw new Error('Utilisateur non trouvé');
+      if (!userRow) throw new Error('Utilisateur non trouvé');
 
       const { data: agent } = await supabase
         .from('Agent')
         .select('id, organizationId')
-        .eq('userId', appUser.id)
+        .eq('userId', userRow.id)
         .single();
       if (!agent) throw new Error('Agent non trouvé');
 

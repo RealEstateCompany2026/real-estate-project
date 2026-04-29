@@ -248,10 +248,22 @@ export function ClientCreateView() {
       setIsSubmitting(true);
       try {
         const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        const orgId = user?.user_metadata?.organizationId ?? null;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Non authentifié');
+
+        const { data: userRow } = await supabase
+          .from('User')
+          .select('id')
+          .eq('supabase_id', user.id)
+          .single();
+        if (!userRow) throw new Error('Utilisateur non trouvé');
+
+        const { data: agent } = await supabase
+          .from('Agent')
+          .select('id, organizationId')
+          .eq('userId', userRow.id)
+          .single();
+        if (!agent) throw new Error('Agent non trouvé');
 
         const { data: client, error } = await supabase
           .from('Client')
@@ -259,8 +271,8 @@ export function ClientCreateView() {
             ...data,
             mobilePhone: normalizePhoneE164(data.mobilePhone),
             dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,
-            agentId: user?.id ?? null,
-            organizationId: orgId,
+            agentId: agent.id,
+            organizationId: agent.organizationId,
             isActive: true,
             completionScore: 0,
             isPotentialDuplicate: false,
