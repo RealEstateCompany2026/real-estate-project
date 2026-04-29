@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
+
+/**
+ * Validation téléphone français — accepte les formats courants :
+ * 06 12 34 56 78, 0612345678, +33 6 12 34 56 78, +33612345678
+ */
+const PHONE_FR_REGEX = /^(?:(?:\+33|0033)\s?[1-9](?:[\s.-]?\d{2}){4}|0[1-9](?:[\s.-]?\d{2}){4})$/;
 
 // Création complète — V2 formulaire one-page 6 sections
 export const clientCreateSchema = z.object({
@@ -19,8 +24,8 @@ export const clientCreateSchema = z.object({
   primaryEmail: z.string().email('Email invalide'),
   secondaryEmail: z.string().email('Email invalide').optional().or(z.literal('')),
   mobilePhone: z.string().min(1, 'Téléphone requis').refine(
-    (val) => val === '' || isValidPhoneNumber(val, 'FR'),
-    { message: 'Numéro de téléphone invalide (ex: 06 12 34 56 78 ou +33 6 12 34 56 78)' },
+    (val) => val === '' || PHONE_FR_REGEX.test(val.trim()),
+    { message: 'Numéro invalide (ex: 06 12 34 56 78 ou +33 6 12 34 56 78)' },
   ),
   address: z.string().min(1, 'Adresse requise'),
 
@@ -63,14 +68,13 @@ export const clientUpdateSchema = clientCreateSchema.partial();
 export type ClientUpdateData = z.infer<typeof clientUpdateSchema>;
 
 /**
- * Normalise un numéro de téléphone au format E.164 (+33612345678).
- * Retourne le numéro original si le parsing échoue.
+ * Normalise un numéro de téléphone français au format E.164 (+33612345678).
+ * Accepte 06 12 34 56 78, 0612345678, +33 6 12 34 56 78, etc.
  */
 export function normalizePhoneE164(phone: string): string {
-  try {
-    const parsed = parsePhoneNumber(phone, 'FR');
-    return parsed.format('E.164');
-  } catch {
-    return phone;
-  }
+  const digits = phone.replace(/[\s.\-()]/g, '');
+  if (digits.startsWith('+33')) return digits;
+  if (digits.startsWith('0033')) return '+33' + digits.slice(4);
+  if (digits.startsWith('0') && digits.length === 10) return '+33' + digits.slice(1);
+  return phone;
 }
