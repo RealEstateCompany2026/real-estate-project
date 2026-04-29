@@ -7,7 +7,7 @@ export type PropertyType =
 
 export type PropertyStatus =
   | 'OFF_MARKET' | 'A_VENDRE' | 'A_LOUER'
-  | 'VENDU' | 'LOUE' | 'EN_VIAGER' | 'OTHER';
+  | 'VENDU' | 'LOUE' | 'EN_VIAGER' | 'SOUS_GESTION' | 'OTHER';
 
 export type PropertyCondition =
   | 'NEUF' | 'RENOVE' | 'BON_ETAT' | 'A_RENOVER' | 'ANCIEN';
@@ -292,6 +292,7 @@ export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
   VENDU: 'Vendu',
   LOUE: 'Loué',
   EN_VIAGER: 'En viager',
+  SOUS_GESTION: 'Sous gestion',
   OTHER: 'Autre',
 };
 
@@ -302,6 +303,7 @@ export const PROPERTY_STATUS_COLORS: Record<PropertyStatus, string> = {
   VENDU: 'var(--purple-500)',
   LOUE: 'var(--purple-500)',
   EN_VIAGER: 'var(--orange-500)',
+  SOUS_GESTION: 'var(--blue-500)',
   OTHER: 'var(--neutral-400)',
 };
 
@@ -407,8 +409,8 @@ export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
 };
 
 export const DIAGNOSTIC_TYPE_LABELS: Record<DiagnosticType, string> = {
-  DPE: 'DPE (Énergie)',
-  GES: 'GES (Gaz à effet de serre)',
+  DPE: 'DPE',
+  GES: 'GES',
   AMIANTE: 'Amiante',
   PLOMB: 'Plomb',
   TERMITES: 'Termites',
@@ -423,5 +425,6 @@ export const ROOM_COUNT_LABELS: Record<number, string> = {
   2: 'T2',
   3: 'T3',
   4: 'T4',
-  5: 'T5+',
+  5: 'T5',
+  6: 'Plus',
 };

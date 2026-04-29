@@ -19,14 +19,16 @@ import { AddressField } from '@real-estate/ui/address-field';
 import type { AddressSuggestion } from '@real-estate/ui/address-field';
 import { Label } from '@real-estate/ui/label';
 import { DatePicker } from '@real-estate/ui/date-picker';
+import { IconDpe } from '@real-estate/ui/icon-dpe';
+import { IconGes } from '@real-estate/ui/icon-ges';
+import type { DpeType } from '@real-estate/ui/icon-dpe';
+import type { GesType } from '@real-estate/ui/icon-ges';
 
 // App imports
 import { useToast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
 import { propertyCreateSchema, type PropertyCreateData } from '@/lib/validations/property';
 import {
-  PROPERTY_CATEGORY_TYPES,
-  CATEGORY_LABELS,
   PROPERTY_TYPE_LABELS,
   PROPERTY_CONDITION_LABELS,
   VIEW_TYPE_LABELS,
@@ -35,10 +37,9 @@ import {
   ROOM_TYPE_LABELS,
   PROPERTY_STATUS_LABELS,
   EXPOSURE_LABELS,
-  DPE_COLORS,
   DIAGNOSTIC_TYPE_LABELS,
+  ROOM_COUNT_LABELS,
   type DpeClass,
-  type PropertyCategory,
   type PropertyType,
   type PropertyStatus,
   type RoomType,
@@ -82,10 +83,42 @@ const APARTMENT_LIKE_TYPES: PropertyType[] = [
   'APPARTEMENT', 'STUDIO', 'LOFT', 'T1', 'T2', 'T3', 'T4',
 ];
 
-// Status checkboxes to show (excluding OFF_MARKET and OTHER)
+// C1 — Status checkboxes: OFF_MARKET, A_VENDRE, A_LOUER, EN_VIAGER, SOUS_GESTION
 const STATUS_CHECKBOX_VALUES: PropertyStatus[] = [
-  'A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER',
+  'OFF_MARKET', 'A_VENDRE', 'A_LOUER', 'EN_VIAGER', 'SOUS_GESTION',
 ];
+
+// C3 — Simplified category options (direct PropertyType mapping)
+const CATEGORY_OPTIONS: { value: PropertyType; label: string }[] = [
+  { value: 'APPARTEMENT', label: 'Appartement' },
+  { value: 'MAISON', label: 'Maison' },
+  { value: 'LOFT', label: 'Loft' },
+  { value: 'OTHER', label: 'Autre' },
+];
+
+// ---------------------------------------------------------------------------
+// C7 — DPE/GES class computation helpers
+// ---------------------------------------------------------------------------
+
+function computeDpeClass(value: number): DpeClass {
+  if (value <= 70) return 'A';
+  if (value <= 110) return 'B';
+  if (value <= 180) return 'C';
+  if (value <= 250) return 'D';
+  if (value <= 330) return 'E';
+  if (value <= 420) return 'F';
+  return 'G';
+}
+
+function computeGesClass(value: number): DpeClass {
+  if (value <= 6) return 'A';
+  if (value <= 11) return 'B';
+  if (value <= 30) return 'C';
+  if (value <= 50) return 'D';
+  if (value <= 70) return 'E';
+  if (value <= 100) return 'F';
+  return 'G';
+}
 
 // ---------------------------------------------------------------------------
 // FormSection sub-component
@@ -125,9 +158,6 @@ export function PropertyCreateView() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Category selection (front-only grouping)
-  const [selectedCategory, setSelectedCategory] = useState<PropertyCategory | null>(null);
-
   // Address autocomplete state
   const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
   const [addressLoading, setAddressLoading] = useState(false);
@@ -149,7 +179,7 @@ export function PropertyCreateView() {
     companyName: string | null;
   }[]>([
     { diagnosticType: 'DPE', class: null, value: null, unit: 'kWh/m²/an', validityDate: null, companyName: null },
-    { diagnosticType: 'GES', class: null, value: null, unit: 'gCO₂/m²/an', validityDate: null, companyName: null },
+    { diagnosticType: 'GES', class: null, value: null, unit: 'kgCO₂/m²/an', validityDate: null, companyName: null },
   ]);
 
   // Equipment state (add-row pattern with key + comment)
@@ -162,11 +192,12 @@ export function PropertyCreateView() {
     parkingWidthM: string;
   }[]>([]);
 
-  // Client (owner) search state
+  // C2 — Multi-owner state
   const [clientSearch, setClientSearch] = useState('');
   const [clientResults, setClientResults] = useState<{ id: string; firstName: string; lastName: string; primaryEmail: string }[]>([]);
   const [clientSearchLoading, setClientSearchLoading] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<{ id: string; name: string } | null>(null);
+  const [selectedClients, setSelectedClients] = useState<{ id: string; name: string }[]>([]);
+  const [showClientSearch, setShowClientSearch] = useState(false);
   const clientDebounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   // ---------- Form ----------
@@ -175,7 +206,7 @@ export function PropertyCreateView() {
     resolver: zodResolver(propertyCreateSchema) as any,
     defaultValues: {
       statusCheckboxes: [],
-      clientId: '',
+      clientIds: [],
       type: undefined,
       livingAreaSqm: undefined as unknown as number,
       numberOfRooms: undefined,
@@ -228,7 +259,6 @@ export function PropertyCreateView() {
   // ---------- Derived state ----------
 
   const isApartmentType = formValues.type != null && APARTMENT_LIKE_TYPES.includes(formValues.type);
-  const isResidentialNonTerrain = formValues.type != null && formValues.type !== 'TERRAIN';
 
   // ---------- Completion logic ----------
 
@@ -241,13 +271,13 @@ export function PropertyCreateView() {
       return v != null;
     };
 
-    // S1: statusCheckboxes (at least 1) + clientId
+    // S1: statusCheckboxes (at least 1) + clientIds
     const s1a = (formValues.statusCheckboxes?.length ?? 0) > 0 ? 1 : 0;
-    const s1b = isFilled(formValues.clientId) ? 1 : 0;
+    const s1b = (formValues.clientIds?.length ?? 0) > 0 ? 1 : 0;
     const s1 = ((s1a + s1b) / 2) * 100;
 
-    // S2: type + livingAreaSqm + address required, + optional fields proportional
-    const s2Required = [formValues.type, formValues.livingAreaSqm, formValues.address];
+    // S2: type + address required, + optional fields proportional
+    const s2Required = [formValues.type, formValues.address];
     const s2Optional = [
       formValues.numberOfRooms,
       formValues.mainExposure,
@@ -260,21 +290,21 @@ export function PropertyCreateView() {
     ];
     const s2ReqFilled = s2Required.filter(isFilled).length;
     const s2OptFilled = s2Optional.filter(isFilled).length;
-    const s2 = ((s2ReqFilled + s2OptFilled) / (3 + 8)) * 100;
+    const s2 = ((s2ReqFilled + s2OptFilled) / (2 + 8)) * 100;
 
     // S3: 2 optional prices
     const s3Fields = [formValues.desiredSellingPrice, formValues.estimatedMarketValue];
     const s3 = (s3Fields.filter(isFilled).length / 2) * 100;
 
-    // S4: 2 optional surfaces
-    const s4Fields = [formValues.landAreaSqm, formValues.terraceAreaSqm];
-    const s4 = (s4Fields.filter(isFilled).length / 2) * 100;
+    // S4: 3 surfaces (livingAreaSqm required + 2 optional)
+    const s4Fields = [formValues.livingAreaSqm, formValues.terraceAreaSqm, formValues.landAreaSqm];
+    const s4 = (s4Fields.filter(isFilled).length / 3) * 100;
 
     // S5: at least 1 room with areaSqm filled
     const s5 = rooms.some(r => r.areaSqm != null && r.areaSqm > 0) ? 100 : 0;
 
-    // S6: at least 1 diagnostic with class filled
-    const s6 = diagnosticRows.some(d => d.class != null && d.class.length > 0) ? 100 : 0;
+    // S6: at least 1 diagnostic with value filled
+    const s6 = diagnosticRows.some(d => d.value != null) ? 100 : 0;
 
     // S7: at least 1 equipment selected
     const s7 = equipmentRows.length > 0 ? 100 : 0;
@@ -292,12 +322,12 @@ export function PropertyCreateView() {
     const sections = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
     const global = Math.round(sections.reduce((a, b) => a + b, 0) / 10);
 
-    // Mandatory threshold: type + address + livingAreaSqm + clientId
+    // Mandatory threshold: type + address + livingAreaSqm + clientIds
     const met =
       !!formValues.type &&
       !!formValues.address &&
       formValues.livingAreaSqm != null && formValues.livingAreaSqm > 0 &&
-      !!formValues.clientId;
+      (formValues.clientIds?.length ?? 0) > 0;
 
     return { sectionCompletions: sections, globalCompletion: global, isThresholdMet: met };
   }, [formValues, rooms, diagnosticRows, equipmentRows, parkingRows]);
@@ -406,7 +436,17 @@ export function PropertyCreateView() {
   };
 
   const updateDiagnostic = (index: number, updates: Record<string, any>) => {
-    setDiagnosticRows(prev => prev.map((d, i) => i === index ? { ...d, ...updates } : d));
+    setDiagnosticRows(prev => prev.map((d, i) => {
+      if (i !== index) return d;
+      const updated = { ...d, ...updates };
+      // C7 — Auto-compute class for DPE/GES based on value
+      if (updated.diagnosticType === 'DPE' && updated.value != null && updated.value > 0) {
+        updated.class = computeDpeClass(updated.value);
+      } else if (updated.diagnosticType === 'GES' && updated.value != null && updated.value > 0) {
+        updated.class = computeGesClass(updated.value);
+      }
+      return updated;
+    }));
   };
 
   // ---------- Equipment handlers ----------
@@ -437,7 +477,7 @@ export function PropertyCreateView() {
     setParkingRows(prev => prev.map((p, i) => i === index ? { ...p, ...updates } : p));
   };
 
-  // ---------- Client search handlers ----------
+  // ---------- C2 — Client search handlers (multi-owner) ----------
 
   const handleClientSearch = useCallback((query: string) => {
     setClientSearch(query);
@@ -460,10 +500,25 @@ export function PropertyCreateView() {
   }, []);
 
   const selectClient = useCallback((client: { id: string; firstName: string; lastName: string }) => {
-    setValue('clientId', client.id, { shouldValidate: true });
-    setSelectedClient({ id: client.id, name: `${client.firstName} ${client.lastName}` });
+    const newClient = { id: client.id, name: `${client.firstName} ${client.lastName}` };
+    // Don't add duplicates
+    setSelectedClients(prev => {
+      if (prev.some(c => c.id === client.id)) return prev;
+      const updated = [...prev, newClient];
+      setValue('clientIds', updated.map(c => c.id), { shouldValidate: true });
+      return updated;
+    });
     setClientSearch('');
     setClientResults([]);
+    setShowClientSearch(false);
+  }, [setValue]);
+
+  const removeClient = useCallback((clientId: string) => {
+    setSelectedClients(prev => {
+      const updated = prev.filter(c => c.id !== clientId);
+      setValue('clientIds', updated.map(c => c.id), { shouldValidate: true });
+      return updated;
+    });
   }, [setValue]);
 
   // ---------- Submit ----------
@@ -493,9 +548,9 @@ export function PropertyCreateView() {
       // 3. Derive operationTypes + status from statusCheckboxes
       const opTypes: string[] = [];
       const statusChecks = data.statusCheckboxes ?? [];
-      if (statusChecks.includes('A_VENDRE') || statusChecks.includes('VENDU')) opTypes.push('VENTE');
-      if (statusChecks.includes('A_LOUER') || statusChecks.includes('LOUE')) opTypes.push('LOCATION');
-      if (statusChecks.includes('EN_VIAGER')) opTypes.push('VIAGER');
+      if (statusChecks.includes('A_VENDRE' as any)) opTypes.push('VENTE');
+      if (statusChecks.includes('A_LOUER' as any)) opTypes.push('LOCATION');
+      if (statusChecks.includes('EN_VIAGER' as any)) opTypes.push('VIAGER');
 
       const primaryStatus = statusChecks.length > 0 ? statusChecks[0] : 'OFF_MARKET';
 
@@ -508,13 +563,17 @@ export function PropertyCreateView() {
       // 5. Build mainExposure → exposures array for retro-compat
       const exposuresArray = data.mainExposure ? [data.mainExposure] : [];
 
+      // C2 — Use first clientId for the Property row
+      const primaryClientId = data.clientIds[0];
+
       // 6. Insert Property
-      const { statusCheckboxes: _sc, rooms: _rooms, diagnostics: _diags, featureKeys: _fk, ...rest } = data;
+      const { statusCheckboxes: _sc, clientIds: _cids, rooms: _rooms, diagnostics: _diags, featureKeys: _fk, ...rest } = data;
 
       const { data: property, error: propertyError } = await supabase
         .from('Property')
         .insert({
           ...rest,
+          clientId: primaryClientId,
           operationTypes: opTypes,
           status: primaryStatus,
           exposures: exposuresArray,
@@ -556,7 +615,7 @@ export function PropertyCreateView() {
 
       // 8. Insert PropertyDiagnostic rows
       const diagsToInsert = diagnosticRows
-        .filter((d) => d.class != null)
+        .filter((d) => d.value != null || (d.class != null && d.class.length > 0))
         .map((d) => ({
           propertyId: property.id,
           organizationId: agent.organizationId,
@@ -647,7 +706,7 @@ export function PropertyCreateView() {
         {/* ── Section 1 — Statut du bien ── */}
         <FormSection title="Statut du bien" completion={sectionCompletions[0]} className="bg-surface-neutral-action">
           <div className="space-y-4">
-            {/* Ligne 1: Status checkboxes */}
+            {/* Ligne 1: Status checkboxes — C1 */}
             <div className="flex flex-wrap gap-4">
               {STATUS_CHECKBOX_VALUES.map((status) => (
                 <Checkbox
@@ -662,35 +721,42 @@ export function PropertyCreateView() {
               Un bien peut être proposé en vente et en location simultanément.
             </p>
 
-            {/* Ligne 2: Owner search */}
+            {/* Ligne 2: C2 — Multi-owner with Chips + Add button */}
             <div>
-              <Label label="Propriétaire" required className="mb-2" />
-              {selectedClient ? (
-                <div className="flex items-center gap-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
-                  <Chip
-                    label={selectedClient.name}
-                    variant="filled"
-                    selected
-                  />
-                  <IconButton
-                    variant="ghost"
+              <Label label="Propriétaire(s)" required className="mb-2" />
+              <div className="flex flex-wrap items-center gap-2">
+                {selectedClients.map((client) => (
+                  <div key={client.id} className="flex items-center gap-1">
+                    <Chip
+                      label={client.name}
+                      variant="filled"
+                      selected
+                    />
+                    <IconButton variant="ghost" type="button" onClick={() => removeClient(client.id)}>
+                      <X size={14} />
+                    </IconButton>
+                  </div>
+                ))}
+                {!showClientSearch && (
+                  <Button
+                    variant="outline"
                     type="button"
-                    onClick={() => {
-                      setSelectedClient(null);
-                      setValue('clientId', '', { shouldValidate: true });
-                    }}
+                    onClick={() => setShowClientSearch(true)}
                   >
-                    <X size={16} />
-                  </IconButton>
-                </div>
-              ) : (
-                <div className="relative">
+                    <Plus size={16} className="mr-1" />
+                    Ajouter
+                  </Button>
+                )}
+              </div>
+
+              {showClientSearch && (
+                <div className="relative mt-2">
                   <InputFieldOutlined
                     label=""
                     value={clientSearch}
                     onChange={handleClientSearch}
                     placeholder="Rechercher un client par nom ou email..."
-                    error={!!errors.clientId}
+                    error={false}
                   />
                   {clientResults.length > 0 && (
                     <div className="absolute z-10 top-full left-0 right-0 mt-1 border border-edge-default rounded-lg bg-surface-neutral-default shadow-lg max-h-48 overflow-y-auto">
@@ -709,10 +775,24 @@ export function PropertyCreateView() {
                       ))}
                     </div>
                   )}
-                  {errors.clientId && (
-                    <p className="text-xs text-content-error mt-1">{errors.clientId.message}</p>
-                  )}
+                  <div className="flex justify-end mt-1">
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() => {
+                        setShowClientSearch(false);
+                        setClientSearch('');
+                        setClientResults([]);
+                      }}
+                    >
+                      Annuler
+                    </Button>
+                  </div>
                 </div>
+              )}
+
+              {errors.clientIds && (
+                <p className="text-xs text-content-error mt-1">{errors.clientIds.message}</p>
               )}
             </div>
           </div>
@@ -721,86 +801,30 @@ export function PropertyCreateView() {
         {/* ── Section 2 — Informations générales ── */}
         <FormSection title="Informations générales" completion={sectionCompletions[1]}>
           <div className="space-y-4">
-            {/* Ligne 1: Catégorie + sous-types */}
-            <div>
+            {/* C3 + C4 — Single line: Catégorie + Nb pièces + Orientation + Vue */}
+            <div className="flex gap-4">
               <div className="w-[330px]">
                 <SelectField
                   label="Catégorie"
-                  value={selectedCategory ?? ''}
+                  value={formValues.type ?? ''}
                   onChange={(val) => {
-                    const cat = val as PropertyCategory;
-                    setSelectedCategory(cat);
-                    const types = PROPERTY_CATEGORY_TYPES[cat];
-                    if (types.length === 1) {
-                      setValue('type', types[0], { shouldValidate: true });
-                    }
+                    setValue('type', val as PropertyType, { shouldValidate: true });
                   }}
-                  options={Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
-                    value,
-                    label,
-                  }))}
+                  options={CATEGORY_OPTIONS}
                   error={errors.type ? 'Catégorie requise' : undefined}
                 />
               </div>
-              {selectedCategory && PROPERTY_CATEGORY_TYPES[selectedCategory].length > 1 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {PROPERTY_CATEGORY_TYPES[selectedCategory].map((subType) => (
-                    <Chip
-                      key={subType}
-                      label={PROPERTY_TYPE_LABELS[subType]}
-                      selected={formValues.type === subType}
-                      variant="filled"
-                      onClick={() => setValue('type', subType, { shouldValidate: true })}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Ligne 2: Surface + Pièces + Orientation + Vue */}
-            <div className="flex gap-4">
               <div className="w-[180px]">
-                <Controller
-                  name="livingAreaSqm"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <div>
-                      <InputFieldOutlined
-                        label="Surface habitable (m²)"
-                        type="number"
-                        value={field.value != null ? String(field.value) : ''}
-                        onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        required
-                      />
-                      {fieldState.error && (
-                        <p className="text-xs text-content-error mt-1">{fieldState.error.message}</p>
-                      )}
-                    </div>
-                  )}
+                <SelectField
+                  label="Nombre de pièces"
+                  value={formValues.numberOfRooms != null ? String(formValues.numberOfRooms) : ''}
+                  onChange={(val) => setValue('numberOfRooms', val === '' ? undefined : Number(val), { shouldValidate: true })}
+                  options={Object.entries(ROOM_COUNT_LABELS).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
                 />
               </div>
-              {isResidentialNonTerrain && (
-                <div className="w-[180px]">
-                  <Controller
-                    name="numberOfRooms"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <div>
-                        <InputFieldOutlined
-                          label="Nombre de pièces"
-                          type="number"
-                          value={field.value != null ? String(field.value) : ''}
-                          onChange={(v) => field.onChange(v === '' ? undefined : v)}
-                          onBlur={field.onBlur}
-                          error={!!fieldState.error}
-                        />
-                      </div>
-                    )}
-                  />
-                </div>
-              )}
               <div className="w-[180px]">
                 <SelectField
                   label="Orientation"
@@ -825,7 +849,7 @@ export function PropertyCreateView() {
               </div>
             </div>
 
-            {/* Ligne 3: Adresse */}
+            {/* Ligne 2: Adresse */}
             <div className="w-[1030px]">
               <Label label="Adresse" required className="mb-1" />
               <AddressField
@@ -843,7 +867,7 @@ export function PropertyCreateView() {
               )}
             </div>
 
-            {/* Ligne 4: Building fields (apartment-like only) */}
+            {/* Ligne 3: Building fields (apartment-like only) */}
             {isApartmentType && (
               <div className="flex gap-4">
                 <div className="w-[200px]">
@@ -905,7 +929,7 @@ export function PropertyCreateView() {
               </div>
             )}
 
-            {/* Ligne 5: Année de construction + État général */}
+            {/* Ligne 4: Année de construction + État général */}
             <div className="flex gap-4">
               <div className="w-[330px]">
                 <Controller
@@ -994,24 +1018,27 @@ export function PropertyCreateView() {
           </div>
         </FormSection>
 
-        {/* ── Section 4 — Surfaces ── */}
+        {/* ── Section 4 — Surfaces (C5) ── */}
         <FormSection title="Surfaces" completion={sectionCompletions[3]}>
           <div className="flex gap-4">
             <div className="w-[240px]">
               <Controller
-                name="landAreaSqm"
+                name="livingAreaSqm"
                 control={control}
                 render={({ field, fieldState }) => (
                   <div>
                     <InputFieldOutlined
-                      label="Surface terrain (m²)"
+                      label="Surface habitable (m²)"
                       type="number"
                       value={field.value != null ? String(field.value) : ''}
                       onChange={(v) => field.onChange(v === '' ? undefined : v)}
                       onBlur={field.onBlur}
                       error={!!fieldState.error}
-                      placeholder="Ex: 500"
+                      required
                     />
+                    {fieldState.error && (
+                      <p className="text-xs text-content-error mt-1">{fieldState.error.message}</p>
+                    )}
                   </div>
                 )}
               />
@@ -1023,13 +1050,32 @@ export function PropertyCreateView() {
                 render={({ field, fieldState }) => (
                   <div>
                     <InputFieldOutlined
+                      label="Surface extérieure (m²)"
+                      type="number"
+                      value={field.value != null ? String(field.value) : ''}
+                      onChange={(v) => field.onChange(v === '' ? undefined : v)}
+                      onBlur={field.onBlur}
+                      error={!!fieldState.error}
+                      placeholder="Balcon, terrasse, jardin..."
+                    />
+                  </div>
+                )}
+              />
+            </div>
+            <div className="w-[240px]">
+              <Controller
+                name="landAreaSqm"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div>
+                    <InputFieldOutlined
                       label="Surface annexe (m²)"
                       type="number"
                       value={field.value != null ? String(field.value) : ''}
                       onChange={(v) => field.onChange(v === '' ? undefined : v)}
                       onBlur={field.onBlur}
                       error={!!fieldState.error}
-                      placeholder="Ex: 15"
+                      placeholder="Cave, etc."
                     />
                   </div>
                 )}
@@ -1038,13 +1084,13 @@ export function PropertyCreateView() {
           </div>
         </FormSection>
 
-        {/* ── Section 5 — Caractéristiques par pièce ── */}
+        {/* ── Section 5 — Caractéristiques par pièce (C6) ── */}
         <FormSection title="Caractéristiques par pièce" completion={sectionCompletions[4]}>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {rooms.map((room, index) => (
               <div
                 key={`room-${index}`}
-                className="flex items-start gap-4 border border-edge-default rounded-lg p-4"
+                className="flex items-start gap-4"
               >
                 <div className="w-[220px]">
                   <SelectField
@@ -1109,6 +1155,17 @@ export function PropertyCreateView() {
                   </>
                 )}
 
+                {/* C6 — Equipment text field */}
+                <div className="flex-1">
+                  <InputFieldOutlined
+                    label="Équipement"
+                    type="text"
+                    value={room.equipment[0] ?? ''}
+                    onChange={(v) => updateRoom(index, { equipment: v ? [v] : [] })}
+                    placeholder="Équipement de la pièce..."
+                  />
+                </div>
+
                 {/* Delete button (not for first 2 default rows) */}
                 {index >= 2 && (
                   <div className="pt-6">
@@ -1127,13 +1184,13 @@ export function PropertyCreateView() {
           </div>
         </FormSection>
 
-        {/* ── Section 6 — Diagnostics ── */}
+        {/* ── Section 6 — Diagnostics (C7 + C8) ── */}
         <FormSection title="Diagnostics" completion={sectionCompletions[5]}>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {diagnosticRows.map((diag, index) => (
               <div
                 key={`diag-${index}`}
-                className="border border-edge-default rounded-lg p-4 space-y-3"
+                className="space-y-3"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-[220px]">
@@ -1148,66 +1205,45 @@ export function PropertyCreateView() {
                     />
                   </div>
 
-                  {/* DPE/GES: colored buttons A-G */}
+                  {/* C7 — DPE/GES: Score input + auto-computed icon */}
                   {(diag.diagnosticType === 'DPE' || diag.diagnosticType === 'GES') ? (
-                    <div className="flex-1">
-                      <Label label="Classe" className="mb-2" />
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {(['A', 'B', 'C', 'D', 'E', 'F', 'G'] as DpeClass[]).map((cls) => (
-                          <button
-                            key={cls}
-                            type="button"
-                            className={`w-10 h-10 rounded-lg font-bold text-white transition-all ${
-                              diag.class === cls
-                                ? 'ring-2 ring-offset-2 ring-content-strong scale-110'
-                                : 'opacity-70 hover:opacity-100'
-                            }`}
-                            style={{ backgroundColor: DPE_COLORS[cls] }}
-                            onClick={() => updateDiagnostic(index, { class: cls })}
-                          >
-                            {cls}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex gap-4">
-                        <div className="w-[150px]">
-                          <InputFieldOutlined
-                            label="Valeur"
-                            type="number"
-                            value={diag.value != null ? String(diag.value) : ''}
-                            onChange={(v) => updateDiagnostic(index, { value: v === '' ? null : Number(v) })}
-                            placeholder="Ex: 120"
-                          />
-                        </div>
-                        <div className="w-[150px]">
-                          <InputFieldOutlined
-                            label="Unité"
-                            type="text"
-                            value={diag.unit ?? ''}
-                            onChange={(v) => updateDiagnostic(index, { unit: v || null })}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="w-[150px]">
+                    <div className="flex items-start gap-4">
+                      <div className="w-[180px]">
                         <InputFieldOutlined
-                          label="Valeur"
-                          type="text"
+                          label="Score"
+                          type="number"
                           value={diag.value != null ? String(diag.value) : ''}
                           onChange={(v) => updateDiagnostic(index, { value: v === '' ? null : Number(v) })}
+                          placeholder={diag.diagnosticType === 'DPE' ? 'kWh/m²/an' : 'kgCO₂/m²/an'}
                         />
                       </div>
-                      <div className="w-[150px]">
-                        <InputFieldOutlined
-                          label="Unité"
-                          type="text"
-                          value={diag.unit ?? ''}
-                          onChange={(v) => updateDiagnostic(index, { unit: v || null })}
-                        />
-                      </div>
-                    </>
+                      {diag.value != null && diag.value > 0 && (
+                        <div className="pt-6">
+                          {diag.diagnosticType === 'DPE' ? (
+                            <IconDpe
+                              classe={computeDpeClass(diag.value) as DpeType}
+                              selected
+                              size="medium"
+                            />
+                          ) : (
+                            <IconGes
+                              classe={computeGesClass(diag.value) as GesType}
+                              selected
+                              size="medium"
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="w-[150px]">
+                      <InputFieldOutlined
+                        label="Valeur"
+                        type="text"
+                        value={diag.value != null ? String(diag.value) : ''}
+                        onChange={(v) => updateDiagnostic(index, { value: v === '' ? null : Number(v) })}
+                      />
+                    </div>
                   )}
 
                   <div className="w-[180px]">

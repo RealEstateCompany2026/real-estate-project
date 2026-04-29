@@ -41,9 +41,9 @@ export const propertyFeatureSchema = z.object({
 export const propertyCreateSchema = z.object({
   // Section 1 — Statut du bien
   statusCheckboxes: z
-    .array(z.enum(['A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER']))
+    .array(z.enum(['OFF_MARKET', 'A_VENDRE', 'A_LOUER', 'EN_VIAGER', 'SOUS_GESTION']))
     .default([]),
-  clientId: z.string().min(1, 'Propriétaire requis'),
+  clientIds: z.array(z.string().min(1)).min(1, 'Au moins un propriétaire requis'),
 
   // Section 2 — Informations générales
   type: z.enum([
@@ -113,7 +113,7 @@ export const propertyCreateSchema = z.object({
     .array(z.enum(['VENTE', 'LOCATION', 'VIAGER', 'CESSION']))
     .default([]),
   status: z
-    .enum(['OFF_MARKET', 'A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER', 'OTHER'])
+    .enum(['OFF_MARKET', 'A_VENDRE', 'A_LOUER', 'VENDU', 'LOUE', 'EN_VIAGER', 'SOUS_GESTION', 'OTHER'])
     .default('OFF_MARKET'),
   tags: z.array(z.string()).default([]),
   internalRef: z.string().optional(),
