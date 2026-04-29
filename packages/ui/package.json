@@ -111,7 +111,8 @@
         "./sheet-agenda-bien": "./src/components/SheetAgendaBien.tsx",
         "./sheet-visite": "./src/components/SheetVisite.tsx",
         "./list-document": "./src/components/ListDocument.tsx",
-        "./sheet-document": "./src/components/SheetDocument.tsx"
+        "./sheet-document": "./src/components/SheetDocument.tsx",
+        "./address-field": "./src/components/AddressField.tsx"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.10",
