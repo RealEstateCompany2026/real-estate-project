@@ -1206,7 +1206,7 @@ export function PropertyCreateView() {
 
                   {/* C7 — DPE/GES: Score input + auto-computed icon */}
                   {(diag.diagnosticType === 'DPE' || diag.diagnosticType === 'GES') ? (
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-end gap-4">
                       <div className="w-[180px]">
                         <InputFieldOutlined
                           label="Score"
@@ -1217,17 +1217,15 @@ export function PropertyCreateView() {
                         />
                       </div>
                       {diag.value != null && diag.value > 0 && (
-                        <div className="pt-6">
+                        <div>
                           {diag.diagnosticType === 'DPE' ? (
                             <IconDpe
                               classe={computeDpeClass(diag.value) as DpeType}
-                              selected
                               size="medium"
                             />
                           ) : (
                             <IconGes
                               classe={computeGesClass(diag.value) as GesType}
-                              selected
                               size="medium"
                             />
                           )}

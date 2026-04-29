@@ -286,7 +286,7 @@ export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
 };
 
 export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
-  OFF_MARKET: 'Brouillon',
+  OFF_MARKET: 'Off market',
   A_VENDRE: 'À vendre',
   A_LOUER: 'À louer',
   VENDU: 'Vendu',
