@@ -234,14 +234,14 @@ export function ClientCreateView() {
     const supabase = createClient();
     const { data } = await supabase
       .from('Property')
-      .select('id, type, surface, city')
-      .ilike('city', `%${query}%`)
+      .select('id, type, livingAreaSqm, addressCity')
+      .ilike('addressCity', `%${query}%`)
       .limit(5);
     if (data) {
       setPropertyResults(
         data.map((p) => ({
           id: p.id,
-          label: `${p.type ?? ''} . ${p.surface ?? '?'} m² . ${p.city ?? ''}`.trim(),
+          label: `${p.type ?? ''} . ${p.livingAreaSqm ?? '?'} m² . ${p.addressCity ?? ''}`.trim(),
         })),
       );
     }

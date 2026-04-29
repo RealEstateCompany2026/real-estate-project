@@ -371,7 +371,7 @@ function DatePickerDocked({
 
       {/* Dropdown calendar */}
       {isOpen && (
-        <div className="absolute w-full z-50 mt-1 bg-surface-neutral-default border border-edge-neutral-default rounded-lg shadow-lg p-[16px]">
+        <div className="absolute w-full z-50 mt-1 bg-surface-neutral-default border border-edge-default rounded-lg shadow-lg p-[16px]">
           <DatePickerCalendar
             selectedDate={selectedDate ?? new Date()}
             minDate={minDate}

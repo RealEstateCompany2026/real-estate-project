@@ -151,7 +151,7 @@ export function DatePickerCalendar({
   };
 
   // Year selector logic
-  const yearRangeStart = minDate?.getFullYear() ?? currentYear - 10;
+  const yearRangeStart = minDate?.getFullYear() ?? currentYear - 100;
   const yearRangeEnd = maxDate?.getFullYear() ?? currentYear + 10;
   const years: number[] = [];
   for (let y = yearRangeStart; y <= yearRangeEnd; y++) {
@@ -223,7 +223,7 @@ export function DatePickerCalendar({
 
           {/* Year selector dropdown */}
           {isYearSelectorOpen && (
-            <div className="absolute left-1/2 -translate-x-1/2 top-full z-50 bg-surface-neutral-default border border-edge-neutral-default rounded-lg shadow-lg max-h-[200px] overflow-y-auto mt-1">
+            <div className="absolute left-1/2 -translate-x-1/2 top-full z-50 bg-surface-neutral-default border border-edge-default rounded-lg shadow-lg max-h-[200px] overflow-y-auto mt-1">
               {years.map((year) => {
                 const isCurrent = year === currentYear;
                 return (

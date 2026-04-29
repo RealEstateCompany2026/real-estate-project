@@ -264,7 +264,7 @@ export function AddressField({
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute w-full z-50 bg-surface-neutral-default border border-edge-neutral-default rounded-lg shadow-lg max-h-[240px] overflow-y-auto mt-1"
+          className="absolute w-full z-50 bg-surface-neutral-default border border-edge-default rounded-lg shadow-lg max-h-[240px] overflow-y-auto mt-1"
         >
           {suggestions.map((suggestion, index) => (
             <li

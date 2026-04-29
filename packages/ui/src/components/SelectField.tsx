@@ -98,7 +98,7 @@ export function SelectField({
 
         {/* Dropdown menu */}
         {isOpen && (
-          <div className="absolute z-50 top-full mt-1 w-full rounded-[16px] overflow-hidden bg-surface-neutral-default border border-solid border-edge-neutral-default shadow-lg max-h-80 overflow-y-auto">
+          <div className="absolute z-50 top-full mt-1 w-full rounded-[16px] overflow-hidden bg-surface-neutral-default border border-solid border-edge-default shadow-lg max-h-80 overflow-y-auto">
             {options.map((opt) => (
               <MenuItem
                 key={opt.value}
