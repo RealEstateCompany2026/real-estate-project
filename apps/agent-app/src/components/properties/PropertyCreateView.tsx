@@ -736,43 +736,44 @@ export function PropertyCreateView() {
                   </div>
                 ))}
                 {!showClientSearch && (
-                  <Button
+                  <IconButton
                     variant="outline"
                     type="button"
                     onClick={() => setShowClientSearch(true)}
                   >
-                    <Plus size={16} className="mr-1" />
-                    Ajouter
-                  </Button>
+                    <Plus size={16} />
+                  </IconButton>
                 )}
               </div>
 
               {showClientSearch && (
-                <div className="relative mt-2">
-                  <InputFieldOutlined
-                    label=""
-                    value={clientSearch}
-                    onChange={handleClientSearch}
-                    placeholder="Rechercher un client par nom ou email..."
-                    error={false}
-                  />
-                  {clientResults.length > 0 && (
-                    <div className="absolute z-10 top-full left-0 right-0 mt-1 border border-edge-default rounded-lg bg-surface-neutral-default shadow-lg max-h-48 overflow-y-auto">
-                      {clientResults.map((c) => (
-                        <button
-                          key={c.id}
-                          type="button"
-                          className="w-full px-4 py-3 text-left hover:bg-surface-neutral-action transition-colors text-sm"
-                          onClick={() => selectClient(c)}
-                        >
-                          <span className="font-medium text-content-strong">
-                            {c.firstName} {c.lastName}
-                          </span>
-                          <span className="ml-2 text-content-subtle">{c.primaryEmail}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                <div className="mt-2">
+                  <div className="relative">
+                    <InputFieldOutlined
+                      label=""
+                      value={clientSearch}
+                      onChange={handleClientSearch}
+                      placeholder="Rechercher un client par nom ou email..."
+                      error={false}
+                    />
+                    {clientResults.length > 0 && (
+                      <div className="absolute z-10 top-full left-0 right-0 mt-1 border border-edge-default rounded-lg bg-surface-neutral-default shadow-lg max-h-48 overflow-y-auto">
+                        {clientResults.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            className="w-full px-4 py-3 text-left hover:bg-surface-neutral-action transition-colors text-sm"
+                            onClick={() => selectClient(c)}
+                          >
+                            <span className="font-medium text-content-strong">
+                              {c.firstName} {c.lastName}
+                            </span>
+                            <span className="ml-2 text-content-subtle">{c.primaryEmail}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex justify-end mt-1">
                     <Button
                       variant="ghost"
@@ -1084,7 +1085,7 @@ export function PropertyCreateView() {
 
         {/* ── Section 5 — Caractéristiques par pièce (C6) ── */}
         <FormSection title="Caractéristiques par pièce" completion={sectionCompletions[4]}>
-          <div className="space-y-2">
+          <div className="space-y-4">
             {rooms.map((room, index) => (
               <div
                 key={`room-${index}`}
@@ -1184,7 +1185,7 @@ export function PropertyCreateView() {
 
         {/* ── Section 6 — Diagnostics (C7 + C8) ── */}
         <FormSection title="Diagnostics" completion={sectionCompletions[5]}>
-          <div className="space-y-2">
+          <div className="space-y-4">
             {diagnosticRows.map((diag, index) => (
               <div
                 key={`diag-${index}`}
