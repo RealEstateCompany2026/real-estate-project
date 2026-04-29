@@ -1,4 +1,4 @@
-import { ClientFormWizard } from '@/components/clients/ClientFormWizard';
+import { ClientCreateView } from '@/components/clients/ClientCreateView';
 
 export const metadata = {
   title: 'Nouveau client — RealAgent',
@@ -6,9 +6,8 @@ export const metadata = {
 
 export default function NewClientPage() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold text-content-headings mb-8">Nouveau client</h1>
-      <ClientFormWizard />
+    <div className="px-6 py-8">
+      <ClientCreateView />
     </div>
   );
 }

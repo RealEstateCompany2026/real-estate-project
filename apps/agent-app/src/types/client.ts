@@ -75,6 +75,12 @@ export interface Client {
   emailConsent: boolean;
   emailConsentSource: string | null;
   emailConsentDate: string | null;
+  smsConsent: boolean;
+  smsConsentSource: string | null;
+  smsConsentDate: string | null;
+  whatsappConsent: boolean;
+  whatsappConsentSource: string | null;
+  whatsappConsentDate: string | null;
 
   // Méta
   isActive: boolean;
@@ -123,3 +129,23 @@ export const CLIENT_SOURCE_LABELS: Record<ClientSource, string> = {
   CRM: 'CRM externe',
   ANNONCE: 'Annonce',
 };
+
+export type MaritalStatus = 'CELIBATAIRE' | 'MARIE' | 'PACSE' | 'DIVORCE' | 'VEUF';
+
+export const MARITAL_STATUS_LABELS: Record<MaritalStatus, string> = {
+  CELIBATAIRE: 'Célibataire',
+  MARIE: 'Marié(e)',
+  PACSE: 'Pacsé(e)',
+  DIVORCE: 'Divorcé(e)',
+  VEUF: 'Veuf(ve)',
+};
+
+export const INCOME_BRACKET_OPTIONS = [
+  'Moins de 20 000 €',
+  '20 000 € - 30 000 €',
+  '30 000 € - 50 000 €',
+  '50 000 € - 70 000 €',
+  '70 000 € - 90 000 €',
+  '90 000 € - 120 000 €',
+  'Plus de 120 000 €',
+] as const;

@@ -1,31 +1,40 @@
 import { z } from 'zod';
 
-// Création complète (CLI-01→06)
+// Création complète — V2 formulaire one-page 6 sections
 export const clientCreateSchema = z.object({
-  // CLI-02 — Identité
-  gender: z.enum(['HOMME', 'FEMME', 'AUTRE']).optional(),
-  firstName: z.string().min(1, 'Prénom requis').max(100),
-  lastName: z.string().min(1, 'Nom requis').max(100),
-  status: z
-    .array(z.enum(['PROPRIETAIRE', 'ACQUEREUR', 'BAILLEUR', 'LOCATAIRE']))
-    .min(1, 'Sélectionnez au moins un type'),
+  // Section 1 — Type de client
+  status: z.array(z.enum(['PROPRIETAIRE', 'ACQUEREUR', 'BAILLEUR', 'LOCATAIRE'])).min(1, 'Au moins 1 type requis'),
 
-  // CLI-03 — Coordonnées
+  // Section 2 — Informations de profil
+  gender: z.enum(['HOMME', 'FEMME']),
+  lastName: z.string().min(1, 'Nom requis').max(100),
+  firstName: z.string().min(1, 'Prénom requis').max(100),
+  dateOfBirth: z.string().min(1, 'Date de naissance requise'),
+  placeOfBirth: z.string().max(100).optional().or(z.literal('')),
+  nationality: z.string().max(100).optional().or(z.literal('')),
+  maritalStatus: z.enum(['CELIBATAIRE', 'MARIE', 'PACSE', 'DIVORCE', 'VEUF']).optional(),
+
+  // Section 3 — Contact
   primaryEmail: z.string().email('Email invalide'),
   secondaryEmail: z.string().email('Email invalide').optional().or(z.literal('')),
-  mobilePhone: z.string().optional(), // validation libphonenumber côté hook
-  address: z.string().optional(),
+  mobilePhone: z.string().min(1, 'Téléphone requis'),
+  address: z.string().min(1, 'Adresse requise'),
 
-  // CLI-05 — Projet (résumé texte, détail dans Deal/P10)
-  searchCriteriaSummary: z.string().max(500).optional(),
-
-  // CLI-06 — Notes & tags
-  source: z.enum(['MANUEL', 'IMPORT_CSV', 'CRM', 'ANNONCE']).default('MANUEL'),
-  notes: z.string().max(2000, 'Max 2000 caractères').optional(),
-  tags: z.array(z.string()).optional().default([]),
-
-  // RGPD
+  // Section 4 — Marketing (RGPD)
   emailConsent: z.boolean().default(false),
+  smsConsent: z.boolean().default(false),
+  whatsappConsent: z.boolean().default(false),
+
+  // Section 5 — Professionnel
+  jobTitle: z.string().max(100).optional().or(z.literal('')),
+  employer: z.string().max(100).optional().or(z.literal('')),
+  incomeBracket: z.string().optional().or(z.literal('')),
+
+  // Section 6 — Complémentaire
+  notes: z.string().max(2000, 'Max 2000 caractères').optional().or(z.literal('')),
+
+  // Hidden defaults
+  source: z.enum(['MANUEL', 'IMPORT_CSV', 'CRM', 'ANNONCE']).default('MANUEL'),
   language: z.string().default('fr'),
 });
 
