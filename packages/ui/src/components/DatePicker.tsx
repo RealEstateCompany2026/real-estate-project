@@ -1,32 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
-import { DatePickerDay } from "./DatePickerDay";
-import { DatePickerMonth } from "./DatePickerMonth";
-import { DatePickerNumber } from "./DatePickerNumber";
+import { useState, useEffect, useRef } from "react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
+import { DatePickerCalendar } from "./DatePickerCalendar";
 
 /**
  * DatePicker - Composant complet de sélection de date
- * Based on Figma ModalDatePicker
+ * Deux variants :
+ * - "modal" (défaut) : carte 390px avec header/footer (pattern original)
+ * - "docked" : input trigger + dropdown calendrier (pattern AddressField)
  *
- * Structure:
- * - Largeur : 390px
- * - Background : bg-surface-neutral-default
- * - Border-radius : 16px
- * - Titre "Select date"
- * - Champ de date sélectionnée avec icône edit
- * - Sélecteur de mois avec navigation
- * - Grille de dates (7 colonnes × 6 lignes max)
- * - Boutons Cancel / OK
- *
- * Nouvelles fonctionnalités:
- * - minDate: Date minimum sélectionnable
- * - maxDate: Date maximum sélectionnable
- * - dateFormat: Format d'affichage ("short" | "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD")
- *
- * Usage:
+ * Usage modal:
  * <DatePicker
+ *   variant="modal"
  *   selectedDate={new Date(2025, 7, 30)}
  *   minDate={new Date(2025, 0, 1)}
  *   maxDate={new Date(2025, 11, 31)}
@@ -35,9 +21,21 @@ import { DatePickerNumber } from "./DatePickerNumber";
  *   onCancel={() => {}}
  *   onConfirm={(date) => {}}
  * />
+ *
+ * Usage docked:
+ * <DatePicker
+ *   variant="docked"
+ *   selectedDate={selectedDate}
+ *   dateFormat="DD/MM/YYYY"
+ *   placeholder="Sélectionner une date"
+ *   onDateSelect={(date) => setDate(date)}
+ *   error={false}
+ *   disabled={false}
+ * />
  */
 
 interface DatePickerProps {
+  variant?: "modal" | "docked";
   selectedDate?: Date;
   /**
    * Date minimum sélectionnable (inclusive)
@@ -55,27 +53,17 @@ interface DatePickerProps {
    * - "YYYY-MM-DD": Format ISO "2025-08-15"
    */
   dateFormat?: "short" | "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
-  onDateSelect?: (date: Date) => void;
+  onDateSelect?: (date: Date | undefined) => void;
+  // Modal-only
   onCancel?: () => void;
   onConfirm?: (date: Date) => void;
+  // Docked-only
+  placeholder?: string;
+  disabled?: boolean;
+  error?: boolean;
+  // Common
   className?: string;
 }
-
-const DAYS_OF_WEEK = ["D", "L", "M", "M", "J", "V", "S"];
-const MONTHS = [
-  "Janvier",
-  "Février",
-  "Mars",
-  "Avril",
-  "Mai",
-  "Juin",
-  "Juillet",
-  "Aout",
-  "Septembre",
-  "Octobre",
-  "Novembre",
-  "Décembre",
-];
 
 function formatDate(
   date: Date,
@@ -99,112 +87,82 @@ function formatDate(
 }
 
 export function DatePicker({
-  selectedDate = new Date(),
+  variant = "modal",
+  selectedDate,
   minDate,
   maxDate,
   dateFormat = "short",
   onDateSelect,
   onCancel,
   onConfirm,
+  placeholder = "Sélectionner une date",
+  disabled = false,
+  error = false,
   className = "",
 }: DatePickerProps) {
-  const [currentMonth, setCurrentMonth] = useState(selectedDate.getMonth());
-  const [currentYear, setCurrentYear] = useState(selectedDate.getFullYear());
+  if (variant === "docked") {
+    return (
+      <DatePickerDocked
+        selectedDate={selectedDate}
+        minDate={minDate}
+        maxDate={maxDate}
+        dateFormat={dateFormat}
+        onDateSelect={onDateSelect}
+        placeholder={placeholder}
+        disabled={disabled}
+        error={error}
+        className={className}
+      />
+    );
+  }
+
+  return (
+    <DatePickerModal
+      selectedDate={selectedDate ?? new Date()}
+      minDate={minDate}
+      maxDate={maxDate}
+      dateFormat={dateFormat}
+      onDateSelect={onDateSelect}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      className={className}
+    />
+  );
+}
+
+/* ──────────────────────────────────────────────
+   Variant MODAL — rendu identique à l'ancien
+   ────────────────────────────────────────────── */
+
+function DatePickerModal({
+  selectedDate,
+  minDate,
+  maxDate,
+  dateFormat,
+  onDateSelect,
+  onCancel,
+  onConfirm,
+  className = "",
+}: {
+  selectedDate: Date;
+  minDate?: Date;
+  maxDate?: Date;
+  dateFormat: "short" | "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+  onDateSelect?: (date: Date) => void;
+  onCancel?: () => void;
+  onConfirm?: (date: Date) => void;
+  className?: string;
+}) {
   const [internalSelectedDate, setInternalSelectedDate] = useState(selectedDate);
-  const [hoveredDate, setHoveredDate] = useState<number | null>(null);
 
-  const today = new Date();
-  const isToday = (day: number) =>
-    day === today.getDate() &&
-    currentMonth === today.getMonth() &&
-    currentYear === today.getFullYear();
-
-  const isSelected = (day: number) =>
-    day === internalSelectedDate.getDate() &&
-    currentMonth === internalSelectedDate.getMonth() &&
-    currentYear === internalSelectedDate.getFullYear();
-
-  // Check if a date is disabled based on minDate/maxDate
-  const isDateDisabled = (day: number): boolean => {
-    const date = new Date(currentYear, currentMonth, day);
-
-    if (minDate) {
-      const minDateOnly = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
-      if (date < minDateOnly) return true;
-    }
-
-    if (maxDate) {
-      const maxDateOnly = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
-      if (date > maxDateOnly) return true;
-    }
-
-    return false;
-  };
-
-  // Check if navigation to previous month is disabled
-  const isPrevMonthDisabled = (): boolean => {
-    if (!minDate) return false;
-    const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1);
-    const lastDayOfPrevMonth = new Date(currentYear, currentMonth, 0);
-    return lastDayOfPrevMonth < minDate;
-  };
-
-  // Check if navigation to next month is disabled
-  const isNextMonthDisabled = (): boolean => {
-    if (!maxDate) return false;
-    const lastDayOfCurrentMonth = new Date(currentYear, currentMonth + 1, 0);
-    const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1);
-    return firstDayOfNextMonth > maxDate;
-  };
-
-  // Calculate days in month
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-
-  // Generate calendar grid
-  const calendarDays: (number | null)[] = [];
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    calendarDays.push(null);
-  }
-  for (let i = 1; i <= daysInMonth; i++) {
-    calendarDays.push(i);
-  }
-
-  const handleDateClick = (day: number) => {
-    const newDate = new Date(currentYear, currentMonth, day);
-    setInternalSelectedDate(newDate);
-    onDateSelect?.(newDate);
-  };
-
-  const handlePrevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
-
-  const getDateState = (day: number | null) => {
-    if (day === null) return "disabled";
-    if (isSelected(day)) return "selected";
-    if (isToday(day)) return "today";
-    if (day === hoveredDate) return "hover";
-    return "default";
+  const handleDateSelect = (date: Date) => {
+    setInternalSelectedDate(date);
+    onDateSelect?.(date);
   };
 
   return (
     <div
-      className={`relative rounded-[16px] w-[390px] bg-surface-neutral-default border border-surface-neutral-default ${className}`.trim()}
+      className={`relative rounded-[16px] w-[390px] bg-surface-neutral-default border border-edge-default ${className}`.trim()}
     >
       <div className="p-[24px]">
         {/* Header - Select date */}
@@ -227,64 +185,14 @@ export function DatePicker({
           </div>
         </div>
 
-        {/* Month navigation */}
-        <div className="flex items-center justify-between mb-[16px]">
-          <button
-            onClick={handlePrevMonth}
-            className="p-[8px] rounded-[8px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed bg-surface-neutral-action"
-            type="button"
-            disabled={isPrevMonthDisabled()}
-          >
-            <ChevronLeft
-              size={20}
-              className="text-icon-neutral-default"
-            />
-          </button>
-
-          <DatePickerMonth
-            month={`${MONTHS[currentMonth]} ${currentYear}`}
-            onClick={() => {}}
-          />
-
-          <button
-            onClick={handleNextMonth}
-            className="p-[8px] rounded-[8px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed bg-surface-neutral-action"
-            type="button"
-            disabled={isNextMonthDisabled()}
-          >
-            <ChevronRight
-              size={20}
-              className="text-icon-neutral-default"
-            />
-          </button>
-        </div>
-
-        {/* Days of week */}
-        <div className="flex gap-[10px] items-center mb-[8px]">
-          {DAYS_OF_WEEK.map((day, index) => (
-            <DatePickerDay key={index} day={day} />
-          ))}
-        </div>
-
-        {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-[10px] mb-[24px]">
-          {calendarDays.map((day, index) => (
-            <div key={index}>
-              {day === null ? (
-                <div className="w-[40px] h-[40px]" />
-              ) : (
-                <DatePickerNumber
-                  value={day}
-                  state={getDateState(day)}
-                  onClick={() => handleDateClick(day)}
-                  onMouseEnter={() => setHoveredDate(day)}
-                  onMouseLeave={() => setHoveredDate(null)}
-                  disabled={isDateDisabled(day)}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        {/* Calendar */}
+        <DatePickerCalendar
+          selectedDate={internalSelectedDate}
+          minDate={minDate}
+          maxDate={maxDate}
+          onDateSelect={handleDateSelect}
+          className="mb-[24px]"
+        />
 
         {/* Footer buttons */}
         <div className="flex gap-2 justify-end px-4 pb-4">
@@ -304,6 +212,174 @@ export function DatePicker({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────
+   Variant DOCKED — input trigger + dropdown
+   ────────────────────────────────────────────── */
+
+function DatePickerDocked({
+  selectedDate,
+  minDate,
+  maxDate,
+  dateFormat,
+  onDateSelect,
+  placeholder,
+  disabled,
+  error,
+  className = "",
+}: {
+  selectedDate?: Date;
+  minDate?: Date;
+  maxDate?: Date;
+  dateFormat: "short" | "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+  onDateSelect?: (date: Date | undefined) => void;
+  placeholder: string;
+  disabled: boolean;
+  error: boolean;
+  className?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Escape handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  const handleDateSelect = (date: Date) => {
+    onDateSelect?.(date);
+    setIsOpen(false);
+  };
+
+  const handleClear = () => {
+    onDateSelect?.(undefined);
+  };
+
+  const handleTriggerClick = () => {
+    if (disabled) return;
+    setIsOpen((prev) => !prev);
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Delay dropdown close to allow clicks in calendar to fire first
+    setTimeout(() => {
+      // Only close if container lost focus
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(document.activeElement)
+      ) {
+        setIsOpen(false);
+      }
+    }, 150);
+  };
+
+  // Border color based on state
+  const borderColorClass = disabled
+    ? "border-edge-disabled"
+    : error
+      ? "border-edge-error-default"
+      : isFocused
+        ? "border-edge-neutral-default"
+        : "border-edge-default";
+
+  return (
+    <div ref={containerRef} className={`relative ${className}`}>
+      {/* Input trigger */}
+      <button
+        type="button"
+        onClick={handleTriggerClick}
+        onBlur={handleBlur}
+        disabled={disabled}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
+        aria-label="Sélectionner une date"
+        className={`
+          relative flex items-center gap-[8px] w-full transition-all
+          h-[56px] px-[12px] py-[18px]
+          border-b ${borderColorClass}
+          ${disabled ? "bg-surface-disabled opacity-50 cursor-not-allowed" : "bg-surface-neutral-default cursor-pointer"}
+        `.trim()}
+      >
+        {/* Calendar icon left */}
+        <CalendarIcon
+          size={20}
+          className="text-icon-neutral-default flex-shrink-0"
+          aria-hidden="true"
+        />
+
+        {/* Date text or placeholder */}
+        <span
+          className={`
+            flex-1 text-left
+            text-[16px] leading-[20px] font-semibold tracking-[0.16px] font-roboto
+            ${selectedDate ? "text-content-body" : "text-content-placeholder"}
+          `.trim()}
+        >
+          {selectedDate ? formatDate(selectedDate, dateFormat) : placeholder}
+        </span>
+
+        {/* Clear button */}
+        {selectedDate && !disabled && (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClear();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
+                handleClear();
+              }
+            }}
+            className="p-[4px] rounded-full hover:bg-surface-neutral-action transition-colors flex-shrink-0"
+            aria-label="Effacer la date"
+          >
+            <X size={20} className="text-icon-neutral-default" />
+          </div>
+        )}
+      </button>
+
+      {/* Dropdown calendar */}
+      {isOpen && (
+        <div className="absolute w-full z-50 mt-1 bg-surface-neutral-default border border-edge-neutral-default rounded-lg shadow-lg p-[16px]">
+          <DatePickerCalendar
+            selectedDate={selectedDate ?? new Date()}
+            minDate={minDate}
+            maxDate={maxDate}
+            onDateSelect={handleDateSelect}
+          />
+        </div>
+      )}
     </div>
   );
 }

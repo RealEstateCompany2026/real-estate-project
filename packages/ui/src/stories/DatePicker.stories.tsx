@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { DatePicker } from "../components/DatePicker";
 
@@ -13,11 +13,12 @@ const today = new Date(2026, 3, 10); // April 10, 2026
 const minDate = new Date(2026, 0, 1);
 const maxDate = new Date(2026, 11, 31);
 
-export const Default: Story = {
+/* ── Modal stories ── */
+
+export const ModalDefault: Story = {
   args: {
+    variant: "modal",
     selectedDate: today,
-    minDate,
-    maxDate,
     dateFormat: "DD/MM/YYYY",
     onDateSelect: (date) => console.log("Date selected:", date),
     onCancel: () => console.log("Cancelled"),
@@ -25,47 +26,12 @@ export const Default: Story = {
   },
 };
 
-export const ShortFormat: Story = {
+export const ModalWithMinMax: Story = {
   args: {
-    selectedDate: today,
-    minDate,
-    maxDate,
-    dateFormat: "short",
-    onDateSelect: (date) => console.log("Date selected:", date),
-    onCancel: () => console.log("Cancelled"),
-    onConfirm: (date) => console.log("Confirmed:", date),
-  },
-};
-
-export const ISOFormat: Story = {
-  args: {
-    selectedDate: new Date(2026, 5, 15),
-    minDate,
-    maxDate,
-    dateFormat: "YYYY-MM-DD",
-    onDateSelect: (date) => console.log("Date selected:", date),
-    onCancel: () => console.log("Cancelled"),
-    onConfirm: (date) => console.log("Confirmed:", date),
-  },
-};
-
-export const USFormat: Story = {
-  args: {
-    selectedDate: new Date(2026, 2, 20),
-    minDate,
-    maxDate,
-    dateFormat: "MM/DD/YYYY",
-    onDateSelect: (date) => console.log("Date selected:", date),
-    onCancel: () => console.log("Cancelled"),
-    onConfirm: (date) => console.log("Confirmed:", date),
-  },
-};
-
-export const WithConstraints: Story = {
-  args: {
+    variant: "modal",
     selectedDate: new Date(2026, 6, 1),
-    minDate: new Date(2026, 6, 1), // Start of July
-    maxDate: new Date(2026, 8, 30), // End of September
+    minDate: new Date(2026, 6, 1),
+    maxDate: new Date(2026, 8, 30),
     dateFormat: "DD/MM/YYYY",
     onDateSelect: (date) => console.log("Date selected:", date),
     onCancel: () => console.log("Cancelled"),
@@ -73,14 +39,70 @@ export const WithConstraints: Story = {
   },
 };
 
-export const PastDate: Story = {
+/* ── Docked stories ── */
+
+const DockedTemplate = (args: React.ComponentProps<typeof DatePicker>) => {
+  const [date, setDate] = useState<Date | undefined>(args.selectedDate);
+  return (
+    <div className="w-[320px]">
+      <DatePicker
+        {...args}
+        selectedDate={date}
+        onDateSelect={(d) => {
+          setDate(d);
+          console.log("Date selected:", d);
+        }}
+      />
+    </div>
+  );
+};
+
+export const DockedDefault: Story = {
+  render: (args) => <DockedTemplate {...args} />,
   args: {
-    selectedDate: new Date(2025, 11, 25),
-    minDate: new Date(2025, 0, 1),
-    maxDate: new Date(2026, 11, 31),
+    variant: "docked",
     dateFormat: "DD/MM/YYYY",
-    onDateSelect: (date) => console.log("Date selected:", date),
-    onCancel: () => console.log("Cancelled"),
-    onConfirm: (date) => console.log("Confirmed:", date),
+    placeholder: "Sélectionner une date",
+  },
+};
+
+export const DockedWithDate: Story = {
+  render: (args) => <DockedTemplate {...args} />,
+  args: {
+    variant: "docked",
+    selectedDate: new Date(1985, 2, 15),
+    dateFormat: "DD/MM/YYYY",
+    placeholder: "Date de naissance",
+  },
+};
+
+export const DockedWithMinMax: Story = {
+  render: (args) => <DockedTemplate {...args} />,
+  args: {
+    variant: "docked",
+    maxDate: new Date(2026, 3, 29),
+    dateFormat: "DD/MM/YYYY",
+    placeholder: "Date de naissance",
+  },
+};
+
+export const DockedError: Story = {
+  render: (args) => <DockedTemplate {...args} />,
+  args: {
+    variant: "docked",
+    error: true,
+    dateFormat: "DD/MM/YYYY",
+    placeholder: "Sélectionner une date",
+  },
+};
+
+export const DockedDisabled: Story = {
+  render: (args) => <DockedTemplate {...args} />,
+  args: {
+    variant: "docked",
+    disabled: true,
+    selectedDate: new Date(1985, 2, 15),
+    dateFormat: "DD/MM/YYYY",
+    placeholder: "Sélectionner une date",
   },
 };
