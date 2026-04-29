@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, AlertCircle } from 'lucide-react';
+import { Sparkles, Pencil, CheckCheck, Database, MessageCirclePlus, ScrollText, ArrowRight, Upload, AlertCircle, X, Plus } from 'lucide-react';
 
 // ── DS Components ──
 import { AppBarFicheClient } from '@real-estate/ui/app-bar-fiche-client';
@@ -11,7 +11,13 @@ import { AppBarClientAncres } from '@real-estate/ui/app-bar-client-ancres';
 import { IconButtonMega } from '@real-estate/ui/icon-button-mega';
 import { Spinner } from '@real-estate/ui/spinner';
 import { Badge } from '@real-estate/ui/badge';
-import { Button } from '@real-estate/ui/button';
+import { Button, IconButton } from '@real-estate/ui/button';
+import { Checkbox } from '@real-estate/ui/checkbox';
+import { DatePicker } from '@real-estate/ui/date-picker';
+import { Label } from '@real-estate/ui/label';
+import { TextArea } from '@real-estate/ui/text-area';
+import { AddressField } from '@real-estate/ui/address-field';
+import type { AddressSuggestion } from '@real-estate/ui/address-field';
 import { AiSuggestionBanner } from '@real-estate/ui/ai-suggestion-banner';
 import { CardLog } from '@real-estate/ui/card-log';
 import { Chip } from '@real-estate/ui/chip';
@@ -28,7 +34,9 @@ import { CollapsibleSection } from '@real-estate/ui/collapsible-section';
 // ── App-level ──
 import { createClient } from '@/lib/supabase/client';
 import { formatIdAsReference } from '@/lib/utils/formatMandateReference';
-import type { Client, ClientStatus } from '@/types/client';
+import { searchAddress } from '@/lib/utils/address';
+import type { Client, ClientStatus, MaritalStatus } from '@/types/client';
+import { CLIENT_STATUS_LABELS, MARITAL_STATUS_LABELS, INCOME_BRACKET_OPTIONS } from '@/types/client';
 import { seedRandomInt } from '@/utils/seedRandom';
 import { useSheetManager } from '@/hooks/useSheetManager';
 import type { DealType, PipelineStage } from '@real-estate/ui/deal-types';
@@ -475,8 +483,28 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     jobTitle: '',
     employer: '',
     incomeBracket: '',
+    status: [] as ClientStatus[],
+    emailConsent: false,
+    smsConsent: false,
+    whatsappConsent: false,
+    notes: '',
   });
   const [profileFormInitial, setProfileFormInitial] = useState<typeof profileForm | null>(null);
+
+  // Address autocomplete for profile sheet
+  const [profileAddressSuggestions, setProfileAddressSuggestions] = useState<AddressSuggestion[]>([]);
+  const [profileAddressLoading, setProfileAddressLoading] = useState(false);
+  const profileDebounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // Linked biens & affaires for profile sheet
+  const [profileLinkedProperties, setProfileLinkedProperties] = useState<{ id: string; label: string }[]>([]);
+  const [profileLinkedDeals, setProfileLinkedDeals] = useState<{ id: string; label: string }[]>([]);
+  const [showProfilePropertySearch, setShowProfilePropertySearch] = useState(false);
+  const [showProfileDealSearch, setShowProfileDealSearch] = useState(false);
+  const [profilePropertyQuery, setProfilePropertyQuery] = useState('');
+  const [profileDealQuery, setProfileDealQuery] = useState('');
+  const [profilePropertyResults, setProfilePropertyResults] = useState<{ id: string; label: string }[]>([]);
+  const [profileDealResults, setProfileDealResults] = useState<{ id: string; label: string }[]>([]);
   const isProfileDirty = profileFormInitial !== null && JSON.stringify(profileForm) !== JSON.stringify(profileFormInitial);
   const [isDocUploadSheetOpen, setIsDocUploadSheetOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -648,7 +676,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
     setProfileForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleOpenProfileSheet = useCallback(() => {
+  const handleOpenProfileSheet = useCallback(async () => {
     if (!data) return;
     const c = data.client;
     const initialValues = {
@@ -667,10 +695,40 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
       jobTitle: c.jobTitle ?? '',
       employer: c.employer ?? '',
       incomeBracket: c.incomeBracket ?? '',
+      status: c.status ?? [],
+      emailConsent: c.emailConsent ?? false,
+      smsConsent: c.smsConsent ?? false,
+      whatsappConsent: c.whatsappConsent ?? false,
+      notes: c.notes ?? '',
     };
     setProfileForm(initialValues);
     setProfileFormInitial(initialValues);
     setIsProfileSheetOpen(true);
+
+    // Fetch linked properties
+    const supabase = createClient();
+    const { data: props } = await supabase
+      .from('Property')
+      .select('id, type, livingAreaSqm, addressCity')
+      .eq('clientId', c.id);
+    setProfileLinkedProperties(
+      (props ?? []).map((p: any) => ({
+        id: p.id,
+        label: `${p.type ?? ''} · ${p.livingAreaSqm ?? '?'} m² · ${p.addressCity ?? ''}`.trim(),
+      }))
+    );
+
+    // Fetch linked deals
+    const { data: deals } = await supabase
+      .from('Deal')
+      .select('id, reference')
+      .eq('clientId', c.id);
+    setProfileLinkedDeals(
+      (deals ?? []).map((d: any) => ({
+        id: d.id,
+        label: d.reference ?? d.id.slice(0, 8),
+      }))
+    );
   }, [data]);
 
   const handleSaveProfile = useCallback(async () => {
@@ -696,6 +754,11 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           jobTitle: profileForm.jobTitle || null,
           employer: profileForm.employer || null,
           incomeBracket: profileForm.incomeBracket || null,
+          status: profileForm.status,
+          emailConsent: profileForm.emailConsent,
+          smsConsent: profileForm.smsConsent,
+          whatsappConsent: profileForm.whatsappConsent,
+          notes: profileForm.notes || null,
         })
         .eq('id', data.client.id);
 
@@ -704,12 +767,124 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         return;
       }
 
+      // Update property associations
+      const currentPropIds = profileLinkedProperties.map(p => p.id);
+      const { data: existingProps } = await supabase
+        .from('Property')
+        .select('id')
+        .eq('clientId', data.client.id);
+      const existingPropIds = (existingProps ?? []).map((p: any) => p.id);
+      const removedPropIds = existingPropIds.filter((id: string) => !currentPropIds.includes(id));
+      if (removedPropIds.length > 0) {
+        await supabase.from('Property').update({ clientId: null }).in('id', removedPropIds);
+      }
+      const newPropIds = currentPropIds.filter(id => !existingPropIds.includes(id));
+      if (newPropIds.length > 0) {
+        await supabase.from('Property').update({ clientId: data.client.id }).in('id', newPropIds);
+      }
+
+      // Same for deals
+      const currentDealIds = profileLinkedDeals.map(d => d.id);
+      const { data: existingDeals } = await supabase
+        .from('Deal')
+        .select('id')
+        .eq('clientId', data.client.id);
+      const existingDealIds = (existingDeals ?? []).map((d: any) => d.id);
+      const removedDealIds = existingDealIds.filter((id: string) => !currentDealIds.includes(id));
+      if (removedDealIds.length > 0) {
+        await supabase.from('Deal').update({ clientId: null }).in('id', removedDealIds);
+      }
+      const newDealIds = currentDealIds.filter(id => !existingDealIds.includes(id));
+      if (newDealIds.length > 0) {
+        await supabase.from('Deal').update({ clientId: data.client.id }).in('id', newDealIds);
+      }
+
       setIsProfileSheetOpen(false);
       setRefreshKey((k) => k + 1);
     } finally {
       setIsSavingProfile(false);
     }
-  }, [data, profileForm]);
+  }, [data, profileForm, profileLinkedProperties, profileLinkedDeals]);
+
+  // Address search for profile sheet
+  const handleProfileAddressSearch = useCallback((query: string) => {
+    updateProfileField('address', query);
+    if (profileDebounceRef.current) clearTimeout(profileDebounceRef.current);
+    if (query.length < 3) {
+      setProfileAddressSuggestions([]);
+      return;
+    }
+    profileDebounceRef.current = setTimeout(async () => {
+      setProfileAddressLoading(true);
+      const results = await searchAddress(query, 5);
+      setProfileAddressSuggestions(
+        results.map((r) => ({
+          label: r.label,
+          street: r.street,
+          zipCode: r.zipCode,
+          city: r.city,
+          lat: r.lat,
+          lng: r.lng,
+        }))
+      );
+      setProfileAddressLoading(false);
+    }, 300);
+  }, [updateProfileField]);
+
+  const handleProfileAddressSelect = useCallback((suggestion: AddressSuggestion) => {
+    updateProfileField('address', suggestion.label);
+    setProfileAddressSuggestions([]);
+  }, [updateProfileField]);
+
+  const handleProfileAddressClear = useCallback(() => {
+    updateProfileField('address', '');
+    setProfileAddressSuggestions([]);
+  }, [updateProfileField]);
+
+  // Property search for profile sheet
+  const searchProfileProperties = useCallback(async (query: string) => {
+    if (query.length < 2) { setProfilePropertyResults([]); return; }
+    const supabase = createClient();
+    const { data: results } = await supabase
+      .from('Property')
+      .select('id, type, livingAreaSqm, addressCity')
+      .ilike('addressCity', `%${query}%`)
+      .limit(5);
+    setProfilePropertyResults(
+      (results ?? []).map((p: any) => ({
+        id: p.id,
+        label: `${p.type ?? ''} · ${p.livingAreaSqm ?? '?'} m² · ${p.addressCity ?? ''}`.trim(),
+      }))
+    );
+  }, []);
+
+  // Deal search for profile sheet
+  const searchProfileDeals = useCallback(async (query: string) => {
+    if (query.length < 2) { setProfileDealResults([]); return; }
+    const supabase = createClient();
+    const { data: results } = await supabase
+      .from('Deal')
+      .select('id, reference')
+      .ilike('reference', `%${query}%`)
+      .limit(5);
+    setProfileDealResults(
+      (results ?? []).map((d: any) => ({
+        id: d.id,
+        label: d.reference ?? d.id.slice(0, 8),
+      }))
+    );
+  }, []);
+
+  // Toggle status in profile form
+  const toggleProfileStatus = useCallback((status: ClientStatus) => {
+    setProfileForm((prev) => {
+      const current = prev.status ?? [];
+      const next = current.includes(status)
+        ? current.filter((s) => s !== status)
+        : [...current, status];
+      return { ...prev, status: next };
+    });
+  }, []);
 
   const handleUploadDocument = useCallback(async () => {
     if (!data || !uploadFile) return;
@@ -1297,9 +1472,124 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
         }
       >
         <div className="flex flex-col gap-[16px] px-[20px] py-[20px]">
-          {/* Section Identité */}
+          {/* Section 1 — Type de client */}
           <CollapsibleSection
-            title="Informations d'identité"
+            title="Type de client"
+            defaultExpanded={true}
+            badge={(() => {
+              const pct = (profileForm.status?.length ?? 0) > 0 ? 100 : 0;
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <p className="text-xs text-content-caption">Un client peut avoir plusieurs rôles.</p>
+              <div className="flex flex-wrap gap-4">
+                {(Object.entries(CLIENT_STATUS_LABELS) as [ClientStatus, string][]).map(([value, label]) => (
+                  <Checkbox
+                    key={value}
+                    label={label}
+                    checked={profileForm.status?.includes(value) ?? false}
+                    onChange={() => toggleProfileStatus(value)}
+                  />
+                ))}
+              </div>
+
+              {/* Biens associés */}
+              <div>
+                <Label label="Biens associés" className="mb-2" />
+                <div className="flex items-center gap-2 flex-wrap">
+                  {profileLinkedProperties.map((p) => (
+                    <div key={p.id} className="flex items-center gap-1">
+                      <Button variant="outline" type="button" onClick={() => {/* navigate to property */}}>
+                        {p.label}
+                      </Button>
+                      <IconButton variant="ghost" type="button" onClick={() => setProfileLinkedProperties(prev => prev.filter(x => x.id !== p.id))}>
+                        <X size={14} />
+                      </IconButton>
+                    </div>
+                  ))}
+                  <IconButton variant="outline" type="button" onClick={() => setShowProfilePropertySearch(true)}>
+                    <Plus size={20} />
+                  </IconButton>
+                </div>
+                {showProfilePropertySearch && (
+                  <div className="mt-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
+                    <InputFieldOutlined
+                      label="Rechercher un bien"
+                      id="profilePropertySearch"
+                      type="text"
+                      value={profilePropertyQuery}
+                      onChange={(value) => { setProfilePropertyQuery(value); searchProfileProperties(value); }}
+                      placeholder="Rechercher par ville..."
+                    />
+                    {profilePropertyResults.length > 0 && (
+                      <ul className="mt-2 space-y-1">
+                        {profilePropertyResults.map((p) => (
+                          <li key={p.id}>
+                            <button type="button" className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-surface-neutral-action transition-colors cursor-pointer" onClick={() => {
+                              if (!profileLinkedProperties.some(lp => lp.id === p.id)) setProfileLinkedProperties(prev => [...prev, p]);
+                              setShowProfilePropertySearch(false); setProfilePropertyQuery(''); setProfilePropertyResults([]);
+                            }}>{p.label}</button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <Button variant="ghost" size="sm" type="button" onClick={() => { setShowProfilePropertySearch(false); setProfilePropertyQuery(''); setProfilePropertyResults([]); }}>Fermer</Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Affaires associées */}
+              <div>
+                <Label label="Affaires associées" className="mb-2" />
+                <div className="flex items-center gap-2 flex-wrap">
+                  {profileLinkedDeals.map((d) => (
+                    <div key={d.id} className="flex items-center gap-1">
+                      <Button variant="outline" type="button" onClick={() => {/* navigate to deal */}}>
+                        {d.label}
+                      </Button>
+                      <IconButton variant="ghost" type="button" onClick={() => setProfileLinkedDeals(prev => prev.filter(x => x.id !== d.id))}>
+                        <X size={14} />
+                      </IconButton>
+                    </div>
+                  ))}
+                  <IconButton variant="outline" type="button" onClick={() => setShowProfileDealSearch(true)}>
+                    <Plus size={20} />
+                  </IconButton>
+                </div>
+                {showProfileDealSearch && (
+                  <div className="mt-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
+                    <InputFieldOutlined
+                      label="Rechercher une affaire"
+                      id="profileDealSearch"
+                      type="text"
+                      value={profileDealQuery}
+                      onChange={(value) => { setProfileDealQuery(value); searchProfileDeals(value); }}
+                      placeholder="Rechercher par référence..."
+                    />
+                    {profileDealResults.length > 0 && (
+                      <ul className="mt-2 space-y-1">
+                        {profileDealResults.map((d) => (
+                          <li key={d.id}>
+                            <button type="button" className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-surface-neutral-action transition-colors cursor-pointer" onClick={() => {
+                              if (!profileLinkedDeals.some(ld => ld.id === d.id)) setProfileLinkedDeals(prev => [...prev, d]);
+                              setShowProfileDealSearch(false); setProfileDealQuery(''); setProfileDealResults([]);
+                            }}>{d.label}</button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <Button variant="ghost" size="sm" type="button" onClick={() => { setShowProfileDealSearch(false); setProfileDealQuery(''); setProfileDealResults([]); }}>Fermer</Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* Section 2 — Informations de profil */}
+          <CollapsibleSection
+            title="Informations de profil"
             defaultExpanded={false}
             badge={(() => {
               const fields = [profileForm.gender, profileForm.lastName, profileForm.firstName, profileForm.dateOfBirth, profileForm.placeOfBirth, profileForm.nationality, profileForm.maritalStatus];
@@ -1311,25 +1601,39 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
           >
             <div className="flex flex-col gap-[16px]">
               <SelectField
-                label="Genre"
+                label="Civilité"
                 value={profileForm.gender}
                 onChange={(v) => updateProfileField('gender', v)}
                 options={[
                   { value: 'HOMME', label: 'M.' },
                   { value: 'FEMME', label: 'Mme' },
-                  { value: 'AUTRE', label: 'Autre' },
                 ]}
               />
-              <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" {...emptyProps(profileForm.lastName)} />
-              <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" {...emptyProps(profileForm.firstName)} />
-              <InputFieldOutlined label="Date de naissance" value={profileForm.dateOfBirth} onChange={(v) => updateProfileField('dateOfBirth', v)} type="date" {...emptyProps(profileForm.dateOfBirth)} />
-              <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" {...emptyProps(profileForm.placeOfBirth)} />
-              <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" {...emptyProps(profileForm.nationality)} />
-              <InputFieldOutlined label="Statut marital" value={profileForm.maritalStatus} onChange={(v) => updateProfileField('maritalStatus', v)} placeholder="Statut marital" {...emptyProps(profileForm.maritalStatus)} />
+              <InputFieldOutlined label="Nom" value={profileForm.lastName} onChange={(v) => updateProfileField('lastName', v)} placeholder="Nom" />
+              <InputFieldOutlined label="Prénom" value={profileForm.firstName} onChange={(v) => updateProfileField('firstName', v)} placeholder="Prénom" />
+              <div className="flex flex-col gap-[12px]">
+                <Label label="Date de naissance" />
+                <DatePicker
+                  variant="docked"
+                  selectedDate={profileForm.dateOfBirth ? new Date(profileForm.dateOfBirth) : undefined}
+                  dateFormat="DD/MM/YYYY"
+                  maxDate={new Date()}
+                  onDateSelect={(date) => updateProfileField('dateOfBirth', date ? date.toISOString().split('T')[0] : '')}
+                  placeholder="Sélectionner la date"
+                />
+              </div>
+              <InputFieldOutlined label="Lieu de naissance" value={profileForm.placeOfBirth} onChange={(v) => updateProfileField('placeOfBirth', v)} placeholder="Ville" />
+              <InputFieldOutlined label="Nationalité" value={profileForm.nationality} onChange={(v) => updateProfileField('nationality', v)} placeholder="Nationalité" />
+              <SelectField
+                label="Statut marital"
+                value={profileForm.maritalStatus}
+                onChange={(v) => updateProfileField('maritalStatus', v)}
+                options={Object.entries(MARITAL_STATUS_LABELS).map(([value, label]) => ({ value, label }))}
+              />
             </div>
           </CollapsibleSection>
 
-          {/* Section Contact */}
+          {/* Section 3 — Informations de contact */}
           <CollapsibleSection
             title="Informations de contact"
             defaultExpanded={false}
@@ -1342,10 +1646,21 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             })()}
           >
             <div className="flex flex-col gap-[16px]">
-              <InputFieldOutlined label="Adresse" value={profileForm.address} onChange={(v) => updateProfileField('address', v)} placeholder="Adresse complète" {...emptyProps(profileForm.address)} />
-              <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" {...emptyProps(profileForm.mobilePhone)} />
-              <InputFieldOutlined label="Email (1)" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" {...emptyProps(profileForm.primaryEmail)} />
-              <InputFieldOutlined label="Email (2)" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" {...emptyProps(profileForm.secondaryEmail)} />
+              <InputFieldOutlined label="Email" value={profileForm.primaryEmail} onChange={(v) => updateProfileField('primaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+              <InputFieldOutlined label="Email secondaire" value={profileForm.secondaryEmail} onChange={(v) => updateProfileField('secondaryEmail', v)} type="email" placeholder="email@exemple.fr" />
+              <InputFieldOutlined label="Tél. Mobile" value={profileForm.mobilePhone} onChange={(v) => updateProfileField('mobilePhone', v)} type="tel" placeholder="+33 6 12 34 56 78" />
+              <div>
+                <Label label="Adresse" className="mb-1" />
+                <AddressField
+                  value={profileForm.address}
+                  suggestions={profileAddressSuggestions}
+                  onSearch={handleProfileAddressSearch}
+                  onSelect={handleProfileAddressSelect}
+                  onClear={handleProfileAddressClear}
+                  loading={profileAddressLoading}
+                  placeholder="Rechercher une adresse..."
+                />
+              </div>
               <SelectField
                 label="Canal préféré"
                 value={profileForm.preferredChannel}
@@ -1360,7 +1675,28 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </div>
           </CollapsibleSection>
 
-          {/* Section Professionnel */}
+          {/* Section 4 — Informations marketing */}
+          <CollapsibleSection
+            title="Informations marketing"
+            defaultExpanded={false}
+            badge={(() => {
+              const consents = [profileForm.emailConsent, profileForm.smsConsent, profileForm.whatsappConsent];
+              const pct = Math.round((consents.filter(Boolean).length / 3) * 100);
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <Label label="Opt-in" />
+              <div className="flex flex-col gap-3">
+                <Checkbox label="Email" checked={profileForm.emailConsent} onChange={(checked) => setProfileForm(prev => ({ ...prev, emailConsent: checked }))} />
+                <Checkbox label="SMS" checked={profileForm.smsConsent} onChange={(checked) => setProfileForm(prev => ({ ...prev, smsConsent: checked }))} />
+                <Checkbox label="WhatsApp" checked={profileForm.whatsappConsent} onChange={(checked) => setProfileForm(prev => ({ ...prev, whatsappConsent: checked }))} />
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          {/* Section 5 — Informations professionnelles */}
           <CollapsibleSection
             title="Informations professionnelles"
             defaultExpanded={false}
@@ -1373,9 +1709,35 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
             })()}
           >
             <div className="flex flex-col gap-[16px]">
-              <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" {...emptyProps(profileForm.jobTitle)} />
-              <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" {...emptyProps(profileForm.employer)} />
-              <InputFieldOutlined label="Revenus" value={profileForm.incomeBracket} onChange={(v) => updateProfileField('incomeBracket', v)} placeholder="Tranche de revenus" {...emptyProps(profileForm.incomeBracket)} />
+              <InputFieldOutlined label="Profession" value={profileForm.jobTitle} onChange={(v) => updateProfileField('jobTitle', v)} placeholder="Profession" />
+              <InputFieldOutlined label="Employeur" value={profileForm.employer} onChange={(v) => updateProfileField('employer', v)} placeholder="Employeur" />
+              <SelectField
+                label="Revenus"
+                value={profileForm.incomeBracket}
+                onChange={(v) => updateProfileField('incomeBracket', v)}
+                options={INCOME_BRACKET_OPTIONS.map((opt) => ({ value: opt, label: opt }))}
+              />
+            </div>
+          </CollapsibleSection>
+
+          {/* Section 6 — Informations complémentaires */}
+          <CollapsibleSection
+            title="Informations complémentaires"
+            defaultExpanded={false}
+            badge={(() => {
+              const pct = (profileForm.notes?.length ?? 0) > 0 ? 100 : 0;
+              const color = pct >= 80 ? 'bg-surface-success-subtle text-content-success' : pct >= 50 ? 'bg-surface-warning-subtle text-content-warning' : 'bg-surface-error-subtle text-content-error';
+              return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{pct}%</span>;
+            })()}
+          >
+            <div className="flex flex-col gap-[16px]">
+              <Label label="Commentaire libre" />
+              <TextArea
+                value={profileForm.notes}
+                onChange={(val) => setProfileForm(prev => ({ ...prev, notes: val }))}
+                placeholder="Notes visibles uniquement par l'équipe..."
+                rows={4}
+              />
             </div>
           </CollapsibleSection>
         </div>

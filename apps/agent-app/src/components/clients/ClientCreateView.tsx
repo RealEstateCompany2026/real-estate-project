@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 
 // DS imports
 import { Button, IconButton } from '@real-estate/ui/button';
@@ -77,16 +77,6 @@ export function ClientCreateView() {
 
   // Duplicate check
   const { matches, checkDuplicates, dismiss } = useDuplicateCheck();
-
-  // Linked properties & deals state
-  const [linkedProperties, setLinkedProperties] = useState<{ id: string; label: string }[]>([]);
-  const [linkedDeals, setLinkedDeals] = useState<{ id: string; label: string }[]>([]);
-  const [showPropertySearch, setShowPropertySearch] = useState(false);
-  const [showDealSearch, setShowDealSearch] = useState(false);
-  const [propertySearchQuery, setPropertySearchQuery] = useState('');
-  const [dealSearchQuery, setDealSearchQuery] = useState('');
-  const [propertyResults, setPropertyResults] = useState<{ id: string; label: string }[]>([]);
-  const [dealResults, setDealResults] = useState<{ id: string; label: string }[]>([]);
 
   const methods = useForm<ClientCreateData>({
     resolver: zodResolver(clientCreateSchema) as any,
@@ -224,58 +214,6 @@ export function ClientCreateView() {
     setAddressSuggestions([]);
   }, [setValue]);
 
-  // ---------- Property & Deal search ----------
-
-  const searchProperties = useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setPropertyResults([]);
-      return;
-    }
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('Property')
-      .select('id, type, livingAreaSqm, addressCity')
-      .ilike('addressCity', `%${query}%`)
-      .limit(5);
-    if (data) {
-      setPropertyResults(
-        data.map((p) => ({
-          id: p.id,
-          label: `${p.type ?? ''} . ${p.livingAreaSqm ?? '?'} m² . ${p.addressCity ?? ''}`.trim(),
-        })),
-      );
-    }
-  }, []);
-
-  const searchDeals = useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setDealResults([]);
-      return;
-    }
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('Deal')
-      .select('id, reference')
-      .ilike('reference', `%${query}%`)
-      .limit(5);
-    if (data) {
-      setDealResults(
-        data.map((d) => ({
-          id: d.id,
-          label: d.reference ?? d.id,
-        })),
-      );
-    }
-  }, []);
-
-  const removeLinkedProperty = useCallback((id: string) => {
-    setLinkedProperties((prev) => prev.filter((p) => p.id !== id));
-  }, []);
-
-  const removeLinkedDeal = useCallback((id: string) => {
-    setLinkedDeals((prev) => prev.filter((d) => d.id !== id));
-  }, []);
-
   // ---------- Duplicate check ----------
 
   const handleEmailBlur = () => {
@@ -338,17 +276,6 @@ export function ClientCreateView() {
 
         if (error) throw error;
 
-        // Link properties & deals to the new client
-        const linkedPropertyIds = linkedProperties.map((p) => p.id);
-        const linkedDealIds = linkedDeals.map((d) => d.id);
-
-        if (linkedPropertyIds.length > 0) {
-          await supabase.from('Property').update({ clientId: client.id }).in('id', linkedPropertyIds);
-        }
-        if (linkedDealIds.length > 0) {
-          await supabase.from('Deal').update({ clientId: client.id }).in('id', linkedDealIds);
-        }
-
         toast('Client créé avec succès', 'success');
         router.push(`/clients/${client.id}`);
       } catch (err) {
@@ -358,7 +285,7 @@ export function ClientCreateView() {
         setIsSubmitting(false);
       }
     },
-    [router, toast, linkedProperties, linkedDeals],
+    [router, toast],
   );
 
   // ---------- Close ----------
@@ -423,126 +350,6 @@ export function ClientCreateView() {
           {errors.status && (
             <p className="text-xs text-content-error mt-2">{errors.status.message}</p>
           )}
-
-          {/* Biens associés */}
-          <div className="mt-4">
-            <Label label="Biens associés" className="mb-2" />
-            <div className="flex items-center gap-2 flex-wrap">
-              {linkedProperties.map((p) => (
-                <div key={p.id} className="flex items-center gap-1">
-                  <Button variant="outline" type="button" onClick={() => router.push(`/biens/${p.id}`)}>
-                    {p.label}
-                  </Button>
-                  <IconButton variant="ghost" type="button" onClick={() => removeLinkedProperty(p.id)}>
-                    <X size={14} />
-                  </IconButton>
-                </div>
-              ))}
-              <IconButton variant="outline" type="button" onClick={() => setShowPropertySearch(true)}>
-                <Plus size={20} />
-              </IconButton>
-            </div>
-            {showPropertySearch && (
-              <div className="mt-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
-                <InputFieldOutlined
-                  label="Rechercher un bien"
-                  id="propertySearch"
-                  type="text"
-                  value={propertySearchQuery}
-                  onChange={(value) => {
-                    setPropertySearchQuery(value);
-                    searchProperties(value);
-                  }}
-                  placeholder="Rechercher par ville..."
-                />
-                {propertyResults.length > 0 && (
-                  <ul className="mt-2 space-y-1">
-                    {propertyResults.map((p) => (
-                      <li key={p.id}>
-                        <button
-                          type="button"
-                          className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-surface-neutral-action transition-colors cursor-pointer"
-                          onClick={() => {
-                            if (!linkedProperties.some((lp) => lp.id === p.id)) {
-                              setLinkedProperties((prev) => [...prev, p]);
-                            }
-                            setShowPropertySearch(false);
-                            setPropertySearchQuery('');
-                            setPropertyResults([]);
-                          }}
-                        >
-                          {p.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <Button variant="ghost" size="sm" type="button" onClick={() => { setShowPropertySearch(false); setPropertySearchQuery(''); setPropertyResults([]); }}>
-                  Fermer
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Affaires associées */}
-          <div className="mt-4">
-            <Label label="Affaires associées" className="mb-2" />
-            <div className="flex items-center gap-2 flex-wrap">
-              {linkedDeals.map((d) => (
-                <div key={d.id} className="flex items-center gap-1">
-                  <Button variant="outline" type="button" onClick={() => router.push(`/affaires/${d.id}`)}>
-                    {d.label}
-                  </Button>
-                  <IconButton variant="ghost" type="button" onClick={() => removeLinkedDeal(d.id)}>
-                    <X size={14} />
-                  </IconButton>
-                </div>
-              ))}
-              <IconButton variant="outline" type="button" onClick={() => setShowDealSearch(true)}>
-                <Plus size={20} />
-              </IconButton>
-            </div>
-            {showDealSearch && (
-              <div className="mt-2 p-3 border border-edge-default rounded-lg bg-surface-neutral-default">
-                <InputFieldOutlined
-                  label="Rechercher une affaire"
-                  id="dealSearch"
-                  type="text"
-                  value={dealSearchQuery}
-                  onChange={(value) => {
-                    setDealSearchQuery(value);
-                    searchDeals(value);
-                  }}
-                  placeholder="Rechercher par référence..."
-                />
-                {dealResults.length > 0 && (
-                  <ul className="mt-2 space-y-1">
-                    {dealResults.map((d) => (
-                      <li key={d.id}>
-                        <button
-                          type="button"
-                          className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-surface-neutral-action transition-colors cursor-pointer"
-                          onClick={() => {
-                            if (!linkedDeals.some((ld) => ld.id === d.id)) {
-                              setLinkedDeals((prev) => [...prev, d]);
-                            }
-                            setShowDealSearch(false);
-                            setDealSearchQuery('');
-                            setDealResults([]);
-                          }}
-                        >
-                          {d.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <Button variant="ghost" size="sm" type="button" onClick={() => { setShowDealSearch(false); setDealSearchQuery(''); setDealResults([]); }}>
-                  Fermer
-                </Button>
-              </div>
-            )}
-          </div>
         </FormSection>
 
         {/* Section 2 — Informations de profil */}
