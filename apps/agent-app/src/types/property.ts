@@ -27,6 +27,13 @@ export type ParkingType = 'BOX_FERME' | 'PARKING_EXTERIEUR' | 'GARAGE' | 'AUCUN'
 
 export type KitchenType = 'SEPAREE' | 'OUVERTE' | 'AMERICAINE' | 'KITCHENETTE';
 
+export type RoomType =
+  | 'SEJOUR' | 'CUISINE' | 'CHAMBRE' | 'SALLE_DE_BAIN' | 'DOUCHE'
+  | 'WC' | 'BUREAU' | 'CELLIER' | 'DRESSING' | 'BUANDERIE';
+
+export type DiagnosticType =
+  | 'DPE' | 'GES' | 'AMIANTE' | 'PLOMB' | 'TERMITES' | 'ERP' | 'CARREZ';
+
 export type HotWaterSystem = 'CUMULUS_ELECTRIQUE' | 'CHAUDIERE_GAZ' | 'SOLAIRE' | 'THERMODYNAMIQUE';
 
 export type OperationType = 'VENTE' | 'LOCATION' | 'VIAGER' | 'CESSION';
@@ -208,6 +215,58 @@ export interface PropertyShareLink {
   createdAt: string;
 }
 
+// Table PropertyRoom
+export interface PropertyRoom {
+  id: string;
+  propertyId: string;
+  organizationId: string | null;
+  roomType: RoomType;
+  areaSqm: number | null;
+  kitchenType: KitchenType | null;
+  hasBathtub: boolean | null;
+  hasShower: boolean | null;
+  hasToilet: boolean | null;
+  equipment: string[];
+  sortOrder: number;
+  createdAt: string;
+}
+
+// Table PropertyDiagnostic
+export interface PropertyDiagnostic {
+  id: string;
+  propertyId: string;
+  organizationId: string | null;
+  diagnosticType: DiagnosticType;
+  class: string | null;
+  value: number | null;
+  unit: string | null;
+  validityDate: string | null;
+  companyName: string | null;
+  createdAt: string;
+}
+
+// Form-only type for PropertyRoom (no id/propertyId/organizationId/createdAt)
+export interface PropertyRoomFormData {
+  roomType: RoomType;
+  areaSqm: number | null;
+  kitchenType: KitchenType | null;
+  hasBathtub: boolean | null;
+  hasShower: boolean | null;
+  hasToilet: boolean | null;
+  equipment: string[];
+  sortOrder: number;
+}
+
+// Form-only type for PropertyDiagnostic
+export interface PropertyDiagnosticFormData {
+  diagnosticType: DiagnosticType;
+  class: string | null;
+  value: number | null;
+  unit: string | null;
+  validityDate: string | null;
+  companyName: string | null;
+}
+
 // Labels d'affichage
 export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   STUDIO: 'Studio',
@@ -277,6 +336,17 @@ export const DPE_COLORS: Record<DpeClass, string> = {
   G: '#EE1D23',
 };
 
+export const EXPOSURE_LABELS: Record<Exposure, string> = {
+  N: 'Nord',
+  NE: 'Nord-Est',
+  E: 'Est',
+  SE: 'Sud-Est',
+  S: 'Sud',
+  SO: 'Sud-Ouest',
+  O: 'Ouest',
+  NO: 'Nord-Ouest',
+};
+
 export const OPERATION_TYPE_LABELS: Record<OperationType, string> = {
   VENTE: 'Vente',
   LOCATION: 'Location',
@@ -319,4 +389,37 @@ export const PARKING_TYPE_LABELS: Record<ParkingType, string> = {
   PARKING_EXTERIEUR: 'Parking extérieur',
   GARAGE: 'Garage',
   AUCUN: 'Aucun',
+};
+
+export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
+  SEJOUR: 'Séjour',
+  CUISINE: 'Cuisine',
+  CHAMBRE: 'Chambre',
+  SALLE_DE_BAIN: 'Salle de bain',
+  DOUCHE: 'Salle d\'eau',
+  WC: 'WC',
+  BUREAU: 'Bureau',
+  CELLIER: 'Cellier',
+  DRESSING: 'Dressing',
+  BUANDERIE: 'Buanderie',
+};
+
+export const DIAGNOSTIC_TYPE_LABELS: Record<DiagnosticType, string> = {
+  DPE: 'DPE (Énergie)',
+  GES: 'GES (Gaz à effet de serre)',
+  AMIANTE: 'Amiante',
+  PLOMB: 'Plomb',
+  TERMITES: 'Termites',
+  ERP: 'ERP (Risques)',
+  CARREZ: 'Loi Carrez',
+};
+
+// Mapping numberOfRooms → label pour le sélecteur de typologie
+export const ROOM_COUNT_LABELS: Record<number, string> = {
+  0: 'Studio',
+  1: 'T1',
+  2: 'T2',
+  3: 'T3',
+  4: 'T4',
+  5: 'T5+',
 };

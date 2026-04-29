@@ -1,4 +1,4 @@
-import { PropertyFormWizard } from '@/components/properties/PropertyFormWizard';
+import { PropertyCreateView } from '@/components/properties/PropertyCreateView';
 
 export const metadata = {
   title: 'Nouveau bien — RealAgent',
@@ -6,9 +6,8 @@ export const metadata = {
 
 export default function NewPropertyPage() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold text-content-headings mb-8">Nouveau bien</h1>
-      <PropertyFormWizard />
+    <div className="px-6 py-8">
+      <PropertyCreateView />
     </div>
   );
 }
