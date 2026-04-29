@@ -618,7 +618,7 @@ export function PropertyCreateView() {
         const { error: roomsError } = await supabase
           .from('PropertyRoom')
           .insert(roomsToInsert);
-        if (roomsError) console.error('Erreur insertion pièces:', roomsError);
+        if (roomsError) console.error('Erreur insertion pièces:', roomsError?.message ?? roomsError?.code ?? JSON.stringify(roomsError));
       }
 
       // 8. Insert PropertyDiagnostic rows
@@ -639,7 +639,7 @@ export function PropertyCreateView() {
         const { error: diagsError } = await supabase
           .from('PropertyDiagnostic')
           .insert(diagsToInsert);
-        if (diagsError) console.error('Erreur insertion diagnostics:', diagsError);
+        if (diagsError) console.error('Erreur insertion diagnostics:', diagsError?.message ?? diagsError?.code ?? JSON.stringify(diagsError));
       }
 
       // 9. Insert PropertyFeature rows (key + comment)
@@ -647,7 +647,6 @@ export function PropertyCreateView() {
         .filter((e) => e.key.length > 0)
         .map((e) => ({
           propertyId: property.id,
-          organizationId: agent.organizationId,
           featureKey: e.key,
           featureValue: e.comment || 'true',
         }));
@@ -656,7 +655,7 @@ export function PropertyCreateView() {
         const { error: featuresError } = await supabase
           .from('PropertyFeature')
           .insert(featuresToInsert);
-        if (featuresError) console.error('Erreur insertion équipements:', featuresError);
+        if (featuresError) console.error('Erreur insertion équipements:', featuresError?.message ?? featuresError?.code ?? JSON.stringify(featuresError));
       }
 
       toast('Bien créé avec succès', 'success');
