@@ -1430,7 +1430,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   {profileLinkedProperties.length > 0 ? (
                     profileLinkedProperties.map((p) => (
-                      <Button key={p.id} variant="outline" type="button" onClick={() => router.push(`/biens/${p.id}`)}>
+                      <Button key={p.id} variant="outline" type="button" onClick={() => router.push(`/properties/${p.id}`)}>
                         {p.label}
                       </Button>
                     ))
@@ -1446,7 +1446,7 @@ export function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   {profileLinkedDeals.length > 0 ? (
                     profileLinkedDeals.map((d) => (
-                      <Button key={d.id} variant="outline" type="button" onClick={() => router.push(`/affaires/${d.id}`)}>
+                      <Button key={d.id} variant="outline" type="button" onClick={() => router.push(`/deals/${d.id}`)}>
                         {d.label}
                       </Button>
                     ))
