@@ -15,10 +15,13 @@ export function Sidebar() {
 
   function mapPathToSection(path: string): NavSection | undefined {
     if (path === '/dashboard' || path === '/') return 'dashboard';
+    if (path.startsWith('/import')) return 'database';
     if (path.startsWith('/clients')) return 'clients';
     if (path.startsWith('/properties')) return 'properties';
     if (path.startsWith('/deals')) return 'deals';
     if (path.startsWith('/documents')) return 'documents';
+    if (path.startsWith('/calendar')) return 'calendar';
+    if (path.startsWith('/automations')) return 'automations';
     return undefined;
   }
 
@@ -32,7 +35,7 @@ export function Sidebar() {
       onNavigate={(section) => {
         const routeMap: Record<NavSection, string> = {
           dashboard: '/dashboard',
-          database: '/database',
+          database: '/import',
           clients: '/clients',
           properties: '/properties',
           deals: '/deals',
