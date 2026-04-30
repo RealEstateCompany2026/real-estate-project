@@ -337,6 +337,7 @@ export function DocumentListView() {
                     },
                   }))}
                   maxHeight={400}
+                    elevated
                 />
               </div>
             )}

@@ -407,6 +407,7 @@ export function PropertyListView() {
                     },
                   }))}
                   maxHeight={400}
+                    elevated
                 />
               </div>
             )}

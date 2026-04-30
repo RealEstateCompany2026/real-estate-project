@@ -387,6 +387,7 @@ export function DealListView() {
                     },
                   }))}
                   maxHeight={400}
+                    elevated
                 />
               </div>
             )}

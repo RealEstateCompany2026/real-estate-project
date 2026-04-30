@@ -45,6 +45,11 @@ export interface MenuProps {
    */
   size?: "default" | "small";
   /**
+   * Afficher une ombre portée (utile en mode dropdown déplié)
+   * @default false
+   */
+  elevated?: boolean;
+  /**
    * Classe CSS personnalisée
    */
   className?: string;
@@ -56,6 +61,7 @@ export function Menu({
   width = 347,
   maxHeight,
   size = "default",
+  elevated = false,
   className = "",
 }: MenuProps) {
   return (
@@ -68,7 +74,7 @@ export function Menu({
       <div className="content-stretch flex items-start relative w-full">
         {/* Menu items container */}
         <div
-          className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px relative rounded-[16px] overflow-hidden bg-surface-neutral-default"
+          className={`content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px relative rounded-[16px] overflow-hidden bg-surface-neutral-default${elevated ? ' shadow-lg' : ''}`}
           style={{
             maxHeight: maxHeight ? `${maxHeight}px` : undefined,
             overflowY: maxHeight ? "auto" : undefined,

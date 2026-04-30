@@ -381,6 +381,7 @@ export function ClientListView() {
                     },
                   }))}
                   maxHeight={400}
+                    elevated
                 />
               </div>
             )}
