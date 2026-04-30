@@ -295,76 +295,79 @@ export function DocumentListView() {
 
   return (
     <>
-      {/* ═══════════════════════════════════════════════════════
-          1. AppBarCategory — "Documents" + dropdown + add + search
-          ═══════════════════════════════════════════════════════ */}
-      <AppBarCategory
-        title="Documents"
-        onAdd={() => {/* TODO: open upload modal */}}
-        onSearch={() => {/* TODO: search */}}
-      />
+      {/* Sticky header: AppBar + filter bar */}
+      <div className="sticky top-0 z-40 bg-surface-page">
+        {/* ═══════════════════════════════════════════════════════
+            1. AppBarCategory — "Documents" + dropdown + add + search
+            ═══════════════════════════════════════════════════════ */}
+        <AppBarCategory
+          title="Documents"
+          onAdd={() => {/* TODO: open upload modal */}}
+          onSearch={() => {/* TODO: search */}}
+        />
 
-      {/* ═══════════════════════════════════════════════════════
-          2. Filter bar — filter icon + badges + add filter
-          ═══════════════════════════════════════════════════════ */}
-      <div className="flex items-center justify-between px-0 py-[10px]">
-        <div className="flex items-center gap-[8px] flex-wrap">
-          {/* Macro category dropdown — permanent first filter */}
-          <div ref={macroDropdownRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setMacroMenuOpen(!macroMenuOpen)}
-              className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
-            >
-              <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
-                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Tous'}
-              </span>
-              <ChevronDown
-                size={20}
-                style={{ color: 'var(--icon-neutral-default)' }}
-                className={`transition-transform ${macroMenuOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-            {macroMenuOpen && (
-              <div className="absolute top-full left-0 mt-[4px] z-50">
-                <Menu
-                  items={CATEGORY_FILTERS.map((f) => ({
-                    label: f.label,
-                    onClick: () => {
-                      setCategoryFilter(f.value);
-                      setPage(0);
-                      setMacroMenuOpen(false);
-                    },
-                  }))}
-                  maxHeight={400}
-                    elevated
+        {/* ═══════════════════════════════════════════════════════
+            2. Filter bar — filter icon + badges + add filter
+            ═══════════════════════════════════════════════════════ */}
+        <div className="flex items-center justify-between px-0 py-[10px]">
+          <div className="flex items-center gap-[8px] flex-wrap">
+            {/* Macro category dropdown — permanent first filter */}
+            <div ref={macroDropdownRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMacroMenuOpen(!macroMenuOpen)}
+                className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
+              >
+                <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
+                  {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Tous'}
+                </span>
+                <ChevronDown
+                  size={20}
+                  style={{ color: 'var(--icon-neutral-default)' }}
+                  className={`transition-transform ${macroMenuOpen ? 'rotate-180' : ''}`}
                 />
-              </div>
-            )}
-          </div>
+              </button>
+              {macroMenuOpen && (
+                <div className="absolute top-full left-0 mt-[4px] z-50">
+                  <Menu
+                    items={CATEGORY_FILTERS.map((f) => ({
+                      label: f.label,
+                      onClick: () => {
+                        setCategoryFilter(f.value);
+                        setPage(0);
+                        setMacroMenuOpen(false);
+                      },
+                    }))}
+                    maxHeight={400}
+                      elevated
+                  />
+                </div>
+              )}
+            </div>
 
-          {/* Filter icon */}
-          <IconButton
-            variant="ghost"
-            icon={<Filter size={20} />}
-            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
-          />
-
-          {/* Active filter badges */}
-          {activeFilters.map((filter) => (
-            <BadgeCriteria
-              key={filter.criterionId}
-              label={filter.label}
-              onRemove={() => handleRemoveFilter(filter.criterionId)}
+            {/* Filter icon */}
+            <IconButton
+              variant="ghost"
+              icon={<Filter size={20} />}
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
             />
-          ))}
 
-          {/* Add filter button */}
-          <IconButton
-            variant="ghost"
-            icon={<Plus size={20} />}
-            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
-          />
+            {/* Active filter badges */}
+            {activeFilters.map((filter) => (
+              <BadgeCriteria
+                key={filter.criterionId}
+                label={filter.label}
+                onRemove={() => handleRemoveFilter(filter.criterionId)}
+              />
+            ))}
+
+            {/* Add filter button */}
+            <IconButton
+              variant="ghost"
+              icon={<Plus size={20} />}
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+            />
+          </div>
         </div>
       </div>
 

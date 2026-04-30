@@ -330,91 +330,81 @@ export function DealListView() {
 
   return (
     <>
-      {/* =====================================================================
-          1. AppBarCategory -- "Affaires" + dropdown + add + search
-          ===================================================================== */}
-      <AppBarCategory
-        title="Affaires"
-        onAdd={() => router.push('/deals/new')}
-        onSearch={() => {
-          // TODO: open search overlay
-        }}
-      />
+      {/* Sticky header: AppBar + filter bar */}
+      <div className="sticky top-0 z-40 bg-surface-page">
+        {/* =====================================================================
+            1. AppBarCategory -- "Affaires" + dropdown + add + search
+            ===================================================================== */}
+        <AppBarCategory
+          title="Affaires"
+          onAdd={() => router.push('/deals/new')}
+          onSearch={() => {
+            // TODO: open search overlay
+          }}
+        />
 
-      {/* =====================================================================
-          2. GraphCourbe -- Affaires curve (placeholder)
-          ===================================================================== */}
-      <GraphCourbe
-        title="Portefeuille affaires"
-        data={GRAPH_DATA}
-        selectedIndex={5}
-        selectedDate="22 f\u00e9v 2026"
-        selectedLabel="25 nouvelles affaires"
-        trendPercentage="12%"
-        trendDirection="up"
-      />
-
-      {/* =====================================================================
-          3. Filter bar -- filter icon + badges + add filter
-          ===================================================================== */}
-      <div className="flex items-center justify-between px-0 py-[10px]">
-        <div className="flex items-center gap-[8px] flex-wrap">
-          {/* Macro category dropdown — permanent first filter */}
-          <div ref={macroDropdownRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setMacroMenuOpen(!macroMenuOpen)}
-              className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
-            >
-              <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
-                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Toutes les affaires'}
-              </span>
-              <ChevronDown
-                size={20}
-                style={{ color: 'var(--icon-neutral-default)' }}
-                className={`transition-transform ${macroMenuOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-            {macroMenuOpen && (
-              <div className="absolute top-full left-0 mt-[4px] z-50">
-                <Menu
-                  items={CATEGORY_FILTERS.map((f) => ({
-                    label: f.label,
-                    onClick: () => {
-                      setCategoryFilter(f.value);
-                      setPage(0);
-                      setMacroMenuOpen(false);
-                    },
-                  }))}
-                  maxHeight={400}
-                    elevated
+        {/* =====================================================================
+            3. Filter bar -- filter icon + badges + add filter
+            ===================================================================== */}
+        <div className="flex items-center justify-between px-0 py-[10px]">
+          <div className="flex items-center gap-[8px] flex-wrap">
+            {/* Macro category dropdown — permanent first filter */}
+            <div ref={macroDropdownRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMacroMenuOpen(!macroMenuOpen)}
+                className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
+              >
+                <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
+                  {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Toutes les affaires'}
+                </span>
+                <ChevronDown
+                  size={20}
+                  style={{ color: 'var(--icon-neutral-default)' }}
+                  className={`transition-transform ${macroMenuOpen ? 'rotate-180' : ''}`}
                 />
-              </div>
-            )}
-          </div>
+              </button>
+              {macroMenuOpen && (
+                <div className="absolute top-full left-0 mt-[4px] z-50">
+                  <Menu
+                    items={CATEGORY_FILTERS.map((f) => ({
+                      label: f.label,
+                      onClick: () => {
+                        setCategoryFilter(f.value);
+                        setPage(0);
+                        setMacroMenuOpen(false);
+                      },
+                    }))}
+                    maxHeight={400}
+                      elevated
+                  />
+                </div>
+              )}
+            </div>
 
-          {/* Filter icon */}
-          <IconButton
-            variant="ghost"
-            icon={<Filter size={20} />}
-            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
-          />
-
-          {/* Active filter badges */}
-          {activeFilters.map((filter) => (
-            <BadgeCriteria
-              key={filter.criterionId}
-              label={filter.label}
-              onRemove={() => handleRemoveFilter(filter.criterionId)}
+            {/* Filter icon */}
+            <IconButton
+              variant="ghost"
+              icon={<Filter size={20} />}
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
             />
-          ))}
 
-          {/* Add filter button */}
-          <IconButton
-            variant="ghost"
-            icon={<Plus size={20} />}
-            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
-          />
+            {/* Active filter badges */}
+            {activeFilters.map((filter) => (
+              <BadgeCriteria
+                key={filter.criterionId}
+                label={filter.label}
+                onRemove={() => handleRemoveFilter(filter.criterionId)}
+              />
+            ))}
+
+            {/* Add filter button */}
+            <IconButton
+              variant="ghost"
+              icon={<Plus size={20} />}
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+            />
+          </div>
         </div>
       </div>
 
@@ -437,6 +427,19 @@ export function DealListView() {
           onClose={() => setFilterPanelOpen(false)}
         />
       )}
+
+      {/* =====================================================================
+          2. GraphCourbe -- Affaires curve (placeholder)
+          ===================================================================== */}
+      <GraphCourbe
+        title="Portefeuille affaires"
+        data={GRAPH_DATA}
+        selectedIndex={5}
+        selectedDate="22 fév 2026"
+        selectedLabel="25 nouvelles affaires"
+        trendPercentage="12%"
+        trendDirection="up"
+      />
 
       {/* =====================================================================
           4. Deal list
