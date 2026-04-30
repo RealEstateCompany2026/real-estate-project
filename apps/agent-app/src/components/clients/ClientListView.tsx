@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Filter, Plus, MapPin, User, Calendar, Home, FileText, BookOpen } from 'lucide-react';
+import { Filter, Plus, MapPin, User, Calendar, Home, FileText, BookOpen, ChevronDown } from 'lucide-react';
 
 // ── DS Components (from packages/ui) ──
 import { AppBarCategory } from '@real-estate/ui/app-bar-category';
@@ -18,6 +18,7 @@ import { IconButton } from '@real-estate/ui/button';
 import { SheetClientDetails } from '@real-estate/ui/sheet-client-details';
 import { FilterPanel, type FilterCriterionDef, type ActiveFilter } from '@real-estate/ui/filter-panel';
 import { BadgeCriteria } from '@real-estate/ui/badge-criteria';
+import { Menu } from '@real-estate/ui/menu';
 import { MessageCircle, Phone } from 'lucide-react';
 
 // ── App-level ──
@@ -127,7 +128,7 @@ function mockKpiDetails(id: string, kpis: ClientKpis): ClientKpiDetails {
 // ---------------------------------------------------------------------------
 
 const CATEGORY_FILTERS = [
-  { label: 'tous', value: 'ALL' as const },
+  { label: 'Tous', value: 'ALL' as const },
   { label: 'propriétaires', value: 'PROPRIETAIRE' as const },
   { label: 'acquéreurs', value: 'ACQUEREUR' as const },
   { label: 'bailleurs', value: 'BAILLEUR' as const },
@@ -193,6 +194,23 @@ export function ClientListView() {
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+
+  // ── Macro filter dropdown state ──
+  const [macroMenuOpen, setMacroMenuOpen] = useState(false);
+  const macroDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close macro dropdown on outside click
+  useEffect(() => {
+    if (!macroMenuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (macroDropdownRef.current && !macroDropdownRef.current.contains(e.target as Node)) {
+        setMacroMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [macroMenuOpen]);
+
   const [page, setPage] = useState(0);
 
   // ── Sheet state ──
@@ -311,14 +329,6 @@ export function ClientListView() {
           ═══════════════════════════════════════════════════════ */}
       <AppBarCategory
         title="Clients"
-        filterLabel={CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'tous'}
-        filterItems={CATEGORY_FILTERS.map((f) => ({
-          label: f.label,
-          onClick: () => {
-            setCategoryFilter(f.value);
-            setPage(0);
-          },
-        }))}
         onAdd={() => router.push('/clients/new')}
         onSearch={() => {
           // TODO: open search overlay
@@ -343,6 +353,39 @@ export function ClientListView() {
           ═══════════════════════════════════════════════════════ */}
       <div className="flex items-center justify-between px-0 py-[10px]">
         <div className="flex items-center gap-[8px] flex-wrap">
+          {/* Macro category dropdown — permanent first filter */}
+          <div ref={macroDropdownRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setMacroMenuOpen(!macroMenuOpen)}
+              className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
+            >
+              <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
+                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Tous'}
+              </span>
+              <ChevronDown
+                size={20}
+                style={{ color: 'var(--icon-neutral-default)' }}
+                className={`transition-transform ${macroMenuOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {macroMenuOpen && (
+              <div className="absolute top-full left-0 mt-[4px] z-50">
+                <Menu
+                  items={CATEGORY_FILTERS.map((f) => ({
+                    label: f.label,
+                    onClick: () => {
+                      setCategoryFilter(f.value);
+                      setPage(0);
+                      setMacroMenuOpen(false);
+                    },
+                  }))}
+                  maxHeight={400}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Filter icon */}
           <IconButton
             variant="ghost"

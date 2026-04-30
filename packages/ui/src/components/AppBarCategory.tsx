@@ -73,39 +73,41 @@ export function AppBarCategory({
           {title}
         </h4>
 
-        {/* 2. Dropdown filtre — ghost button + Menu */}
-        <div ref={dropdownRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
-          >
-            <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
-              {filterLabel}
-            </span>
-            <ChevronDown
-              size={20}
-              style={{ color: iconColor }}
-              className={`transition-transform ${menuOpen ? "rotate-180" : ""}`}
-            />
-          </button>
-
-          {/* Menu dropdown */}
-          {menuOpen && filterItems.length > 0 && (
-            <div className="absolute top-full left-0 mt-[4px] z-50">
-              <Menu
-                items={filterItems.map((item) => ({
-                  ...item,
-                  onClick: () => {
-                    item.onClick?.();
-                    setMenuOpen(false);
-                  },
-                }))}
-                maxHeight={400}
+        {/* 2. Dropdown filtre — ghost button + Menu (conditionnel) */}
+        {filterItems.length > 0 && (
+          <div ref={dropdownRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
+            >
+              <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
+                {filterLabel}
+              </span>
+              <ChevronDown
+                size={20}
+                style={{ color: iconColor }}
+                className={`transition-transform ${menuOpen ? "rotate-180" : ""}`}
               />
-            </div>
-          )}
-        </div>
+            </button>
+
+            {/* Menu dropdown */}
+            {menuOpen && (
+              <div className="absolute top-full left-0 mt-[4px] z-50">
+                <Menu
+                  items={filterItems.map((item) => ({
+                    ...item,
+                    onClick: () => {
+                      item.onClick?.();
+                      setMenuOpen(false);
+                    },
+                  }))}
+                  maxHeight={400}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 3. Icon button "+" (ajouter) */}
         <button
