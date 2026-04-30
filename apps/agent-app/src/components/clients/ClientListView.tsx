@@ -128,11 +128,11 @@ function mockKpiDetails(id: string, kpis: ClientKpis): ClientKpiDetails {
 // ---------------------------------------------------------------------------
 
 const CATEGORY_FILTERS = [
-  { label: 'Tous', value: 'ALL' as const },
-  { label: 'propriétaires', value: 'PROPRIETAIRE' as const },
-  { label: 'acquéreurs', value: 'ACQUEREUR' as const },
-  { label: 'bailleurs', value: 'BAILLEUR' as const },
-  { label: 'locataires', value: 'LOCATAIRE' as const },
+  { label: 'Tous les clients', value: 'ALL' as const },
+  { label: 'Propriétaires', value: 'PROPRIETAIRE' as const },
+  { label: 'Acquéreurs', value: 'ACQUEREUR' as const },
+  { label: 'Bailleurs', value: 'BAILLEUR' as const },
+  { label: 'Locataires', value: 'LOCATAIRE' as const },
 ];
 
 // ---------------------------------------------------------------------------
@@ -361,7 +361,7 @@ export function ClientListView() {
               className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
             >
               <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
-                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Tous'}
+                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Tous les clients'}
               </span>
               <ChevronDown
                 size={20}

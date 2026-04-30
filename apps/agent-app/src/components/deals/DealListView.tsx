@@ -76,11 +76,11 @@ interface DealListItem {
 // ---------------------------------------------------------------------------
 
 const CATEGORY_FILTERS = [
-  { label: 'toutes', value: 'ALL' as const },
-  { label: 'vente', value: 'VENTE' as const },
-  { label: 'acquisition', value: 'ACQUISITION' as const },
-  { label: 'location', value: 'LOCATION' as const },
-  { label: 'gestion', value: 'GESTION' as const },
+  { label: 'Toutes les affaires', value: 'ALL' as const },
+  { label: 'Ventes', value: 'VENTE' as const },
+  { label: "Recherches d'acquisition", value: 'ACQUISITION' as const },
+  { label: 'Recherches de location', value: 'LOCATION' as const },
+  { label: 'Gestion locative', value: 'GESTION' as const },
 ];
 
 // ---------------------------------------------------------------------------
@@ -367,7 +367,7 @@ export function DealListView() {
               className="flex gap-[8px] items-center justify-center p-[12px] rounded-lg transition-colors hover:bg-[var(--surface-neutral-action)] text-content-body"
             >
               <span className="text-base font-semibold font-roboto tracking-[0.16px] leading-[20px] whitespace-nowrap">
-                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'toutes'}
+                {CATEGORY_FILTERS.find((f) => f.value === categoryFilter)?.label ?? 'Toutes les affaires'}
               </span>
               <ChevronDown
                 size={20}
